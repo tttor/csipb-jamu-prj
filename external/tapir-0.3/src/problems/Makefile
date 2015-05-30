@@ -1,5 +1,5 @@
 MODULE_NAME = problems
-CHILD_DIRS := shared rocksample tag pushbox conttag jamusample
+CHILD_DIRS := shared jamusample #rocksample tag pushbox conttag
 
 ifdef HAS_ROOT_MAKEFILE
 
