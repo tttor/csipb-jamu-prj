@@ -173,7 +173,7 @@ void JamuSampleModel::initialize() {
     recalculateAllDistances();
 
     if (getDistance(startPos_, -1) == -1){
-        cout << "ERROR: Unreachable goal!";
+        cout << "ERROR: Unreachable goal!\n";
         std::exit(10);
     }
 }
