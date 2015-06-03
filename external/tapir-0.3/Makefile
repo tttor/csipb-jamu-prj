@@ -8,7 +8,7 @@ HAS_ROOT_MAKEFILE := true
 # Eigen is optional, so you don't really need it unless you want to use
 # policy iteration to solve an MDP
 # (see src/problems/shared/policy_iteration.hpp).
-HAS_EIGEN            := false
+HAS_EIGEN            := true
 
 # ----------------------------------------------------------------------
 # ROS configuration settings

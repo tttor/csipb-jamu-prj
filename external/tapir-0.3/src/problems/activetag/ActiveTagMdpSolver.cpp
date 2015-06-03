@@ -29,6 +29,8 @@ ActiveTagMdpSolver::ActiveTagMdpSolver(ActiveTagModel *model) :
 }
 
 void ActiveTagMdpSolver::solve() {
+    using namespace std;
+    cout << "ActiveTagMdpSolver::solve():BEGIN\n";
 #ifndef HAS_EIGEN
     debug::show_message("ERROR: Can't use MDP Policy Iteration without Eigen!");
     std::exit(15);
@@ -176,6 +178,7 @@ void ActiveTagMdpSolver::solve() {
     if (model_->options_->hasVerboseOutput) {
         std::cout << "        Done; took " << numSteps << " steps." << std::endl << std::endl;
     }
+    cout << "ActiveTagMdpSolver::solve():END\n";
 #endif
 }
 

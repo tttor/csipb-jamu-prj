@@ -1,5 +1,5 @@
 MODULE_NAME = activetag
-TARGET_NAMES := solve simulate
+TARGET_NAMES := solve_mdp #solve simulate
 
 ifdef HAS_ROOT_MAKEFILE
 

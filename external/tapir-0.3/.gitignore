@@ -21,6 +21,7 @@ simulate-ros
 simulate
 solve
 solve-mdp
+solve_mdp
 stest
 
 # Logging outputs
