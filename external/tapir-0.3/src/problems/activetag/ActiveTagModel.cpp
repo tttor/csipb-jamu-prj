@@ -207,6 +207,18 @@ GridPosition ActiveTagModel::randomEmptyCell() {
     return pos;
 }
 
+std::vector<GridPosition> ActiveTagModel::getEmptyCells() {
+    std::vector<GridPosition> emptyCells;
+    for (long row = 0; row < this->getNRows(); row++) {
+        for (long col = 0; col < this->getNCols(); col++) {
+            // Ignore impossible states.
+            if (envMap_[row][col] == TagCellType::EMPTY) {
+                emptyCells.emplace_back(row, col);
+            }
+        }
+    }
+    return emptyCells;
+}
 
 /* --------------- The model interface proper ----------------- */
 std::unique_ptr<solver::State> ActiveTagModel::sampleAnInitState() {

@@ -105,6 +105,9 @@ class ActiveTagModel: public shared::ModelWithProgramOptions {
         WALL = -1
     };
 
+    /** Get a vector of valid grid positions */
+    std::vector<GridPosition> getEmptyCells();
+
     /******************** Added by Josh **************************/
 
     /** Get 2D vector representing the current environment map */
