@@ -32,6 +32,24 @@
 #include "GwAimaMdpSolver.hpp"
 
 namespace gwaima {
+/** A parser for a simple upper bound heuristic for ActiveTag.
+ *
+ * The actual function is defined in GwAimaModel::getUpperBoundHeuristicValue; this parser allows
+ * that heuristic to be selected by using the string "upper()" in the configuration file.
+ */
+class GwAimaUBParser : public shared::Parser<solver::HeuristicFunction> {
+public:
+    /** Creates a new GwAimaUBParser associated with the given GwAimaModel instance. */
+    GwAimaUBParser(GwAimaModel *model);
+    virtual ~GwAimaUBParser() = default;
+    _NO_COPY_OR_MOVE(GwAimaUBParser);
+
+    virtual solver::HeuristicFunction parse(solver::Solver *solver, std::vector<std::string> args);
+
+private:
+    /** The GwAimaModel instance this heuristic parser is associated with. */
+    GwAimaModel *model_;
+};
 
 /** The implementation of the Model interface for the GwAima POMDP.
  *
@@ -56,27 +74,13 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
     enum class GwAimaCellType : int {
         /** An empty cell. */
         EMPTY = 0,
+        /* The goal cell(s). */
+        GOAL = 1,
+        /* The boom cell(s). */
+        BOOM = 2,
         /* A wall. */
         WALL = -1
     };
-
-    /** Get a vector of valid grid positions */
-    std::vector<GridPosition> getEmptyCells();
-
-    /******************** Added by Josh **************************/
-
-    /** Get 2D vector representing the current environment map */
-    inline const std::vector<std::vector<GwAimaCellType>>& getEnvMap() {
-        return envMap_;
-    }
-
-    /**
-     * Returns proportion of belief particles about the target's
-     * position for each grid position in the map
-     */
-    std::vector<std::vector<float>> getBeliefProportions(solver::BeliefNode const *belief);
-
-    /************************************************************/
 
     /** Returns the resulting coordinates of an agent after it takes the given action type from the
      * given position.
@@ -90,7 +94,6 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
      */
     std::pair<GridPosition, bool> getMovedPos(GridPosition const &position, ActionType action);
 
-
     /* ---------- Custom getters for extra functionality  ---------- */
     /** Returns the number of rows in the map for this GwAimaModel instance. */
     long getNRows() const {
@@ -100,6 +103,20 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
     long getNCols() const {
         return nCols_;
     }
+
+    /** Get a vector of valid grid positions */
+    std::vector<GridPosition> getEmptyCells();
+
+    /** Get 2D vector representing the current environment map */
+    inline const std::vector<std::vector<GwAimaCellType>>& getEnvMap() {
+        return envMap_;
+    }
+
+    /**
+     * Returns proportion of belief particles about the target's
+     * position for each grid position in the map
+     */
+    std::vector<std::vector<float>> getBeliefProportions(solver::BeliefNode const *belief);
 
     /** Initializes a GwAimaMdpSolver for this GwAimaModel, which can then be used to return heuristic
      * values for each state.
@@ -166,7 +183,6 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
             solver::Action const &action,
             solver::Observation const &obs,
             long nParticles) override;
-
 
     /* --------------- Pretty printing methods ----------------- */
     /** Prints a single cell of the map out to the given output stream. */
@@ -236,6 +252,18 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
     /** The penalty for each movement action. */
     double moveCost_;
 
+    /** The reward for successfully reach the goal state. */
+    double goalReward_;
+    /** The penalty for stepping into a boom cell. */
+    double boomPenalty_;
+
+    /** The starting position. */
+    GridPosition startPos_;
+    /** The coordinates of the booms. */
+    std::vector<GridPosition> boomPositions_;
+    /** The coordinates of the goal squares. */
+    std::vector<GridPosition> goalPositions_;
+
     /** The number of rows in the map. */
     long nRows_;
     /** The number of columns in the map. */
@@ -255,26 +283,6 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
     /** The pairwise distances between each pair of cells in the map. */
     std::vector<std::vector<std::vector<std::vector<int>>>> pairwiseDistances_;
 };
-
-/** A parser for a simple upper bound heuristic for ActiveTag.
- *
- * The actual function is defined in ActiveTagModel::getUpperBoundHeuristicValue; this parser allows
- * that heuristic to be selected by using the string "upper()" in the configuration file.
- */
-class ActiveTagUBParser : public shared::Parser<solver::HeuristicFunction> {
-public:
-    /** Creates a new ActiveTagUBParser associated with the given ActiveTagModel instance. */
-    ActiveTagUBParser(ActiveTagModel *model);
-    virtual ~ActiveTagUBParser() = default;
-    _NO_COPY_OR_MOVE(ActiveTagUBParser);
-
-    virtual solver::HeuristicFunction parse(solver::Solver *solver, std::vector<std::string> args);
-
-private:
-    /** The ActiveTagModel instance this heuristic parser is associated with. */
-    ActiveTagModel *model_;
-};
-
 }// namespace gwaima
 
 #endif

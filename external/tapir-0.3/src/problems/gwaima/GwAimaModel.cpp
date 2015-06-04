@@ -66,19 +66,22 @@ GwAimaModel::GwAimaModel(RandomGenerator *randGen, std::unique_ptr<ActiveTagOpti
             moveCost_(options_->moveCost),
             nRows_(0), // to be updated
             nCols_(0), // to be updated
+            startPos_(), // update
+            rockPositions_(), // push rocks
+            goalPositions_(), // push goals
             mapText_(), // will be pushed to
             envMap_(), // will be pushed to
             nActions_(5),
             mdpSolver_(nullptr),
             pairwiseDistances_() {
-    options_->numberOfStateVariables = 5;
-    // options_->minVal = -failedTagPenalty_ / (1 - options_->discountFactor);
-    // options_->maxVal = tagReward_;
+    options_->numberOfStateVariables = 5;//TODO why 5?
+    options_->minVal = -boomPenalty_ / (1 - options_->discountFactor);
+    options_->maxVal = goalReward_;
 
     // Register the upper bound heuristic parser.
     registerHeuristicParser("upper", std::make_unique<GwAimaUBParser>(this));
     // Register the exact MDP heuristic parser.
-    registerHeuristicParser("exactMdp", std::make_unique<ActiveTagMdpParser>(this));
+    registerHeuristicParser("exactMdp", std::make_unique<GwAimaMdpParser>(this));
 
     // Read the map from the file.
     std::ifstream inFile;
@@ -171,6 +174,12 @@ void GwAimaModel::initialize() {
             GwAimaCellType cellType;
             if (c == 'X') {
                 cellType = GwAimaCellType::WALL;
+            } else if (c == "G") {
+                cellType = GwAimaCellType::GOAL;
+                goalPositions_.push_back(p);
+            } else if (c == "B") {
+                cellType = GwAimaCellType::BOOM;   
+                boomPositions_.push_back(p);
             } else {
                 cellType = GwAimaCellType::EMPTY;
             }
@@ -230,8 +239,10 @@ std::unique_ptr<solver::State> GwAimaModel::sampleStateUninformed() {
 }
 
 bool GwAimaModel::isTerminal(solver::State const &state) {
-	// TODO
-    // return static_cast<GwAimaState const &>(state).isTagged();
+    return (static_cast<GwAimaState const &>(state)==GwAimaState(goalPositions_[0])
+            or 
+            static_cast<GwAimaState const &>(state)==GwAimaState(boomPositions_[0])
+           )
 }
 
 bool GwAimaModel::isValid(solver::State const &state) {
@@ -245,45 +256,9 @@ std::pair<std::unique_ptr<GwAimaState>, bool> GwAimaModel::makeNextState(
 	GwAimaState const &gwAimaState = static_cast<GwAimaState const &>(state);
 	GwAimaAction const &gwAimaAction = static_cast<GwAimaAction const &>(action);
     
-    // TODO
-    // GridPosition robotPos = gwAimaState.getRobotPosition();
-    // if (robotPos == opponentPos) {
-    //     return std::make_pair(
-    //             std::make_unique<GwAimaState>(robotPos, opponentPos, true), true);
-    // }
-
-    // GridPosition newOpponentPos = sampleNextOpponentPosition(robotPos, opponentPos);
-    // GridPosition newRobotPos;
-    // bool wasValid;
-    // std::tie(newRobotPos, wasValid) = getMovedPos(robotPos, gwAimaAction.getActionType());
-    // return std::make_pair(std::make_unique<GwAimaState>(newRobotPos, newOpponentPos, false),
-    //         wasValid);
+    GridPosition newRobotPos;
+    bool wasValid;
+    std::tie(newRobotPos, wasValid) = getMovedPos(robotPos, gwAimaAction.getActionType());
+    return std::make_pair(std::make_unique<GwAimaState>(newRobotPos), wasValid);
 }
-
-std::vector<ActionType> GwAimaModel::makeOpponentActions(
-        GridPosition const &robotPos, GridPosition const &opponentPos) {
-    std::vector<ActionType> actions;
-    if (robotPos.i > opponentPos.i) {
-        actions.push_back(ActionType::NORTH);
-        actions.push_back(ActionType::NORTH);
-    } else if (robotPos.i < opponentPos.i) {
-        actions.push_back(ActionType::SOUTH);
-        actions.push_back(ActionType::SOUTH);
-    } else {
-        actions.push_back(ActionType::NORTH);
-        actions.push_back(ActionType::SOUTH);
-    }
-    if (robotPos.j > opponentPos.j) {
-        actions.push_back(ActionType::WEST);
-        actions.push_back(ActionType::WEST);
-    } else if (robotPos.j < opponentPos.j) {
-        actions.push_back(ActionType::EAST);
-        actions.push_back(ActionType::EAST);
-    } else {
-        actions.push_back(ActionType::EAST);
-        actions.push_back(ActionType::WEST);
-    }
-    return actions;
-}
-
 }// namespace gwaima
