@@ -10,6 +10,8 @@
 #include "options/option_parser.hpp"
 #include "ActiveTagMdpSolver.hpp"
 #include "ActiveTagModel.hpp"
+#include "ActiveTagState.hpp"
+
 
 using std::cout;
 using std::endl;
@@ -19,6 +21,8 @@ using std::endl;
  */
 template<typename ModelType, typename OptionsType>
 int solve_mdp(int argc, char const *argv[]) {
+    using namespace activetag;
+
     std::unique_ptr<options::OptionParser> parser = OptionsType::makeParser(false);
 
     OptionsType options;
@@ -38,40 +42,43 @@ int solve_mdp(int argc, char const *argv[]) {
         return 2;
     }
 
-    // if (options.seed == 0) {
-    //     options.seed = std::time(nullptr);
-    // }
-    // cout << "Seed: " << options.seed << endl;
-    // RandomGenerator randGen;
-    // randGen.seed(options.seed);
-    // randGen.discard(10);
+    if (!options.baseConfigPath.empty()) {
+        tapir::change_directory(workingDir);
+    }
 
-    // std::unique_ptr<ModelType> newModel = std::make_unique<ModelType>(&randGen,
-    //         std::make_unique<OptionsType>(options));
-    // if (!options.baseConfigPath.empty()) {
-    //     tapir::change_directory(workingDir);
-    // }
+    if (options.seed == 0) {
+        options.seed = std::time(nullptr);
+    }
+    cout << "Seed: " << options.seed << endl;
+    RandomGenerator randGen;
+    randGen.seed(options.seed);
+    randGen.discard(10);
 
-    // solver::Solver solver(std::move(newModel));
-    // solver.initializeEmpty();
+    // Define the MDP model of the problem
+    ModelType* model;
+    model = new ModelType(&randGen,
+                          std::make_unique<OptionsType>(options));
 
-    // double totT;
-    // double tStart;
-    // tStart = tapir::clock_ms();
+    // Define the mdp solver
+    std::unique_ptr<activetag::ActiveTagMdpSolver> mdpSolver;  
+    mdpSolver = std::make_unique<activetag::ActiveTagMdpSolver>(model);
 
-    // solver.improvePolicy();
+    //
+    mdpSolver->solve();
 
-    // totT = tapir::clock_ms() - tStart;
-    // cout << "Total solving time: " << totT << "ms" << endl;
+    //
+    // Vector of valid grid positions.
+    std::vector<GridPosition> emptyCells;
+    emptyCells = model->getEmptyCells();
 
-    // cout << "Saving to file...";
-    // cout.flush();
-    // std::ofstream outFile(options.policyPath);
-    // outFile << std::setprecision(std::numeric_limits<double>::max_digits10);
-    // solver.getSerializer()->save(outFile);
-    // outFile.close();
-    // cout << "    Done." << endl;
+    for (GridPosition const &robotPos : emptyCells) {
+        for (GridPosition const &opponentPos : emptyCells) {
+            ActiveTagState state(robotPos, opponentPos, false);
+            // cout << "mdpSolver->getValue(state)= " << mdpSolver->getValue(state) << endl;
+        }
+    }
 
+    delete model;
     return 0;
 }
 
@@ -83,10 +90,9 @@ int main(int argc, char const *argv[]) {
 	// std::unique_ptr<ActiveTagModel> activeTagModel;
 	// activeTagModel = std::make_unique<ActiveTagModel>(&randGen, std::make_unique<OptionsType>(options));
 
-	// std::unique_ptr<ActiveTagMdpSolver> mdpSolver_;	
- //    mdpSolver_ = std::make_unique<ActiveTagMdpSolver>(this);
 
- //    mdpSolver_->solve();
+
+
 
 	// return 0;
 }
