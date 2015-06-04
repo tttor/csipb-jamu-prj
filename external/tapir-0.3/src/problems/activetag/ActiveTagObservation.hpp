@@ -2,8 +2,8 @@
  *
  * Defines the ActiveTagObservation class, which represents an observation in the ActiveTag POMDP.
  */
-#ifndef TAG_OBSERVATION_HPP_
-#define TAG_OBSERVATION_HPP_
+#ifndef ACTIVETAG_OBSERVATION_HPP_
+#define ACTIVETAG_OBSERVATION_HPP_
 
 #include <cstddef>                      // for size_t
 
@@ -53,4 +53,4 @@ class ActiveTagObservation : public solver::Point {
     bool seesOpponent_;
 };
 } /* namespace activetag */
-#endif /* TAG_OBSERVATION_HPP_ */
+#endif /* ACTIVETAG_OBSERVATION_HPP_ */
