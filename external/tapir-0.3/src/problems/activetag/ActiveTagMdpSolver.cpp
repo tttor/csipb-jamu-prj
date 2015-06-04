@@ -137,6 +137,8 @@ void ActiveTagMdpSolver::solve() {
             }
             GridPosition nextRobotPos = model_->getMovedPos(robotPos, actionType).first;
             for (auto &entry : nextOpponentPosDistribution) {
+                // entry.first is the opponent's pos
+                // entry.first is the probability of (entry.first)
                 ActiveTagState nextState(nextRobotPos, entry.first, false);
                 int nextStateIndex = stateIndex[nextState];
                 nextStateTransitions[nextStateIndex] = std::make_pair(entry.second, reward);
@@ -167,7 +169,7 @@ void ActiveTagMdpSolver::solve() {
 
     iterator.fixValue(allStates.size(), 0.0);
 
-    long numSteps = iterator.solve();
+    long numIterations = iterator.solve();
     std::vector<double> stateValues = iterator.getCurrentValues();
 
     // Now put all of the state values into our map.
@@ -176,7 +178,7 @@ void ActiveTagMdpSolver::solve() {
     }
 
     if (model_->options_->hasVerboseOutput) {
-        std::cout << "        Done; took " << numSteps << " steps." << std::endl << std::endl;
+        std::cout << "        Done; took " << numIterations << " iterations." << std::endl << std::endl;
     }
     cout << "ActiveTagMdpSolver::solve():END\n";
 #endif
