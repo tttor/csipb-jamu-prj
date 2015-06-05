@@ -60,9 +60,9 @@ solver::HeuristicFunction GwAimaUBParser::parse(solver::Solver * /*solver*/, std
     };
 }
 
-GwAimaModel::GwAimaModel(RandomGenerator *randGen, std::unique_ptr<ActiveTagOptions> options) :
+GwAimaModel::GwAimaModel(RandomGenerator *randGen, std::unique_ptr<GwAimaOptions> options) :
             ModelWithProgramOptions("GwAima", randGen, std::move(options)),
-            options_(const_cast<ActiveTagOptions *>(static_cast<ActiveTagOptions const *>(getOptions()))),
+            options_(const_cast<GwAimaOptions *>(static_cast<GwAimaOptions const *>(getOptions()))),
             moveCost_(options_->moveCost),
             nRows_(0), // to be updated
             nCols_(0), // to be updated

@@ -21,7 +21,7 @@
 #include "GwAimaModel.hpp"
 #include "GwAimaState.hpp"
 
-namespace tag {
+namespace gwaima {
 /* ---------------------- GwAimaMdpSolver --------------------- */
 GwAimaMdpSolver::GwAimaMdpSolver(GwAimaModel *model) :
             model_(model),
@@ -78,7 +78,8 @@ void GwAimaMdpSolver::solve() {
     }
     // An index of size (past the end of the array!!) will be used to represent terminal states.
     // A default action for the terminal state is meaningless, but we need it anyway.
-    policy[index] = static_cast<int>(ActionType::TAG);
+    // TODO Why does not include this terminal state in allStates? why should past the end of array?
+    policy[index] = static_cast<int>(ActionType::NORTH);// TODO: fix this action!
 
     // Initialise the state transitions.
     std::vector<std::vector<std::unordered_map<int, double>>> transitions;
@@ -169,4 +170,4 @@ solver::HeuristicFunction GwAimaMdpParser::parse(solver::Solver * /*solver*/,
         return solver->getValue(static_cast<GwAimaState const &>(*state));
     };
 }
-} /* namespace tag */
+} /* namespace gwaima */

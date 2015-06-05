@@ -34,16 +34,16 @@ enum class ActionType : long {
  * enumerated action mapping approach (EnumeratedActionPool) to store the available actions from
  * each belief node.
  */
-class ActiveTagAction : public solver::DiscretizedPoint {
-    friend class TagTextSerializer;
+class GwAimaAction : public solver::DiscretizedPoint {
+    friend class GwAimaTextSerializer;
   public:
     /** Constructs a new action from the given ActionType. */
-    ActiveTagAction(ActionType actionType);
+    GwAimaAction(ActionType actionType);
     /** Constructs a new action from the given integer code. */
-    ActiveTagAction(long code);
+    GwAimaAction(long code);
 
-    virtual ~ActiveTagAction() = default;
-    _NO_COPY_OR_MOVE(ActiveTagAction);
+    virtual ~GwAimaAction() = default;
+    _NO_COPY_OR_MOVE(GwAimaAction);
 
     std::unique_ptr<solver::Action> copy() const override;
     double distanceTo(solver::Action const &otherAction) const override;

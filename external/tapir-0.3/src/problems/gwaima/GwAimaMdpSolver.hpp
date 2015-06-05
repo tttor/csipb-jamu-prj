@@ -21,7 +21,7 @@
 
 #include "GwAimaState.hpp"
 
-namespace tag {
+namespace gwaima {
 class GwAimaModel;
 
 /** A class that solves the fully observable version of GwAima and stores the calculated value for
@@ -65,6 +65,6 @@ private:
     /** The GwAimaModel instance this heuristic parser is associated with. */
     GwAimaModel *model_;
 };
-} /* namespace tag */
+} /* namespace gwaima */
 
 #endif // GWAIMA_MDPSOLVER_HPP_

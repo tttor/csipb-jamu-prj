@@ -32,7 +32,7 @@
 #include "GwAimaMdpSolver.hpp"
 
 namespace gwaima {
-/** A parser for a simple upper bound heuristic for ActiveTag.
+/** A parser for a simple upper bound heuristic for GwAima.
  *
  * The actual function is defined in GwAimaModel::getUpperBoundHeuristicValue; this parser allows
  * that heuristic to be selected by using the string "upper()" in the configuration file.
@@ -65,7 +65,7 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
     /** Constructs a new GwAimaModel instance with the given random number engine, and the given set
      * of configuration options.
      */
-    GwAimaModel(RandomGenerator *randGen, std::unique_ptr<ActiveTagOptions> options);
+    GwAimaModel(RandomGenerator *randGen, std::unique_ptr<GwAimaOptions> options);
 
     ~GwAimaModel() = default;
     _NO_COPY_OR_MOVE(GwAimaModel);
@@ -199,16 +199,13 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
 
     /** Returns an upper bound heuristic value for the given state.
      *
-     * This upper bound assumes that the opponent will not move, and hence the heuristic value
-     * simply calculates the discounted total reward, including the cost of moving one square at a
-     * time until the robot reaches the opponent's current square, and then the reward for tagging
-     * the opponent at that time.
+     * This upper bound assumes that ... TODO
      */
     virtual double getUpperBoundHeuristicValue(solver::State const &state);
 
     /* ------- Customization of more complex solver functionality  --------- */
     /** Returns all of the actions available for the GwAima POMDP, in the order of their enumeration
-     * (as specified by activetag::ActionType).
+     * (as specified by gwaima::ActionType).
      */
     virtual std::vector<std::unique_ptr<solver::DiscretizedPoint>> getAllActionsInOrder();
     virtual std::unique_ptr<solver::ActionPool> createActionPool(solver::Solver *solver) override;
@@ -233,21 +230,21 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
      * Moving into a wall in GwAima simply means nothing happens - there is no associated penalty;
      * as such, this flag is mostly not used in the GwAima problem.
      */
-    std::pair<std::unique_ptr<ActiveTagState>, bool> makeNextState(
+    std::pair<std::unique_ptr<GwAimaState>, bool> makeNextState(
             solver::State const &state, solver::Action const &action);
 
     /** Generates an observation given the resulting next state, after the GwAima robot has made its
      * action.
      */
-    std::unique_ptr<solver::Observation> makeObservation(ActiveTagState const &nextState);
+    std::unique_ptr<solver::Observation> makeObservation(GwAimaState const &nextState);
 
     /** Returns true iff the given GridPosition represents a valid square that an agent could be
      * in - that is, the square must be empty, and within the bounds of the map.
      */
     bool isValid(GridPosition const &pos);
 
-    /** The ActiveTagOptions instance associated with this model. */
-    ActiveTagOptions *options_;
+    /** The GwAimaOptions instance associated with this model. */
+    GwAimaOptions *options_;
 
     /** The penalty for each movement action. */
     double moveCost_;
