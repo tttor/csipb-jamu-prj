@@ -58,12 +58,4 @@ void GwAimaState::print(std::ostream &os) const {
 GridPosition GwAimaState::getRobotPosition() const {
     return robotPos_;
 }
-
-GridPosition GwAimaState::getOpponentPosition() const {
-    return opponentPos_;
-}
-
-bool GwAimaState::isTagged() const {
-    return isTagged_;
-}
 }// namespace gwaima
