@@ -67,7 +67,6 @@ GwAimaModel::GwAimaModel(RandomGenerator *randGen, std::unique_ptr<GwAimaOptions
             nRows_(0), // to be updated
             nCols_(0), // to be updated
             startPos_(), // update
-            rockPositions_(), // push rocks
             goalPositions_(), // push goals
             mapText_(), // will be pushed to
             envMap_(), // will be pushed to
@@ -174,10 +173,10 @@ void GwAimaModel::initialize() {
             GwAimaCellType cellType;
             if (c == 'X') {
                 cellType = GwAimaCellType::WALL;
-            } else if (c == "G") {
+            } else if (c == 'G') {
                 cellType = GwAimaCellType::GOAL;
                 goalPositions_.push_back(p);
-            } else if (c == "B") {
+            } else if (c == 'B') {
                 cellType = GwAimaCellType::BOOM;   
                 boomPositions_.push_back(p);
             } else {
@@ -242,12 +241,12 @@ bool GwAimaModel::isTerminal(solver::State const &state) {
     return (static_cast<GwAimaState const &>(state)==GwAimaState(goalPositions_[0])
             or 
             static_cast<GwAimaState const &>(state)==GwAimaState(boomPositions_[0])
-           )
+           );
 }
 
 bool GwAimaModel::isValid(solver::State const &state) {
     GwAimaState const gwAimaState = static_cast<GwAimaState const &>(state);
-    return isValid( isValid(gwAimaState.getRobotPosition() );
+    return isValid(gwAimaState.getRobotPosition());
 }
 
 /* -------------------- Black box dynamics ---------------------- */
@@ -256,6 +255,8 @@ std::pair<std::unique_ptr<GwAimaState>, bool> GwAimaModel::makeNextState(
 	GwAimaState const &gwAimaState = static_cast<GwAimaState const &>(state);
 	GwAimaAction const &gwAimaAction = static_cast<GwAimaAction const &>(action);
     
+    GridPosition robotPos = gwAimaState.getRobotPosition();
+
     GridPosition newRobotPos;
     bool wasValid;
     std::tie(newRobotPos, wasValid) = getMovedPos(robotPos, gwAimaAction.getActionType());

@@ -82,5 +82,5 @@ int solve_mdp(int argc, char const *argv[]) {
 }
 
 int main(int argc, char const *argv[]) {
-	return solve_mdp<gwaima::GwAimaModel, gwaima::GwAimaOptions>(argc, argv);
+	// return solve_mdp<gwaima::GwAimaModel, gwaima::GwAimaOptions>(argc, argv);
 }

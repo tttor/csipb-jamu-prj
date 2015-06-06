@@ -82,7 +82,7 @@ void GwAimaMdpSolver::solve() {
     policy[index] = static_cast<int>(ActionType::NORTH);// TODO: fix this action!
 
     // Initialise the state transitions.
-    std::vector<std::vector<std::unordered_map<int, double>>> transitions;
+    std::vector<std::vector<std::unordered_map<int, std::pair<double, double>>>> transitions;
     transitions.resize(allStates.size() + 1);
     for (unsigned int stateNo = 0; stateNo <= allStates.size(); stateNo++) {
         GwAimaState const &state = allStates[stateNo];
@@ -98,7 +98,8 @@ void GwAimaMdpSolver::solve() {
             
             GwAimaState nextState(nextRobotPos);
             int nextStateIndex = stateIndex[nextState];
-            nextStateTransitions[nextStateIndex] = reward;
+            double probability = getTransitionProbability(robotPos, nextRobotPos, actionType);
+            nextStateTransitions[nextStateIndex] = std::make_pair(probability, reward);
         }
     }
 
