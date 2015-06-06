@@ -1,7 +1,7 @@
 /** @file GwAimaTextSerializer.hpp
  *
  * Contains text-based serialization methods for the core classes implementing GwAima, that is:
- * TagChange, TagState, TagAction, and TagObservation.
+ * GwAimaChange, GwAimaState, GwAimaAction, and GwAimaObservation.
  */
 #ifndef GWAIMATEXTSERIALIZER_HPP_
 #define GWAIMATEXTSERIALIZER_HPP_
@@ -38,15 +38,15 @@ std::vector<long> loadVector(std::istream &is);
  * the action mappings, and from solver::DiscreteObservationTextSerializer in order to serialize
  * the observation mappings.
  */
-class TagTextSerializer: virtual public solver::TextSerializer,
+class GwAimaTextSerializer: virtual public solver::TextSerializer,
         virtual public solver::EnumeratedActionTextSerializer,
         virtual public solver::DiscreteObservationTextSerializer {
   public:
-    /** Creates a new TagTextSerializer instance, associated with the given solver. */
-    TagTextSerializer(solver::Solver *solver);
+    /** Creates a new GwAimaTextSerializer instance, associated with the given solver. */
+    GwAimaTextSerializer(solver::Solver *solver);
 
-    virtual ~TagTextSerializer() = default;
-    _NO_COPY_OR_MOVE(TagTextSerializer);
+    virtual ~GwAimaTextSerializer() = default;
+    _NO_COPY_OR_MOVE(GwAimaTextSerializer);
 
     void saveState(solver::State const *state, std::ostream &os) override;
     std::unique_ptr<solver::State> loadState(std::istream &is) override;

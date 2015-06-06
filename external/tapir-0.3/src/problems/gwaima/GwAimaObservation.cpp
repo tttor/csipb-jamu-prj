@@ -29,7 +29,7 @@ bool GwAimaObservation::equals(
         solver::Observation const &otherObs) const {
     GwAimaObservation const &other =
         static_cast<GwAimaObservation const &>(otherObs);
-    return position_ == other.position_ && seesOpponent_ == other.seesOpponent_;
+    return position_ == other.position_;
 }
 
 std::size_t GwAimaObservation::hash() const {
@@ -40,6 +40,7 @@ std::size_t GwAimaObservation::hash() const {
 }
 
 void GwAimaObservation::print(std::ostream &os) const {
+    //TODO: print!
 }
 
 GridPosition GwAimaObservation::getPosition() const {

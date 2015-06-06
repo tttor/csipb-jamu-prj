@@ -1,6 +1,6 @@
 /** @file GwAimaTextSerializer.cpp
  *
- * Contains the implementations of the serialization methods for Tag.
+ * Contains the implementations of the serialization methods for GwAima.
  */
 #include "GwAimaTextSerializer.hpp"
 
@@ -56,8 +56,8 @@ GwAimaTextSerializer::GwAimaTextSerializer(solver::Solver *solver) :
 }
 
 void GwAimaTextSerializer::saveState(solver::State const *state, std::ostream &os) {
-    GwAimaState const &tagState = static_cast<GwAimaState const &>(*state);
-    os << tagState.robotPos_.i << " " << tagState.robotPos_.j;
+    GwAimaState const &gwAimaState = static_cast<GwAimaState const &>(*state);
+    os << gwAimaState.robotPos_.i << " " << gwAimaState.robotPos_.j;
 }
 
 std::unique_ptr<solver::State> GwAimaTextSerializer::loadState(std::istream &is) {

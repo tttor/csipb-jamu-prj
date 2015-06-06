@@ -27,14 +27,14 @@ std::unique_ptr<solver::Point> GwAimaState::copy() const {
 }
 
 double GwAimaState::distanceTo(solver::State const &otherState) const {
-    GwAimaState const &otherTagState = static_cast<GwAimaState const &>(otherState);
-    double distance = robotPos_.manhattanDistanceTo(otherTagState.robotPos_);
+    GwAimaState const &otherGwAimaState = static_cast<GwAimaState const &>(otherState);
+    double distance = robotPos_.manhattanDistanceTo(otherGwAimaState.robotPos_);
     return distance;
 }
 
 bool GwAimaState::equals(solver::State const &otherState) const {
-    GwAimaState const &otherTagState = static_cast<GwAimaState const &>(otherState);
-    return (robotPos_ == otherTagState.robotPos_);
+    GwAimaState const &otherGwAimaState = static_cast<GwAimaState const &>(otherState);
+    return (robotPos_ == otherGwAimaState.robotPos_);
 }
 
 std::size_t GwAimaState::hash() const {
@@ -57,13 +57,5 @@ void GwAimaState::print(std::ostream &os) const {
 
 GridPosition GwAimaState::getRobotPosition() const {
     return robotPos_;
-}
-
-GridPosition GwAimaState::getOpponentPosition() const {
-    return opponentPos_;
-}
-
-bool GwAimaState::isTagged() const {
-    return isTagged_;
 }
 }// namespace gwaima

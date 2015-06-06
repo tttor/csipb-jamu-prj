@@ -1,14 +1,9 @@
-MODULE_NAME = problems
-
-#jamusample activetag gwaima
-#rocksample tag pushbox conttag
-CHILD_DIRS := shared gwaima
+MODULE_NAME = gwaima
+TARGET_NAMES := solve_mdp #solve simulate
 
 ifdef HAS_ROOT_MAKEFILE
 
-problems: $(CHILD_DIRS)
-
-include .make/template.mk
+include .make/problem-template.mk
 
 else
 REDIRECT=$(MODULE_NAME)
