@@ -118,6 +118,32 @@ int GwAimaModel::getMapDistance(GridPosition p1, GridPosition p2) {
     return pairwiseDistances_[p1.i][p1.j][p2.i][p2.j];
 }
 
+double GwAimaModel::getTransitionProbability(GridPosition nextRobotPos, 
+                                             GridPosition robotPos, ActionType actionType) {
+    int drow, dcol;
+    drow = nextRobotPos.i - robotPos.i;
+    dcol = nextRobotPos.j - robotPos.j;
+
+    switch (static_cast<int>(actionType)) {
+        case ActionType::NORTH: {
+            if (drow > 0 ) return 0.0;
+            else            
+        }
+    }
+
+    if (drow > 0) {
+        switch (static_cast<int>(actionType)) {
+            case ActionType::NORTH:
+                return 
+
+        }
+    }
+
+    if (dcol > 0) {
+
+    }
+}
+
 void GwAimaModel::calculateDistancesFrom(GridPosition position) {
     auto &distanceGrid = pairwiseDistances_[position.i][position.j];
     // Fill the grid with "-1", for inaccessible cells.
@@ -259,7 +285,81 @@ std::pair<std::unique_ptr<GwAimaState>, bool> GwAimaModel::makeNextState(
 
     GridPosition newRobotPos;
     bool wasValid;
-    std::tie(newRobotPos, wasValid) = getMovedPos(robotPos, gwAimaAction.getActionType());
+    std::tie(newRobotPos, wasValid) = sampleNextRobotPosition(robotPos, gwAimaAction);
+        
     return std::make_pair(std::make_unique<GwAimaState>(newRobotPos), wasValid);
 }
+
+std::pair<GridPosition, bool> sampleNextRobotPosition(GridPosition robotPos, 
+                                                      GwAimaAction desiredAction) {
+    
+    // Take into account the transition probability via the actual action selection
+    // For example, if the desired action is North, then
+    // the probability of actual action  Get robot action based on transition probability
+    std::discrete_distribution<int> distribution {0.8, 0.1, 0.1, 0.0};
+    unsigned int actionNo = distribution( *getRandomGenerator() );
+
+    const unsigned int nActions = 4;
+    GwAimaAction actualAction;
+    switch (actionNo) {
+        case 0: { // go straight
+            actualAction = desiredAction;
+            break;
+        }
+        case 1: { // turn right
+            actualAction = desiredAction + 1;
+            actualAction %= nActions; 
+            break;
+        }
+        case 2: { // turn left
+            if (static_cast<int>(desiredAction)==0)
+                actualAction = ActionType::WEST;
+            else
+                actualAction = desiredAction - 1;
+            break;
+        }
+        case 3: { // turn back
+            break;
+        }
+    }
+
+    return getMovedPos(robotPos, actualAction);
+}
+
+std::pair<GridPosition, bool> GwAimaModel::getMovedPos(GridPosition const &position,
+                                                       ActionType action) {
+    GridPosition movedPos = position;
+    switch (action) {
+        case ActionType::NORTH:
+            movedPos.i -= 1;
+            break;
+        case ActionType::EAST:
+            movedPos.j += 1;
+            break;
+        case ActionType::SOUTH:
+            movedPos.i += 1;
+            break;
+        case ActionType::WEST:
+            movedPos.j -= 1;
+            break;
+        default:
+            std::ostringstream message;
+            message << "Invalid action: " << (long) action;
+            debug::show_message(message.str());
+            break;
+    }
+
+    bool wasValid = isValid(movedPos);
+    if (!wasValid) {
+        movedPos = position;
+    }
+
+    return std::make_pair(movedPos, wasValid);
+}
+
+bool GwAimaModel::isValid(GridPosition const &position) {
+    return (position.i >= 0 && position.i < nRows_ && position.j >= 0
+            && position.j < nCols_ && envMap_[position.i][position.j] != TagCellType::WALL);
+}
+
 }// namespace gwaima

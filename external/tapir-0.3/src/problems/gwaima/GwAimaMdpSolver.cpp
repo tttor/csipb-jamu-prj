@@ -98,7 +98,7 @@ void GwAimaMdpSolver::solve() {
             
             GwAimaState nextState(nextRobotPos);
             int nextStateIndex = stateIndex[nextState];
-            double probability = getTransitionProbability(robotPos, nextRobotPos, actionType);
+            double probability = model_->getTransitionProbability(robotPos, nextRobotPos, actionType);
             nextStateTransitions[nextStateIndex] = std::make_pair(probability, reward);
         }
     }
@@ -141,8 +141,10 @@ void GwAimaMdpSolver::solve() {
 }
 
 double GwAimaMdpSolver::getValue(GwAimaState const &state) const {
-    if (state.isTerminal()) {
-        return 0; // Terminal; the reward is applied on the previous timestep.
+    // if this state is a terminal state, then
+    // return 0 because the reward is applied on the previous timestep.
+    if (model_->isTerminal(state)) {
+        return 0;
     }
 
     try {

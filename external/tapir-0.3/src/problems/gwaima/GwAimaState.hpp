@@ -52,6 +52,7 @@ class GwAimaState : public solver::VectorState {
 
     /** Returns the position of the robot. */
     GridPosition getRobotPosition() const;
+
   private:
     /** The position of the robot in the grid. */
     GridPosition robotPos_;

@@ -134,6 +134,9 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
     /** Returns the distance within the map between the two given positions. */
     int getMapDistance(GridPosition p1, GridPosition p2);
 
+    /** Obtain the transitino probability */
+    double getTransitionProbability(GridPosition nextRobotPos, GridPosition robotPos, ActionType actionType);
+
 
     /* --------------- The model interface proper ----------------- */
     std::unique_ptr<solver::State> sampleAnInitState() override;
@@ -158,6 +161,9 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
                 solver::State const * /*nextState*/) override;
     virtual Model::StepResult generateStep(solver::State const &state,
             solver::Action const &action) override;
+
+    std::pair<GridPosition, bool> sampleNextRobotPosition(GridPosition robotPos, 
+                                                          GwAimaAction desiredAction);
 
     /* ------------ Methods for handling particle depletion -------------- */
     /** Generates particles for GwAima using a particle filter from the previous belief.
