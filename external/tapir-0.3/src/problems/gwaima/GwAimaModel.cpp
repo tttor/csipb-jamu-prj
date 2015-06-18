@@ -534,10 +534,10 @@ GwAimaModel::generateParticles( solver::BeliefNode * /*previousBelief*/, solver:
 void GwAimaModel::dispCell(GwAimaCellType cellType, std::ostream &os) {
     switch (cellType) {
     case GwAimaCellType::EMPTY:
-        os << " 0";
+        os << ".";
         break;
     case GwAimaCellType::WALL:
-        os << "XX";
+        os << "X";
         break;
     default:
         os << "ER";
