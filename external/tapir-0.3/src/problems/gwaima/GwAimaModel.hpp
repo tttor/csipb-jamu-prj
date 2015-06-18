@@ -137,11 +137,12 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
     /** Obtain the transitino probability */
     double getTransitionProbability(GridPosition nextRobotPos, GridPosition robotPos, ActionType actionType);
 
-
     /* --------------- The model interface proper ----------------- */
     std::unique_ptr<solver::State> sampleAnInitState() override;
     std::unique_ptr<solver::State> sampleStateUninformed() override;
     bool isTerminal(solver::State const &state) override;
+    bool isTerminalGoal(solver::State const &state);
+    bool isTerminalBoom(solver::State const &state);
     bool isValid(solver::State const &state) override;
 
     /* -------------------- Black box dynamics ---------------------- */
@@ -244,6 +245,10 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
      */
     std::unique_ptr<solver::Observation> makeObservation(GwAimaState const &nextState);
 
+    /** Retrieves the reward via the next state. */
+    double makeReward( GwAimaState const &state, GwAimaAction const &action,
+                       GwAimaState const &nextState, bool isLegal);
+
     /** Returns true iff the given GridPosition represents a valid square that an agent could be
      * in - that is, the square must be empty, and within the bounds of the map.
      */
@@ -252,13 +257,12 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
     /** The GwAimaOptions instance associated with this model. */
     GwAimaOptions *options_;
 
-    /** The penalty for each movement action. */
-    double moveCost_;
-
     /** The reward for successfully reach the goal state. */
     double goalReward_;
+    /** The penalty for each movement action. */
+    double moveCost_;
     /** The penalty for stepping into a boom cell. */
-    double boomPenalty_;
+    double boomCost_;
 
     /** The starting position. */
     GridPosition startPos_;
