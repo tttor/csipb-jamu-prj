@@ -71,10 +71,8 @@ int solve_mdp(int argc, char const *argv[]) {
     emptyCells = model->getEmptyCells();
 
     for (GridPosition const &robotPos : emptyCells) {
-        for (GridPosition const &opponentPos : emptyCells) {
-            GwAimaState state(robotPos, opponentPos, false);
-            // cout << "mdpSolver->getValue(state)= " << mdpSolver->getValue(state) << endl;
-        }
+        GwAimaState state(robotPos);
+        // cout << "mdpSolver->getValue(state)= " << mdpSolver->getValue(state) << endl;
     }
 
     delete model;
@@ -82,5 +80,5 @@ int solve_mdp(int argc, char const *argv[]) {
 }
 
 int main(int argc, char const *argv[]) {
-	// return solve_mdp<gwaima::GwAimaModel, gwaima::GwAimaOptions>(argc, argv);
+	return solve_mdp<gwaima::GwAimaModel, gwaima::GwAimaOptions>(argc, argv);
 }

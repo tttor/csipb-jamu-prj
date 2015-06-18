@@ -1,26 +1,21 @@
 README
 
 AIMA: p645
-Suppose that an agent is situated in the 4 x 3 environment shown in Figure 17.1(a). Beginning
-in the start state, it must choose an action at each time step. The interaction with the environ-
-ment terminates when the agent reaches one of the goal states, marked +1 or –1. Just as for
-search problems, the actions available to the agent in each state are given by ACTIONS (s),
-sometimes abbreviated to A(s); in the 4 x 3 environment, the actions in every state are Up,
-Down, Left, and Right. We assume for now that the environment is fully observable, so that
-the agent always knows where it is.
+Suppose that an agent is situated in the 4 x 3 environment shown in Figure 17.1(a). 
+Beginning in the start state, it must choose an action at each time step. 
+The interaction with the environment terminates when the agent reaches one of the goal states, marked +1 or -1. 
+Just as for search problems, the actions available to the agent in each state are given by ACTIONS (s), sometimes abbreviated to A(s); in the 4 x 3 environment, the actions in every state are Up, Down, Left, and Right. 
+We assume for now that the environment is fully observable, so that the agent always knows where it is.
 
-If the environment were deterministic, a solution would be easy: [Up, Up, Right, Right,
-Right]. Unfortunately, the environment won’t always go along with this solution, because the
-actions are unreliable. The particular model of stochastic motion that we adopt is illustrated
-in Figure 17.1(b). Each action achieves the intended effect with probability 0.8, but the rest
-of the time, the action moves the agent at right angles to the intended direction. Furthermore,
-if the agent bumps into a wall, it stays in the same square. For example, from the start square
-(1,1), the action Up moves the agent to (1,2) with probability 0.8, but with probability 0.1, it
-moves right to (2,1), and with probability 0.1, it moves left, bumps into the wall, and stays in
-(1,1). In such an environment, the sequence [Up, Up, Right, Right , Right] goes up around
-the barrier and reaches the goal state at (4,3) with probability 0.85 = 0.32768. There is also a
-small chance of accidentally reaching the goal by going the other way around with probability
-0.14 × 0.8, for a grand total of 0.32776. (See also Exercise 17.1.)
+If the environment were deterministic, a solution would be easy: [Up, Up, Right, Right, Right]. 
+Unfortunately, the environment won’t always go along with this solution, because the
+actions are unreliable. 
+The particular model of stochastic motion that we adopt is illustrated in Figure 17.1(b). 
+Each action achieves the intended effect with probability 0.8, but the rest of the time, the action moves the agent at right angles to the intended direction. 
+Furthermore, if the agent bumps into a wall, it stays in the same square. 
+For example, from the start square (1,1), the action Up moves the agent to (1,2) with probability 0.8, but with probability 0.1, it moves right to (2,1), and with probability 0.1, it moves left, bumps into the wall, and stays in (1,1). 
+In such an environment, the sequence [Up, Up, Right, Right , Right] goes up around the barrier and reaches the goal state at (4,3) with probability 0.85 = 0.32768. 
+There is also a small chance of accidentally reaching the goal by going the other way around with probability 0.14 × 0.8, for a grand total of 0.32776. (See also Exercise 17.1.)
 
 Figure 17.1 (a) A simple 4 x 3 environment that presents the agent with a sequential
 decision problem. (b) Illustration of the transition model of the environment: the “intended”

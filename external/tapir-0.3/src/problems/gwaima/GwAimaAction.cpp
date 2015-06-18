@@ -56,7 +56,9 @@ void GwAimaAction::print(std::ostream &os) const {
 long GwAimaAction::getBinNumber() const {
     return static_cast<long>(actionType_);
 }
+
 ActionType GwAimaAction::getActionType() const {
     return actionType_;
 }
+
 } /* namespace gwaima */

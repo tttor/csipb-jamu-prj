@@ -63,18 +63,21 @@ solver::HeuristicFunction GwAimaUBParser::parse(solver::Solver * /*solver*/, std
 GwAimaModel::GwAimaModel(RandomGenerator *randGen, std::unique_ptr<GwAimaOptions> options) :
             ModelWithProgramOptions("GwAima", randGen, std::move(options)),
             options_(const_cast<GwAimaOptions *>(static_cast<GwAimaOptions const *>(getOptions()))),
+            goalReward_(0.0),//TODO take from options
             moveCost_(options_->moveCost),
+            boomCost_(0.0),//TODO take from options
+            startPos_(), // update
+            boomPositions_(),
+            goalPositions_(), // push goals
             nRows_(0), // to be updated
             nCols_(0), // to be updated
-            startPos_(), // update
-            goalPositions_(), // push goals
             mapText_(), // will be pushed to
             envMap_(), // will be pushed to
             nActions_(5),
             mdpSolver_(nullptr),
             pairwiseDistances_() {
     options_->numberOfStateVariables = 5;//TODO why 5?
-    options_->minVal = -boomPenalty_ / (1 - options_->discountFactor);
+    options_->minVal = -boomCost_ / (1 - options_->discountFactor);
     options_->maxVal = goalReward_;
 
     // Register the upper bound heuristic parser.
@@ -285,27 +288,20 @@ bool GwAimaModel::isTerminal(solver::State const &state) {
            );
 }
 
+bool GwAimaModel::isTerminalGoal(solver::State const &state) {
+    return (static_cast<GwAimaState const &>(state)==GwAimaState(goalPositions_[0]));
+}
+
+bool GwAimaModel::isTerminalBoom(solver::State const &state) {
+    return (static_cast<GwAimaState const &>(state)==GwAimaState(boomPositions_[0]));
+}
+
 bool GwAimaModel::isValid(solver::State const &state) {
     GwAimaState const gwAimaState = static_cast<GwAimaState const &>(state);
     return isValid(gwAimaState.getRobotPosition());
 }
 
 /* -------------------- Black box dynamics ---------------------- */
-std::pair<std::unique_ptr<GwAimaState>, bool> GwAimaModel::makeNextState(
-        solver::State const &state, solver::Action const &action) {
-	GwAimaState const &gwAimaState = static_cast<GwAimaState const &>(state);
-	GwAimaAction const &gwAimaAction = static_cast<GwAimaAction const &>(action);
-    
-    GridPosition robotPos = gwAimaState.getRobotPosition();
-
-    GridPosition newRobotPos;
-    bool wasValid;
-    // TODO fixme
-    // std::tie(newRobotPos, wasValid) = sampleNextRobotPosition(robotPos, gwAimaAction);
-        
-    return std::make_pair(std::make_unique<GwAimaState>(newRobotPos), wasValid);
-}
-
 std::pair<GridPosition, bool> GwAimaModel::sampleNextRobotPosition(GridPosition robotPos, 
                                                                    ActionType desiredAction) {
     
@@ -316,7 +312,7 @@ std::pair<GridPosition, bool> GwAimaModel::sampleNextRobotPosition(GridPosition 
     unsigned int actionNo = distribution(*getRandomGenerator());
 
     const unsigned int nActions = 4;
-    int actualAction;
+    int actualAction = -1;
     switch (actionNo) {
         case 0: { // go straight
             actualAction = static_cast<int>(desiredAction);
@@ -336,6 +332,9 @@ std::pair<GridPosition, bool> GwAimaModel::sampleNextRobotPosition(GridPosition 
         }
         case 3: { // turn back
             break;
+        }
+        default: {
+            assert (false && "UNKNOWN ActionType");
         }
     }
 
@@ -377,5 +376,295 @@ bool GwAimaModel::isValid(GridPosition const &position) {
     return (position.i >= 0 && position.i < nRows_ && position.j >= 0
             && position.j < nCols_ && envMap_[position.i][position.j] != GwAimaCellType::WALL);
 }
+
+std::pair<std::unique_ptr<GwAimaState>, bool> 
+GwAimaModel::makeNextState(solver::State const &state, solver::Action const &action) {
+	GwAimaState const &gwAimaState = static_cast<GwAimaState const &>(state);
+	GwAimaAction const &gwAimaAction = static_cast<GwAimaAction const &>(action);
+    
+    GridPosition robotPos = gwAimaState.getRobotPosition();
+    ActionType actionType = gwAimaAction.getActionType();
+
+    GridPosition newRobotPos;
+    bool wasValid;
+    std::tie(newRobotPos, wasValid) = sampleNextRobotPosition(robotPos, actionType);
+        
+    return std::make_pair(std::make_unique<GwAimaState>(newRobotPos), wasValid);
+}
+
+std::unique_ptr<solver::State> 
+GwAimaModel::generateNextState(
+                                solver::State const &state, solver::Action const &action,
+                                solver::TransitionParameters const * /*tp*/) {
+    return makeNextState(static_cast<GwAimaState const &>(state), action).first;
+}
+
+double GwAimaModel::makeReward( GwAimaState const &state, GwAimaAction const &action,
+                                GwAimaState const &nextState, bool isLegal) {
+    if (isTerminalGoal(nextState)) {
+        return goalReward_;
+    }
+    else if (isTerminalBoom(nextState)) {
+        return -boomCost_;
+    }
+    else {
+        return -moveCost_;
+    }
+
+    return 0.0;
+}
+
+double GwAimaModel::generateReward( solver::State const &state,
+                                    solver::Action const &action,
+                                    solver::TransitionParameters const * /*tp*/,
+                                    solver::State const * /*nextState*/) {
+    GwAimaState const &gwAimaState = (static_cast<GwAimaState const &>(state));
+    GwAimaAction const &gwAimaAction = (static_cast<GwAimaAction const &>(action));
+
+    std::unique_ptr<GwAimaState> nextState;
+    bool isLegal;
+    std::tie(nextState, isLegal) = makeNextState(gwAimaState, gwAimaAction);
+    
+    return makeReward(gwAimaState, gwAimaAction, *nextState, isLegal);
+}
+
+
+std::unique_ptr<solver::Observation> GwAimaModel::makeObservation(GwAimaState const &nextState) {
+    return std::make_unique<GwAimaObservation>( nextState.getRobotPosition() );
+}
+
+std::unique_ptr<solver::Observation> 
+GwAimaModel::generateObservation(
+                                solver::State const * /*state*/, solver::Action const &/*action*/,
+                                solver::TransitionParameters const * /*tp*/,
+                                solver::State const &nextState) {
+    return makeObservation(static_cast<GwAimaState const &>(nextState));
+}
+
+solver::Model::StepResult GwAimaModel::generateStep(solver::State const &state,
+                                                    solver::Action const &action) {
+    solver::Model::StepResult result;
+    result.action = action.copy();
+    std::unique_ptr<GwAimaState> nextState = makeNextState(state, action).first;
+
+    result.observation = makeObservation(*nextState);
+    result.reward = generateReward(state, action, nullptr, nullptr);
+    result.isTerminal = isTerminal(*nextState);
+    result.nextState = std::move(nextState);
+
+    return result;
+}
+
+/* ------------ Methods for handling particle depletion -------------- */
+std::vector<std::unique_ptr<solver::State>> 
+GwAimaModel::generateParticles(
+                                solver::BeliefNode * /*previousBelief*/, solver::Action const &action,
+                                solver::Observation const &obs,
+                                long nParticles,
+                                std::vector<solver::State const *> const &previousParticles) {
+    std::vector<std::unique_ptr<solver::State>> newParticles;
+    // TODO fix me
+    // GwAimaObservation const &observation = (static_cast<GwAimaObservation const &>(obs));
+    // ActionType actionType = (static_cast<GwAimaAction const &>(action).getActionType());
+
+    // typedef std::unordered_map<GwAimaState, double> WeightMap;
+    // WeightMap weights;
+    // double weightTotal = 0;
+
+    // GridPosition newRobotPos(observation.getPosition());
+
+    // for (solver::State const *state : previousParticles) {
+    //     GwAimaState const *tagState = static_cast<GwAimaState const *>(state);
+    //     GridPosition oldRobotPos(tagState->getRobotPosition());
+    //     // Ignore states that do not match knowledge of the robot's position.
+    //     if (newRobotPos != getMovedPos(oldRobotPos, actionType).first) {
+    //         continue;
+    //     }
+
+    //     // Get the probability distribution for opponent moves.
+    //     GridPosition oldOpponentPos(tagState->getOpponentPosition());
+    //     std::unordered_map<GridPosition, double> opponentPosDistribution = (
+    //             getNextOpponentPositionDistribution(oldRobotPos, oldOpponentPos));
+
+    //     for (auto const &entry : opponentPosDistribution) {
+    //         if (entry.first != newRobotPos) {
+    //             GwAimaState newState(newRobotPos, entry.first, false);
+    //             weights[newState] += entry.second;
+    //             weightTotal += entry.second;
+    //         }
+    //     }
+    // }
+    // double scale = nParticles / weightTotal;
+    // for (WeightMap::iterator it = weights.begin(); it != weights.end();
+    //         it++) {
+    //     double proportion = it->second * scale;
+    //     long numToAdd = static_cast<long>(proportion);
+    //     if (std::bernoulli_distribution(proportion - numToAdd)(
+    //             *getRandomGenerator())) {
+    //         numToAdd += 1;
+    //     }
+    //     for (int i = 0; i < numToAdd; i++) {
+    //         newParticles.push_back(std::make_unique<GwAimaState>(it->first));
+    //     }
+    // }
+    return newParticles;
+}
+
+std::vector<std::unique_ptr<solver::State>> 
+GwAimaModel::generateParticles( solver::BeliefNode * /*previousBelief*/, solver::Action const &action,
+                                solver::Observation const &obs, long nParticles) {
+    std::vector<std::unique_ptr<solver::State>> newParticles;
+    // TODO fix me
+    // GwAimaObservation const &observation = (static_cast<GwAimaObservation const &>(obs));
+    // ActionType actionType = (static_cast<GwAimaAction const &>(action).getActionType());
+    // GridPosition newRobotPos(observation.getPosition());
+    
+    // while ((long)newParticles.size() < nParticles) {
+    //     std::unique_ptr<solver::State> state = sampleStateUninformed();
+    //     solver::Model::StepResult result = generateStep(*state, action);
+    //     if (obs == *result.observation) {
+    //         newParticles.push_back(std::move(result.nextState));
+    //     }
+    // }
+    
+    return newParticles;
+}
+
+/* --------------- Pretty printing methods ----------------- */
+void GwAimaModel::dispCell(GwAimaCellType cellType, std::ostream &os) {
+    switch (cellType) {
+    case GwAimaCellType::EMPTY:
+        os << " 0";
+        break;
+    case GwAimaCellType::WALL:
+        os << "XX";
+        break;
+    default:
+        os << "ER";
+        break;
+    }
+}
+
+void GwAimaModel::drawEnv(std::ostream &os) {
+    for (std::vector<GwAimaCellType> &row : envMap_) {
+        for (GwAimaCellType cellType : row) {
+            dispCell(cellType, os);
+            os << " ";
+        }
+        os << endl;
+    }
+}
+
+void GwAimaModel::drawSimulationState(solver::BeliefNode const *belief,
+        solver::State const &state, std::ostream &os) {
+    // TODO fix drawSimulationState()
+    // TagState const &tagState = static_cast<TagState const &>(state);
+    // std::vector<solver::State const *> particles = belief->getStates();
+    // std::vector<std::vector<long>> particleCounts(nRows_,
+    //         std::vector<long>(nCols_));
+    // for (solver::State const *particle : particles) {
+    //     GridPosition opponentPos =
+    //             static_cast<TagState const &>(*particle).getOpponentPosition();
+    //     particleCounts[opponentPos.i][opponentPos.j] += 1;
+    // }
+
+    // std::vector<int> colors { 196, 161, 126, 91, 56, 21, 26, 31, 36, 41, 46 };
+    // if (options_->hasColorOutput) {
+    //     os << "Color map: ";
+    //     for (int color : colors) {
+    //         os << "\033[38;5;" << color << "m";
+    //         os << '*';
+    //         os << "\033[0m";
+    //     }
+    //     os << endl;
+    // }
+    // for (std::size_t i = 0; i < envMap_.size(); i++) {
+    //     for (std::size_t j = 0; j < envMap_[0].size(); j++) {
+    //         double proportion = (double) particleCounts[i][j]
+    //                 / particles.size();
+    //         if (options_->hasColorOutput) {
+    //             if (proportion > 0) {
+    //                 int color = colors[proportion * (colors.size() - 1)];
+    //                 os << "\033[38;5;" << color << "m";
+    //             }
+    //         }
+    //         GridPosition pos(i, j);
+    //         bool hasRobot = (pos == tagState.getRobotPosition());
+    //         bool hasOpponent = (pos == tagState.getOpponentPosition());
+    //         if (hasRobot) {
+    //             if (hasOpponent) {
+    //                 os << "#";
+    //             } else {
+    //                 os << "r";
+    //             }
+    //         } else if (hasOpponent) {
+    //             os << "o";
+    //         } else {
+    //             if (envMap_[i][j] == GwAimaCellType::WALL) {
+    //                 os << "X";
+    //             } else {
+    //                 os << ".";
+    //             }
+    //         }
+    //         if (options_->hasColorOutput) {
+    //             os << "\033[0m";
+    //         }
+    //     }
+    //     os << endl;
+    // }
+}
+
+/* ---------------------- Basic customizations  ---------------------- */
+double GwAimaModel::getDefaultHeuristicValue(solver::HistoryEntry const * /*entry*/,
+            solver::State const *state, solver::HistoricalData const * /*data*/) {
+    return 0.0;
+    // TODO fix getDefaultHeuristicValue()
+    // TagState const &tagState = static_cast<TagState const &>(*state);
+    // if (tagState.isTagged()) {
+    //     return 0;
+    // }
+    // GridPosition robotPos = tagState.getRobotPosition();
+    // GridPosition opponentPos = tagState.getOpponentPosition();
+    // long dist = getMapDistance(robotPos, opponentPos);
+    // double nSteps = dist / opponentStayProbability_;
+    // double finalDiscount = std::pow(options_->discountFactor, nSteps);
+    // double qVal = -moveCost_ * (1 - finalDiscount) / (1 - options_->discountFactor);
+    // qVal += finalDiscount * tagReward_;
+    // return qVal;
+}
+
+double GwAimaModel::getUpperBoundHeuristicValue(solver::State const &state) {
+    return 0.0;
+    // TODO fix getUpperBoundHeuristicValue
+    // TagState const &tagState = static_cast<TagState const &>(state);
+    // if (tagState.isTagged()) {
+    //     return 0;
+    // }
+    // GridPosition robotPos = tagState.getRobotPosition();
+    // GridPosition opponentPos = tagState.getOpponentPosition();
+    // long dist = getMapDistance(robotPos, opponentPos);
+    // double finalDiscount = std::pow(options_->discountFactor, dist);
+    // double qVal = -moveCost_ * (1 - finalDiscount) / (1 - options_->discountFactor);
+    // qVal += finalDiscount * tagReward_;
+    // return qVal;
+}
+
+/* ------- Customization of more complex solver functionality  --------- */
+std::vector<std::unique_ptr<solver::DiscretizedPoint>> GwAimaModel::getAllActionsInOrder() {
+    std::vector<std::unique_ptr<solver::DiscretizedPoint>> allActions;
+    for (long code = 0; code < nActions_; code++) {
+        allActions.push_back(std::make_unique<GwAimaAction>(code));
+    }
+    return allActions;
+}
+
+std::unique_ptr<solver::ActionPool> GwAimaModel::createActionPool(solver::Solver * /*solver*/) {
+    return std::make_unique<solver::EnumeratedActionPool>(this, getAllActionsInOrder());
+}
+
+std::unique_ptr<solver::Serializer> GwAimaModel::createSerializer(solver::Solver *solver) {
+    return std::make_unique<GwAimaTextSerializer>(solver);
+}
+
 
 }// namespace gwaima
