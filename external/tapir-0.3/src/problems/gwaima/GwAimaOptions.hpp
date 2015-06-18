@@ -25,6 +25,8 @@ struct GwAimaOptions : public shared::SharedOptions {
     double boomCost = 0.0;
     /** Reward per being in the goal cell. */
     double goalReward = 0.0;
+    /** The number of actions. */
+    long nActions = 0;
     /** Path to vrep scene gwaima.ttt */
     std::string vrepScenePath = "";
 
@@ -47,6 +49,7 @@ struct GwAimaOptions : public shared::SharedOptions {
         parser->addOption<double>("problem", "moveCost", &GwAimaOptions::moveCost);
         parser->addOption<double>("problem", "boomCost", &GwAimaOptions::boomCost);
         parser->addOption<double>("problem", "goalReward", &GwAimaOptions::goalReward);
+        parser->addOption<long>("problem", "nActions", &GwAimaOptions::nActions);
 
         parser->addOptionWithDefault<std::string>("ros", "vrepScenePath", &GwAimaOptions::vrepScenePath, "");
     }

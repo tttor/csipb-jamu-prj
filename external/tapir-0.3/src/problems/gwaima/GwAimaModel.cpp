@@ -73,7 +73,7 @@ GwAimaModel::GwAimaModel(RandomGenerator *randGen, std::unique_ptr<GwAimaOptions
             nCols_(0), // to be updated
             mapText_(), // will be pushed to
             envMap_(), // will be pushed to
-            nActions_(5),
+            nActions_(options_->nActions),
             mdpSolver_(nullptr),
             pairwiseDistances_() {
     options_->numberOfStateVariables = 5;//TODO why 5?
