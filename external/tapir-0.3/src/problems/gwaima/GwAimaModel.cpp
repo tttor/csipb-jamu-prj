@@ -223,6 +223,9 @@ void GwAimaModel::initialize() {
             } else if (c == 'B') {
                 cellType = GwAimaCellType::BOOM;   
                 boomPositions_.push_back(p);
+            } else if (c == 'S') {
+                startPos_ = p;
+                cellType = GwAimaCellType::EMPTY;
             } else {
                 cellType = GwAimaCellType::EMPTY;
             }
@@ -282,18 +285,18 @@ std::unique_ptr<solver::State> GwAimaModel::sampleStateUninformed() {
 }
 
 bool GwAimaModel::isTerminal(solver::State const &state) {
-    return (static_cast<GwAimaState const &>(state)==GwAimaState(goalPositions_[0])
+    return (static_cast<GwAimaState const &>(state)==GwAimaState(goalPositions_.at(0))
             or 
-            static_cast<GwAimaState const &>(state)==GwAimaState(boomPositions_[0])
+            static_cast<GwAimaState const &>(state)==GwAimaState(boomPositions_.at(0))
            );
 }
 
 bool GwAimaModel::isTerminalGoal(solver::State const &state) {
-    return (static_cast<GwAimaState const &>(state)==GwAimaState(goalPositions_[0]));
+    return (static_cast<GwAimaState const &>(state)==GwAimaState(goalPositions_.at(0)));
 }
 
 bool GwAimaModel::isTerminalBoom(solver::State const &state) {
-    return (static_cast<GwAimaState const &>(state)==GwAimaState(boomPositions_[0]));
+    return (static_cast<GwAimaState const &>(state)==GwAimaState(boomPositions_.at(0)));
 }
 
 bool GwAimaModel::isValid(solver::State const &state) {
