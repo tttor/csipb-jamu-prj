@@ -131,6 +131,11 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
         return mdpSolver_.get();
     }
 
+    /** Returns the starting position for this problem. */
+    GridPosition getStartPosition() {
+        return startPos_;
+    }
+    
     /** Returns the distance within the map between the two given positions. */
     int getMapDistance(GridPosition p1, GridPosition p2);
 
