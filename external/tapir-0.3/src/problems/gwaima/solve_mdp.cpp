@@ -5,6 +5,7 @@
 #include <memory>                       // for unique_ptr
 #include <string>                       // for string
 #include <utility>                      // for move                // IWYU pragma: keep
+#include <cassert>
 
 #include "global.hpp"                     // for RandomGenerator, make_unique
 #include "options/option_parser.hpp"

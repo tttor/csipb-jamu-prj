@@ -21,6 +21,10 @@ struct GwAimaOptions : public shared::SharedOptions {
     std::string mapPath = "";
     /** Cost per move. */
     double moveCost = 0.0;
+    /** Cost per being in the boom cell. */
+    double boomCost = 0.0;
+    /** Reward per being in the goal cell. */
+    double goalReward = 0.0;
     /** Path to vrep scene gwaima.ttt */
     std::string vrepScenePath = "";
 
@@ -41,6 +45,9 @@ struct GwAimaOptions : public shared::SharedOptions {
                 "", "map", "the path to the map file (relative to the base config path)", "path");
 
         parser->addOption<double>("problem", "moveCost", &GwAimaOptions::moveCost);
+        parser->addOption<double>("problem", "boomCost", &GwAimaOptions::boomCost);
+        parser->addOption<double>("problem", "goalReward", &GwAimaOptions::goalReward);
+
         parser->addOptionWithDefault<std::string>("ros", "vrepScenePath", &GwAimaOptions::vrepScenePath, "");
     }
 };
