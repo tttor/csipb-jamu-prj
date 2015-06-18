@@ -63,9 +63,9 @@ solver::HeuristicFunction GwAimaUBParser::parse(solver::Solver * /*solver*/, std
 GwAimaModel::GwAimaModel(RandomGenerator *randGen, std::unique_ptr<GwAimaOptions> options) :
             ModelWithProgramOptions("GwAima", randGen, std::move(options)),
             options_(const_cast<GwAimaOptions *>(static_cast<GwAimaOptions const *>(getOptions()))),
-            goalReward_(0.0),//TODO take from options
+            goalReward_(options_->goalReward),
             moveCost_(options_->moveCost),
-            boomCost_(0.0),//TODO take from options
+            boomCost_(options_->boomCost),
             startPos_(), // update
             boomPositions_(),
             goalPositions_(), // push goals
