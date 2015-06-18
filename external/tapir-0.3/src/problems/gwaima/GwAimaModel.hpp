@@ -163,7 +163,7 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
             solver::Action const &action) override;
 
     std::pair<GridPosition, bool> sampleNextRobotPosition(GridPosition robotPos, 
-                                                          GwAimaAction desiredAction);
+                                                          ActionType desiredAction);
 
     /* ------------ Methods for handling particle depletion -------------- */
     /** Generates particles for GwAima using a particle filter from the previous belief.
