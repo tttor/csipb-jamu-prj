@@ -42,8 +42,8 @@ void GwAimaMdpSolver::solve() {
     valueMap_.clear();
 
     // Enumerated vector of actions.
-    std::vector<std::unique_ptr<solver::DiscretizedPoint>> allActions = (
-            model_->getAllActionsInOrder());
+    std::vector<std::unique_ptr<solver::DiscretizedPoint>> 
+    allActions = (model_->getAllActionsInOrder());
 
     // Vector of valid grid positions.
     std::vector<GridPosition> emptyCells;
@@ -75,7 +75,7 @@ void GwAimaMdpSolver::solve() {
         allStates.push_back(state);
         stateIndex[state] = index;
         policy.push_back(static_cast<int>(initialAction));
-        index += 1;
+        index++;
     }
     // An index of size (past the end of the array!!) will be used to represent terminal states.
     // A default action for the terminal state is meaningless, but we need it anyway.
@@ -129,24 +129,83 @@ void GwAimaMdpSolver::solve() {
 
     cout << "mdp::PolicyIterator iterator()\n";
     mdp::PolicyIterator iterator(policy, model_->options_->discountFactor,
-            allStates.size() + 1, allActions.size(),
-            possibleNextStates, transitionProbability, reward);
+                                 allStates.size() + 1, allActions.size(),
+                                 possibleNextStates, transitionProbability, 
+                                 reward);
 
+    /** Sets the value of the given state as a fixed quantity - this is used to set reward values
+    * for terminal states, if any exist.
+    */
     iterator.fixValue(allStates.size(), 0.0);
 
+    /** Solves the MDP via policy iteration and returns the number of policy iteration steps taken
+     * in attempting to solve the problem.
+     */
     long numSteps = iterator.solve();
-    std::vector<double> stateValues = iterator.getCurrentValues();
-
-    // Now put all of the state values into our map.
-    cout << "put all of the state values into our map\n";
-    for (unsigned int stateNo = 0; stateNo < allStates.size(); stateNo++) {
-        valueMap_[allStates[stateNo]] = stateValues[stateNo];
-    }
 
     if (model_->options_->hasVerboseOutput) {
         std::cout << "Done; took " << numSteps << " steps." << std::endl << std::endl;
     }
+
+    // Evaluate the resulted policy
+    mdp::Policy bestPolicy;
+    bestPolicy = iterator.getBestPolicy();
+    print(bestPolicy, allStates);
+
+    std::vector<double> stateValues;
+    stateValues = iterator.getCurrentValues();
+    
+    cout << "stateValues.size()= " << stateValues.size() << endl;
+    for (size_t i=0; i<stateValues.size(); ++i) {
+        cout << "stateValues["<< i << "]= " << stateValues.at(i) << endl;
+    }
+    // for (unsigned int stateNo = 0; stateNo < allStates.size(); stateNo++) {
+    //     valueMap_[allStates[stateNo]] = stateValues[stateNo];
+    // }
 #endif
+}
+
+void GwAimaMdpSolver::print(const mdp::Policy& policy, const std::vector<GwAimaState>& states) {
+    using namespace std;
+
+    std::vector<std::vector<long>> 
+    policyMap(model_->getNRows(), 
+              std::vector<long>(model_->getNCols(),-1));
+
+    for (size_t i=0; i<policy.size(); ++i) {
+        GwAimaState state = states.at(i);
+        GridPosition robotPos = state.getRobotPosition();
+        policyMap.at(robotPos.i).at(robotPos.j) = policy.at(i);
+        // cout << "at (" <<  robotPos.i << ", " << robotPos.j << ")= " 
+        //      << policy.at(i) << endl;
+    }
+
+    for (size_t i=0; i<policyMap.size(); ++i) {
+        for (size_t j=0; j<policyMap.at(i).size(); ++j) {
+            ActionType action;
+            action = static_cast<ActionType>( policyMap.at(i).at(j) );
+
+            switch (action) {
+                case ActionType::NORTH:
+                    cout << "^";
+                    break;
+                case ActionType::EAST:
+                    cout << ">";
+                    break;
+                case ActionType::SOUTH:
+                    cout << "v";
+                    break;
+                case ActionType::WEST:
+                    cout << "<";
+                    break;
+                default:
+                    cout << "X";
+                    break;
+            }
+            cout << " ";
+        }
+        cout << endl;
+    }
 }
 
 double GwAimaMdpSolver::getValue(GwAimaState const &state) const {

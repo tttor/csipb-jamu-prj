@@ -14,10 +14,12 @@
 #include <vector>
 
 #include "global.hpp"
-
 #include "problems/shared/parsers.hpp"
-
 #include "solver/abstract-problem/heuristics/HeuristicFunction.hpp"
+
+#ifdef HAS_EIGEN
+#include "problems/shared/policy_iteration.hpp"
+#endif
 
 #include "GwAimaState.hpp"
 
@@ -39,6 +41,9 @@ public:
 
     /** Returns the calculated MDP value for the given state. */
     double getValue(GwAimaState const &state) const;
+
+    /** */
+    void print(const mdp::Policy& policy, const std::vector<GwAimaState>& states);
 
 private:
     /** The model instance this MDP solver is associated with. */
