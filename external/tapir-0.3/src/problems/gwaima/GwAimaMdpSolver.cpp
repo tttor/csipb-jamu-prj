@@ -29,12 +29,13 @@ GwAimaMdpSolver::GwAimaMdpSolver(GwAimaModel *model) :
 }
 
 void GwAimaMdpSolver::solve() {
+    using namespace std;
 #ifndef HAS_EIGEN
     debug::show_message("ERROR: Can't use MDP Policy Iteration without Eigen!");
     std::exit(15);
 #else
     if (model_->options_->hasVerboseOutput) {
-        std::cout << "Solving MDP...";
+        std::cout << "Solving MDP...\n";
         std::cout.flush();
     }
 
@@ -82,6 +83,7 @@ void GwAimaMdpSolver::solve() {
     policy[index] = static_cast<int>(ActionType::NORTH);// TODO: fix this action!
 
     // Initialise the state transitions.
+    cout << "Initialise the state transitions.:BEGIN\n";
     std::vector<std::vector<std::unordered_map<int, std::pair<double, double>>>> transitions;
     transitions.resize(allStates.size() + 1);
     for (unsigned int stateNo = 0; stateNo <= allStates.size(); stateNo++) {
@@ -103,6 +105,7 @@ void GwAimaMdpSolver::solve() {
         }
     }
 
+    cout << "std::function<std::vector<int>(int, int)> possibleNextStates\n";
     std::function<std::vector<int>(int, int)> possibleNextStates =
             [transitions](int state, int action) {
                 std::vector<int> nextStates;
@@ -111,15 +114,20 @@ void GwAimaMdpSolver::solve() {
                 }
                 return std::move(nextStates);
             };
+
+    cout << "std::function<double(int, int, int)> transitionProbability\n";
     std::function<double(int, int, int)> transitionProbability =
             [transitions](int state, int action, int nextState) {
                 return transitions[state][action].at(nextState).first;
             };
+
+    cout << "std::function<double(int, int, int)> reward\n";        
     std::function<double(int, int, int)> reward =
             [transitions](int state, int action, int nextState) {
                 return transitions[state][action].at(nextState).second;
             };
 
+    cout << "mdp::PolicyIterator iterator()\n";
     mdp::PolicyIterator iterator(policy, model_->options_->discountFactor,
             allStates.size() + 1, allActions.size(),
             possibleNextStates, transitionProbability, reward);
@@ -130,12 +138,13 @@ void GwAimaMdpSolver::solve() {
     std::vector<double> stateValues = iterator.getCurrentValues();
 
     // Now put all of the state values into our map.
+    cout << "put all of the state values into our map\n";
     for (unsigned int stateNo = 0; stateNo < allStates.size(); stateNo++) {
         valueMap_[allStates[stateNo]] = stateValues[stateNo];
     }
 
     if (model_->options_->hasVerboseOutput) {
-        std::cout << "        Done; took " << numSteps << " steps." << std::endl << std::endl;
+        std::cout << "Done; took " << numSteps << " steps." << std::endl << std::endl;
     }
 #endif
 }
@@ -144,14 +153,17 @@ double GwAimaMdpSolver::getValue(GwAimaState const &state) const {
     // if this state is a terminal state, then
     // return 0 because the reward is applied on the previous timestep.
     if (model_->isTerminal(state)) {
+        std::cout << "model_->isTerminal(state) return 0\n";
         return 0;
     }
 
     try {
+        std::cout << "return valueMap_.at(state);\n";
         return valueMap_.at(state);
-    } catch (std::out_of_range const &oor) {
+    } 
+    catch (std::out_of_range const &oor) {
         // INVALID STATE => return 0
-        // std::cout << "NOTE: Queried heuristic value of an invalid state." << std::endl;
+        std::cout << "NOTE: Queried heuristic value of an invalid state." << std::endl;
         return 0;
     }
 }
