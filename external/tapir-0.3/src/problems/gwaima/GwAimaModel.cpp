@@ -109,10 +109,12 @@ GwAimaModel::GwAimaModel(RandomGenerator *randGen, std::unique_ptr<GwAimaOptions
         cout << "Discount: " << options_->discountFactor << endl;
         cout << "Size: " << nRows_ << " by " << nCols_ << endl;
         cout << "move cost: " << moveCost_ << endl;
+        cout << "boom cost: " << boomCost_ << endl;
+        cout << "goal reward: " << goalReward_ << endl;
         cout << "nActions: " << nActions_ << endl;
         cout << "nStVars: " << options_->numberOfStateVariables << endl;
         cout << "minParticleCount: " << options_->minParticleCount << endl;
-        cout << "Environment:" << endl << endl;
+        cout << "Environment:" << endl;
         drawEnv(cout);
     }
 }
@@ -541,6 +543,12 @@ void GwAimaModel::dispCell(GwAimaCellType cellType, std::ostream &os) {
         break;
     case GwAimaCellType::WALL:
         os << "X";
+        break;
+    case GwAimaCellType::GOAL:
+        os << "G";
+        break;
+    case GwAimaCellType::BOOM:
+        os << "B";
         break;
     default:
         os << "ER";
