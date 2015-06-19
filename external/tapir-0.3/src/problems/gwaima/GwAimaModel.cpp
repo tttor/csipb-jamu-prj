@@ -63,9 +63,9 @@ solver::HeuristicFunction GwAimaUBParser::parse(solver::Solver * /*solver*/, std
 GwAimaModel::GwAimaModel(RandomGenerator *randGen, std::unique_ptr<GwAimaOptions> options) :
             ModelWithProgramOptions("GwAima", randGen, std::move(options)),
             options_(const_cast<GwAimaOptions *>(static_cast<GwAimaOptions const *>(getOptions()))),
-            goalReward_(0.0),//TODO take from options
+            goalReward_(options_->goalReward),
             moveCost_(options_->moveCost),
-            boomCost_(0.0),//TODO take from options
+            boomCost_(options_->boomCost),
             startPos_(), // update
             boomPositions_(),
             goalPositions_(), // push goals
@@ -73,7 +73,7 @@ GwAimaModel::GwAimaModel(RandomGenerator *randGen, std::unique_ptr<GwAimaOptions
             nCols_(0), // to be updated
             mapText_(), // will be pushed to
             envMap_(), // will be pushed to
-            nActions_(5),
+            nActions_(options_->nActions),
             mdpSolver_(nullptr),
             pairwiseDistances_() {
     options_->numberOfStateVariables = 5;//TODO why 5?
@@ -223,6 +223,9 @@ void GwAimaModel::initialize() {
             } else if (c == 'B') {
                 cellType = GwAimaCellType::BOOM;   
                 boomPositions_.push_back(p);
+            } else if (c == 'S') {
+                startPos_ = p;
+                cellType = GwAimaCellType::EMPTY;
             } else {
                 cellType = GwAimaCellType::EMPTY;
             }
@@ -282,18 +285,18 @@ std::unique_ptr<solver::State> GwAimaModel::sampleStateUninformed() {
 }
 
 bool GwAimaModel::isTerminal(solver::State const &state) {
-    return (static_cast<GwAimaState const &>(state)==GwAimaState(goalPositions_[0])
+    return (static_cast<GwAimaState const &>(state)==GwAimaState(goalPositions_.at(0))
             or 
-            static_cast<GwAimaState const &>(state)==GwAimaState(boomPositions_[0])
+            static_cast<GwAimaState const &>(state)==GwAimaState(boomPositions_.at(0))
            );
 }
 
 bool GwAimaModel::isTerminalGoal(solver::State const &state) {
-    return (static_cast<GwAimaState const &>(state)==GwAimaState(goalPositions_[0]));
+    return (static_cast<GwAimaState const &>(state)==GwAimaState(goalPositions_.at(0)));
 }
 
 bool GwAimaModel::isTerminalBoom(solver::State const &state) {
-    return (static_cast<GwAimaState const &>(state)==GwAimaState(boomPositions_[0]));
+    return (static_cast<GwAimaState const &>(state)==GwAimaState(boomPositions_.at(0)));
 }
 
 bool GwAimaModel::isValid(solver::State const &state) {
@@ -534,10 +537,10 @@ GwAimaModel::generateParticles( solver::BeliefNode * /*previousBelief*/, solver:
 void GwAimaModel::dispCell(GwAimaCellType cellType, std::ostream &os) {
     switch (cellType) {
     case GwAimaCellType::EMPTY:
-        os << " 0";
+        os << ".";
         break;
     case GwAimaCellType::WALL:
-        os << "XX";
+        os << "X";
         break;
     default:
         os << "ER";
