@@ -542,6 +542,12 @@ void GwAimaModel::dispCell(GwAimaCellType cellType, std::ostream &os) {
     case GwAimaCellType::WALL:
         os << "X";
         break;
+    case GwAimaCellType::GOAL:
+        os << "G";
+        break;
+    case GwAimaCellType::BOOM:
+        os << "B";
+        break;
     default:
         os << "ER";
         break;
