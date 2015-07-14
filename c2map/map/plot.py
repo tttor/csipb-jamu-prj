@@ -5,6 +5,8 @@ import scipy
 import pylab
 import scipy.cluster.hierarchy as sch
 
+fig = pylab.figure(figsize=(8,8))
+
 # Generate random features and distance matrix.
 x = scipy.rand(40)
 D = scipy.zeros([40,40])
@@ -13,7 +15,6 @@ for i in range(40):
         D[i,j] = abs(x[i] - x[j])
 
 # Compute and plot first dendrogram.
-fig = pylab.figure(figsize=(8,8))
 ax1 = fig.add_axes([0.09,0.1,0.2,0.6])
 Y = sch.linkage(D, method='centroid')
 Z1 = sch.dendrogram(Y, orientation='right')
@@ -40,5 +41,9 @@ axmatrix.set_yticks([])
 # Plot colorbar.
 axcolor = fig.add_axes([0.91,0.1,0.02,0.6])
 pylab.colorbar(im, cax=axcolor)
-fig.show()
-fig.savefig('dendrogram.png')
+
+out_dir = '/home/tor/jamu/xprmnt/c2map'
+map_filename = out_dir + '/c2map.png'
+
+# fig.show()
+fig.savefig(map_filename)
