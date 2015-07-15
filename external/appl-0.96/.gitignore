@@ -1,5 +1,9 @@
 *.o
 *.a
+*.policy
+*.dot
+
+src/*.pdf
 src/polgraph
 src/pomdpconvert
 src/pomdpeval
