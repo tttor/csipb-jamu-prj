@@ -123,7 +123,7 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
      */
     void makeMdpSolver() {
         mdpSolver_ = std::make_unique<GwAimaMdpSolver>(this);
-        mdpSolver_->solve();
+        mdpSolver_->solve_via_policy_iter();
     }
 
     /** Returns the GwAimaMdpSolver solver (if any) owned by this model. */
