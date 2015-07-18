@@ -28,7 +28,7 @@ GwAimaMdpSolver::GwAimaMdpSolver(GwAimaModel *model) :
             valueMap_() {
 }
 
-void GwAimaMdpSolver::solve() {
+void GwAimaMdpSolver::solve_via_policy_iter() {
     using namespace std;
 #ifndef HAS_EIGEN
     debug::show_message("ERROR: Can't use MDP Policy Iteration without Eigen!");
@@ -69,8 +69,9 @@ void GwAimaMdpSolver::solve() {
 
         ActionType initialAction;
         // Set a default initial action for our initial policy.
-        // TODO: uniformly at random
-        initialAction = ActionType::NORTH;
+        long initialActionRaw = std::uniform_int_distribution<long>(0, model_->nActions_ - 1)
+                                (*model_->getRandomGenerator());
+        initialAction = static_cast<ActionType>(initialActionRaw);
 
         allStates.push_back(state);
         stateIndex[state] = index;
@@ -94,13 +95,13 @@ void GwAimaMdpSolver::solve() {
         for (unsigned int actionNo = 0; actionNo < allActions.size(); actionNo++) {
             ActionType actionType = static_cast<ActionType>(actionNo);
             auto &nextStateTransitions = transitions[stateNo][actionNo];
-
-            double reward = -1;// move costs TODO: take from options
-            GridPosition nextRobotPos = model_->getMovedPos(robotPos, actionType).first;
             
+            GridPosition nextRobotPos = model_->getMovedPos(robotPos, actionType).first;
             GwAimaState nextState(nextRobotPos);
             int nextStateIndex = stateIndex[nextState];
+
             double probability = model_->getTransitionProbability(robotPos, nextRobotPos, actionType);
+            double reward = model_->moveCost_;// TODO: recheck! consider other costs?
             nextStateTransitions[nextStateIndex] = std::make_pair(probability, reward);
         }
     }

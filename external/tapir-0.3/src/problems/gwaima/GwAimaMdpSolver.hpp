@@ -12,7 +12,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <vector>
-
+#include <random>                       // for uniform_int_distribution, bernoulli_distribution
 #include "global.hpp"
 #include "problems/shared/parsers.hpp"
 #include "solver/abstract-problem/heuristics/HeuristicFunction.hpp"
@@ -37,7 +37,7 @@ public:
     _NO_COPY_OR_MOVE(GwAimaMdpSolver);
 
     /** Solves the MDP, using the current state of the */
-    void solve();
+    void solve_via_policy_iter();
 
     /** Returns the calculated MDP value for the given state. */
     double getValue(GwAimaState const &state) const;

@@ -64,7 +64,7 @@ int solve_mdp(int argc, char const *argv[]) {
     mdpSolver = std::make_unique<gwaima::GwAimaMdpSolver>(model);
 
     //
-    mdpSolver->solve();
+    mdpSolver->solve_via_policy_iter();
 
     // // Vector of valid grid positions.
     // std::vector<GridPosition> emptyCells;
