@@ -23,6 +23,7 @@ template<typename ModelType, typename OptionsType>
 int solve_mdp(int argc, char const *argv[]) {
     using namespace gwaima;
 
+    // Parsing options
     std::unique_ptr<options::OptionParser> parser = OptionsType::makeParser(false);
 
     OptionsType options;
@@ -56,15 +57,15 @@ int solve_mdp(int argc, char const *argv[]) {
 
     // Define the MDP model of the problem
     ModelType* model;
-    model = new ModelType(&randGen,
-                          std::make_unique<OptionsType>(options));
+    model = new ModelType(&randGen, std::make_unique<OptionsType>(options));
 
     // Define the mdp solver
     std::unique_ptr<gwaima::GwAimaMdpSolver> mdpSolver;  
     mdpSolver = std::make_unique<gwaima::GwAimaMdpSolver>(model);
 
     //
-    mdpSolver->solve_via_policy_iter();
+    // mdpSolver->solve_via_policy_iter();
+    mdpSolver->solve_via_value_iter();
 
     delete model;
     return 0;
