@@ -39,6 +39,9 @@ public:
     /** Solves the MDP, using the current state of the */
     void solve_via_policy_iter();
 
+    /** Solves the MDP, using the value iteration */
+    void solve_via_value_iter();
+
     /** Returns the calculated MDP value for the given state. */
     double getValue(GwAimaState const &state) const;
 
@@ -48,8 +51,17 @@ public:
 private:
     /** The model instance this MDP solver is associated with. */
     GwAimaModel *model_;
+
     /** A map to hold the calculated value for each non-terminal state. */
     std::unordered_map<GwAimaState, double> valueMap_;
+
+    /** Calculates the q-value for the given action, from the current position.
+    * 
+    * The action is a simplified MDP action:
+    * -1 => exit the map
+    * 0+ => ??
+    */
+    double calculateQValue(GridPosition pos, long action) const;
 };
 
 /** A class to parse the command-line heuristic setting for the case "exactMdp()". */

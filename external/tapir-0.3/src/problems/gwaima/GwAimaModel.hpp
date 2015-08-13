@@ -95,6 +95,16 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
     std::pair<GridPosition, bool> getMovedPos(GridPosition const &position, ActionType action);
 
     /* ---------- Custom getters for extra functionality  ---------- */
+    /** Returns the distance from the given grid position to the goal
+    * A return value of -1 means the given goal cannot be reached.
+    */
+    int getDistance(GridPosition p) {
+      std::vector< std::vector<int> > *grid = nullptr;
+      grid = &goalDistances_;
+
+      return (*grid)[p.i][p.j];
+    }
+
     /** Returns the number of rows in the map for this GwAimaModel instance. */
     long getNRows() const {
         return nRows_;
@@ -134,6 +144,11 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
     /** Returns the starting position for this problem. */
     GridPosition getStartPosition() {
         return startPos_;
+    }
+
+    /** Returns the cell type for the given position. */
+    GwAimaCellType getCellType(GridPosition p) {
+        return envMap_[p.i][p.j];
     }
     
     /** Returns the distance within the map between the two given positions. */
@@ -233,8 +248,22 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
     /** Initialises the required data structures and variables for this model. */
     void initialize();
 
+    /** For each cell, calculates the distance to the nearest goal*/
+    void recalculateAllDistances();
+
+    /** For each cell, calculates the distance to the nearest target. 
+     * If no target can be reached, the distance will be -1.
+     */
+    void recalculateDistances(std::vector<std::vector<int>> &grid,
+            std::vector<GridPosition> targets);
+
     /** Generates a random empty grid cell. */
     GridPosition randomEmptyCell();
+
+    /** Generates an adjacent position without doing bounds checks or legality checks. */
+    GridPosition makeAdjacentPosition(GridPosition position, ActionType actionType);
+    /** Generates the next position for the given position and action. */
+    std::pair<GridPosition, bool> makeNextPosition(GridPosition pos, ActionType actionType);
 
     /** Generates a next state for the given state and action, as well as a boolean flag that will
      * be true if the action moved into a wall, and false otherwise.
@@ -275,6 +304,9 @@ class GwAimaModel: public shared::ModelWithProgramOptions {
     std::vector<GridPosition> boomPositions_;
     /** The coordinates of the goal squares. */
     std::vector<GridPosition> goalPositions_;
+
+    /** The distance from each cell to the nearest goal square. */
+    std::vector<std::vector<int>> goalDistances_;
 
     /** The number of rows in the map. */
     long nRows_;
