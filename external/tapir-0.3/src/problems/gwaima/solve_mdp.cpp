@@ -66,16 +66,6 @@ int solve_mdp(int argc, char const *argv[]) {
     //
     mdpSolver->solve_via_policy_iter();
 
-    // // Vector of valid grid positions.
-    // std::vector<GridPosition> emptyCells;
-    // emptyCells = model->getEmptyCells();
-    // cout << "emptyCells.size()= " << emptyCells.size() << endl;
-
-    // for (GridPosition const &robotPos : emptyCells) {
-    //     GwAimaState state(robotPos);
-    //     cout << "mdpSolver->getValue(state)= " << mdpSolver->getValue(state) << endl;
-    // }
-
     delete model;
     return 0;
 }

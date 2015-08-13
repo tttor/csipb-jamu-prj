@@ -28,6 +28,70 @@ GwAimaMdpSolver::GwAimaMdpSolver(GwAimaModel *model) :
             valueMap_() {
 }
 
+void GwAimaMdpSolver::solve_via_value_iter() {
+    if (model_->options_->hasVerboseOutput) {
+        std::cout << "Solving MDP using value_iteration...";
+        std::cout.flush();
+    }
+
+    valueMap_.clear();
+
+
+    std::set<std::pair<int,int>> states;
+    std::set<std::pair<int,int>> newStates;
+
+    for (int i = 0; i < model_->nRows_; ++i) {
+        for (int j = 0; j < model_->nCols_; ++j) {
+            newStates.insert(std::make_pair(i,j));
+        }
+    }
+
+    states = newStates;
+    for (std::pair<int,int> entry : states) {
+        GridPosition pos(entry.first, entry.second);
+
+        // // The value of going straight to the goal is a simple lower bound.
+        // double value = calculateQValue(pos, -1);// -1 => exit the map
+        // if (valueMap_[entry] < value) {
+        //     valueMap_[entry] = value;
+        // } else {
+        //     value = valueMap_[entry];
+        // }
+    }
+
+    if (model_->options_->hasVerboseOutput) {
+        std::cout << "                   Done." << std::endl << std::endl;
+    }
+}
+
+double GwAimaMdpSolver::calculateQValue(GridPosition pos, long action) const {
+    long actionsUntilReward = model_->getDistance(pos);
+    if (actionsUntilReward == -1) {
+        // The goal is Impossible to reach!
+        return -std::numeric_limits<double>::infinity();
+    }
+
+    double reward;
+    double nextQValue;
+
+    if (action == -1) {
+        // Reward is received as you move in to the goal, not afterwards
+        actionsUntilReward -= 1;// decrement by one as the agent moves in the goal
+        
+        reward = model_->goalReward_;
+        nextQValue = 0; // Terminal
+    }
+    else {
+        //TODO
+
+        // reward = 
+        // nextQValue = 
+    }
+
+    double discountFactor = model_->options_->discountFactor;
+    return std::pow(discountFactor, actionsUntilReward) * (reward + discountFactor * nextQValue);
+}
+
 void GwAimaMdpSolver::solve_via_policy_iter() {
     using namespace std;
 #ifndef HAS_EIGEN
@@ -35,7 +99,7 @@ void GwAimaMdpSolver::solve_via_policy_iter() {
     std::exit(15);
 #else
     if (model_->options_->hasVerboseOutput) {
-        std::cout << "Solving MDP...\n";
+        std::cout << "Solving MDP using policy_iteration...\n";
         std::cout.flush();
     }
 
@@ -227,7 +291,6 @@ double GwAimaMdpSolver::getValue(GwAimaState const &state) const {
         return 0;
     }
 }
-
 
 /* ---------------------- GwAimaMdpParser --------------------- */
 GwAimaMdpParser::GwAimaMdpParser(GwAimaModel *model) :

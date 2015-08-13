@@ -73,6 +73,7 @@ GwAimaModel::GwAimaModel(RandomGenerator *randGen, std::unique_ptr<GwAimaOptions
             nCols_(0), // to be updated
             mapText_(), // will be pushed to
             envMap_(), // will be pushed to
+            goalDistances_(), // calculate distances
             nActions_(options_->nActions),
             mdpSolver_(nullptr),
             pairwiseDistances_() {
@@ -235,6 +236,18 @@ void GwAimaModel::initialize() {
         }
     }
 
+    goalDistances_.resize(nRows_);
+    for (std::vector<int> &row: goalDistances_) {
+        row.resize(nCols_);
+    }
+
+    recalculateAllDistances();
+
+    if (getDistance(startPos_) == -1) {
+        std::cout << "ERROR: Unreachable goal!\n";
+        std::exit(10);
+    }
+
     pairwiseDistances_.resize(nRows_);
     for (auto &rowOfGrids : pairwiseDistances_) {
         rowOfGrids.resize(nCols_);
@@ -247,6 +260,61 @@ void GwAimaModel::initialize() {
     }
 
     calculatePairwiseDistances();
+}
+
+void GwAimaModel::recalculateAllDistances() {
+    //filter goal position from goal_at_obstacle
+    std::vector<GridPosition> realGoalPositions;
+    for (GridPosition const &pos: goalPositions_) {
+        if (envMap_[pos.i][pos.j] != GwAimaCellType::WALL) {
+            realGoalPositions.push_back(pos);
+        }
+    }
+
+    recalculateDistances(goalDistances_,realGoalPositions);
+}
+
+void GwAimaModel::recalculateDistances(std::vector<std::vector<int>> &grid,
+                                       std::vector<GridPosition> targets) {
+    // Preinitialize to -1 for all cells.
+    // -1 means goal is unreachable
+    for (auto &row : grid) {
+        for (auto &cell : row) {
+            cell = -1;
+        }
+    }
+
+    // assign distance to goals for goal-cells to zero
+    // simultaneously, pushing targets to a queue
+    std::queue<GridPosition> queue;
+    for (GridPosition &pos: targets) {
+        grid[pos.i][pos.j] = 0;
+        queue.push(pos);
+    }
+
+    // assign distance to goals for the rest of the cells
+    while (!queue.empty()) {
+        GridPosition pos = queue.front();
+        queue.pop();
+
+        int distance = grid[pos.i][pos.j] + 1;//TODO why +1? the minimum distance from non-goal cells?
+
+        for (ActionType direction: {ActionType::NORTH, ActionType::SOUTH, ActionType::WEST,
+            ActionType::EAST}) {
+            GridPosition nextPos;
+            bool isLegal;
+            std::tie(nextPos, isLegal) = makeNextPosition(pos, direction);
+            
+            // The distance matters only if the move is legal, and doesn't move into a goal.
+            if (isLegal && getCellType(nextPos)!=GwAimaCellType::GOAL) {
+                int &nextPosDistance = grid[nextPos.i][nextPos.j];
+                if (nextPosDistance == -1 || nextPosDistance>distance) {
+                    nextPosDistance = distance;
+                    queue.push(nextPos);
+                }
+            }
+        }
+    }
 }
 
 GridPosition GwAimaModel::randomEmptyCell() {
@@ -380,6 +448,33 @@ std::pair<GridPosition, bool> GwAimaModel::getMovedPos(GridPosition const &posit
 bool GwAimaModel::isValid(GridPosition const &position) {
     return (position.i >= 0 && position.i < nRows_ && position.j >= 0
             && position.j < nCols_ && envMap_[position.i][position.j] != GwAimaCellType::WALL);
+}
+
+GridPosition GwAimaModel::makeAdjacentPosition(GridPosition position, ActionType actionType) {
+    if (actionType == ActionType::NORTH) {
+        position.i -= 1;
+    } else if (actionType == ActionType::EAST) {
+        position.j += 1;
+    } else if (actionType == ActionType::SOUTH) {
+        position.i += 1;
+    } else if (actionType == ActionType::WEST) {
+        position.j -= 1;
+    }
+    return position;
+}
+
+std::pair<GridPosition, bool> GwAimaModel::makeNextPosition(GridPosition position, 
+                                                            ActionType actionType) {
+    GridPosition oldPosition = position;
+
+    bool isLegal = true;
+    position = makeAdjacentPosition(position, actionType);
+    if (!isValid(position)) {
+        position = oldPosition;
+        isLegal = false;
+    }
+
+    return std::make_pair(position, isLegal);
 }
 
 std::pair<std::unique_ptr<GwAimaState>, bool> 
