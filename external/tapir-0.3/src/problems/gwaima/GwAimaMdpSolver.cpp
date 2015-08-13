@@ -36,7 +36,8 @@ void GwAimaMdpSolver::solve_via_value_iter() {
 
     valueMap_.clear();
 
-
+    // States are represented as pairs of integers
+    // That is an element of <i,j>
     std::set<std::pair<int,int>> states;
     std::set<std::pair<int,int>> newStates;
 
@@ -50,17 +51,24 @@ void GwAimaMdpSolver::solve_via_value_iter() {
     for (std::pair<int,int> entry : states) {
         GridPosition pos(entry.first, entry.second);
 
-        // // The value of going straight to the goal is a simple lower bound.
-        // double value = calculateQValue(pos, -1);// -1 => exit the map
-        // if (valueMap_[entry] < value) {
-        //     valueMap_[entry] = value;
-        // } else {
-        //     value = valueMap_[entry];
-        // }
+        // The value of going straight to the goal is a simple lower bound.
+        // TODO lower bound = ...?
+        double value = calculateQValue(pos, -1);// -1 => exit the map
+
+        // take the max:
+        // valueMap_[entry] = value = max (valueMap_[entry], value)
+        if (valueMap_[entry] < value) {
+            valueMap_[entry] = value;
+        } else {
+            value = valueMap_[entry];
+        }
+
+        // TODO follow solution in gw-aima (in python)
+        // the implementation in rocksample is too specific
     }
 
     if (model_->options_->hasVerboseOutput) {
-        std::cout << "                   Done." << std::endl << std::endl;
+        std::cout << ": Done." << std::endl << std::endl;
     }
 }
 
