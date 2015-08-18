@@ -42,8 +42,8 @@ axmatrix.set_yticks([])
 axcolor = fig.add_axes([0.91,0.1,0.02,0.6])
 pylab.colorbar(im, cax=axcolor)
 
-out_dir = '/home/tor/jamu/xprmnt/c2map'
-map_filename = out_dir + '/c2map.png'
+out_dir = '/home/tor/jamu/xprmnt/c2mapjamu'
+map_filename = out_dir + '/c2mapjamu.png'
 
 # fig.show()
 fig.savefig(map_filename)
