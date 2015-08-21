@@ -45,3 +45,24 @@ The higher the $score_{pd}$ is, the more significant the over­representation of
 
 Totally, $k \times g$ connection scores are calculated to built C­Map in which statistical data cleaning and filtering and clustering analysis are applied.
 The clustered disease­ specific C­Map contains novel knowledge (hypothesis), subject to validation.
+
+===
+Text(Literature)-mining
+
+http://stackoverflow.com/questions/5410151/download-pubmed-abstracts-in-java
+http://stackoverflow.com/questions/17409107/obtaining-data-from-pubmed-using-python
+http://stackoverflow.com/questions/25740582/script-for-downloading-medline-abstracts-with-pmid
+http://biology.stackexchange.com/questions/21404/how-can-i-text-mine-full-text-articles-from-pubmed
+http://www.ncbi.nlm.nih.gov/books/NBK179288/
+
+1) the protein list to search for in abstracts
+2) the compound list to search for in abstracts
+
+Extracts
+Medicinal plant
+Natural products
+Bioactivity
+Bioassay
+Drugs
+Diabetes melitus + natural products
+Dm + extracts
