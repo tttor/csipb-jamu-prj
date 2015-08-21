@@ -38,14 +38,15 @@ def main(argv):
 
     # Visualize the c2mapjamu
     # Generate random features and distance matrix.
-    x = scipy.rand(40)
-    D = scipy.zeros([40,40])
-    for i in range(40):
-        for j in range(40):
+    n = 10
+    x = scipy.rand(n)
+    D = scipy.zeros([n,n])
+    for i in range(n):
+        for j in range(n):
             D[i,j] = abs(x[i] - x[j])
-    c2map.save_mat(D, c2mapjamu_dir+'/c2mapjamu.mat.png')
+    # c2map.save_mat(D, c2mapjamu_dir+'/c2mapjamu.mat.png')
     # c2map.save_mat(c2mapjamu, c2mapjamu_dir+'/c2mapjamu.mat.png')
-    # c2map.save_graph(c2mapjamu, c2mapjamu_dir)
+    c2map.save_graph(c2mapjamu, c2mapjamu_dir+'/c2mapjamu.graph.png')
 
 if __name__ == '__main__':
     main(sys.argv)
