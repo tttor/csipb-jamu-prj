@@ -1,49 +1,37 @@
 #!/bin/bash
-
-# TODO use query var
-# http://superuser.com/questions/360966/how-do-i-use-a-bash-variable-string-containing-quotes-in-a-command
-
-# diabetes mellitus [TIAB] AND medicinal plant [TIAB]
-# diabetes mellitus [TIAB] AND bioactivity [TIAB]
-# diabetes mellitus [TIAB] AND bioassay [TIAB]
-# diabetes mellitus [TIAB] AND drugs [TIAB]
-# diabetes mellitus [TIAB] AND natural products [TIAB]
-# diabetes mellitus [TIAB] AND extracts [TIAB]
-
-# -query "diabetes mellitus [TIAB] AND medicinal plant[TIAB] AND 2015 [PDAT]" | \
-# -query "diabetes mellitus [TIAB] AND bioactivity [TIAB] AND 2015 [PDAT]" | \
-# -query "diabetes mellitus [TIAB] AND bioassay [TIAB] AND 2015 [PDAT]" | \
-# -query "diabetes mellitus [TIAB] AND drugs [TIAB] AND 2015 [PDAT]" | \
-
-timestamp="$(date +'%Y%m%d.%H%M%S')"
-out_dir=/home/tor/jamu/xprmnt/abstact-pubmed/01
-mkdir -p out_dir
-out_filepath=$out_dir/esearch.$timestamp.xml
-meta_filepath=$out_dir/esearch.$timestamp.meta
-
+mainkeyword='diabetes mellitus'
+declare -a keywords=("medicinal plant" "bioactivity" "bioassay" "extracts" "natural products")
+declare -a years=(2015 2014 2013 2012 2011 2010 2009 2008 2007 2006 2005 2004 2003 2002 2001 2000)
 db=pubmed
-query='"diabetes mellitus [TIAB] AND drugs [TIAB]"'
 
-echo 'esearch...'
-esearch_tic="$(date +'%Y%m%d.%H%M%S')"
+out_dir=/home/tor/jamu/xprmnt/pubmed-article/04
+mkdir -p $out_dir
 
-esearch -db $db \
-		-query "diabetes mellitus [TIAB] AND natural products [TIAB] AND 2015 [PDAT]" | \
-efetch -format xml > $out_filepath
+for keyword in "${keywords[@]}"
+do
+	for year in "${years[@]}"
+	do
+		timestamp="$(date +'%Y%m%d.%H%M%S')"
+		out_filepath=$out_dir/esearch.$timestamp.xml
+		meta_filepath=$out_dir/esearch.$timestamp.meta
 
-# mindate=2014
-# maxdate=2015
-# esearch -db $db \
-# 		-query "diabetes mellitus [TIAB]" | \
-# 		efilter -mindate $mindate -maxdate $maxdate -datetype PDAT | \
-# 		efetch -format xml > \
-# 		$out_filepath
+		query=(-query "$mainkeyword [TIAB] AND $keyword [TIAB] AND $year [PDAT]")
 
-esearch_toc="$(date +'%Y%m%d.%H%M%S')"
+		#
+		echo 'esearch for' "${query[@]}"
+		esearch_tic="$(date +'%Y%m%d.%H%M%S')"
 
-echo $db >> $meta_filepath
-echo $query >> $meta_filepath
-echo $mindate >> $meta_filepath
-echo $maxdate >> $meta_filepath
-echo $esearch_tic >> $meta_filepath
-echo $esearch_toc >> $meta_filepath
+		esearch -db $db "${query[@]}" | \
+		efetch -format xml > $out_filepath
+
+		esearch_toc="$(date +'%Y%m%d.%H%M%S')"
+
+		#
+		echo $db >> $meta_filepath
+		echo "${query[@]}" >> $meta_filepath
+		echo $year >> $meta_filepath
+		echo $keyword >> $meta_filepath
+		echo $esearch_tic >> $meta_filepath
+		echo $esearch_toc >> $meta_filepath
+	done
+done
