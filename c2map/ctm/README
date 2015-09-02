@@ -2,3 +2,7 @@ ctm: Compound Text Mining
 
 goal:
 collect the compounds of jamu plants from available texts (publications)
+
+faq:
+> how are symbols (\alpha, \beta, \gamma) represented in the abstracts?
+ANS they appear in their original forms, see pmid 25620384

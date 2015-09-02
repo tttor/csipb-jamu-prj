@@ -5,7 +5,7 @@ import yaml
 def load_json_from_dir(dirpath):
     out_list = []
     for filepath in glob.glob(os.path.join(dirpath, '*.json')):
-        print('opening: %s' % filepath)
+        # print('opening: %s' % filepath)
     
         i = {}    
         with open(filepath) as f:  
@@ -16,6 +16,3 @@ def load_json_from_dir(dirpath):
 
 def gen_protein_meta():
 	pass
-
-
-

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-#TODO use query var
+# TODO use query var
+# http://superuser.com/questions/360966/how-do-i-use-a-bash-variable-string-containing-quotes-in-a-command
 
 # diabetes mellitus [TIAB] AND medicinal plant [TIAB]
 # diabetes mellitus [TIAB] AND bioactivity [TIAB]
