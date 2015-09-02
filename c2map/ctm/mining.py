@@ -7,8 +7,6 @@ from lxml import etree
 sys.path.append('/home/tor/jamu/ws/csipb-jamu-prj/c2map/util')
 import util
 
-abs_filepath = "/home/tor/jamu/xprmnt/abstact-pubmed/esearch.20150829.170428.xml"
-
 def read_article_set(article_set_filepath):
 	article_set = {}
 
@@ -69,30 +67,49 @@ def main(argv):
 	print '#article-sets=', len(article_sets)
 
 	n_articles = sum([len(i['data']) for i in article_sets])
-	print 'n_articles=', n_articles
+	print '#articles=', n_articles
 
 	# search for compounds
 	compounds = util.load_json_from_dir(ori_compound_data_dir)
-	print compounds
+	print '#compounds=', len(compounds)
 
 	for c in compounds:
-		c['n_search_docs'] = [n_articles]
+		c['n_search_abstracts'] = [n_articles]
 	
 		for article_set in article_sets:
 			for article_datum in article_set['data']:
 				abstract = article_datum['abstract'].lower()
 
-				c['pmid_of_containing_doc'] = []
+				c['pmid_of_containing_abstracts'] = []
 				if abstract.find(c['name'][0]) is not -1:
-					c['pmid_of_containing_doc'].append(article_datum['pmid'])
+					c['pmid_of_containing_abstracts'].append(article_datum['pmid'])
 
-		with open(compound_data_dir+'/'+c['id'][0]+'.json','w') as f:
+		compound_filepath = compound_data_dir+'/'+c['id']+'.json';
+		with open(compound_filepath,'w') as f:
 			json.dump(c, f)  
 
 	# search for proteins
 	proteins = util.load_json_from_dir(ori_protein_data_dir)
-	print proteins
+	print '#proteins=', len(proteins)
 
+	for p in proteins:
+		p['n_search_abstracts'] = [n_articles]
+	
+		for article_set in article_sets:
+			for article_datum in article_set['data']:
+				abstract = article_datum['abstract'].lower()
+
+				p['pmid_of_containing_abstracts'] = []
+				if abstract.find(p['description'][0]) is not -1:
+					p['pmid_of_containing_abstracts'].append(article_datum['pmid'])
+				if abstract.find(p['symbol'][0]) is not -1:
+					p['pmid_of_containing_abstracts'].append(article_datum['pmid'])
+
+		p['pmid_of_containing_abstracts'] = list(set(p['pmid_of_containing_abstracts']))
+
+		protein_filepath = protein_data_dir+'/'+p['id']+'.json';
+		with open(protein_filepath,'w') as f:
+			json.dump(p, f)  
 
 if __name__ == '__main__':
 	main(sys.argv)
