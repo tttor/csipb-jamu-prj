@@ -52,7 +52,7 @@ def read_article_sets(article_set_filepaths):
 	return article_sets
 
 def main(argv):
-	article_set_dir = '/home/tor/jamu/xprmnt/abstact-pubmed/01'
+	article_set_dir = '/home/tor/jamu/xprmnt/pubmed-article/06'
 	ori_compound_data_dir = '/home/tor/jamu/xprmnt/compound-data/ori'
 	ori_protein_data_dir = '/home/tor/jamu/xprmnt/protein-data/ori'
 	compound_data_dir = '/home/tor/jamu/xprmnt/compound-data/searched'
@@ -78,11 +78,12 @@ def main(argv):
 	
 		for article_set in article_sets:
 			for article_datum in article_set['data']:
-				abstract = article_datum['abstract'].lower()
+				if 'abstract' in article_datum:
+					abstract = article_datum['abstract'].lower()
 
-				c['pmid_of_containing_abstracts'] = []
-				if abstract.find(c['name'][0]) is not -1:
-					c['pmid_of_containing_abstracts'].append(article_datum['pmid'])
+					c['pmid_of_containing_abstracts'] = []
+					if abstract.find(c['name'][0]) is not -1:
+						c['pmid_of_containing_abstracts'].append(article_datum['pmid'])
 
 		compound_filepath = compound_data_dir+'/'+c['id']+'.json';
 		with open(compound_filepath,'w') as f:
@@ -97,13 +98,14 @@ def main(argv):
 	
 		for article_set in article_sets:
 			for article_datum in article_set['data']:
-				abstract = article_datum['abstract'].lower()
+				if 'abstract' in article_datum:
+					abstract = article_datum['abstract'].lower()
 
-				p['pmid_of_containing_abstracts'] = []
-				if abstract.find(p['description'][0]) is not -1:
-					p['pmid_of_containing_abstracts'].append(article_datum['pmid'])
-				if abstract.find(p['symbol'][0]) is not -1:
-					p['pmid_of_containing_abstracts'].append(article_datum['pmid'])
+					p['pmid_of_containing_abstracts'] = []
+					if abstract.find(p['description'][0]) is not -1:
+						p['pmid_of_containing_abstracts'].append(article_datum['pmid'])
+					if abstract.find(p['symbol'][0]) is not -1:
+						p['pmid_of_containing_abstracts'].append(article_datum['pmid'])
 
 		p['pmid_of_containing_abstracts'] = list(set(p['pmid_of_containing_abstracts']))
 
