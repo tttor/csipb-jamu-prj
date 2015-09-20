@@ -2,7 +2,7 @@ MODULE_NAME = problems
 
 #jamusample activetag gwaima
 #rocksample tag pushbox conttag
-CHILD_DIRS := shared gwaima
+CHILD_DIRS := shared tag
 
 ifdef HAS_ROOT_MAKEFILE
 
