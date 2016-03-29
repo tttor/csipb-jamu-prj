@@ -1,3 +1,0 @@
-<launch>
-	<node pkg="tapir" type="tag_node" name="tag_node" output="screen"/>
-</launch>
