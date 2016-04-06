@@ -5,6 +5,7 @@ import numpy
 import math
 
 from deap import tools, base, creator, gp, algorithms
+from operator import itemgetter
 
 # Define primitive set (pSet)
 def protectedDiv(left, right):
@@ -20,6 +21,7 @@ pset.addPrimitive(operator.add, 2)
 pset.addPrimitive(operator.mul, 2)
 pset.addPrimitive(operator.sub, 2)
 pset.addPrimitive(protectedDiv, 2)
+pset.addTerminal(0.5)
 pset.addEphemeralConstant("randConstant", lambda: random.randint(2,4))
 
 # Renaming the Arguments to desire one
@@ -46,30 +48,59 @@ toolbox.register("compile", gp.compile, pset=pset)
 
 # Define function to calculate similarity
 def calcSim(individual) :
-    result = ()
     func = toolbox.compile(expr=individual)
 
-    dataset  = numpy.matrix(numpy.loadtxt('dataset.csv', delimiter=','))
+    dataset = numpy.matrix(numpy.loadtxt('dataset.csv', delimiter=','))
 
-    kelas = numpy.matrix(numpy.loadtxt('referensi.csv', delimiter=','))
+    referensi = numpy.matrix(numpy.loadtxt('referensi.csv', delimiter=','))
 
+    sm = numpy.array([])
 
     for i in range (0, dataset.shape[0]):
-        for j in range (0, kelas.shape[0]):
+        for j in range (0, referensi.shape[0]):
             x = dataset[i, 1:]
             xAks = 1 - x
-            y = kelas[j, 1:]
+            y = referensi[j, 1:]
             yAks = 1 - y
 
+    # Generate variabel a, b, c, d
             a = numpy.inner(x, y)
             b = numpy.inner(x, yAks)
             c = numpy.inner(xAks, y)
             d = numpy.inner(xAks, yAks)
 
-            result += (func(a, b, c, d),)
+            print [a, b, c, d]
+
+            result = func(a, b, c, d)
+    # Create sm variabel to save information row of dataset and referensi data
+    # This variabel is an array which contain [rowDataset, rowReferensi, labelDataset, label, similarityValue]
+            if (i == 0) and  (j == 0):
+                sm = [i, j, dataset[i, 0], referensi[j, 0], result]
+            else :
+                zz = numpy.vstack((sm, [i, j, dataset[i, 0], referensi[j, 0], result]))
+                sm = zz
+
+    # Ranking the best similarity
+    ls = numpy.matrix(sorted(sm, key=itemgetter(4), reverse=True))
+    print ls
+    print len(ls)
+
+    TP = 0
+    avg = []
+    # Get 10% from each class calculation then count TP (True Positive) and save the similarity value
+    # Count the average by mean
+    for i in range(0, len(ls)):
+        if ls[i, 2] == ls[i, 3] :
+            TP += 1
+            avg.append(ls[i,4])
+    print TP
+    print avg
+    print sorted(avg)
+    print numpy.median(sorted(avg))
+    # # Collect the ranking value from Similarity Coefficient for each class
 
 
-    return result
+    return sm
 
 # Define fitness function detail
 def evalRecall(individual):
