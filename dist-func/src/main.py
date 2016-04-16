@@ -1,12 +1,9 @@
 # import library
 import random
 import operator
+import numpy
 from collections import OrderedDict
 from collections import defaultdict
-
-import numpy
-import math
-
 from deap import tools, base, creator, gp, algorithms
 from operator import itemgetter
 
@@ -55,20 +52,20 @@ toolbox.register("compile", gp.compile, pset=pset)
 kendall = dict()
 rank = dict()
 
+
+# Dataset
+x = numpy.matrix(
+    numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/voting/dataset_new.csv', delimiter=','))
+# Referensi
+y = numpy.matrix(
+    numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/voting/referensi_new.csv', delimiter=','))
+
+
 # Define function to calculate similarity
 def calcSim(pop):
     idx = 0
-
     for individual in pop:
         func = toolbox.compile(expr=individual)
-
-        # Dataset
-        x = numpy.matrix(
-            numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/voting/dataset.csv', delimiter=','))
-        # Referensi
-        y = numpy.matrix(
-            numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/voting/referensi.csv', delimiter=','))
-
         sim = numpy.array([])
         for i in range(0, y.shape[0]):
             sm = numpy.array([0, 0])
@@ -82,7 +79,7 @@ def calcSim(pop):
                 d = numpy.inner(1 - y[i,1:], 1 - x[j, 1:])
 
                 # Check if data and reference in same class
-                if (x[j, 0] == y[i, 0]):
+                if x[j, 0] == y[i, 0]:
                     flg = 1
                 else :
                     flg = 0
@@ -114,14 +111,12 @@ def calcSim(pop):
 
         d2 = defaultdict(list)
         for ss in range(0, len(d)):
-            d2[idx].append(sum(d.get(ss))/len(d.get(ss)))
+            # d2[idx].append(sum(d.get(ss))/len(d.get(ss)))
+            d2[idx].append(numpy.median(d.get(ss)))
         s = dict((k, tuple(v)) for k, v in d2.iteritems())
 
         kendall[str(individual)] = s.get(idx)
         idx += 1
-
-    # print kendall
-    # print sorted(kendall.items(), key=lambda t: t[1][0], reverse=True)
 
     for individu in pop:
         ln = len(kendall.get(str(individu)))
@@ -141,16 +136,12 @@ def calcSim(pop):
         rank[str(individu)] = d3.get(str(individu))
 
 
-
 # Define fitness function detail
 def evalRecall(individual):
     ln = len(rank.get(str(individual)))
     sm = sum(rank.get(str(individual)))
-
     result = sm / ln
-
     return result,
-
 
 # Setting up the operator of Genetic Programming such as Evaluation, Selection, Crossover, Mutation
 toolbox.register("evaluate", evalRecall)
@@ -162,15 +153,17 @@ toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
-
 # Define main function of program
 def main():
-    pop = toolbox.population(n=100)
-
-    calcSim(pop)
-
+    perc = "001"
+    nPop = 3
+    pop = toolbox.population(nPop)
     hof = tools.HallOfFame(1)
-    CXPB, MUTPB, NGEN = 0.5, 0.2, 10000
+    CXPB, MUTPB, NGEN = 0.5, 0.2, 3
+    calcSim(pop)
+    logpop = defaultdict(list)
+    loghof = defaultdict(list)
+    logstat = defaultdict(list)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
     stats_size = tools.Statistics(len)
@@ -184,6 +177,10 @@ def main():
     logbook = tools.Logbook()
     logbook.header = ['gen', 'nevals'] + mstats.fields
 
+    for iPop in pop:
+        logpop[0].append(str(iPop))
+
+
     # Evaluate the entire population
     invalid_ind = [ind for ind in pop if not ind.fitness.valid]
     fitnesses = map(toolbox.evaluate, pop)
@@ -191,6 +188,9 @@ def main():
         ind.fitness.values = fit
 
     hof.update(pop)
+
+    for iHof in hof:
+        loghof[0].append(str(iHof))
     #
     record = mstats.compile(pop) if mstats else {}
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
@@ -201,7 +201,6 @@ def main():
         # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
         # Clone the selected individuals
-
         offspring = map(toolbox.clone, offspring)
 
         # Apply crossover and mutation on the offspring
@@ -216,9 +215,11 @@ def main():
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
 
+        for iPop in offspring:
+            logpop[g].append(str(iPop))
+
         # Evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-
 
         calcSim(invalid_ind)
         fitnesses = map(toolbox.evaluate, invalid_ind)
@@ -226,6 +227,9 @@ def main():
             ind.fitness.values = fit
 
         hof.update(offspring)
+
+        for iHof in hof:
+            loghof[g].append(str(iHof))
 
         # The population is entirely replaced by the offspring
         pop[:] = offspring
@@ -235,24 +239,27 @@ def main():
         logbook.record(gen=g, nevals=len(invalid_ind), **record)
         print logbook.stream
 
+    logstat["0"].append(logbook.chapters["fitness"].select("avg"))
+    logstat["1"].append(logbook.chapters["fitness"].select("max"))
+    logstat["2"].append(logbook.chapters["fitness"].select("min"))
+    logstat["3"].append(logbook.chapters["fitness"].select("std"))
+
+    logstat = OrderedDict(sorted(logstat.items(), key=lambda t: t[0]))
+    logpop = OrderedDict(sorted(logpop.items(), key=lambda t: t[0]))
+    loghof = OrderedDict(sorted(loghof.items(), key=lambda t: t[0]))
+    
+    print logstat
+    print logpop
+    print loghof
+
+    numpy.savetxt("Percobaan"+perc+"_STATS_nPOP(" + str(nPop) + ")-nGEN(" + str(NGEN) + ").csv", logstat.values(),
+                  fmt='%s',delimiter="\t")
+    numpy.savetxt("Percobaan"+perc+"_POP_nPOP("+str(nPop)+")-nGEN("+str(NGEN)+").csv", logpop.values(),
+                  fmt='%s', delimiter="\t")
+    numpy.savetxt("Percobaan"+perc+"_HOF_nPOP("+str(nPop)+")-nGEN("+str(NGEN)+").csv", loghof.values(),
+                  fmt='%s', delimiter="\t")
+
     return pop, logbook, hof
-
-
-# def main():
-#     pop = toolbox.population(n=2)
-#     hof = tools.HallOfFame(1)
-#
-#     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
-#     stats_size = tools.Statistics(len)
-#     mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
-#     mstats.register("avg", numpy.mean)
-#     mstats.register("std", numpy.std)
-#     mstats.register("min", numpy.min)
-#     mstats.register("max", numpy.max)
-#
-# pop, log = algorithms.eaSimple(pop, toolbox, 0.5, 0.1, 40, stats=mstats, halloffame=hof, verbose=True)
-#     # print log
-#     return pop, log, hof
 
 if __name__ == "__main__":
     main()
