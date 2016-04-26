@@ -1,0 +1,101 @@
+protectedDiv(protectedDiv(add(b, c), sub(a, b)), protectedDiv(add(c, c), add(c, c)))	protectedDiv(sub(add(a, c), protectedDiv(c, b)), add(add(c, a), add(c, a)))	sub(c, c)	sub(protectedDiv(b, b), protectedDiv(b, b))	protectedDiv(a, b)	protectedDiv(sub(protectedDiv(b, a), protectedDiv(a, c)), add(sub(b, c), add(c, c)))	protectedDiv(sub(c, b), add(a, c))	protectedDiv(b, b)	add(protectedDiv(b, c), protectedDiv(b, a))	sub(protectedDiv(a, b), protectedDiv(a, c))	add(sub(a, b), sub(a, a))	add(add(a, c), sub(b, c))	sub(sub(add(c, c), add(b, b)), sub(protectedDiv(c, b), protectedDiv(b, b)))	add(sub(c, c), protectedDiv(c, b))	sub(b, a)	protectedDiv(b, b)	add(sub(add(c, a), sub(a, a)), protectedDiv(sub(b, b), protectedDiv(c, a)))	protectedDiv(protectedDiv(add(a, a), sub(c, b)), add(add(c, b), protectedDiv(a, b)))	sub(c, c)	add(c, a)
+protectedDiv(protectedDiv(add(a, a), c), add(add(c, b), protectedDiv(a, b)))	sub(c, sub(b, b))	protectedDiv(protectedDiv(add(b, c), sub(a, b)), protectedDiv(add(c, c), protectedDiv(b, c)))	add(add(c, c), protectedDiv(b, a))	protectedDiv(protectedDiv(add(a, a), sub(c, b)), add(add(c, b), protectedDiv(a, b)))	sub(b, a)	sub(c, c)	sub(c, c)	protectedDiv(protectedDiv(add(a, a), sub(c, b)), add(add(c, b), protectedDiv(a, b)))	protectedDiv(b, b)	protectedDiv(sub(protectedDiv(b, a), protectedDiv(a, c)), add(sub(b, c), add(c, c)))	sub(c, sub(c, c))	protectedDiv(c, b)	sub(c, b)	sub(c, c)	protectedDiv(protectedDiv(add(b, c), sub(a, b)), protectedDiv(add(c, c), add(c, c)))	sub(protectedDiv(b, b), protectedDiv(b, b))	protectedDiv(sub(protectedDiv(b, a), protectedDiv(a, c)), add(sub(b, c), add(c, c)))	sub(c, add(c, b))	protectedDiv(protectedDiv(add(a, a), sub(c, b)), add(c, protectedDiv(a, b)))
+sub(c, c)	sub(protectedDiv(b, b), protectedDiv(b, b))	sub(sub(b, b), c)	sub(c, c)	sub(c, sub(b, b))	sub(c, sub(b, b))	sub(c, c)	sub(c, c)	sub(c, c)	protectedDiv(protectedDiv(add(b, c), sub(a, b)), protectedDiv(add(c, c), add(c, c)))	sub(protectedDiv(b, b), protectedDiv(b, b))	sub(a, sub(b, b))	add(add(c, c), protectedDiv(b, a))	sub(c, add(c, b))	add(add(c, c), protectedDiv(b, a))	protectedDiv(c, b)	sub(c, a)	sub(b, c)	sub(b, c)	protectedDiv(c, c)
+sub(c, c)	protectedDiv(c, b)	protectedDiv(c, c)	protectedDiv(c, b)	sub(c, sub(sub(b, b), b))	sub(b, b)	sub(c, c)	sub(c, c)	sub(c, sub(b, b))	sub(c, c)	sub(b, sub(b, b))	sub(c, c)	sub(c, sub(b, b))	sub(b, c)	sub(c, c)	sub(c, c)	sub(sub(b, c), c)	sub(c, b)	sub(sub(protectedDiv(c, a), add(c, c)), c)	sub(c, sub(sub(sub(b, a), add(a, b)), b))
+sub(c, sub(b, b))	sub(protectedDiv(add(c, b), add(a, b)), c)	add(a, b)	sub(c, c)	sub(c, b)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, sub(sub(c, b), b))	protectedDiv(c, c)	sub(c, c)	sub(c, protectedDiv(b, b))	sub(c, c)	sub(protectedDiv(c, b), c)	sub(c, sub(b, b))	sub(sub(b, b), c)	sub(c, c)
+sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, sub(b, b))	sub(c, c)	sub(c, c)	sub(c, sub(b, c))	sub(c, b)	sub(c, c)	sub(c, c)	sub(add(a, b), c)	sub(protectedDiv(add(c, b), c), c)	sub(c, c)	sub(c, c)
+sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(b, b)	sub(c, c)	sub(c, c)	sub(c, c)	sub(add(add(c, c), add(c, b)), c)	sub(c, c)	sub(c, protectedDiv(c, a))	sub(c, c)	sub(c, c)	protectedDiv(b, b)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)
+sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, add(add(b, c), protectedDiv(c, a)))	sub(c, c)	sub(c, c)	sub(sub(protectedDiv(a, b), sub(c, c)), c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(sub(add(b, a), sub(b, a)), c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, a)
+sub(c, c)	sub(protectedDiv(a, a), add(a, c))	sub(c, c)	sub(c, c)	c	sub(a, c)	sub(c, c)	b	protectedDiv(c, b)	sub(c, add(add(a, c), sub(c, a)))	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)
+add(c, b)	sub(c, c)	sub(c, c)	sub(protectedDiv(b, a), c)	sub(c, protectedDiv(protectedDiv(a, a), sub(c, c)))	sub(c, c)	sub(c, protectedDiv(add(a, a), add(a, c)))	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)
+sub(c, c)	a	add(c, c)	sub(c, add(b, c))	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(add(a, a), c)	sub(c, b)	add(c, c)	sub(c, b)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)
+sub(c, c)	sub(c, c)	sub(c, c)	a	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(sub(a, b), c)	sub(c, c)	sub(sub(a, b), sub(b, b))	sub(protectedDiv(a, b), c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, protectedDiv(c, b))	sub(c, c)	protectedDiv(c, c)	sub(c, c)	sub(c, c)
+a	sub(b, c)	b	sub(c, c)	sub(c, c)	a	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, add(b, a))	sub(c, c)	sub(c, c)	sub(c, c)	b	sub(protectedDiv(b, c), protectedDiv(a, c))	sub(c, c)	sub(c, c)	sub(a, c)	sub(sub(c, b), sub(b, b))
+sub(c, c)	sub(c, c)	sub(c, c)	b	add(a, a)	sub(c, c)	a	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(b, c)	sub(c, sub(protectedDiv(a, a), add(a, a)))	sub(c, c)	a	sub(c, c)	sub(c, c)	sub(add(b, a), c)	sub(c, sub(c, c))
+sub(c, protectedDiv(sub(a, b), add(a, a)))	sub(c, c)	sub(c, c)	sub(c, sub(c, b))	sub(c, c)	sub(c, c)	add(protectedDiv(c, c), protectedDiv(a, b))	sub(c, c)	sub(a, a)	sub(c, c)	add(a, c)	sub(c, c)	sub(a, c)	sub(c, c)	protectedDiv(a, b)	sub(c, c)	sub(c, c)	sub(c, c)	sub(a, c)	sub(c, c)
+sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, protectedDiv(sub(a, b), add(a, a)))	sub(c, c)	sub(add(add(b, c), sub(a, a)), c)	sub(c, c)	sub(c, c)	sub(c, protectedDiv(a, a))	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)
+sub(c, c)	sub(c, c)	sub(b, c)	sub(c, c)	sub(c, add(add(a, c), add(a, b)))	sub(c, c)	sub(c, c)	add(b, a)	sub(c, c)	protectedDiv(protectedDiv(a, a), protectedDiv(a, b))	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(sub(b, b), c)
+sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	c	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, sub(add(a, b), add(c, a)))	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)
+sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	c	sub(c, c)	sub(c, c)	sub(c, c)	c	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)
+sub(c, c)	sub(add(sub(c, c), sub(c, c)), c)	sub(c, sub(protectedDiv(a, c), sub(b, b)))	sub(c, c)	sub(a, c)	sub(c, c)	sub(c, c)	sub(c, c)	protectedDiv(sub(a, c), sub(b, a))	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	b	sub(c, c)	sub(c, c)
+sub(c, c)	sub(a, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	a	add(sub(c, b), protectedDiv(a, c))	sub(c, sub(protectedDiv(a, b), protectedDiv(b, c)))	sub(c, c)	b	sub(c, c)	sub(c, c)	sub(c, c)
+sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, protectedDiv(a, b))	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, a)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)
+sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, protectedDiv(protectedDiv(b, b), add(a, a)))	sub(c, c)	sub(add(a, b), c)	c	sub(c, c)	sub(c, sub(add(c, b), add(b, c)))	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, b)	sub(c, c)	sub(c, c)	protectedDiv(add(c, a), sub(a, c))	sub(c, c)
+sub(c, c)	sub(c, c)	sub(a, b)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, sub(protectedDiv(c, c), add(a, c)))	sub(c, c)	sub(c, c)	sub(add(sub(c, a), add(a, a)), c)	sub(a, c)	sub(c, c)
+sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(b, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)
+add(c, b)	add(protectedDiv(c, c), add(b, c))	a	sub(c, c)	sub(c, b)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	sub(c, c)	add(c, b)	b	sub(c, c)	sub(c, c)	sub(c, c)	protectedDiv(protectedDiv(b, b), add(b, b))	sub(c, c)	sub(c, c)	sub(c, c)
+sub(c, c)	sub(c, c)	protectedDiv(add(a, b), protectedDiv(c, a))	a	sub(c, c)	a	protectedDiv(protectedDiv(c, c), add(b, b))	sub(b, c)	sub(c, c)	a	sub(c, c)	sub(c, c)	sub(c, c)	a	sub(c, c)	c	sub(c, c)	sub(c, c)	sub(c, c)	a
+sub(add(c, b), c)	sub(c, c)	sub(c, c)	protectedDiv(add(a, b), protectedDiv(c, a))	sub(c, c)	a	a	a	sub(c, sub(protectedDiv(b, b), add(c, b)))	a	protectedDiv(add(a, b), protectedDiv(c, a))	sub(c, sub(add(a, b), sub(b, c)))	sub(c, c)	sub(c, c)	sub(c, c)	a	sub(c, c)	b	sub(c, c)	sub(add(sub(c, b), add(c, a)), c)
+sub(c, sub(add(a, b), sub(b, c)))	a	a	protectedDiv(add(a, b), protectedDiv(c, a))	a	sub(c, c)	a	a	a	a	sub(sub(a, c), sub(a, c))	protectedDiv(add(a, b), protectedDiv(c, a))	a	sub(b, b)	protectedDiv(add(a, b), protectedDiv(c, a))	a	sub(c, c)	a	add(c, b)	protectedDiv(add(a, b), protectedDiv(c, a))
+a	a	a	a	a	a	a	a	a	protectedDiv(add(a, b), protectedDiv(c, a))	a	a	a	a	a	a	a	a	a	a
+a	a	a	sub(protectedDiv(a, a), add(c, a))	a	a	a	a	a	a	a	add(b, b)	add(protectedDiv(c, b), protectedDiv(a, a))	a	a	c	add(sub(b, c), sub(a, b))	a	a	sub(a, c)
+a	a	add(protectedDiv(c, b), protectedDiv(a, a))	c	a	a	add(add(c, a), protectedDiv(a, b))	protectedDiv(protectedDiv(c, a), add(a, b))	a	a	sub(add(a, b), sub(c, a))	a	a	a	a	a	a	a	sub(c, a)	c
+a	a	a	a	a	a	a	a	a	a	a	a	protectedDiv(add(b, c), sub(b, b))	a	a	a	a	a	a	a
+a	a	a	a	a	a	a	c	a	a	a	a	a	a	a	a	a	protectedDiv(b, a)	a	a
+a	a	c	a	a	a	a	a	a	a	a	sub(sub(c, c), add(a, b))	a	a	a	a	a	a	add(add(b, b), sub(a, c))	a
+protectedDiv(b, c)	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	sub(c, a)	a	a
+a	sub(protectedDiv(b, a), protectedDiv(a, b))	a	a	protectedDiv(b, a)	a	a	a	add(b, c)	a	a	a	a	a	a	a	a	a	a	protectedDiv(c, c)
+a	a	a	a	a	a	a	a	protectedDiv(protectedDiv(c, c), protectedDiv(c, b))	a	a	a	sub(c, c)	a	a	a	a	c	c	a
+add(a, b)	sub(add(b, c), sub(b, b))	a	a	a	a	a	a	a	a	a	a	a	a	a	a	sub(b, c)	a	a	a
+protectedDiv(protectedDiv(b, b), sub(c, c))	a	a	a	a	protectedDiv(sub(b, b), add(c, b))	a	a	a	protectedDiv(add(b, b), sub(b, a))	a	a	a	a	a	a	add(sub(a, c), sub(a, a))	a	a	a
+a	a	a	a	a	a	a	a	a	add(c, a)	a	a	a	a	a	a	add(c, a)	a	protectedDiv(add(a, b), add(c, c))	a
+a	a	protectedDiv(add(c, a), add(c, c))	a	protectedDiv(add(a, c), add(a, b))	a	sub(c, a)	a	a	a	a	a	a	a	add(add(c, a), add(a, c))	a	a	a	a	a
+a	sub(c, c)	a	a	a	protectedDiv(add(a, a), add(c, a))	a	a	a	a	sub(protectedDiv(b, c), sub(c, a))	a	a	protectedDiv(add(a, c), add(a, b))	sub(b, c)	a	a	a	a	a
+a	a	a	a	protectedDiv(a, b)	c	protectedDiv(protectedDiv(b, b), sub(a, b))	a	a	a	a	a	protectedDiv(b, b)	a	a	add(a, b)	a	protectedDiv(sub(b, b), add(c, c))	sub(c, b)	a
+a	a	a	a	a	a	a	a	a	sub(sub(c, a), protectedDiv(a, b))	a	a	a	a	a	a	a	a	a	add(a, c)
+sub(add(c, a), add(c, a))	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	sub(add(a, a), sub(a, b))	a	a
+a	a	a	a	sub(add(b, c), protectedDiv(a, b))	add(a, b)	a	a	a	a	a	a	a	a	a	a	a	a	a	a
+a	a	protectedDiv(sub(c, b), sub(a, c))	protectedDiv(sub(a, a), add(c, b))	a	a	a	a	a	a	a	sub(sub(c, a), add(c, b))	a	protectedDiv(a, a)	a	a	c	a	a	a
+a	a	a	a	protectedDiv(c, c)	protectedDiv(c, a)	a	a	a	sub(a, b)	a	a	a	a	protectedDiv(protectedDiv(b, a), sub(a, a))	a	a	a	protectedDiv(add(c, c), protectedDiv(b, a))	a
+a	c	protectedDiv(sub(b, a), protectedDiv(b, b))	a	add(sub(b, b), protectedDiv(a, b))	a	a	a	a	protectedDiv(c, b)	b	a	a	a	sub(c, a)	a	a	a	a	a
+a	a	a	a	b	a	a	sub(sub(b, a), add(b, a))	a	a	a	a	a	a	a	a	a	a	a	a
+c	a	add(c, a)	b	a	protectedDiv(b, c)	add(protectedDiv(c, a), sub(c, a))	a	a	a	sub(add(a, a), sub(b, b))	add(protectedDiv(c, b), add(c, b))	add(b, b)	a	a	a	b	add(b, b)	a	a
+a	a	a	add(c, a)	a	a	a	a	a	a	protectedDiv(b, c)	b	a	protectedDiv(a, c)	c	add(add(b, a), add(c, a))	a	add(sub(a, b), protectedDiv(a, a))	c	a
+a	protectedDiv(a, c)	sub(b, b)	a	a	a	a	a	a	sub(a, a)	b	a	a	a	add(c, a)	sub(add(c, c), sub(b, c))	a	a	a	a
+b	a	protectedDiv(protectedDiv(b, c), protectedDiv(c, b))	a	a	a	sub(protectedDiv(c, c), add(a, a))	a	a	a	a	a	a	a	protectedDiv(a, c)	a	a	a	a	a
+a	a	a	a	a	protectedDiv(a, c)	a	protectedDiv(a, c)	protectedDiv(a, c)	a	a	a	a	a	a	a	a	a	a	a
+protectedDiv(a, c)	protectedDiv(a, c)	protectedDiv(c, a)	a	a	a	a	a	add(add(b, a), sub(b, a))	a	a	a	a	a	a	a	a	a	a	a
+add(sub(b, a), add(b, a))	a	a	sub(add(a, a), sub(b, a))	a	c	a	a	a	a	b	a	a	b	a	a	a	a	a	a
+a	a	sub(protectedDiv(b, a), add(b, a))	a	add(a, b)	a	a	sub(a, a)	a	a	a	a	a	add(protectedDiv(c, c), sub(a, b))	add(sub(c, a), add(c, b))	a	a	a	c	a
+a	a	add(c, b)	a	a	a	a	a	a	b	a	sub(add(b, b), protectedDiv(b, c))	a	a	a	a	protectedDiv(a, b)	a	sub(add(b, c), sub(c, b))	a
+a	a	protectedDiv(protectedDiv(c, c), add(a, a))	b	c	a	a	a	a	a	protectedDiv(b, b)	a	a	a	a	a	protectedDiv(a, b)	a	b	a
+a	a	a	a	a	a	a	protectedDiv(protectedDiv(a, b), sub(a, a))	protectedDiv(b, b)	protectedDiv(add(c, b), add(c, b))	sub(b, c)	a	a	a	protectedDiv(protectedDiv(c, b), add(c, b))	sub(protectedDiv(a, b), sub(b, a))	a	a	a	b
+protectedDiv(protectedDiv(a, b), sub(a, a))	a	b	a	a	a	sub(protectedDiv(c, b), protectedDiv(b, c))	add(a, a)	a	a	a	a	a	a	a	a	a	sub(protectedDiv(a, b), protectedDiv(b, b))	a	a
+protectedDiv(protectedDiv(b, a), add(c, a))	a	a	a	a	a	a	a	a	a	a	protectedDiv(b, c)	a	protectedDiv(protectedDiv(b, c), sub(c, a))	a	sub(b, b)	add(add(a, b), add(a, c))	a	protectedDiv(protectedDiv(a, b), sub(a, a))	a
+protectedDiv(protectedDiv(a, a), add(c, a))	a	a	a	a	a	a	a	a	b	a	a	a	a	a	protectedDiv(a, a)	a	a	a	protectedDiv(b, b)
+a	a	protectedDiv(protectedDiv(a, c), protectedDiv(a, b))	protectedDiv(protectedDiv(b, a), protectedDiv(b, c))	a	a	a	b	a	a	a	a	a	a	a	a	a	a	sub(b, a)	a
+a	a	a	c	add(protectedDiv(c, a), add(c, a))	add(a, a)	a	a	a	a	a	a	a	c	a	a	a	a	sub(b, a)	a
+a	a	a	a	a	protectedDiv(c, c)	a	add(add(a, b), add(c, a))	a	a	a	sub(c, c)	a	c	a	a	sub(b, a)	c	protectedDiv(add(a, c), sub(a, b))	b
+a	sub(add(a, a), sub(c, a))	a	a	a	a	a	a	a	sub(c, a)	a	a	a	a	a	a	a	a	a	a
+a	a	a	a	a	sub(sub(b, a), add(b, a))	protectedDiv(b, a)	a	a	add(sub(c, c), sub(a, b))	a	a	a	a	a	a	a	protectedDiv(b, b)	a	add(add(a, b), add(c, c))
+a	a	a	a	a	a	a	a	a	a	a	a	add(a, c)	sub(b, c)	c	a	a	a	a	protectedDiv(sub(b, c), add(b, a))
+a	c	protectedDiv(sub(b, c), add(b, b))	a	a	a	a	a	add(sub(a, a), add(b, b))	a	a	a	a	a	sub(b, b)	a	a	a	a	sub(a, c)
+add(c, c)	a	sub(a, a)	add(c, b)	c	a	protectedDiv(b, b)	c	a	a	a	a	a	sub(sub(a, a), add(b, b))	a	c	a	a	a	a
+a	protectedDiv(b, b)	a	add(add(a, a), sub(b, b))	a	a	c	a	a	a	a	a	a	a	a	a	a	c	a	b
+a	a	a	a	add(sub(c, c), sub(b, a))	a	a	a	a	a	protectedDiv(sub(c, a), protectedDiv(b, b))	a	a	a	a	add(sub(a, c), sub(a, c))	a	a	a	sub(protectedDiv(b, c), sub(b, b))
+c	a	a	a	a	a	add(c, b)	a	a	c	protectedDiv(add(c, a), protectedDiv(a, c))	a	a	sub(c, a)	a	a	a	a	a	a
+a	a	a	a	a	a	a	a	a	protectedDiv(add(sub(b, c), a), protectedDiv(a, c))	a	a	a	a	b	a	a	a	a	a
+a	a	a	a	add(protectedDiv(b, c), sub(c, b))	sub(a, b)	a	a	a	a	a	a	a	a	a	a	a	a	a	a
+a	add(add(b, a), protectedDiv(a, b))	a	a	a	a	a	a	a	a	a	a	a	c	a	a	a	a	a	a
+a	add(sub(b, b), protectedDiv(b, c))	a	add(b, a)	a	a	a	a	protectedDiv(a, c)	a	a	protectedDiv(a, a)	a	a	a	a	a	a	a	a
+a	a	a	a	a	a	a	a	a	a	a	a	a	protectedDiv(c, b)	a	a	a	a	sub(a, a)	a
+a	a	a	a	a	a	a	a	a	a	a	a	a	a	sub(add(c, b), sub(c, a))	add(add(b, b), protectedDiv(a, c))	a	add(protectedDiv(c, c), protectedDiv(a, c))	a	protectedDiv(b, a)
+a	a	a	a	a	a	c	a	a	add(sub(b, a), add(a, c))	a	a	sub(add(a, a), protectedDiv(b, a))	a	c	a	a	a	a	a
+a	add(protectedDiv(b, b), add(c, b))	a	add(a, c)	a	a	a	a	a	c	a	a	a	a	a	a	a	a	a	a
+a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a
+a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a
+add(sub(a, c), sub(a, c))	protectedDiv(protectedDiv(c, a), sub(b, c))	a	a	a	a	a	a	a	a	a	sub(add(a, c), sub(a, c))	a	sub(b, b)	add(c, b)	a	c	a	a	a
+a	a	a	a	a	a	a	a	protectedDiv(c, c)	c	a	a	add(b, b)	a	a	a	a	add(add(a, c), protectedDiv(b, c))	a	a
+a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	protectedDiv(a, a)	a	a
+a	a	a	a	a	a	a	a	a	a	add(a, c)	a	a	a	a	c	a	a	sub(c, b)	a
+a	a	c	a	a	a	a	sub(c, b)	a	a	c	b	a	a	a	protectedDiv(add(a, b), protectedDiv(a, c))	a	a	a	a
+protectedDiv(c, a)	a	a	sub(protectedDiv(c, c), protectedDiv(c, a))	a	a	a	a	b	a	a	protectedDiv(protectedDiv(a, c), add(a, b))	a	a	a	a	a	a	a	a
+a	a	a	a	a	a	a	a	a	protectedDiv(add(c, b), add(c, c))	a	b	a	a	a	a	a	sub(a, a)	a	a
+a	a	a	add(sub(a, b), protectedDiv(b, b))	a	sub(sub(a, a), sub(b, b))	add(sub(b, a), sub(b, b))	a	a	a	sub(add(b, a), sub(c, c))	a	a	a	a	a	a	a	a	a
+protectedDiv(protectedDiv(a, c), protectedDiv(a, b))	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	b	a
+a	a	a	a	add(a, c)	c	a	a	a	a	a	a	a	a	a	a	a	sub(c, b)	a	a
+a	a	sub(protectedDiv(b, b), sub(c, a))	a	a	a	a	a	a	a	add(add(a, c), add(a, b))	a	a	a	a	a	add(b, b)	c	protectedDiv(c, a)	a
+a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	protectedDiv(c, a)	a	a	a
+a	a	add(add(b, a), sub(b, a))	a	a	a	a	a	a	a	a	a	protectedDiv(a, c)	a	protectedDiv(sub(b, c), add(b, b))	a	a	sub(add(c, c), add(c, b))	a	a
+a	a	a	add(add(c, b), sub(b, b))	a	b	a	a	protectedDiv(a, b)	sub(sub(c, b), protectedDiv(b, c))	a	a	a	a	a	a	a	a	a	a
+a	a	a	a	a	a	a	a	a	protectedDiv(b, b)	a	protectedDiv(b, a)	a	a	a	a	b	a	a	a
