@@ -20,19 +20,19 @@ def protectedDiv(left, right):
     return x
 
 
-pset = gp.PrimitiveSet("main", 4)
+pset = gp.PrimitiveSet("main", 3)
 pset.addPrimitive(numpy.add, 2, name="add")
 pset.addPrimitive(numpy.subtract, 2, name="sub")
-pset.addPrimitive(numpy.multiply, 2, name="mul")
+# pset.addPrimitive(numpy.multiply, 2, name="mul")
 pset.addPrimitive(protectedDiv, 2)
-pset.addTerminal(0.5)
-pset.addEphemeralConstant("randConstant", lambda: random.randint(2, 4))
+# pset.addTerminal(0.5)
+# pset.addEphemeralConstant("randConstant", lambda: random.randint(2, 4))
 
 # Renaming the Arguments to desire one
 pset.renameArguments(ARG0="a")
 pset.renameArguments(ARG1="b")
 pset.renameArguments(ARG2="c")
-pset.renameArguments(ARG3="d")
+# pset.renameArguments(ARG3="d")
 
 # Setting up the tree
 expr = gp.genFull(pset, min_=1, max_=3)
@@ -76,7 +76,7 @@ def calcSim(pop):
                 a = numpy.inner(y[i,1:], x[j, 1:])
                 b = numpy.inner(y[i, 1:], 1 - x[j, 1:])
                 c = numpy.inner(1 - y[i, 1:], x[j, 1:])
-                d = numpy.inner(1 - y[i,1:], 1 - x[j, 1:])
+                # d = numpy.inner(1 - y[i,1:], 1 - x[j, 1:])
 
                 # Check if data and reference in same class
                 if x[j, 0] == y[i, 0]:
@@ -85,9 +85,9 @@ def calcSim(pop):
                     flg = 0
 
                 if (i == 0) and (j == 0):
-                    sm = [flg, func(a, b, c, d)]
+                    sm = [flg, func(a, b, c)]
                 else:
-                    zz = numpy.vstack((sm, [flg, func(a, b, c, d)]))
+                    zz = numpy.vstack((sm, [flg, func(a, b, c)]))
                     sm = zz
 
             # Descending order data
@@ -156,10 +156,11 @@ toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max
 # Define main function of program
 def main():
     perc = "001"
-    nPop = 3
+    nPop = 100
     pop = toolbox.population(nPop)
     hof = tools.HallOfFame(1)
-    CXPB, MUTPB, NGEN = 0.5, 0.2, 3
+    CXPB, MUTPB, NGEN = 0.5, 0.2, 10
+
     calcSim(pop)
     logpop = defaultdict(list)
     loghof = defaultdict(list)
@@ -221,6 +222,8 @@ def main():
         # Evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
 
+        kendall.clear()
+        rank.clear()
         calcSim(invalid_ind)
         fitnesses = map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
@@ -248,35 +251,14 @@ def main():
     logpop = OrderedDict(sorted(logpop.items(), key=lambda t: t[0]))
     loghof = OrderedDict(sorted(loghof.items(), key=lambda t: t[0]))
     
-    print logstat
-    print logpop
-    print loghof
-
-    numpy.savetxt("Percobaan"+perc+"_STATS_nPOP(" + str(nPop) + ")-nGEN(" + str(NGEN) + ").csv", logstat.values(),
+    numpy.savetxt("Tanimoto"+perc+"_STATS_nPOP(" + str(nPop) + ")-nGEN(" + str(NGEN) + ").csv", logstat.values(),
                   fmt='%s',delimiter="\t")
-    numpy.savetxt("Percobaan"+perc+"_POP_nPOP("+str(nPop)+")-nGEN("+str(NGEN)+").csv", logpop.values(),
+    numpy.savetxt("Tanimoto"+perc+"_POP_nPOP("+str(nPop)+")-nGEN("+str(NGEN)+").csv", logpop.values(),
                   fmt='%s', delimiter="\t")
-    numpy.savetxt("Percobaan"+perc+"_HOF_nPOP("+str(nPop)+")-nGEN("+str(NGEN)+").csv", loghof.values(),
+    numpy.savetxt("Tanimoto"+perc+"_HOF_nPOP("+str(nPop)+")-nGEN("+str(NGEN)+").csv", loghof.values(),
                   fmt='%s', delimiter="\t")
 
     return pop, logbook, hof
 
 if __name__ == "__main__":
     main()
-
-
-
-    ### Graphviz Section for plotting purpose ###
-    # expr = toolbox.individual()
-    # nodes, edges, labels = gp.graph(expr)
-    #
-    # g = pgv.AGraph()
-    # g.add_nodes_from(nodes)
-    # g.add_edges_from(edges)
-    # g.layout(prog="dot")
-    #
-    # for i in nodes:
-    #     n = g.get_node(i)
-    #     n.attr["label"] = labels[i]
-    #
-    # g.draw("tree.pdf")
