@@ -54,11 +54,16 @@ rank = dict()
 
 
 # Dataset
-x = numpy.matrix(
-    numpy.loadtxt('./data/voting/dataset_new.csv', delimiter=','))
-# Referensi
-y = numpy.matrix(
-    numpy.loadtxt('./data/voting/referensi_new.csv', delimiter=','))
+tmp2 = numpy.matrix(numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/jamu/jamu-dataset.csv', delimiter=','))
+x = numpy.vstack((tmp2[11:72, :], tmp2[84:321, :], tmp2[333:343, :], tmp2[355:1323, :], tmp2[1335:1721, :],
+                   tmp2[1733:2561, :], tmp2[2573:2872, :], tmp2[2884:2979, :], tmp2[2991:3138, :]))
+y = numpy.vstack((tmp2[1:10, :], tmp2[73:83, :], tmp2[322:332, :], tmp2[344:354, :], tmp2[1324:1334, :],
+                   tmp2[1722:1732, :], tmp2[2562:2572, :], tmp2[2873:2883, :], tmp2[2980:2990, :]))
+# x = numpy.matrix(
+#     numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/voting/dataset_new.csv', delimiter=','))
+# # Referensi
+# y = numpy.matrix(
+#     numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/voting/referensi_new.csv', delimiter=','))
 
 
 # Define function to calculate similarity
@@ -156,11 +161,11 @@ toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max
 # Define main function of program
 def main():
     perc = "00"
-    nPop = 3
+    nPop = 1000
     pop = toolbox.population(nPop)
 
     hof = tools.HallOfFame(1)
-    CXPB, MUTPB, NGEN = 0.5, 0.2, 3
+    CXPB, MUTPB, NGEN = 0.5, 0.2, 1000
 
     calcSim(pop)
     logpop = defaultdict(list)

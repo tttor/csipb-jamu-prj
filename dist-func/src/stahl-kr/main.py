@@ -52,13 +52,17 @@ toolbox.register("compile", gp.compile, pset=pset)
 kendall = dict()
 rank = dict()
 
-
-# Dataset
-x = numpy.matrix(
-    numpy.loadtxt('./data/voting/dataset_new.csv', delimiter=','))
-# Referensi
-y = numpy.matrix(
-    numpy.loadtxt('./data/voting/referensi_new.csv', delimiter=','))
+tmp6 = numpy.matrix(numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/stahl-kr/stahl-all.csv', delimiter='\t'))
+x = numpy.vstack((tmp6[11:28, :], tmp6[140:183, :], tmp6[195:226, :], tmp6[238:243, :], tmp6[255:267, :],
+                   tmp6[279:334, :]))
+y = numpy.vstack((tmp6[1:10, :], tmp6[129:139, :], tmp6[184:194, :], tmp6[227:237, :], tmp6[244:254, :],
+                   tmp6[268:278, :]))
+# # Dataset
+# x = numpy.matrix(
+#     numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/voting/dataset_new.csv', delimiter=','))
+# # Referensi
+# y = numpy.matrix(
+#     numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/voting/referensi_new.csv', delimiter=','))
 
 
 # Define function to calculate similarity
@@ -156,11 +160,11 @@ toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max
 # Define main function of program
 def main():
     perc = "00"
-    nPop = 3
+    nPop = 1000
     pop = toolbox.population(nPop)
 
     hof = tools.HallOfFame(1)
-    CXPB, MUTPB, NGEN = 0.5, 0.2, 3
+    CXPB, MUTPB, NGEN = 0.5, 0.2, 1000
 
     calcSim(pop)
     logpop = defaultdict(list)

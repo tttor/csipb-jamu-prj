@@ -55,10 +55,10 @@ rank = dict()
 
 # Dataset
 x = numpy.matrix(
-    numpy.loadtxt('./data/voting/dataset_new.csv', delimiter=','))
+    numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/voting/dataset_new.csv', delimiter=','))
 # Referensi
 y = numpy.matrix(
-    numpy.loadtxt('./data/voting/referensi_new.csv', delimiter=','))
+    numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/voting/referensi_new.csv', delimiter=','))
 
 
 # Define function to calculate similarity

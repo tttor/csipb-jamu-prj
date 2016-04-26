@@ -54,11 +54,14 @@ rank = dict()
 
 
 # Dataset
-x = numpy.matrix(
-    numpy.loadtxt('./data/voting/dataset_new.csv', delimiter=','))
-# Referensi
-y = numpy.matrix(
-    numpy.loadtxt('./data/voting/referensi_new.csv', delimiter=','))
+x = numpy.matrix(numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/zoo/zoo_dataset.csv', delimiter=','))
+y = numpy.matrix(numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/zoo/zoo_referensi.csv', delimiter=','))
+
+# x = numpy.matrix(
+#     numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/voting/dataset_new.csv', delimiter=','))
+# # Referensi
+# y = numpy.matrix(
+#     numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/voting/referensi_new.csv', delimiter=','))
 
 
 # Define function to calculate similarity
@@ -156,11 +159,11 @@ toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max
 # Define main function of program
 def main():
     perc = "00"
-    nPop = 3
+    nPop = 1000
     pop = toolbox.population(nPop)
 
     hof = tools.HallOfFame(1)
-    CXPB, MUTPB, NGEN = 0.5, 0.2, 3
+    CXPB, MUTPB, NGEN = 0.5, 0.2, 1000
 
     calcSim(pop)
     logpop = defaultdict(list)
