@@ -1,0 +1,4 @@
+protectedDiv(b, a)	protectedDiv(sub(sub(b, b), sub(c, a)), protectedDiv(sub(c, a), protectedDiv(c, c)))	add(protectedDiv(b, b), add(c, c))
+protectedDiv(sub(sub(a, b), sub(c, a)), protectedDiv(sub(c, a), protectedDiv(c, c)))	protectedDiv(b, add(protectedDiv(a, b), sub(b, c)))	protectedDiv(sub(sub(b, b), sub(c, a)), protectedDiv(sub(c, a), protectedDiv(c, c)))
+protectedDiv(sub(sub(b, b), sub(c, a)), protectedDiv(sub(c, a), protectedDiv(c, c)))	protectedDiv(b, add(protectedDiv(a, b), sub(b, c)))	protectedDiv(b, add(protectedDiv(a, b), a))
+protectedDiv(sub(sub(b, b), sub(c, a)), protectedDiv(sub(c, a), protectedDiv(c, c)))	protectedDiv(sub(sub(b, b), sub(c, a)), protectedDiv(sub(c, a), protectedDiv(c, c)))	protectedDiv(sub(sub(b, b), sub(c, a)), protectedDiv(sub(c, a), protectedDiv(c, c)))

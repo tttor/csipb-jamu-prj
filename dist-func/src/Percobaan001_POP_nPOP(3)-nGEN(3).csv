@@ -1,4 +1,0 @@
-add(mul(c, 0.5), sub(a, 0.5))	sub(sub(4, c), sub(d, b))	protectedDiv(protectedDiv(mul(a, a), add(0.5, d)), add(sub(4, 2), protectedDiv(d, d)))
-add(mul(c, 0.5), sub(a, 0.5))	add(mul(c, 0.5), sub(a, 0.5))	add(mul(c, 0.5), sub(a, 0.5))
-add(mul(c, 0.5), sub(a, 0.5))	add(mul(c, 0.5), sub(protectedDiv(sub(0.5, c), sub(a, c)), 0.5))	add(mul(c, mul(a, c)), sub(a, 0.5))
-add(mul(c, 0.5), sub(a, 0.5))	add(mul(c, 0.5), sub(protectedDiv(sub(0.5, c), sub(a, c)), 0.5))	add(mul(c, 0.5), sub(add(c, c), 0.5))

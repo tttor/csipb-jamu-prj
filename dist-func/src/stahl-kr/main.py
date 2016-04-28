@@ -1,7 +1,9 @@
 # import library
+import time
 import random
 import operator
 import numpy
+import config as cfg
 from collections import OrderedDict
 from collections import defaultdict
 from deap import tools, base, creator, gp, algorithms
@@ -42,57 +44,63 @@ tree = gp.PrimitiveTree(expr)
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMin, pset=pset)
 
+
+def funcTanimoto():
+    return ('protectedDiv(a, add(a, add(b, c)))')
+
 # register the generation functions into a Toolbox
 toolbox = base.Toolbox()
 toolbox.register("expr", gp.genFull, pset=pset, min_=1, max_=3)
 toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
+
+toolbox.register("exprTanimoto", funcTanimoto)
+toolbox.register("indTanimoto", tools.initIterate, creator.Individual, toolbox.exprTanimoto)
+toolbox.register("popTanimoto", tools.initRepeat, list, toolbox.indTanimoto)
+
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
 kendall = dict()
 rank = dict()
 
-tmp6 = numpy.matrix(numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/stahl-kr/stahl-all.csv', delimiter='\t'))
-x = numpy.vstack((tmp6[11:28, :], tmp6[140:183, :], tmp6[195:226, :], tmp6[238:243, :], tmp6[255:267, :],
-                   tmp6[279:334, :]))
-y = numpy.vstack((tmp6[1:10, :], tmp6[129:139, :], tmp6[184:194, :], tmp6[227:237, :], tmp6[244:254, :],
-                   tmp6[268:278, :]))
-# # Dataset
-# x = numpy.matrix(
-#     numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/voting/dataset_new.csv', delimiter=','))
-# # Referensi
-# y = numpy.matrix(
-#     numpy.loadtxt('/home/banua/csipb-jamu-prj/dist-func/data/voting/referensi_new.csv', delimiter=','))
+mxpair = numpy.array([])
+def calcpair(x, y):
+    for i in range(0, y.shape[0]):
+        for j in range(0, x.shape[0]):
+            # Generate variabel a, b, c, d
+            a = numpy.inner(y[i, 1:], x[j, 1:])
+            b = numpy.inner(y[i, 1:], 1 - x[j, 1:])
+            c = numpy.inner(1 - y[i, 1:], x[j, 1:])
+            # d = numpy.inner(1 - y[i,1:], 1 - x[j, 1:])
 
+            if x[j, 0] == y[i, 0]:
+                flg = 1
+            else:
+                flg = 0
+
+            if (i == 0) and (j == 0):
+                mxpair = [flg, a, b, c, 0]
+            else:
+                tmp = numpy.vstack((mxpair, [flg, a, b, c, 0]))
+                mxpair = tmp
+
+    return mxpair
 
 # Define function to calculate similarity
-def calcSim(pop):
+def calcSim(pop, m, n, p):
     idx = 0
     for individual in pop:
         func = toolbox.compile(expr=individual)
         sim = numpy.array([])
-        for i in range(0, y.shape[0]):
+
+        for i in range(0, p.shape[0]):
+            p[i, 4] = func(p[i, 1], p[i, 2], p[i, 3])
+
+        for i in range(0, n.shape[0]):
             sm = numpy.array([0, 0])
             TP = 0
 
-            for j in range(0, x.shape[0]):
-                # Generate variabel a, b, c, d
-                a = numpy.inner(y[i,1:], x[j, 1:])
-                b = numpy.inner(y[i, 1:], 1 - x[j, 1:])
-                c = numpy.inner(1 - y[i, 1:], x[j, 1:])
-                # d = numpy.inner(1 - y[i,1:], 1 - x[j, 1:])
-
-                # Check if data and reference in same class
-                if x[j, 0] == y[i, 0]:
-                    flg = 1
-                else :
-                    flg = 0
-
-                if (i == 0) and (j == 0):
-                    sm = [flg, func(a, b, c)]
-                else:
-                    zz = numpy.vstack((sm, [flg, func(a, b, c)]))
-                    sm = zz
+            sm = p[i*m.shape[0]:(i+1)*m.shape[0], :]
 
             # Descending order data
             ls = numpy.matrix(sorted(sm, key=itemgetter(1), reverse=True))
@@ -103,9 +111,9 @@ def calcSim(pop):
                     TP += 1
 
             if i == 0:
-                sim = [y[i, 0], TP]
+                sim = [n[i, 0], TP]
             else :
-                xx = numpy.vstack((sim, [y[i, 0], TP]))
+                xx = numpy.vstack((sim, [n[i, 0], TP]))
                 sim = xx
 
         d1 = defaultdict(list)
@@ -159,14 +167,21 @@ toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max
 
 # Define main function of program
 def main():
-    perc = "00"
-    nPop = 1000
-    pop = toolbox.population(nPop)
+    tmp6 = numpy.matrix(
+        numpy.loadtxt(cfg.DATASET, delimiter='\t'))
+    x = numpy.vstack((tmp6[11:28, :], tmp6[140:183, :], tmp6[195:226, :], tmp6[238:243, :], tmp6[255:267, :],
+                       tmp6[279:334, :]))
+    y = numpy.vstack((tmp6[1:10, :], tmp6[129:139, :], tmp6[184:194, :], tmp6[227:237, :], tmp6[244:254, :],
+                       tmp6[268:278, :]))
+
+    pair = calcpair(x, y)
+
+    pop = toolbox.population(cfg.NPOP)
+    calcSim(pop, x, y, pair)
 
     hof = tools.HallOfFame(1)
-    CXPB, MUTPB, NGEN = 0.5, 0.2, 1000
+    CXPB, MUTPB, NGEN = 0.5, 0.2, cfg.NGEN
 
-    calcSim(pop)
     logpop = defaultdict(list)
     loghof = defaultdict(list)
     logstat = defaultdict(list)
@@ -188,7 +203,7 @@ def main():
 
 
     # Evaluate the entire population
-    invalid_ind = [ind for ind in pop if not ind.fitness.valid]
+    # invalid_ind = [ind for ind in pop if not ind.fitness.valid]
     fitnesses = map(toolbox.evaluate, pop)
     for ind, fit in zip(pop, fitnesses):
         ind.fitness.values = fit
@@ -199,7 +214,9 @@ def main():
         loghof[0].append(str(iHof))
     #
     record = mstats.compile(pop) if mstats else {}
-    logbook.record(gen=0, nevals=len(invalid_ind), **record)
+    #
+    logbook.record(gen=0, nevals=len(pop), **record)
+    #
 
     print logbook.stream
 
@@ -225,13 +242,15 @@ def main():
             logpop[g].append(str(iPop))
 
         # Evaluate the individuals with an invalid fitness
-        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+        # invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
 
         kendall.clear()
         rank.clear()
-        calcSim(invalid_ind)
-        fitnesses = map(toolbox.evaluate, invalid_ind)
-        for ind, fit in zip(invalid_ind, fitnesses):
+        calcSim(offspring, x, y, pair)
+
+        fitnesses = map(toolbox.evaluate, offspring)
+        #
+        for ind, fit in zip(offspring, fitnesses):
             ind.fitness.values = fit
 
         hof.update(offspring)
@@ -244,7 +263,8 @@ def main():
 
         # # Append the current generation statistics to the logbook
         record = mstats.compile(pop) if mstats else {}
-        logbook.record(gen=g, nevals=len(invalid_ind), **record)
+        #
+        logbook.record(gen=g, nevals=len(offspring), **record)
         print logbook.stream
 
     logstat["0"].append(logbook.chapters["fitness"].select("avg"))
@@ -255,15 +275,17 @@ def main():
     logstat = OrderedDict(sorted(logstat.items(), key=lambda t: t[0]))
     logpop = OrderedDict(sorted(logpop.items(), key=lambda t: t[0]))
     loghof = OrderedDict(sorted(loghof.items(), key=lambda t: t[0]))
-    
-    numpy.savetxt("Tanimoto"+perc+"_STATS_nPOP(" + str(nPop) + ")-nGEN(" + str(NGEN) + ").csv", logstat.values(),
+
+    numpy.savetxt(cfg.LOGSTAT, logstat.values(),
                   fmt='%s',delimiter="\t")
-    numpy.savetxt("Tanimoto"+perc+"_POP_nPOP("+str(nPop)+")-nGEN("+str(NGEN)+").csv", logpop.values(),
+    numpy.savetxt(cfg.LOGPOP, logpop.values(),
                   fmt='%s', delimiter="\t")
-    numpy.savetxt("Tanimoto"+perc+"_HOF_nPOP("+str(nPop)+")-nGEN("+str(NGEN)+").csv", loghof.values(),
+    numpy.savetxt(cfg.LOGHOF, loghof.values(),
                   fmt='%s', delimiter="\t")
 
     return pop, logbook, hof
 
 if __name__ == "__main__":
+    start_time = time.time()
     main()
+    print("--- %s seconds ---" % (time.time() - start_time))
