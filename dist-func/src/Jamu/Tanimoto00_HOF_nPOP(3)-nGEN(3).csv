@@ -1,4 +1,0 @@
-protectedDiv(sub(sub(b, b), sub(c, a)), protectedDiv(sub(c, a), protectedDiv(c, c)))
-protectedDiv(sub(sub(b, b), sub(c, a)), protectedDiv(sub(c, a), protectedDiv(c, c)))
-protectedDiv(sub(sub(b, b), sub(c, a)), protectedDiv(sub(c, a), protectedDiv(c, c)))
-protectedDiv(sub(sub(b, b), sub(c, a)), protectedDiv(sub(c, a), protectedDiv(c, c)))
