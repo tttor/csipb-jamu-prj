@@ -35,7 +35,7 @@ creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMin, pset=
 
 # register the generation functions into a Toolbox
 toolbox = base.Toolbox()
-toolbox.register("expr", gp.genFull, pset=pset, min_=3, max_=3)
+toolbox.register("expr", gp.genFull, pset=pset, min_=1, max_=3)
 toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
 
 ''' Section for setting Tanimoto Individu '''
@@ -105,8 +105,9 @@ toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max
 
 # Define main function of program
 def main():
+    #rmData, refData = getData(cfg.DATASET, 9, 10)
     data = numpy.loadtxt(cfg.DATASET, delimiter=',')
-    pair = calcpair(data)
+    pair = calcpair(refData)
 
     cx = [0.1, 0.2, 0.3, 0.4, 0.5];
     mu = [0.04, 0.08, 0.12, 0.16, 0.2];
@@ -198,6 +199,8 @@ def main():
             #
             logbook.record(gen=g, nevals=len(offspring), **record)
             print logbook.stream
+            if (logbook.chapters["fitness"].select("min")[g] <= 0.05):
+                break
 
         logstat["0"].append(logbook.chapters["fitness"].select("avg"))
         logstat["1"].append(logbook.chapters["fitness"].select("max"))
@@ -208,11 +211,11 @@ def main():
         logpop = OrderedDict(sorted(logpop.items(), key=lambda t: t[0]))
         loghof = OrderedDict(sorted(loghof.items(), key=lambda t: t[0]))
 
-        numpy.savetxt(str(idx)+"-"+cfg.LOGSTAT, logstat.values(),
+        numpy.savetxt(str(idx)+"--"+cfg.LOGSTAT, logstat.values(),
                       fmt='%s',delimiter="\t")
-        numpy.savetxt(str(idx)+"-"+cfg.LOGPOP, logpop.values(),
+        numpy.savetxt(str(idx)+"--"+cfg.LOGPOP, logpop.values(),
                       fmt='%s', delimiter="\t")
-        numpy.savetxt(str(idx)+"-"+cfg.LOGHOF, loghof.values(),
+        numpy.savetxt(str(idx)+"--"+cfg.LOGHOF, loghof.values(),
                       fmt='%s', delimiter="\t")
 
     return pop, logbook, hof

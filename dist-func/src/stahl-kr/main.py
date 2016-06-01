@@ -50,13 +50,13 @@ def funcTanimoto():
 
 # register the generation functions into a Toolbox
 toolbox = base.Toolbox()
-toolbox.register("expr", gp.genFull, pset=pset, min_=3, max_=5)
+toolbox.register("expr", gp.genFull, pset=pset, min_=1, max_=3)
 toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
 
 '''
 Section for setting Tanimoto Individu
 '''
-toolbox.register("exprTan", gp.genTan, pset=pset, min_=1, max_=3)
+toolbox.register("exprTan", gp.genTan, pset=pset, min_=0, max_=2)
 toolbox.register("indTan", tools.initIterate, creator.Individual, toolbox.exprTan)
 toolbox.register("popTan", tools.initRepeat, list, toolbox.indTan)
 
@@ -187,8 +187,8 @@ def getData(path, n_class, n_ref):
 def evalRecall(individual):
     ln = len(rank.get(str(individual)))
     sm = sum(rank.get(str(individual)))
-    result = sm / ln
-    return result,
+    result = float(sm) / float(ln)
+    return float(result),
 
 # Setting up the operator of Genetic Programming such as Evaluation, Selection, Crossover, Mutation
 toolbox.register("evaluate", evalRecall)
@@ -309,11 +309,13 @@ def main():
         loghof = OrderedDict(sorted(loghof.items(), key=lambda t: t[0]))
 
         numpy.savetxt(str(idx)+"-"+cfg.LOGSTAT, logstat.values(),
-                      fmt='%s',delimiter="\t")
+                      fmt='%s',delimiter=",")
+        numpy.savetxt(str(idx)+"- fitness - "+cfg.LOGSTAT, logstat.values()[2],
+                      fmt='%s', delimiter=",")
         numpy.savetxt(str(idx)+"-"+cfg.LOGPOP, logpop.values(),
-                      fmt='%s', delimiter="\t")
+                      fmt='%s', delimiter=",")
         numpy.savetxt(str(idx)+"-"+cfg.LOGHOF, loghof.values(),
-                      fmt='%s', delimiter="\t")
+                      fmt='%s', delimiter=",")
 
     return pop, logbook, hof
 

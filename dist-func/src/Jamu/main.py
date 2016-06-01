@@ -24,39 +24,27 @@ def protectedDiv(left, right):
 
 pset = gp.PrimitiveSet("main", 3)
 pset.addPrimitive(numpy.add, 2, name="add")
-# pset.addPrimitive(numpy.subtract, 2, name="sub")
-# pset.addPrimitive(numpy.multiply, 2, name="mul")
 pset.addPrimitive(protectedDiv, 2)
-# pset.addTerminal(0.5)
-# pset.addEphemeralConstant("randConstant", lambda: random.randint(2, 4))
 
 # Renaming the Arguments to desire one
 pset.renameArguments(ARG0="a")
 pset.renameArguments(ARG1="b")
 pset.renameArguments(ARG2="c")
-# pset.renameArguments(ARG3="d")
-
-# Setting up the tree
-expr = gp.genFull(pset, min_=3, max_=5)
-tree = gp.PrimitiveTree(expr)
 
 # Settting up the fitness and the individuals
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMin, pset=pset)
 
 
-def funcTanimoto():
-    return ('protectedDiv(a, add(a, add(b, c)))')
-
 # register the generation functions into a Toolbox
 toolbox = base.Toolbox()
-toolbox.register("expr", gp.genFull, pset=pset, min_=3, max_=5)
+toolbox.register("expr", gp.genFull, pset=pset, min_=1, max_=3)
 toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
 
 '''
 Section for setting Tanimoto Individu
 '''
-toolbox.register("exprTan", gp.genTan, pset=pset, min_=1, max_=3)
+toolbox.register("exprTan", gp.genTan, pset=pset, min_=0, max_=2)
 toolbox.register("indTan", tools.initIterate, creator.Individual, toolbox.exprTan)
 toolbox.register("popTan", tools.initRepeat, list, toolbox.indTan)
 
@@ -209,8 +197,8 @@ def getData(path, n_class, n_ref):
 def evalRecall(individual):
     ln = len(rank.get(str(individual)))
     sm = sum(rank.get(str(individual)))
-    result = sm / ln
-    return result,
+    result = float(sm) / float(ln)
+    return float(result),
 
 # Setting up the operator of Genetic Programming such as Evaluation, Selection, Crossover, Mutation
 toolbox.register("evaluate", evalRecall)
@@ -331,11 +319,13 @@ def main():
         loghof = OrderedDict(sorted(loghof.items(), key=lambda t: t[0]))
 
         numpy.savetxt(str(idx)+"-"+cfg.LOGSTAT, logstat.values(),
-                      fmt='%s',delimiter="\t")
+                      fmt='%s',delimiter=",")
+        numpy.savetxt(str(idx)+"- fitness - "+cfg.LOGSTAT, logstat.values()[2],
+                      fmt='%s', delimiter=",")
         numpy.savetxt(str(idx)+"-"+cfg.LOGPOP, logpop.values(),
-                      fmt='%s', delimiter="\t")
+                      fmt='%s', delimiter=",")
         numpy.savetxt(str(idx)+"-"+cfg.LOGHOF, loghof.values(),
-                      fmt='%s', delimiter="\t")
+                      fmt='%s', delimiter=",")
 
     return pop, logbook, hof
 
