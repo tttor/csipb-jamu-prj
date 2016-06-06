@@ -1,0 +1,5 @@
+JAMU = '/media/banua/Data/Kuliah/Destiny/Tesis/Program/csipb-jamu-prj/dist-func/data/jamu/jamu-dataset.csv'
+KR = '/media/banua/Data/Kuliah/Destiny/Tesis/Program/csipb-jamu-prj/dist-func/data/stahl-kr/stahl-all.csv'
+PUBCHEM = '/media/banua/Data/Kuliah/Destiny/Tesis/Program/csipb-jamu-prj/dist-func/data/stahl-pubchem/stahl-all.csv'
+MACCS = '/media/banua/Data/Kuliah/Destiny/Tesis/Program/csipb-jamu-prj/dist-func/data/stahl-maccs/stahl-all.csv'
+ZOO = '/media/banua/Data/Kuliah/Destiny/Tesis/Program/csipb-jamu-prj/dist-func/data/zoo/zoo.csv'
