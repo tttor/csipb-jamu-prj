@@ -3,6 +3,8 @@ import time
 import random
 import operator
 import numpy
+import config as cfg
+import similarity_calculation as sc
 from collections import OrderedDict
 from collections import defaultdict
 from deap import tools, base, creator, gp, algorithms
@@ -23,142 +25,196 @@ def protectedDiv(left, right):
 
 pset = gp.PrimitiveSet("main", 3)
 pset.addPrimitive(numpy.add, 2, name="add")
-pset.addPrimitive(numpy.subtract, 2, name="sub")
-# pset.addPrimitive(numpy.multiply, 2, name="mul")
 pset.addPrimitive(protectedDiv, 2)
-# pset.addTerminal(0.5)
-# pset.addEphemeralConstant("randConstant", lambda: random.randint(2, 4))
 
 # Renaming the Arguments to desire one
 pset.renameArguments(ARG0="a")
 pset.renameArguments(ARG1="b")
 pset.renameArguments(ARG2="c")
-# pset.renameArguments(ARG3="d")
-
-# Setting up the tree
-expr = gp.genFull(pset, min_=1, max_=3)
-tree = gp.PrimitiveTree(expr)
 
 # Settting up the fitness and the individuals
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMin, pset=pset)
-
-
-def funcTanimoto():
-    return ('protectedDiv(a, add(a, add(b, c)))')
 
 # register the generation functions into a Toolbox
 toolbox = base.Toolbox()
 toolbox.register("expr", gp.genFull, pset=pset, min_=1, max_=3)
 toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
 
-toolbox.register("exprTanimoto", funcTanimoto)
-toolbox.register("indTanimoto", tools.initIterate, creator.Individual, toolbox.exprTanimoto)
-toolbox.register("popTanimoto", tools.initRepeat, list, toolbox.indTanimoto)
+'''
+Section for setting Tanimoto Individu
+'''
+toolbox.register("exprTan", gp.genTan, pset=pset, min_=1, max_=3)
+toolbox.register("indTan", tools.initIterate, creator.Individual, toolbox.exprTan)
+toolbox.register("popTan", tools.initRepeat, list, toolbox.indTan)
+
+'''
+End Section for setting Tanimoto Individu
+'''
 
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
-kendall = dict()
-rank = dict()
+list_median = dict()
+ranking_array = dict()
 
-mxpair = numpy.array([])
-def calcpair(x, y):
+def pairwise_calculation(x, y):
+    """
+        This function to calculate values of a, b, c pairwisely.
+
+        Values a defined as numbers of bits ON (1) in both of object.
+        Values b defined as numbers of bits ON (1) in first object and bits OFF (0) in second object.
+        Values c defined as numbers of bits OFF (0) in first object and bits ON (1) in second object.
+
+        :param x: An array of first object
+        :param y: An array of second object
+        :return: pairwise_array = An array containing result of pairwise calculation.
+        """
     for i in range(0, y.shape[0]):
         for j in range(0, x.shape[0]):
-            # Generate variabel a, b, c, d
+
+            # Generate variabel a, b, c
             a = numpy.inner(y[i, 1:], x[j, 1:])
             b = numpy.inner(y[i, 1:], 1 - x[j, 1:])
             c = numpy.inner(1 - y[i, 1:], x[j, 1:])
-            # d = numpy.inner(1 - y[i,1:], 1 - x[j, 1:])
 
-            if x[j, 0] == y[i, 0]:
-                flg = 1
-            else:
-                flg = 0
+            flg = 1 if (x[j, 0] == y[i, 0]) else 0
 
+            # Making a pairwise_array
             if (i == 0) and (j == 0):
-                mxpair = [flg, a, b, c, 0]
+                pairwise_array = [flg, a, b, c, 0]
             else:
-                tmp = numpy.vstack((mxpair, [flg, a, b, c, 0]))
-                mxpair = tmp
+                tmp = numpy.vstack((pairwise_array, [flg, a, b, c, 0]))
+                pairwise_array = tmp
 
-    return mxpair
+    return pairwise_array
 
 # Define function to calculate similarity
-def calcSim(pop, m, n, p):
+def calculate_similarities(pop, remaining_data, reference_data, pairwise_array):
+    """
+        This function to calculate similarities between object.
+
+        :param toolbox : A tool set for Genetic Programming from DEAP.
+        :param pop:  A list of candidate chromosome or individual.
+        :param remaining_data: An array of remaining data.
+        :param reference_data: An array of reference data.
+        :param pairwise_array: An array of pairwise calculation.
+        :return: ranking_dict_list : A dictionary list of ranking.
+        """
     idx = 0
     for individual in pop:
+
         func = toolbox.compile(expr=individual)
-        sim = numpy.array([])
+        array_true_positive = numpy.array([])
 
-        for i in range(0, p.shape[0]):
-            p[i, 4] = func(p[i, 1], p[i, 2], p[i, 3])
+        for i in range(0, pairwise_array.shape[0]):
+            pairwise_array[i, 4] = func(pairwise_array[i, 1], pairwise_array[i, 2], pairwise_array[i, 3])
 
-        for i in range(0, n.shape[0]):
-            sm = numpy.array([0, 0])
-            TP = 0
+        for i in range(0, reference_data.shape[0]):
+            similarities_array = numpy.array([0, 0])
+            true_positive = 0
 
-            sm = p[i*m.shape[0]:(i+1)*m.shape[0], :]
+            similarities_array = pairwise_array[i*remaining_data.shape[0]:(i+1)*remaining_data.shape[0], :]
 
             # Descending order data
-            ls = numpy.matrix(sorted(sm, key=itemgetter(1), reverse=True))
+            similarities_array_desc = numpy.matrix(sorted(similarities_array, key=itemgetter(4), reverse=True))
 
             # Count True Positive (TP)
-            for k in range(0, len(ls)):
-                if ls[k,0] == 1:
-                    TP += 1
+            for k in range(0, int(len(similarities_array_desc)*0.1)):
+                if similarities_array_desc[k,0] == 1:
+                    true_positive += 1
 
             if i == 0:
-                sim = [n[i, 0], TP]
+                array_true_positive = [reference_data[i, 0], true_positive]
             else :
-                xx = numpy.vstack((sim, [n[i, 0], TP]))
-                sim = xx
+                temp = numpy.vstack((array_true_positive, [reference_data[i, 0], true_positive]))
+                array_true_positive = temp
 
-        d1 = defaultdict(list)
-        for k, v in sim:
-            d1[k].append(v)
-        d = dict((k, tuple(v)) for k, v in d1.iteritems())
+        dict_true_positive = defaultdict(list)
+        for k, v in array_true_positive:
+            dict_true_positive[k].append(v)
+        dict_true_positive = dict((k, tuple(v)) for k, v in dict_true_positive.iteritems())
 
-        d2 = defaultdict(list)
-        for ss in range(0, len(d)):
+        dict_median = defaultdict(list)
+        for ss in range(0, len(dict_true_positive)):
             # d2[idx].append(sum(d.get(ss))/len(d.get(ss)))
-            d2[idx].append(numpy.median(d.get(ss)))
-        s = dict((k, tuple(v)) for k, v in d2.iteritems())
+            dict_median[idx].append(numpy.median(dict_true_positive.get(ss)))
+            
+        dict_median = dict((k, tuple(v)) for k, v in dict_median.iteritems())
 
-        kendall[str(individual)] = s.get(idx)
+        list_median[str(individual)] = dict_median.get(idx)
         idx += 1
 
     for individu in pop:
-        ln = len(kendall.get(str(individu)))
-        d3 = defaultdict(list)
+        ln = len(list_median.get(str(individu)))
+        ranking_array_ordered = defaultdict(list)
 
         for i in range(0, ln):
-            newOne = OrderedDict(sorted(kendall.items(), key=lambda t: t[1][i], reverse=True))
+            list_median_ordered = OrderedDict(sorted(list_median.items(), key=lambda t: t[1][i], reverse=True))
 
             urutan = 0
-            for j, key in enumerate(newOne.keys()):
+            for j, key in enumerate(list_median_ordered.keys()):
                 if (key == str(individu)):
                     urutan = j + 1
                     break
 
-            d3[str(individu)].append(urutan)
+            ranking_array_ordered[str(individu)].append(urutan)
 
-        rank[str(individu)] = d3.get(str(individu))
+        ranking_array[str(individu)] = ranking_array_ordered.get(str(individu))
+
+def getData(path, n_class, n_ref, flag=None):
+    """
+        This function to split data into remaining data and reference data.
+
+        :param path: A string where you store the dataset.
+        :param n_class: number of class.
+        :param n_ref: number of data to take in each class.
+        :return: remaining_data : An array of Remmaining data after splitting.
+                 reference_data : An array of reference data were chosen.
+        """
+    if flag == None:
+        try:
+            data = numpy.loadtxt(path, delimiter=',')
+        except:
+            data = numpy.loadtxt(path, delimiter="\t")
+    elif flag:
+        data = path
+
+    data_per_class = defaultdict(list)
+    ref_data = numpy.array([])
+    remaining_data = numpy.array([])
+
+    for i in range(n_class):
+        for j in range(0, len(data)):
+            if data[j, 0] == i:
+                data_per_class[i].append(data[j, :])
+
+        t = numpy.random.choice(len(data_per_class.values()[i]), size=(n_ref, 1), replace=False)
+        ref_idx = list(t.flat)
+        remaining_idx = [l for l in range(len(data_per_class.values()[i])) if l not in t]
+        x = numpy.asarray(data_per_class.values()[i])
+
+        if i == 0:
+            ref_data = x[ref_idx, :]
+            remaining_data = x[remaining_idx, :]
+        else:
+            tmp = ref_data
+            ref_data = numpy.vstack((tmp, x[ref_idx, :]))
+            tmp = remaining_data
+            remaining_data = numpy.vstack((tmp, x[remaining_idx, :]))
+
+    return remaining_data, ref_data
 
 
 # Define fitness function detail
 def evalRecall(individual):
-    ln = len(rank.get(str(individual)))
-    sm = sum(rank.get(str(individual)))
-    result = sm / ln
-    return result,
+    return numpy.mean(ranking_array.get(str(individual))),
 
 # Setting up the operator of Genetic Programming such as Evaluation, Selection, Crossover, Mutation
 toolbox.register("evaluate", evalRecall)
-toolbox.register("select", tools.selTournament, tournsize=3)
+toolbox.register("select", tools.selRoulette)
 toolbox.register("mate", gp.cxOnePoint)
-toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
+toolbox.register("expr_mut", gp.genFull, min_=1, max_=2)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
 toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
@@ -166,26 +222,19 @@ toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max
 
 # Define main function of program
 def main():
-    # Dataset
-    x = numpy.matrix(
-        numpy.loadtxt(
-            '/media/banua/Data/Kuliah/Destiny/Tesis/Program/csipb-jamu-prj/dist-func/data/voting/dataset_new.csv',
-            delimiter=','))
-    # Referensi
-    y = numpy.matrix(
-        numpy.loadtxt(
-            '/media/banua/Data/Kuliah/Destiny/Tesis/Program/csipb-jamu-prj/dist-func/data/voting/referensi_new.csv',
-            delimiter=','))
+    x, y = getData(cfg.DATASET, 6, 10)
 
-    pair = calcpair(x, y)
+    # x, y = getData(training_data, 6, 3, True)
+    pair = pairwise_calculation(x, y)
 
-    perc = "00"
-    nPop = 20
-    pop = toolbox.population(nPop)
-    calcSim(pop, x, y, pair)
+    cx = 0.5
+    mu = 0.1
+
+    pop = toolbox.population(cfg.NPOP)
+    calculate_similarities(pop, x, y, pair)
 
     hof = tools.HallOfFame(1)
-    CXPB, MUTPB, NGEN = 0.5, 0.2, 100
+    CXPB, MUTPB, NGEN = cx, mu, cfg.NGEN
 
     logpop = defaultdict(list)
     loghof = defaultdict(list)
@@ -205,7 +254,6 @@ def main():
 
     for iPop in pop:
         logpop[0].append(str(iPop))
-
 
     # Evaluate the entire population
     # invalid_ind = [ind for ind in pop if not ind.fitness.valid]
@@ -233,13 +281,13 @@ def main():
 
         # Apply crossover and mutation on the offspring
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
-            if random.random() < CXPB:
+            if numpy.random.binomial(1, CXPB):
                 toolbox.mate(child1, child2)
                 del child1.fitness.values
                 del child2.fitness.values
 
         for mutant in offspring:
-            if random.random() < MUTPB:
+            if numpy.random.binomial(1, MUTPB):
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
 
@@ -249,9 +297,9 @@ def main():
         # Evaluate the individuals with an invalid fitness
         # invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
 
-        kendall.clear()
-        rank.clear()
-        calcSim(offspring, x, y, pair)
+        list_median.clear()
+        ranking_array.clear()
+        calculate_similarities(offspring, x, y, pair)
 
         fitnesses = map(toolbox.evaluate, offspring)
         #
@@ -272,6 +320,9 @@ def main():
         logbook.record(gen=g, nevals=len(offspring), **record)
         print logbook.stream
 
+        if (logbook.chapters["fitness"].select("min")[g] <= 1.5) and (len(ranking_array)>1):
+            break
+
     logstat["0"].append(logbook.chapters["fitness"].select("avg"))
     logstat["1"].append(logbook.chapters["fitness"].select("max"))
     logstat["2"].append(logbook.chapters["fitness"].select("min"))
@@ -281,13 +332,73 @@ def main():
     logpop = OrderedDict(sorted(logpop.items(), key=lambda t: t[0]))
     loghof = OrderedDict(sorted(loghof.items(), key=lambda t: t[0]))
 
-    numpy.savetxt("Tanimoto"+perc+"_STATS_nPOP(" + str(nPop) + ")-nGEN(" + str(NGEN) + ").csv", logstat.values(),
-                  fmt='%s',delimiter="\t")
-    numpy.savetxt("Tanimoto"+perc+"_POP_nPOP("+str(nPop)+")-nGEN("+str(NGEN)+").csv", logpop.values(),
-                  fmt='%s', delimiter="\t")
-    numpy.savetxt("Tanimoto"+perc+"_HOF_nPOP("+str(nPop)+")-nGEN("+str(NGEN)+").csv", loghof.values(),
-                  fmt='%s', delimiter="\t")
+    numpy.savetxt("Logstat-"+cfg.LOGSTAT, numpy.array(logstat.values()),
+                    fmt='%s',delimiter=",")
+    numpy.savetxt("Fitness -" + cfg.LOGSTAT, logstat.values()[2],
+                    fmt='%s', delimiter=",")
+    numpy.savetxt("Logpop-"+cfg.LOGPOP, logpop.values(),
+                    fmt='%s', delimiter=",")
+    numpy.savetxt("Loghof-"+cfg.LOGHOF, loghof.values(),
+                    fmt='%s', delimiter=",")
 
+
+    # UJI KNN
+    from sklearn.neighbors import KNeighborsClassifier
+    from sklearn.metrics import accuracy_score
+
+    def tanimoto(x, y):
+        a = numpy.inner(x, y)
+        b = numpy.inner(x, 1 - y)
+        c = numpy.inner(1 - x, y)
+
+        return 1 - (a / (a + b + c))
+
+    def GP(x, y):
+        func = toolbox.compile(expr=hof[len(hof)-1])
+        a = numpy.inner(x, y)
+        b = numpy.inner(x, 1 - y)
+        c = numpy.inner(1 - x, y)
+
+        return 1 - (func(a, b, c))
+
+    X_train = x[:, 1:]
+    y_train = x[:, 0]
+    X_test = y[:, 1:]
+    y_test = y[:, 0]
+
+    n_neigh = [3, 5, 7, 9, 11]
+    log = []
+
+    log.append('KNN, KNN-Tanimoto, KNN-GP')
+
+    for i in n_neigh:
+        print "N-neighbours : ", i
+        log.append('[N-neighbours = ' + str(i) + '],')
+        
+        neigh = KNeighborsClassifier(n_neighbors=i, p=2, metric='minkowski')
+        neigh.fit(X_train, y_train)
+        y_pred = neigh.predict(X_test)
+        y_true = y_test
+        print 'uji knn-default \n', accuracy_score(y_true, y_pred) * 100
+        log.append('Akurasi KNN : ' + str(accuracy_score(y_true, y_pred) * 100))
+
+        neigh2 = KNeighborsClassifier(n_neighbors=i, metric='pyfunc', func=tanimoto)
+        neigh2.fit(X_train, y_train)
+        y_pred2 = neigh2.predict(X_test)
+        y_true2 = y_test
+        print 'uji knn-tanimoto \n', accuracy_score(y_true2, y_pred2) * 100
+        log.append('Akurasi KNN-Tanimoto : ' + str(accuracy_score(y_true2, y_pred2) * 100))
+
+        neigh3 = KNeighborsClassifier(n_neighbors=i, metric='pyfunc', func=GP)
+        neigh3.fit(X_train, y_train)
+        y_pred3 = neigh3.predict(X_test)
+        y_true3 = y_test
+        print 'uji knn-gp \n', accuracy_score(y_true3, y_pred3) * 100, "\n"
+        log.append('Akurasi KNN-GP : ' + str(accuracy_score(y_true3, y_pred3) * 100))
+
+        print "============================================================================================================"
+    numpy.savetxt("ujiknn-maccs.csv", log, fmt='%s', delimiter="\t")
+    
     return pop, logbook, hof
 
 if __name__ == "__main__":
