@@ -1,0 +1,5 @@
+JAMU = '../data/jamu/jamu-dataset.csv'
+KR = '../data/stahl-kr/stahl-all.csv'
+PUBCHEM = '../data/stahl-pubchem/stahl-all.csv'
+MACCS = '../data/stahl-maccs/stahl-all.csv'
+ZOO = '../data/zoo/zoo.csv'

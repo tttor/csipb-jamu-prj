@@ -1,2 +1,0 @@
-DATASET = '/media/banua/Data/Kuliah/Destiny/Tesis/Program/csipb-jamu-prj/dist-func/data/jamu/jamu-dataset.csv'
-REFERENSI = '/media/banua/Data/Kuliah/Destiny/Tesis/Program/csipb-jamu-prj/dist-func/data/jamu/jamu-target.csv'

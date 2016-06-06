@@ -5,289 +5,183 @@ import operator
 import numpy
 from collections import OrderedDict
 from collections import defaultdict
-from deap import tools, base, creator, gp, algorithms
 from operator import itemgetter
 
+import configdataset as cfgData
+import config as cfg
+import util
+import fitness_func as ff
 
-# Define primitive set (pSet)
-def protectedDiv(left, right):
-    with numpy.errstate(divide='ignore',invalid='ignore'):
-        x = numpy.divide(left, right)
-        if isinstance(x, numpy.ndarray):
-            x[numpy.isinf(x)] = 1
-            x[numpy.isnan(x)] = 1
-        elif numpy.isinf(x) or numpy.isnan(x):
-            x = 1
-    return x
+# import deap
+from deap import tools as deapTools
+from deap import base as deapBase
+from deap import creator as deapCreator
+from deap import gp as deapGP
 
-
-pset = gp.PrimitiveSet("main", 3)
-pset.addPrimitive(numpy.add, 2, name="add")
-pset.addPrimitive(numpy.subtract, 2, name="sub")
-# pset.addPrimitive(numpy.multiply, 2, name="mul")
-pset.addPrimitive(protectedDiv, 2)
-# pset.addTerminal(0.5)
-# pset.addEphemeralConstant("randConstant", lambda: random.randint(2, 4))
-
-# Renaming the Arguments to desire one
-pset.renameArguments(ARG0="a")
-pset.renameArguments(ARG1="b")
-pset.renameArguments(ARG2="c")
-# pset.renameArguments(ARG3="d")
-
-# Setting up the tree
-expr = gp.genFull(pset, min_=1, max_=3)
-tree = gp.PrimitiveTree(expr)
-
-# Settting up the fitness and the individuals
-creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
-creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMin, pset=pset)
-
-
-def funcTanimoto():
-    return ('protectedDiv(a, add(a, add(b, c)))')
-
-# register the generation functions into a Toolbox
-toolbox = base.Toolbox()
-toolbox.register("expr", gp.genFull, pset=pset, min_=1, max_=3)
-toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
-
-toolbox.register("exprTanimoto", funcTanimoto)
-toolbox.register("indTanimoto", tools.initIterate, creator.Individual, toolbox.exprTanimoto)
-toolbox.register("popTanimoto", tools.initRepeat, list, toolbox.indTanimoto)
-
-toolbox.register("population", tools.initRepeat, list, toolbox.individual)
-toolbox.register("compile", gp.compile, pset=pset)
-
-kendall = dict()
-rank = dict()
-
-mxpair = numpy.array([])
-def calcpair(x, y):
-    for i in range(0, y.shape[0]):
-        for j in range(0, x.shape[0]):
-            # Generate variabel a, b, c, d
-            a = numpy.inner(y[i, 1:], x[j, 1:])
-            b = numpy.inner(y[i, 1:], 1 - x[j, 1:])
-            c = numpy.inner(1 - y[i, 1:], x[j, 1:])
-            # d = numpy.inner(1 - y[i,1:], 1 - x[j, 1:])
-
-            if x[j, 0] == y[i, 0]:
-                flg = 1
-            else:
-                flg = 0
-
-            if (i == 0) and (j == 0):
-                mxpair = [flg, a, b, c, 0]
-            else:
-                tmp = numpy.vstack((mxpair, [flg, a, b, c, 0]))
-                mxpair = tmp
-
-    return mxpair
-
-# Define function to calculate similarity
-def calcSim(pop, m, n, p):
-    idx = 0
-    for individual in pop:
-        func = toolbox.compile(expr=individual)
-        sim = numpy.array([])
-
-        for i in range(0, p.shape[0]):
-            p[i, 4] = func(p[i, 1], p[i, 2], p[i, 3])
-
-        for i in range(0, n.shape[0]):
-            sm = numpy.array([0, 0])
-            TP = 0
-
-            sm = p[i*m.shape[0]:(i+1)*m.shape[0], :]
-
-            # Descending order data
-            ls = numpy.matrix(sorted(sm, key=itemgetter(1), reverse=True))
-
-            # Count True Positive (TP)
-            for k in range(0, len(ls)):
-                if ls[k,0] == 1:
-                    TP += 1
-
-            if i == 0:
-                sim = [n[i, 0], TP]
-            else :
-                xx = numpy.vstack((sim, [n[i, 0], TP]))
-                sim = xx
-
-        d1 = defaultdict(list)
-        for k, v in sim:
-            d1[k].append(v)
-        d = dict((k, tuple(v)) for k, v in d1.iteritems())
-
-        d2 = defaultdict(list)
-        for ss in range(0, len(d)):
-            # d2[idx].append(sum(d.get(ss))/len(d.get(ss)))
-            d2[idx].append(numpy.median(d.get(ss)))
-        s = dict((k, tuple(v)) for k, v in d2.iteritems())
-
-        kendall[str(individual)] = s.get(idx)
-        idx += 1
-
-    for individu in pop:
-        ln = len(kendall.get(str(individu)))
-        d3 = defaultdict(list)
-
-        for i in range(0, ln):
-            newOne = OrderedDict(sorted(kendall.items(), key=lambda t: t[1][i], reverse=True))
-
-            urutan = 0
-            for j, key in enumerate(newOne.keys()):
-                if (key == str(individu)):
-                    urutan = j + 1
-                    break
-
-            d3[str(individu)].append(urutan)
-
-        rank[str(individu)] = d3.get(str(individu))
-
-
-# Define fitness function detail
-def evalRecall(individual):
-    ln = len(rank.get(str(individual)))
-    sm = sum(rank.get(str(individual)))
-    result = sm / ln
-    return result,
-
-# Setting up the operator of Genetic Programming such as Evaluation, Selection, Crossover, Mutation
-toolbox.register("evaluate", evalRecall)
-toolbox.register("select", tools.selTournament, tournsize=3)
-toolbox.register("mate", gp.cxOnePoint)
-toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
-toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
-
-toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
-toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
-
-# Define main function of program
 def main():
-    # Dataset
-    x = numpy.matrix(
-        numpy.loadtxt(
-            '/media/banua/Data/Kuliah/Destiny/Tesis/Program/csipb-jamu-prj/dist-func/data/voting/dataset_new.csv',
-            delimiter=','))
-    # Referensi
-    y = numpy.matrix(
-        numpy.loadtxt(
-            '/media/banua/Data/Kuliah/Destiny/Tesis/Program/csipb-jamu-prj/dist-func/data/voting/referensi_new.csv',
-            delimiter=','))
+    # Init Data
+    nClass = 6
+    nRef = 10
+    x, y = ff.getData(cfgData.MACCS, nClass, nRef)# x -> remaining (all except ref); y -> ref
+    pair = ff.pairwise_calculation(x, y)# Calcute features: a, b, c
 
-    pair = calcpair(x, y)
+    # init Deap GP
+    # Operators and Operands are based on Tanimoto (a/(a+b+c))
+    nOperand = 3 # a, b, c
+    primitiveSet = deapGP.PrimitiveSet("mainPrimitiveSet", nOperand)
+    primitiveSet.renameArguments(ARG0="a")
+    primitiveSet.renameArguments(ARG1="b")
+    primitiveSet.renameArguments(ARG2="c")
 
-    perc = "00"
-    nPop = 20
-    pop = toolbox.population(nPop)
-    calcSim(pop, x, y, pair)
+    nTermForAdd = 2
+    primitiveSet.addPrimitive(numpy.add, nTermForAdd, name="add")
 
-    hof = tools.HallOfFame(1)
-    CXPB, MUTPB, NGEN = 0.5, 0.2, 100
+    nTermForDiv = 2
+    primitiveSet.addPrimitive(util.protectedDiv, nTermForDiv)
 
-    logpop = defaultdict(list)
+    # Settting up the fitness and the individuals
+    deapCreator.create("FitnessMin", deapBase.Fitness, weights=(-1.0,))
+    deapCreator.create("Individual", deapGP.PrimitiveTree, fitness=deapCreator.FitnessMin, primitiveSet=primitiveSet)
+
+    # Setting up the operator of Genetic Programming such as Evaluation, Selection, Crossover, Mutation
+    # register the generation functions into a Toolbox
+    toolbox = deapBase.Toolbox()
+    toolbox.register("expr", deapGP.genHalfAndHalf, # Half-full, halfGrow
+                             pset=primitiveSet, 
+                             min_=cfg.treeMinDepth, # tree min depth 
+                             max_=cfg.treeMaxDepth) # tree min depth
+
+    toolbox.register("individual", deapTools.initIterate, # alternatives: initRepeat, initCycle
+                                  deapCreator.Individual, toolbox.expr)
+
+    toolbox.register("population", deapTools.initRepeat, 
+                                   list, toolbox.individual)
+
+    toolbox.register("compile", deapGP.compile, 
+                                pset=primitiveSet)
+
+    toolbox.register("evaluate", ff.evalRecall)
+    toolbox.register("select", deapTools.selRoulette)# : selRandom, selBest, selWorst, selTournament, selDoubleTournament
+    toolbox.register("mate", deapGP.cxOnePoint)# :cvOnePointLeafBiased
+    toolbox.register("expr_mut", deapGP.genFull, 
+                                 min_=cfg.subtreeMinDepthMut, # subtree min depth
+                                 max_=cfg.subtreeMinDepthMut) # subtree min depth
+
+    toolbox.register("mutate", deapGP.mutUniform, 
+                               expr=toolbox.expr_mut, pset=primitiveSet)
+
+    toolbox.decorate("mate", deapGP.staticLimit(key=operator.attrgetter("height"), max_value=17))
+    toolbox.decorate("mutate", deapGP.staticLimit(key=operator.attrgetter("height"), max_value=17))
+
+    # init pop    
+    pop = toolbox.population(cfg.nPop)
+
+    # calculate similarity those in pair using distanct function in pop
+    ff.calculate_similarities(toolbox, pop, x, y, pair)
+
+    # Take n-top individuals per generation
+    hof = deapTools.HallOfFame(1)
+
+    # init logging
+    logPop = defaultdict(list)
     loghof = defaultdict(list)
     logstat = defaultdict(list)
-
-    stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
-    stats_size = tools.Statistics(len)
-    mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
+    stats_fit = deapTools.Statistics(lambda ind: ind.fitness.values)
+    stats_size = deapTools.Statistics(len)
+    mstats = deapTools.MultiStatistics(fitness=stats_fit, size=stats_size)
     mstats.register("avg", numpy.mean)
     mstats.register("std", numpy.std)
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
-
-    # Create a logbook
-    logbook = tools.Logbook()
+    logbook = deapTools.Logbook()
     logbook.header = ['gen', 'nevals'] + mstats.fields
-
     for iPop in pop:
-        logpop[0].append(str(iPop))
+        logPop[0].append(str(iPop))
 
-
+### FOR GENERATION 0-th
     # Evaluate the entire population
     # invalid_ind = [ind for ind in pop if not ind.fitness.valid]
     fitnesses = map(toolbox.evaluate, pop)
     for ind, fit in zip(pop, fitnesses):
         ind.fitness.values = fit
 
+    # loggig
     hof.update(pop)
-
     for iHof in hof:
         loghof[0].append(str(iHof))
-    #
     record = mstats.compile(pop) if mstats else {}
-    #
     logbook.record(gen=0, nevals=len(pop), **record)
-    #
-
     print logbook.stream
 
-    for g in range(1, NGEN + 1):
+
+### EVOLVE GENS
+    for g in range(1, cfg.nGen + 1):
         # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
-        # Clone the selected individuals
-        offspring = map(toolbox.clone, offspring)
 
-        # Apply crossover and mutation on the offspring
+        # Apply crossover on the offspring
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
-            if random.random() < CXPB:
+            if numpy.random.binomial(1, cfg.pCx):
                 toolbox.mate(child1, child2)
                 del child1.fitness.values
                 del child2.fitness.values
 
+        # Apply mutation on the offspring
         for mutant in offspring:
-            if random.random() < MUTPB:
+            if numpy.random.binomial(1, cfg.pMut):
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
 
+        # Log
         for iPop in offspring:
-            logpop[g].append(str(iPop))
+            logPop[g].append(str(iPop))
+        ff.list_median.clear()
+        ff.ranking_array.clear()
+        ff.calculate_similarities(toolbox, offspring, x, y, pair)
 
-        # Evaluate the individuals with an invalid fitness
-        # invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-
-        kendall.clear()
-        rank.clear()
-        calcSim(offspring, x, y, pair)
-
+        # Eval each individual
         fitnesses = map(toolbox.evaluate, offspring)
-        #
         for ind, fit in zip(offspring, fitnesses):
             ind.fitness.values = fit
-
-        hof.update(offspring)
-
-        for iHof in hof:
-            loghof[g].append(str(iHof))
 
         # The population is entirely replaced by the offspring
         pop[:] = offspring
 
-        # # Append the current generation statistics to the logbook
+
+        # Log
+        hof.update(offspring)
+        for iHof in hof:
+            loghof[g].append(str(iHof))
+
         record = mstats.compile(pop) if mstats else {}
-        #
         logbook.record(gen=g, nevals=len(offspring), **record)
         print logbook.stream
 
+        # Stopping criteria
+        # TODO fix ranking_array to contain all individuals
+        if (logbook.chapters["fitness"].select("min")[g] <= 1.5) and (len(ff.ranking_array)>1):
+            break
+
+    # Log after evolution
     logstat["0"].append(logbook.chapters["fitness"].select("avg"))
     logstat["1"].append(logbook.chapters["fitness"].select("max"))
     logstat["2"].append(logbook.chapters["fitness"].select("min"))
     logstat["3"].append(logbook.chapters["fitness"].select("std"))
 
     logstat = OrderedDict(sorted(logstat.items(), key=lambda t: t[0]))
-    logpop = OrderedDict(sorted(logpop.items(), key=lambda t: t[0]))
+    logPop = OrderedDict(sorted(logPop.items(), key=lambda t: t[0]))
     loghof = OrderedDict(sorted(loghof.items(), key=lambda t: t[0]))
 
-    numpy.savetxt("Tanimoto"+perc+"_STATS_nPOP(" + str(nPop) + ")-nGEN(" + str(NGEN) + ").csv", logstat.values(),
-                  fmt='%s',delimiter="\t")
-    numpy.savetxt("Tanimoto"+perc+"_POP_nPOP("+str(nPop)+")-nGEN("+str(NGEN)+").csv", logpop.values(),
-                  fmt='%s', delimiter="\t")
-    numpy.savetxt("Tanimoto"+perc+"_HOF_nPOP("+str(nPop)+")-nGEN("+str(NGEN)+").csv", loghof.values(),
-                  fmt='%s', delimiter="\t")
-
+    numpy.savetxt(cfg.xprmtDir+"Logstat-"+cfg.LOGSTAT, numpy.array(logstat.values()),
+                    fmt='%s',delimiter=",")
+    numpy.savetxt(cfg.xprmtDir+"Fitness -" + cfg.LOGSTAT, logstat.values()[2],
+                    fmt='%s', delimiter=",")
+    numpy.savetxt(cfg.xprmtDir+"LogPop-"+cfg.LOGPOP, logPop.values(),
+                    fmt='%s', delimiter=",")
+    numpy.savetxt(cfg.xprmtDir+"Loghof-"+cfg.LOGHOF, loghof.values(),
+                    fmt='%s', delimiter=",")
+    
+    #
     return pop, logbook, hof
 
 if __name__ == "__main__":
