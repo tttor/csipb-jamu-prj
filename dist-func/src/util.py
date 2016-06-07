@@ -10,3 +10,36 @@ def protectedDiv(left, right):
         elif numpy.isinf(x) or numpy.isnan(x):
             x = 1
     return x
+
+def loadData(datapah):
+	'''
+	\return A dictionary, whose key is a class index (begins at 0)
+			example: data[0] contain a matrix as follows
+			Each dict elemet is a matrix where the i-th row indicates the ith-datum,
+			and j-th column indicates j-th binary value except
+			the last column that indicates the label (class)
+	'''
+	pass
+
+def loadDataJamu():
+	pass
+
+def getFeatureA(s1,s2):
+	#TODO
+	pass
+
+def getFeatureB(s1,s2):
+	#TODO
+	pass
+
+def getFeatureC(s1,s2):
+	#TODO
+	pass
+
+def getFeatureD(s1,s2):
+	#TODO
+	pass
+
+def converge():
+	#TODO
+	pass
