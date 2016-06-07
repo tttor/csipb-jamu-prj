@@ -19,11 +19,8 @@ from deap import creator as deapCreator
 from deap import gp as deapGP
 
 def main():
-    # Init Data
-    nClass = 6
-    nRef = 10
-    x, y = ff.getData(cfgData.MACCS, nClass, nRef)# x -> remaining (all except ref); y -> ref
-    pair = ff.pairwise_calculation(x, y)# Calcute features: a, b, c
+    # Init Training Data
+    data = loadData(cfg.dataPath)
 
     # init Deap GP
     # Operators and Operands are based on Tanimoto (a/(a+b+c))
@@ -73,46 +70,20 @@ def main():
     toolbox.decorate("mate", deapGP.staticLimit(key=operator.attrgetter("height"), max_value=17))
     toolbox.decorate("mutate", deapGP.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
+    while
+### GENERATION 0-th
     # init pop    
     pop = toolbox.population(cfg.nPop)
 
-    # calculate similarity those in pair using distanct function in pop
-    ff.calculate_similarities(toolbox, pop, x, y, pair)
-
-    # Take n-top individuals per generation
-    hof = deapTools.HallOfFame(1)
-
-    # init logging
-    logPop = defaultdict(list)
-    loghof = defaultdict(list)
-    logstat = defaultdict(list)
-    stats_fit = deapTools.Statistics(lambda ind: ind.fitness.values)
-    stats_size = deapTools.Statistics(len)
-    mstats = deapTools.MultiStatistics(fitness=stats_fit, size=stats_size)
-    mstats.register("avg", numpy.mean)
-    mstats.register("std", numpy.std)
-    mstats.register("min", numpy.min)
-    mstats.register("max", numpy.max)
-    logbook = deapTools.Logbook()
-    logbook.header = ['gen', 'nevals'] + mstats.fields
-    for iPop in pop:
-        logPop[0].append(str(iPop))
-
-### FOR GENERATION 0-th
     # Evaluate the entire population
     # invalid_ind = [ind for ind in pop if not ind.fitness.valid]
+    for i in range(cfg.maxKendallTrial):
+        valid = testKendal(pop,data)
+    assert valid
+
     fitnesses = map(toolbox.evaluate, pop)
     for ind, fit in zip(pop, fitnesses):
         ind.fitness.values = fit
-
-    # loggig
-    hof.update(pop)
-    for iHof in hof:
-        loghof[0].append(str(iHof))
-    record = mstats.compile(pop) if mstats else {}
-    logbook.record(gen=0, nevals=len(pop), **record)
-    print logbook.stream
-
 
 ### EVOLVE GENS
     for g in range(1, cfg.nGen + 1):
@@ -132,14 +103,11 @@ def main():
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
 
-        # Log
-        for iPop in offspring:
-            logPop[g].append(str(iPop))
-        ff.list_median.clear()
-        ff.ranking_array.clear()
-        ff.calculate_similarities(toolbox, offspring, x, y, pair)
-
         # Eval each individual
+        for i in range(cfg.maxKendallTrial):
+            valid = testKendal(pop,data)
+        assert valid
+        
         fitnesses = map(toolbox.evaluate, offspring)
         for ind, fit in zip(offspring, fitnesses):
             ind.fitness.values = fit
@@ -147,19 +115,8 @@ def main():
         # The population is entirely replaced by the offspring
         pop[:] = offspring
 
-
-        # Log
-        hof.update(offspring)
-        for iHof in hof:
-            loghof[g].append(str(iHof))
-
-        record = mstats.compile(pop) if mstats else {}
-        logbook.record(gen=g, nevals=len(offspring), **record)
-        print logbook.stream
-
         # Stopping criteria
-        # TODO fix ranking_array to contain all individuals
-        if (logbook.chapters["fitness"].select("min")[g] <= 1.5) and (len(ff.ranking_array)>1):
+        if ( util.converge() ):
             break
 
     # Log after evolution
