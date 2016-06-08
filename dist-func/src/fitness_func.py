@@ -3,32 +3,25 @@ import numpy
 from collections import defaultdict
 from operator import itemgetter
 
+import config as cfg
+
 
 def testKendal(toolbox, pop, data):
     valid = False
 
     # Take n reference from each class
+    refIdxList = []
+    remIdxList = []
 
-    refIdxList = numpy.array([])
-    remIdxList = numpy.array([])
+    for key, value in data.iteritems():
+        nSample = value.shape[0]
+        nRef = int( cfg.nRefPerClassInPercentage/100.0 * nSample )
 
-    for i in range(data.keys):
-        n_ref = int(0.1 * len(data.values()[i]))
+        refIdx = np.random.randint(0,nSample, size=nRef)
+        remIdx = [idx for idx in range(nSample) if idx not in refIdx]
 
-        t = numpy.random.choice(len(data.values()[i]), size=(n_ref, 1), replace=False)
-        ref_idx = list(t.flat)
-        remaining_idx = [l for l in range(len(data.values()[i])) if l not in t]
-        x = numpy.asarray(data.values()[i])
-
-        if i == 0:
-            refIdxList = x[ref_idx, :]
-            remIdxList = x[remaining_idx, :]
-        else:
-            tmp = refIdxList
-            refIdxList = numpy.vstack((tmp, x[ref_idx, :]))
-
-            tmp = remIdxList
-            remIdxList = numpy.vstack((tmp, x[remaining_idx, :]))
+        refIdxList.append(refIdx)
+        remIdxList.append(remIdx)
 
     # Calcullate similarity betwreen REM and REF
     recall_matrix = defaultdict(list)
