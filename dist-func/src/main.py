@@ -70,7 +70,6 @@ def main():
     toolbox.decorate("mate", deapGP.staticLimit(key=operator.attrgetter("height"), max_value=17))
     toolbox.decorate("mutate", deapGP.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
-    while
 ### GENERATION 0-th
     # init pop    
     pop = toolbox.population(cfg.nPop)
