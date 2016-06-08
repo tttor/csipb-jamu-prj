@@ -89,6 +89,7 @@ def getData(path, n_class, n_ref, flag=None):
             tmp = remaining_data
             remaining_data = numpy.vstack((tmp, x[remaining_idx, :]))
 
+    print data_per_class.values()[0]
     return remaining_data, ref_data
 
 
@@ -149,7 +150,7 @@ toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max
 
 # Define main function of program
 def main():
-    x, y = getData(cfg.DATASET, 6, 10)
+    x, y = getData(cfg.dataPath[3], 6, 10)
     # data = numpy.loadtxt(cfg.DATASET, delimiter=',')
     pair = calcpair(x)
 

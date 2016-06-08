@@ -20,7 +20,7 @@ from deap import gp as deapGP
 
 def main():
     # Init Training Data
-    data = loadData(cfg.dataPath)
+    data = util.loadData(cfg.dataPath[0])
 
     # init Deap GP
     # Operators and Operands are based on Tanimoto (a/(a+b+c))
@@ -78,7 +78,7 @@ def main():
     # Evaluate the entire population
     # invalid_ind = [ind for ind in pop if not ind.fitness.valid]
     for i in range(cfg.maxKendallTrial):
-        valid = testKendal(pop,data)
+        valid = ff.testKendal(pop,data)
     assert valid
 
     fitnesses = map(toolbox.evaluate, pop)
@@ -105,7 +105,7 @@ def main():
 
         # Eval each individual
         for i in range(cfg.maxKendallTrial):
-            valid = testKendal(pop,data)
+            valid = ff.testKendal(pop,data)
         assert valid
         
         fitnesses = map(toolbox.evaluate, offspring)
