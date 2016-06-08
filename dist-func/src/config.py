@@ -22,4 +22,8 @@ nRefPerClassInPercentage = 10
 maxKendallTrial = 10
 
 # Training Data Config
-dataPath = 'TODO'
+dataPath = ['../data/jamu/jamu-dataset.csv',
+            '../data/stahl-kr/stahl-all.csv',
+            '../data/stahl-pubchem/stahl-all.csv',
+            '../data/stahl-maccs/stahl-all.csv',
+            '../data/zoo/zoo.csv']
