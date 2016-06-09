@@ -57,7 +57,7 @@ def main():
     toolbox.register("compile", deapGP.compile, 
                                 pset=primitiveSet)
 
-    toolbox.register("evaluate", ff.evalRecall)
+    # toolbox.register("evaluate", ff.evalRecall)
     toolbox.register("select", deapTools.selRoulette)# : selRandom, selBest, selWorst, selTournament, selDoubleTournament
     toolbox.register("mate", deapGP.cxOnePoint)# :cvOnePointLeafBiased
     toolbox.register("expr_mut", deapGP.genFull, 
@@ -77,7 +77,7 @@ def main():
     # Evaluate the entire population
     # invalid_ind = [ind for ind in pop if not ind.fitness.valid]
     for i in range(cfg.maxKendallTrial):
-        valid = ff.testKendal(pop,data)
+        valid = ff.testKendal(toolbox,pop,data)
     assert valid
 
     fitnesses = map(toolbox.evaluate, pop)

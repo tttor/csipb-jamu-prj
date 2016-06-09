@@ -8,20 +8,40 @@ import config as cfg
 
 def testKendal(toolbox, pop, data):
     valid = False
+    data2 = numpy.loadtxt('/media/banua/Data/stahl-all.csv', delimiter=',')
+
+    data = defaultdict(list)
+
+    for i in range(0, len(data2)):
+        data[str(data2[i, 0])].append(data2[i, 1:])
 
     # Take n reference from each class
     refIdxList = []
     remIdxList = []
+    #
+    refList = []
+    remList = []
 
     for key, value in data.iteritems():
-        nSample = value.shape[0]
+
+        nSample = len(value)
         nRef = int( cfg.nRefPerClassInPercentage/100.0 * nSample )
 
-        refIdx = np.random.randint(0,nSample, size=nRef)
+        refIdx = numpy.random.randint(0,nSample, size=nRef)
         remIdx = [idx for idx in range(nSample) if idx not in refIdx]
 
-        refIdxList.append(refIdx)
+        refVal = [value[i] for i in refIdx]
+        remVal = [value[i] for i in remIdx]
+
+        refIdxList.append([refIdx])
         remIdxList.append(remIdx)
+
+        refList.append([key, refVal])
+        remList.append([key, remVal])
+
+
+    print "refList", refList
+    print "remList", remList
 
     # Calcullate similarity betwreen REM and REF
     recall_matrix = defaultdict(list)
@@ -30,11 +50,14 @@ def testKendal(toolbox, pop, data):
 
         similarity_pairwise = defaultdict(list)
         list_median = defaultdict(list)
-        for ref in refIdxList:
-            for rem in remIdxList:
-                a = util.getFeatureA(ref[1:], rem[1:])
-                b = util.getFeatureB(ref[1:], rem[1:])
-                c = util.getFeatureC(ref[1:], rem[1:])
+        for ref in refList:
+            for rem in remList:
+                print "ref", ref, len(ref)
+                print "rem", rem, len(rem)
+                assert False
+                a = util.getFeatureA(ref, rem)
+                b = util.getFeatureB(ref, rem)
+                c = util.getFeatureC(ref, rem)
 
                 flg = 1 if (ref[0] == rem[0]) else 0
 
@@ -67,6 +90,7 @@ def testKendal(toolbox, pop, data):
     # Test significance
 
     # Infer
-    if (signicant):
+    significant = True
+    if (significant):
         valid = True
     return valid
