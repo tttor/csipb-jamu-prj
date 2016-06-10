@@ -8,43 +8,53 @@ import config as cfg
 
 def testKendal(toolbox, pop, data):
     valid = False
-    data2 = numpy.loadtxt('/media/banua/Data/stahl-all.csv', delimiter=',')
-
-    data = defaultdict(list)
-
-    for i in range(0, len(data2)):
-        data[str(data2[i, 0])].append(data2[i, 1:])
-
-    # Take n reference from each class
-    refIdxList = []
-    remIdxList = []
-    #
-    refList = []
-    remList = []
-
-    for key, value in data.iteritems():
-
-        nSample = len(value)
-        nRef = int( cfg.nRefPerClassInPercentage/100.0 * nSample )
-
-        refIdx = numpy.random.randint(0,nSample, size=nRef)
-        remIdx = [idx for idx in range(nSample) if idx not in refIdx]
-
-        refVal = [value[i] for i in refIdx]
-        remVal = [value[i] for i in remIdx]
-
-        refIdxList.append([refIdx])
-        remIdxList.append(remIdx)
-
-        refList.append([key, refVal])
-        remList.append([key, remVal])
-
-
-    print "refList", refList
-    print "remList", remList
 
     # Calcullate similarity betwreen REM and REF
-    recall_matrix = defaultdict(list)
+    for individual in pop:
+        simFunc = toolbox.compile(expr=individual)
+
+        for classIdx, classData in data.iteritems():
+            # Get refIdx for this class
+            nSample = len(classData)
+            nRef = int( cfg.nRefPerClassInPercentage/100.0 * nSample )
+            refIdxList = numpy.random.randint(0,nSample, size=nRef)
+
+            for refIdx in refIdxList:
+                refString = value[refIdx]
+                simScoreList = [] # each element contains 3-tuple of (simScore, refClassLabel, remClassLabel)
+
+                # remaining from this class
+                for remIdx in [idx for idx in range(nSample) if idx not in refIdxList]:
+                    remString = classData[remIdx]
+                    a = util.getFeatureA(refString, remString)
+                    b = util.getFeatureB(refString, remString)
+                    c = util.getFeatureC(refString, remString)
+                    simScore = simFunc(a,b,c)
+                    simScoreList.append( (simScore,classIdx,classIdx) )
+
+                # remaining from other class
+                for notThisClassIdx in [i for i in data.keys() if i not classIdx]:
+                    for remString in data[notThisClassIdx]:
+                        a = util.getFeatureA(refString, remString)
+                        b = util.getFeatureB(refString, remString)
+                        c = util.getFeatureC(refString, remString)
+                        simScore = simFunc(a,b,c)
+                        simScoreList.append( (simScore,classIdx,notThisClassIdx) )
+
+                # Sort simScoreList based descending order of SimScore
+                sortedIdx = sorted(range(len(simScoreList)), key=lambda k: s[k][0])
+                nTop = cfg.nTopPercentace/100.0 * len(sortedIdx)
+                sortedIdx = sortedIdx[0:nTop]
+
+                # Get the number of recall/tp
+                nRecall = 0
+                for i in sortedIdx:
+                    refClass = simScoreList[sortedIdx][1]
+                    remClass = simScoreList[sortedIdx][2]
+                    if refClass == remClass:
+                        nRecall = nRecall +1
+
+    recallMatrix = defaultdict(list)
     for individual in pop:
         func = toolbox.compile(expr=individual)
 
@@ -83,7 +93,7 @@ def testKendal(toolbox, pop, data):
             list_median[str(ref[0])].append(true_positive)
 
     # Get Recall Matrix
-        recall_matrix[str(individual)].append(list_median)
+        recallMatrix[str(individual)].append(list_median)
 
     # Get Ranking Matrix
 
