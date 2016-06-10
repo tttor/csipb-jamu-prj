@@ -19,7 +19,9 @@ LOGHOF = "Tan-GP-" + str(nPop) + "-" + str(nGen) + "-hof.csv"
 
 # KendallTest Config
 nRefPerClassInPercentage = 10
+nTopInPercentage = 10
 maxKendallTrial = 10
+
 
 # Training Data Config
 dataPath = ['../data/jamu/jamu-dataset.csv',
