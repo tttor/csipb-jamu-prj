@@ -20,7 +20,7 @@ from deap import gp as deapGP
 
 def main():
     # Init Training Data
-    data = util.loadData(cfg.dataPath[0])
+    data = util.loadData('/media/banua/Data/stahl-all.csv')
 
     # init Deap GP
     # Operators and Operands are based on Tanimoto (a/(a+b+c))
