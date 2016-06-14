@@ -9,7 +9,7 @@ treeMaxDepth = 3
 subtreeMinDepthMut = 1
 subtreeMaxDepthMut = 1
 
-convergenceThreshold = 1.5
+convergenceThreshold = 1.1
 
 # Logggin Config
 xprmtDir = '/home/tor/robotics/prj/csipb-jamu-prj/xprmt/dist-func'
@@ -21,7 +21,7 @@ LOGHOF = "Tan-GP-" + str(nPop) + "-" + str(nGen) + "-hof.csv"
 nRefPerClassInPercentage = 10
 nTopInPercentage = 10
 maxKendallTrial = 10
-
+pValueAcceptance = 0.05
 
 # Training Data Config
 dataPath = ['../data/jamu/jamu-dataset.csv',
