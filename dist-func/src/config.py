@@ -9,10 +9,10 @@ treeMaxDepth = 3
 subtreeMinDepthMut = 1
 subtreeMaxDepthMut = 1
 
-convergenceThreshold = 1.1
+convergenceThreshold = 0.1
 
 # Logggin Config
-xprmtDir = '/home/tor/robotics/prj/csipb-jamu-prj/xprmt/dist-func'
+xprmtDir = '/media/banua/Data/Kuliah/Destiny/Tesis/Program/hasil/syahid/'
 LOGSTAT = "Tan-GP-" + str(nPop) + "-" + str(nGen) + "-stats.csv"
 LOGPOP = "Tan-GP-" + str(nPop) + "-" + str(nGen) + "-pop.csv"
 LOGHOF = "Tan-GP-" + str(nPop) + "-" + str(nGen) + "-hof.csv"
@@ -20,7 +20,7 @@ LOGHOF = "Tan-GP-" + str(nPop) + "-" + str(nGen) + "-hof.csv"
 # KendallTest Config
 nRefPerClassInPercentage = 10
 nTopInPercentage = 10
-maxKendallTrial = 10
+maxKendallTrial = 5
 pValueAcceptance = 0.05
 
 # Training Data Config

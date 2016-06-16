@@ -6,6 +6,9 @@ import numpy
 import sys
 from collections import OrderedDict
 from collections import defaultdict
+import os
+import pickle
+import shutil
 from operator import itemgetter
 
 import configdataset as cfgData
@@ -77,6 +80,17 @@ def main(argv):
     toolbox.decorate("mutate", deapGP.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
 ### GENERATION 0-th
+    path = cfg.xprmtDir+"/"+"Percobaan001_"+time.strftime("%Y-%m-%d_%H:%M:%S")
+
+    try:
+        os.makedirs(path)
+    except OSError:
+        if not os.path.isdir(path):
+            raise
+
+    # Log Pop per Gen
+    logPopPerGen = ()
+    logFitIndPerGen = ()
     print ('GENERATION 0-th ...............................')
     # init pop    
     pop = toolbox.population(cfg.nPop)
@@ -84,12 +98,51 @@ def main(argv):
     # Evaluate the entire population
     for i in range(cfg.maxKendallTrial):
         valid,recallRankMat = ff.testKendal(toolbox,pop,data)
-    assert valid,'Not valid'
+        if valid == True:
+            break
+    # assert valid,'Not valid'
 
     for idx,ind in enumerate(pop):
         fitnessVal = numpy.mean( recallRankMat[idx,:] )
-        ind.fitness.values = fitnessVal, # must be a tuple here
+        ind.fitness.values = float(fitnessVal), # must be a tuple here
+        logPopPerGen += (ind),
+        logFitIndPerGen += (ind.fitness.values),
 
+    pathGen = path+"/Gen 0"
+    try:
+        os.makedirs(pathGen)
+    except OSError:
+        if not os.path.isdir(pathGen):
+            raise
+
+    numpy.savetxt(pathGen+"/individu.csv", logPopPerGen, fmt='%s',delimiter=",")
+    numpy.savetxt(pathGen + "/fitness.csv", logFitIndPerGen, fmt='%s', delimiter=",")
+
+    ###Logging
+    hof = deapTools.HallOfFame(1)
+    logPop = defaultdict(list)
+    logHof = defaultdict(list)
+    logStats = defaultdict(list)
+    stats_fit = deapTools.Statistics(lambda ind: ind.fitness.values)
+    stats_size = deapTools.Statistics(len)
+    mstats = deapTools.MultiStatistics(fitness=stats_fit, size=stats_size)
+    mstats.register("avg", numpy.mean)
+    mstats.register("std", numpy.std)
+    mstats.register("min", numpy.min)
+    mstats.register("max", numpy.max)
+    logbook = deapTools.Logbook()
+    logbook.header = ['gen', 'nevals'] + mstats.fields
+
+    hof.update(pop)
+    [logPop[0].append(str(i)) for i in pop]
+    [logHof[0].append(str(i)) for i in hof]
+    
+    record = mstats.compile(pop) if mstats else {}
+    logbook.record(gen=0, nevals=len(pop), **record)
+    
+    print logbook.stream
+    
+    
 ### EVOLVE GENS
     for g in range(1, cfg.nGen + 1):
         print ('GENERATION '+str(g)+'-th ...............................')
@@ -111,44 +164,71 @@ def main(argv):
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
         
+        #log population
+        [logPop[g].append(str(i)) for i in offspring]
+        
         # Evaluate the entire population
         for i in range(cfg.maxKendallTrial):
             valid,recallRankMat = ff.testKendal(toolbox,offspring,data)
-        assert valid,'Not valid'
+        # assert valid,'Not valid'
 
+        logPopPerGen = ()
+        logFitIndPerGen = ()
         # Eval each individual
         for idx,ind in enumerate(offspring):
             fitnessVal = numpy.mean( recallRankMat[idx,:] )
-            ind.fitness.values = fitnessVal, # must be a tuple here
+            ind.fitness.values = float(fitnessVal), # must be a tuple here
+            logPopPerGen += (ind),
+            logFitIndPerGen += (ind.fitness.values),
+
+        pathGen = path + "/Gen "+str(g)
+        try:
+            os.makedirs(pathGen)
+        except OSError:
+            if not os.path.isdir(pathGen):
+                raise
+
+        numpy.savetxt(pathGen + "/individu.csv", logPopPerGen, fmt='%s', delimiter=",")
+        numpy.savetxt(pathGen + "/fitness.csv", logFitIndPerGen, fmt='%s', delimiter=",")
 
         # The population is entirely replaced by the offspring
         pop[:] = offspring
 
+        #log
+        hof.update(offspring)
+        [logHof[g].append(str(i)) for i in hof]
+        
+        record = mstats.compile(pop) if mstats else {}
+        logbook.record(gen=g, nevals=len(offspring), **record)
+        print logbook.stream
+        
         # Stopping criteria
-        if ( util.isConverged(offspring) ):
-            break
+        # if ( util.isConverged(offspring) ):
+        #     break
 
-    # # Log after evolution
-    # logstat["0"].append(logbook.chapters["fitness"].select("avg"))
-    # logstat["1"].append(logbook.chapters["fitness"].select("max"))
-    # logstat["2"].append(logbook.chapters["fitness"].select("min"))
-    # logstat["3"].append(logbook.chapters["fitness"].select("std"))
-    #
-    # logstat = OrderedDict(sorted(logstat.items(), key=lambda t: t[0]))
-    # logPop = OrderedDict(sorted(logPop.items(), key=lambda t: t[0]))
-    # loghof = OrderedDict(sorted(loghof.items(), key=lambda t: t[0]))
-    #
-    # numpy.savetxt(cfg.xprmtDir+"Logstat-"+cfg.LOGSTAT, numpy.array(logstat.values()),
-    #                 fmt='%s',delimiter=",")
-    # numpy.savetxt(cfg.xprmtDir+"Fitness -" + cfg.LOGSTAT, logstat.values()[2],
-    #                 fmt='%s', delimiter=",")
-    # numpy.savetxt(cfg.xprmtDir+"LogPop-"+cfg.LOGPOP, logPop.values(),
-    #                 fmt='%s', delimiter=",")
-    # numpy.savetxt(cfg.xprmtDir+"Loghof-"+cfg.LOGHOF, loghof.values(),
-    #                 fmt='%s', delimiter=",")
-    #
-    #
-    return pop#, logbook, hof
+    # Log after evolution
+    logStats["0"].append(logbook.chapters["fitness"].select("avg"))
+    logStats["1"].append(logbook.chapters["fitness"].select("max"))
+    logStats["2"].append(logbook.chapters["fitness"].select("min"))
+    logStats["3"].append(logbook.chapters["fitness"].select("std"))
+    
+    logStats = OrderedDict(sorted(logStats.items(), key=lambda t: t[0]))
+    logPop = OrderedDict(sorted(logPop.items(), key=lambda t: t[0]))
+    logHof = OrderedDict(sorted(logHof.items(), key=lambda t: t[0]))
+    
+    numpy.savetxt(path+"/stats_summary.csv", numpy.array(logStats.values()),
+                    fmt='%s',delimiter=",")
+    numpy.savetxt(path+"/fitness_best.csv", logStats.values()[2],
+                    fmt='%s', delimiter=",")
+    numpy.savetxt(path+"/pop_all.csv", logPop.values(),
+                    fmt='%s', delimiter=",")
+    numpy.savetxt(path+"/hof_all.csv", logHof.values(),
+                    fmt='%s', delimiter=",")
+
+    pickle.dump(logHof[g], open(path+"/hof.p", "wb"))
+    shutil.copy2('config.py', path+'/config.py')
+
+    return pop, logbook, hof
 
 if __name__ == "__main__":
     start_time = time.time()
