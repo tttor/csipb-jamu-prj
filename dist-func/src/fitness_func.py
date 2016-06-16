@@ -41,7 +41,7 @@ def testKendal(toolbox, pop, data):
                         b = util.getFeatureB(refString, remString)
                         c = util.getFeatureC(refString, remString)
                         simScore = simFunc(a,b,c)
-                        simScoreList.append( (simScore,classIdx,classIdx) )
+                        simScoreList.append( (simScore,classIdx,remClassIdx) )
 
                 # Sort simScoreList based descending order of SimScore
                 sortedIdx = sorted(range(len(simScoreList)), key=lambda k: simScoreList[k][0])
@@ -74,7 +74,7 @@ def testKendal(toolbox, pop, data):
         rankList = []
         for j in range(nIndividual):
             rank = sortedIdx.index(j)
-            rankList.append(rank)
+            rankList.append(rank+1)
         medianRecallRankMat[:,i] = rankList
 
     # Test i.i.d (independent and identically distributed)
@@ -94,5 +94,6 @@ def testKendal(toolbox, pop, data):
     pValueAvg = numpy.average(pValueList)
     if pValueAvg <= cfg.pValueAcceptance:
         independent = True
+
 
     return independent, medianRecallRankMat

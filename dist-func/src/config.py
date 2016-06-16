@@ -12,7 +12,7 @@ subtreeMaxDepthMut = 1
 convergenceThreshold = 1.1
 
 # Logggin Config
-xprmtDir = '/home/tor/robotics/prj/csipb-jamu-prj/xprmt/dist-func'
+xprmtDir = '/media/banua/Data/Kuliah/Destiny/Tesis/Program/hasil/syahid/'
 LOGSTAT = "Tan-GP-" + str(nPop) + "-" + str(nGen) + "-stats.csv"
 LOGPOP = "Tan-GP-" + str(nPop) + "-" + str(nGen) + "-pop.csv"
 LOGHOF = "Tan-GP-" + str(nPop) + "-" + str(nGen) + "-hof.csv"
