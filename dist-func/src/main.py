@@ -8,6 +8,7 @@ from collections import OrderedDict
 from collections import defaultdict
 import os
 import pickle
+import shutil
 from operator import itemgetter
 
 import configdataset as cfgData
@@ -79,7 +80,7 @@ def main(argv):
     toolbox.decorate("mutate", deapGP.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
 ### GENERATION 0-th
-    path = cfg.xprmtDir+"/"+"Percobaan001_"+time.strftime("%Y-%m-%d_%H:%M:%S", time.gmtime())
+    path = cfg.xprmtDir+"/"+"Percobaan001_"+time.strftime("%Y-%m-%d_%H:%M:%S")
 
     try:
         os.makedirs(path)
@@ -89,6 +90,7 @@ def main(argv):
 
     # Log Pop per Gen
     logPopPerGen = ()
+    logFitIndPerGen = ()
     print ('GENERATION 0-th ...............................')
     # init pop    
     pop = toolbox.population(cfg.nPop)
@@ -96,14 +98,15 @@ def main(argv):
     # Evaluate the entire population
     for i in range(cfg.maxKendallTrial):
         valid,recallRankMat = ff.testKendal(toolbox,pop,data)
-        if valid:
+        if valid == True:
             break
-    assert valid,'Not valid'
+    # assert valid,'Not valid'
 
     for idx,ind in enumerate(pop):
         fitnessVal = numpy.mean( recallRankMat[idx,:] )
         ind.fitness.values = float(fitnessVal), # must be a tuple here
-        logPopPerGen += (ind, ind.fitness.values),
+        logPopPerGen += (ind),
+        logFitIndPerGen += (ind.fitness.values),
 
     pathGen = path+"/Gen 0"
     try:
@@ -112,7 +115,8 @@ def main(argv):
         if not os.path.isdir(pathGen):
             raise
 
-    numpy.savetxt(pathGen+"/fitness.csv", logPopPerGen, fmt='%s',delimiter=",")
+    numpy.savetxt(pathGen+"/individu.csv", logPopPerGen, fmt='%s',delimiter=",")
+    numpy.savetxt(pathGen + "/fitness.csv", logFitIndPerGen, fmt='%s', delimiter=",")
 
     ###Logging
     hof = deapTools.HallOfFame(1)
@@ -166,14 +170,16 @@ def main(argv):
         # Evaluate the entire population
         for i in range(cfg.maxKendallTrial):
             valid,recallRankMat = ff.testKendal(toolbox,offspring,data)
-        assert valid,'Not valid'
+        # assert valid,'Not valid'
 
         logPopPerGen = ()
+        logFitIndPerGen = ()
         # Eval each individual
         for idx,ind in enumerate(offspring):
             fitnessVal = numpy.mean( recallRankMat[idx,:] )
             ind.fitness.values = float(fitnessVal), # must be a tuple here
-            logPopPerGen += (ind, ind.fitness.values),
+            logPopPerGen += (ind),
+            logFitIndPerGen += (ind.fitness.values),
 
         pathGen = path + "/Gen "+str(g)
         try:
@@ -182,7 +188,8 @@ def main(argv):
             if not os.path.isdir(pathGen):
                 raise
 
-        numpy.savetxt(pathGen + "/fitness.csv", logPopPerGen, fmt='%s', delimiter=",")
+        numpy.savetxt(pathGen + "/individu.csv", logPopPerGen, fmt='%s', delimiter=",")
+        numpy.savetxt(pathGen + "/fitness.csv", logFitIndPerGen, fmt='%s', delimiter=",")
 
         # The population is entirely replaced by the offspring
         pop[:] = offspring
@@ -219,6 +226,8 @@ def main(argv):
                     fmt='%s', delimiter=",")
 
     pickle.dump(logHof[g], open(path+"/hof.p", "wb"))
+    shutil.copy2('config.py', path+'/config.py')
+
     return pop, logbook, hof
 
 if __name__ == "__main__":

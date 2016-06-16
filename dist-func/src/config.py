@@ -9,7 +9,7 @@ treeMaxDepth = 3
 subtreeMinDepthMut = 1
 subtreeMaxDepthMut = 1
 
-convergenceThreshold = 1.1
+convergenceThreshold = 0.1
 
 # Logggin Config
 xprmtDir = '/media/banua/Data/Kuliah/Destiny/Tesis/Program/hasil/syahid/'
@@ -20,7 +20,7 @@ LOGHOF = "Tan-GP-" + str(nPop) + "-" + str(nGen) + "-hof.csv"
 # KendallTest Config
 nRefPerClassInPercentage = 10
 nTopInPercentage = 10
-maxKendallTrial = 10
+maxKendallTrial = 5
 pValueAcceptance = 0.05
 
 # Training Data Config

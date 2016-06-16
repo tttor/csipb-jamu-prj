@@ -74,7 +74,7 @@ def testKendal(toolbox, pop, data):
         rankList = []
         for j in range(nIndividual):
             rank = sortedIdx.index(j)
-            rankList.append(rank+1)
+            rankList.append(rank)
         medianRecallRankMat[:,i] = rankList
 
     # Test i.i.d (independent and identically distributed)
