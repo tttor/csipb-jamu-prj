@@ -1,6 +1,5 @@
 # import library
 import time
-import random
 import operator
 import numpy
 import sys
@@ -9,9 +8,7 @@ from collections import defaultdict
 import os
 import pickle
 import shutil
-from operator import itemgetter
 
-import configdataset as cfgData
 import config as cfg
 import util
 import fitness_func as ff
@@ -146,6 +143,7 @@ def main(argv):
 ### EVOLVE GENS
     for g in range(1, cfg.nGen + 1):
         print ('GENERATION '+str(g)+'-th ...............................')
+        popTemp = pop
         # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
         # Clone the selected individuals
@@ -172,7 +170,7 @@ def main(argv):
             valid,recallRankMat = ff.testKendal(toolbox,offspring,data)
             if valid == True:
                 break
-        assert valid, 'Not valid'
+        offspring = popTemp if valid == False else offspring
 
         logPopPerGen = ()
         logFitIndPerGen = ()
@@ -205,8 +203,8 @@ def main(argv):
         print logbook.stream
         
         # Stopping criteria
-        # if ( util.isConverged(offspring) ):
-        #     break
+        if ( util.isConverged(offspring) ):
+            break
 
     # Log after evolution
     logStats["0"].append(logbook.chapters["fitness"].select("avg"))
