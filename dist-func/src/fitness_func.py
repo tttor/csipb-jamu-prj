@@ -95,5 +95,4 @@ def testKendal(toolbox, pop, data):
     if pValueAvg <= cfg.pValueAcceptance:
         independent = True
 
-
     return independent, medianRecallRankMat

@@ -100,7 +100,7 @@ def main(argv):
         valid,recallRankMat = ff.testKendal(toolbox,pop,data)
         if valid == True:
             break
-    # assert valid,'Not valid'
+    assert valid,'Not valid'
 
     for idx,ind in enumerate(pop):
         fitnessVal = numpy.mean( recallRankMat[idx,:] )
@@ -170,7 +170,9 @@ def main(argv):
         # Evaluate the entire population
         for i in range(cfg.maxKendallTrial):
             valid,recallRankMat = ff.testKendal(toolbox,offspring,data)
-        # assert valid,'Not valid'
+            if valid == True:
+                break
+        assert valid, 'Not valid'
 
         logPopPerGen = ()
         logFitIndPerGen = ()
