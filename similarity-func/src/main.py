@@ -34,9 +34,6 @@ def main(argv):
     os.makedirs(dirpath)
     shutil.copy2('config.py', dirpath+'/config.py')
 
-    hof = deapTools.HallOfFame(cfg.nHOF)
-    hofLog = []
-
     statFit = deapTools.Statistics(lambda ind: ind.fitness.values)
     statSize = deapTools.Statistics(len)
     
@@ -48,7 +45,9 @@ def main(argv):
     
     logbook = deapTools.Logbook()
     logbook.header = ['gen'] + mstats.fields
-    
+    hofLog = []
+    testKendalValidLog = []
+
 ##### init Deap GP
     # Set Operators and Operands 
     # Note: For Tanimoto: (a/(a+b+c))
@@ -57,7 +56,7 @@ def main(argv):
     primitiveSet.renameArguments(ARG0="a")
     primitiveSet.renameArguments(ARG1="b")
     primitiveSet.renameArguments(ARG2="c")
-    primitiveSet.renameArguments(ARG2="d")
+    primitiveSet.renameArguments(ARG3="d")
 
     nTermForAdd = 2
     primitiveSet.addPrimitive(np.add, nTermForAdd, name="add")
@@ -112,11 +111,10 @@ def main(argv):
     toolbox.decorate("mate", deapGP.staticLimit(key=operator.attrgetter("height"), max_value=17))
     toolbox.decorate("mutate", deapGP.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
-
 ### EVOLVE GENERATIONS
     # init pop    
-    # pop = toolbox.population(cfg.nIndividual)
-    pop = toolbox.popTan(cfg.nIndividual)
+    pop = toolbox.population(cfg.nIndividual)
+    # pop = toolbox.popTan(cfg.nIndividual)
 
     print('Evolving ...')
     for g in range(cfg.nMaxGen):
@@ -153,13 +151,16 @@ def main(argv):
             for idx,ind in enumerate(offspring):
                 fitnessVal = np.mean( recallRankMat[idx,:] )
                 ind.fitness.values = float(fitnessVal), # must be a tuple here
+            testKendalValidLog.append('valid')
         else: # ignore this generation
             offspring = pop
+            testKendalValidLog.append('invalid')
         
         # The population is entirely replaced by the offspring
         pop = offspring
 
         # Update log
+        hof = deapTools.HallOfFame(cfg.nHOF)
         hof.update(pop)
         hofLog.append(hof)
 
@@ -183,9 +184,10 @@ def main(argv):
 
     np.savetxt(genSummDirpath + "/individualHOF.csv", [[str(i) for i in j] for j in hofLog], fmt='%s', delimiter=',')
     np.savetxt(genSummDirpath + "/fitnessHOF.csv", [[i.fitness.values for i in j] for j in hofLog], fmt='%s', delimiter=',')
+    np.savetxt(genSummDirpath + "/testKendalValidLog.csv", testKendalValidLog, fmt='%s', delimiter=',')
 
     for idx,i in enumerate(hofLog[-1]):
-        pickle.dump(str(i), open(genSummDirpath+'/lastgen_individual_top_'+str(idx)+'.pkl', "wb"),-1)
+        pickle.dump(i, open(genSummDirpath+'/lastgen_individual_top_'+str(idx)+'.pkl', "wb"),-1)
     
 if __name__ == "__main__":
     start_time = time.time()
