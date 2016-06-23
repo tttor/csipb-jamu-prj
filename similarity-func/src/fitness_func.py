@@ -6,7 +6,7 @@ from operator import itemgetter
 
 import config as cfg
 
-def testKendal(toolbox, pop, data):
+def testKendal(pop, data):
     # Get ref idx
     refRemIdxListDict = defaultdict(tuple)
     for classIdx,dataPerClass in data.iteritems():
@@ -21,7 +21,6 @@ def testKendal(toolbox, pop, data):
     nIndividual = len(pop); nClass = len(data)
     medianRecallMat = numpy.zeros( (nIndividual,nClass) )
     for individualIdx,individual in enumerate(pop):
-        simFunc = toolbox.compile(expr=individual)
         medianPerClass = []
 
         for classIdx, classData in data.iteritems():
@@ -40,7 +39,7 @@ def testKendal(toolbox, pop, data):
                         b = util.getFeatureB(refString, remString)
                         c = util.getFeatureC(refString, remString)
                         d = util.getFeatureD(refString, remString)
-                        simScore = simFunc(a,b,c,d)
+                        simScore = individual(a,b,c,d)
                         simScoreList.append( (simScore,classIdx,remClassIdx) )
 
                 # Sort simScoreList based descending order of SimScore

@@ -50,7 +50,7 @@ def main(argv):
 
 ##### init Deap GP
     # Set Operators and Operands 
-    # Note: For Tanimoto: (a/(a+b+c))
+    # Note: Tanimoto: (a/(a+b+c)), Forbes: ?
     nOperand = 4 # at most: a, b, c, d
     primitiveSet = deapGP.PrimitiveSet("mainPrimitiveSet", nOperand)
     primitiveSet.renameArguments(ARG0="a")
@@ -58,17 +58,10 @@ def main(argv):
     primitiveSet.renameArguments(ARG2="c")
     primitiveSet.renameArguments(ARG3="d")
 
-    nTermForAdd = 2
-    primitiveSet.addPrimitive(np.add, nTermForAdd, name="add")
-
-    nTermForDiv = 2
-    primitiveSet.addPrimitive(util.protectedDiv, nTermForDiv, name="pDiv")
-
-    nTermForSubstract = 2
-    primitiveSet.addPrimitive(np.subtract, nTermForSubstract, name="sub")
-
-    nTermForMultiply = 2
-    primitiveSet.addPrimitive(np.multiply, nTermForMultiply, name="mul")
+    primitiveSet.addPrimitive(np.add, arity=2, name="add")
+    primitiveSet.addPrimitive(np.subtract, arity=2, name="sub")
+    primitiveSet.addPrimitive(np.multiply, arity=2, name="mul")
+    primitiveSet.addPrimitive(util.protectedDiv, arity=2, name="pDiv")
 
     # Settting up the fitness and the individuals
     deapCreator.create("FitnessMin", deapBase.Fitness, weights=(-1.0,)) # -1 because we minimize
@@ -77,10 +70,6 @@ def main(argv):
     # Setting up the operator of Genetic Programming such as Evaluation, Selection, Crossover, Mutation
     # register the generation functions into a Toolbox
     toolbox = deapBase.Toolbox()
-
-    toolbox.register("exprTan", util.genTan, pset=primitiveSet, min_=cfg.treeMinDepth, max_=cfg.treeMaxDepth)
-    toolbox.register("indTan", deapTools.initIterate, deapCreator.Individual, toolbox.exprTan)
-    toolbox.register("popTan", deapTools.initRepeat, list, toolbox.indTan)
 
     toolbox.register("expr", deapGP.genHalfAndHalf, # Half-full, halfGrow
                              pset=primitiveSet, 
@@ -111,10 +100,19 @@ def main(argv):
     toolbox.decorate("mate", deapGP.staticLimit(key=operator.attrgetter("height"), max_value=17))
     toolbox.decorate("mutate", deapGP.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
+    toolbox.register("exprTanimoto", util.tanimoto, pset=primitiveSet, min_=cfg.treeMinDepth, max_=cfg.treeMaxDepth)
+    toolbox.register("indTanimoto", deapTools.initIterate, deapCreator.Individual, toolbox.exprTanimoto)
+    toolbox.register("popTanimoto", deapTools.initRepeat, list, toolbox.indTanimoto)
+
+    toolbox.register("exprForbes", util.forbes, pset=primitiveSet, min_=cfg.treeMinDepth, max_=cfg.treeMaxDepth)
+    toolbox.register("indForbes", deapTools.initIterate, deapCreator.Individual, toolbox.exprForbes)
+    toolbox.register("popForbes", deapTools.initRepeat, list, toolbox.indForbes)
+
 ### EVOLVE GENERATIONS
     # init pop    
     pop = toolbox.population(cfg.nIndividual)
-    # pop = toolbox.popTan(cfg.nIndividual)
+    popTanimoto = toolbox.popTanimoto(1)
+    popForbes = toolbox.popForbes(1)
 
     print('Evolving ...')
     for g in range(cfg.nMaxGen):
@@ -143,7 +141,8 @@ def main(argv):
         valid = False
         recallRankMat = None
         for i in range(cfg.maxKendallTrial):
-            valid,recallRankMat = ff.testKendal(toolbox,offspring,data)
+            compiledPop = [toolbox.compile(expr=individual) for individual in offspring]
+            valid,recallRankMat = ff.testKendal(compiledPop, data)
             if valid == True:
                 break
 
@@ -179,15 +178,18 @@ def main(argv):
             break
 
 ### POST EVOLUTION
-    genSummDirpath = dirpath + "/gen-summ"
-    os.makedirs(genSummDirpath) 
+    genSummaryDirpath = dirpath + "/gen-summary"
+    os.makedirs(genSummaryDirpath) 
 
-    np.savetxt(genSummDirpath + "/individualHOF.csv", [[str(i) for i in j] for j in hofLog], fmt='%s', delimiter=',')
-    np.savetxt(genSummDirpath + "/fitnessHOF.csv", [[i.fitness.values for i in j] for j in hofLog], fmt='%s', delimiter=',')
-    np.savetxt(genSummDirpath + "/testKendalValidLog.csv", testKendalValidLog, fmt='%s', delimiter=',')
+    np.savetxt(genSummaryDirpath + "/individualHOF.csv", [[str(i) for i in j] for j in hofLog], fmt='%s', delimiter=',')
+    np.savetxt(genSummaryDirpath + "/fitnessHOF.csv", [[i.fitness.values for i in j] for j in hofLog], fmt='%s', delimiter=',')
+    np.savetxt(genSummaryDirpath + "/testKendalValidLog.csv", testKendalValidLog, fmt='%s', delimiter=',')
 
     for idx,i in enumerate(hofLog[-1]):
-        pickle.dump(i, open(genSummDirpath+'/lastgen_individual_top_'+str(idx)+'.pkl', "wb"),-1)
+        pickle.dump(toolbox.compile(expr=i), open(genSummaryDirpath+'/individual_gp'+str(idx)+'.pkl', "wb"),-1)
+
+    pickle.dump(toolbox.compile(expr=popTanimoto[0]), open(genSummaryDirpath+'/individual_tanimoto.pkl', "wb"),-1)
+    pickle.dump(toolbox.compile(expr=popForbes[0]), open(genSummaryDirpath+'/individual_forbes.pkl', "wb"),-1)
     
 if __name__ == "__main__":
     start_time = time.time()
