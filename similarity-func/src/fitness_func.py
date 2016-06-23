@@ -40,7 +40,8 @@ def testKendal(toolbox, pop, data):
                         a = util.getFeatureA(refString, remString)
                         b = util.getFeatureB(refString, remString)
                         c = util.getFeatureC(refString, remString)
-                        simScore = simFunc(a,b,c)
+                        d = util.getFeatureD(refString, remString)
+                        simScore = simFunc(a,b,c,d)
                         simScoreList.append( (simScore,classIdx,remClassIdx) )
 
                 # Sort simScoreList based descending order of SimScore

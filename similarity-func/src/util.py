@@ -3,6 +3,26 @@ from collections import defaultdict
 
 import config as cfg
 
+def genTan(pset, min_, max_, type_=None):
+    def condition(height, depth):
+        return depth == height
+
+    if type_ is None:
+        type_ = pset.ret
+    expr = []
+    lsTerm = pset.terminals[type_]
+    lsPrim = pset.primitives[type_]
+
+    expr.append(lsPrim[1])
+    expr.append(lsTerm[0])
+    expr.append(lsPrim[0])
+    expr.append(lsTerm[0])
+    expr.append(lsPrim[0])
+    expr.append(lsTerm[1])
+    expr.append(lsTerm[2])
+
+    return expr
+
 # Define primitive set (pSet)
 def protectedDiv(left, right):
     with numpy.errstate(divide='ignore',invalid='ignore'):
