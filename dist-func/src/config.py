@@ -20,7 +20,7 @@ LOGHOF = "Tan-GP-" + str(nPop) + "-" + str(nGen) + "-hof.csv"
 # KendallTest Config
 nRefPerClassInPercentage = 10
 nTopInPercentage = 10
-maxKendallTrial = 5
+maxKendallTrial = 100
 pValueAcceptance = 0.05
 
 # Training Data Config

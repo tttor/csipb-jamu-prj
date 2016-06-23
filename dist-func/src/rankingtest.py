@@ -1,12 +1,15 @@
 import util
+import time
+import sys
 import numpy
 import scipy.stats as stats
 from collections import defaultdict
 from operator import itemgetter
 
 import config as cfg
+import util
 
-def testKendal(toolbox, pop, data):
+def testKendal(pop, data):
     # Get ref idx
     refRemIdxListDict = defaultdict(tuple)
     for classIdx,dataPerClass in data.iteritems():
@@ -21,7 +24,7 @@ def testKendal(toolbox, pop, data):
     nIndividual = len(pop); nClass = len(data)
     medianRecallMat = numpy.zeros( (nIndividual,nClass) )
     for individualIdx,individual in enumerate(pop):
-        simFunc = toolbox.compile(expr=individual)
+        # simFunc = toolbox.compile(expr=individual)
         medianPerClass = []
 
         for classIdx, classData in data.iteritems():
@@ -40,7 +43,7 @@ def testKendal(toolbox, pop, data):
                         a = util.getFeatureA(refString, remString)
                         b = util.getFeatureB(refString, remString)
                         c = util.getFeatureC(refString, remString)
-                        simScore = simFunc(a,b,c)
+                        simScore = eval(str(individual))
                         simScoreList.append( (simScore,classIdx,remClassIdx) )
 
                 # Sort simScoreList based descending order of SimScore
@@ -94,5 +97,20 @@ def testKendal(toolbox, pop, data):
     pValueAvg = numpy.average(pValueList)
     if pValueAvg <= cfg.pValueAcceptance:
         independent = True
-
+    print pValueAvg
     return independent, medianRecallRankMat
+
+def main(argv):
+    dataPath = cfg.dataPath[4]
+    data = util.loadData(dataPath)
+
+    pop= ['util.protectedDiv(a, a+b+c)', 'a+a+a', 'b+c', 'c+c']
+    valid, recallRankMat = testKendal(pop, data)
+
+    print valid, "\n", recallRankMat
+
+
+if __name__ == "__main__":
+    start_time = time.time()
+    main(sys.argv)
+    print("--- %s seconds ---" % (time.time() - start_time))
