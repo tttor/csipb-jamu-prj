@@ -6,7 +6,7 @@ from operator import itemgetter
 
 import config as cfg
 
-def testKendal(toolbox, pop, data):
+def testKendal(pop, data):
     # Get ref idx
     refRemIdxListDict = defaultdict(tuple)
     for classIdx,dataPerClass in data.iteritems():
@@ -21,7 +21,6 @@ def testKendal(toolbox, pop, data):
     nIndividual = len(pop); nClass = len(data)
     medianRecallMat = numpy.zeros( (nIndividual,nClass) )
     for individualIdx,individual in enumerate(pop):
-        simFunc = toolbox.compile(expr=individual)
         medianPerClass = []
 
         for classIdx, classData in data.iteritems():
@@ -30,7 +29,6 @@ def testKendal(toolbox, pop, data):
             for refIdx in refIdxList:
                 refString = classData[refIdx]
                 simScoreList = [] # each element contains 3-tuple of (simScore, refClassLabel, remClassLabel)
-
 
                 # Compute simScore for each pair of (ref, rem)
                 for remClassIdx, refRemIdxListTuple in refRemIdxListDict.iteritems():
@@ -41,13 +39,11 @@ def testKendal(toolbox, pop, data):
                         b = util.getFeatureB(refString, remString)
                         c = util.getFeatureC(refString, remString)
                         d = util.getFeatureD(refString, remString)
-                        simScore = simFunc(a,b,c,d)
+                        simScore = individual(a,b,c,d)
                         simScoreList.append( (simScore,classIdx,remClassIdx) )
 
                 # Sort simScoreList based descending order of SimScore
                 sortedIdx = sorted(range(len(simScoreList)), key=lambda k: simScoreList[k][0])
-                #   print "len sortedIdx : ", len(sortedIdx)
-                #  Must check again, because remaining data should be 72-length but it's given 78-length
 
                 nTop = cfg.nTopInPercentage/100.0 * len(sortedIdx)
                 sortedIdx = sortedIdx[0:int(nTop)]
@@ -96,4 +92,4 @@ def testKendal(toolbox, pop, data):
     if pValueAvg <= cfg.pValueAcceptance:
         independent = True
 
-    return independent, medianRecallRankMat
+    return (independent, medianRecallRankMat)
