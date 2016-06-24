@@ -1,6 +1,34 @@
 import numpy
 from collections import defaultdict
 
+import config as cfg
+
+def tanimoto(pset, min_, max_, type_=None):
+    def condition(height, depth):
+        return depth == height
+
+    if type_ is None:
+        type_ = pset.ret
+
+    expr = []
+    lsTerm = pset.terminals[type_]
+    lsPrim = pset.primitives[type_]
+
+    # TODO fix me
+    expr.append(lsPrim[1])
+    expr.append(lsTerm[0])
+    expr.append(lsPrim[0])
+    expr.append(lsTerm[0])
+    expr.append(lsPrim[0])
+    expr.append(lsTerm[1])
+    expr.append(lsTerm[2])
+
+    return expr
+
+def forbes(pset, min_, max_, type_=None):
+    # TODO complete me
+    pass
+
 # Define primitive set (pSet)
 def protectedDiv(left, right):
     with numpy.errstate(divide='ignore',invalid='ignore'):
@@ -29,7 +57,7 @@ def loadData(datapath):
         data = numpy.loadtxt(datapath, delimiter="\t")
 
     for i in range(0, len(data)):
-        data_dict[str(data[i, 0])].append(data[i, 1:])
+        data_dict[int(data[i, 0])].append(data[i, 1:])
 
     return data_dict
 
@@ -37,21 +65,22 @@ def loadDataJamu():
     pass
 
 def getFeatureA(s1,s2):
-    #TODO
     return numpy.inner(s1, s2)
 
 def getFeatureB(s1,s2):
-    #TODO
     return numpy.inner(s1, 1-s2)
 
 def getFeatureC(s1,s2):
-    #TODO
     return numpy.inner(1-s1, s2)
 
 def getFeatureD(s1,s2):
-    #TODO
     return numpy.inner(1-s1, 1-s2)
 
-def converge():
-    #TODO
-    pass
+def isConverged(pop):
+    minFitnessVal = numpy.min([ind.fitness.values[0] for ind in pop])
+    
+    converged = False
+    if minFitnessVal<cfg.convergenceThreshold:
+        converged = True
+
+    return converged
