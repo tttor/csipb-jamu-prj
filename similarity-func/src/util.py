@@ -63,7 +63,7 @@ def forbes(pset, min_, max_, type_=None):
     expr.append(lsPrim[0])
     expr.append(lsTerm[2])
     expr.append(lsTerm[3])
-    expr.append(lsPrim[8])
+    expr.append(lsPrim[4])
     expr.append(lsPrim[0])
     expr.append(lsTerm[0])
     expr.append(lsTerm[1])
