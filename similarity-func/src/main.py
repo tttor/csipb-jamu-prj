@@ -63,6 +63,15 @@ def main(argv):
     primitiveSet.addPrimitive(np.multiply, arity=2, name="mul")
     primitiveSet.addPrimitive(util.protectedDiv, arity=2, name="pDiv")
 
+    # Adding new primitive set
+    primitiveSet.addPrimitive(np.sqrt, arity=1, name="sqrt")
+    primitiveSet.addPrimitive(util.pow, arity=1, name="pow")
+    primitiveSet.addPrimitive(util.powhalf, arity=1, name="powhalf")
+    primitiveSet.addPrimitive(np.log10, arity=1, name="log")
+    primitiveSet.addPrimitive(np.minimum, arity=2, name="min")
+    primitiveSet.addPrimitive(np.maximum, arity=2, name="max")
+    primitiveSet.addEphemeralConstant("const", lambda: 0.5)
+
     # Settting up the fitness and the individuals
     deapCreator.create("FitnessMin", deapBase.Fitness, weights=(-1.0,)) # -1 because we minimize
     deapCreator.create("Individual", deapGP.PrimitiveTree, fitness=deapCreator.FitnessMin, primitiveSet=primitiveSet)
@@ -112,6 +121,9 @@ def main(argv):
     pop = toolbox.population(cfg.nIndividual) # init pop   
     for g in range(cfg.nMaxGen):
         offspring = pop
+        for i in offspring:
+            print i
+        assert False
 
         if (g > 0):
             # Select the next generation individuals
@@ -207,7 +219,7 @@ def main(argv):
     else:
         print 'WARN: testKendal in evalPop is invalid'
 
-    fitnessSortedIdx = ...
+    # fitnessSortedIdx = ...
 
 if __name__ == "__main__":
     start_time = time.time()
