@@ -70,7 +70,7 @@ def main(argv):
     primitiveSet.addPrimitive(np.log10, arity=1, name="log")
     primitiveSet.addPrimitive(np.minimum, arity=2, name="min")
     primitiveSet.addPrimitive(np.maximum, arity=2, name="max")
-    primitiveSet.addEphemeralConstant("const", lambda: 0.5)
+    # primitiveSet.addEphemeralConstant("const", lambda: 0.5)
 
     # Settting up the fitness and the individuals
     deapCreator.create("FitnessMin", deapBase.Fitness, weights=(-1.0,)) # -1 because we minimize
@@ -121,9 +121,6 @@ def main(argv):
     pop = toolbox.population(cfg.nIndividual) # init pop   
     for g in range(cfg.nMaxGen):
         offspring = pop
-        for i in offspring:
-            print i
-        assert False
 
         if (g > 0):
             # Select the next generation individuals
