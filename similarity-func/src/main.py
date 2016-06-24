@@ -109,12 +109,7 @@ def main(argv):
     toolbox.register("popForbes", deapTools.initRepeat, list, toolbox.indForbes)
 
 ### EVOLVE GENERATIONS
-    # init pop    
-    pop = toolbox.population(cfg.nIndividual)
-    popTanimoto = toolbox.popTanimoto(1)
-    popForbes = toolbox.popForbes(1)
-
-    print('Evolving ...')
+    pop = toolbox.population(cfg.nIndividual) # init pop   
     for g in range(cfg.nMaxGen):
         offspring = pop
 
@@ -185,12 +180,35 @@ def main(argv):
     np.savetxt(genSummaryDirpath + "/fitnessHOF.csv", [[i.fitness.values for i in j] for j in hofLog], fmt='%s', delimiter=',')
     np.savetxt(genSummaryDirpath + "/testKendalValidLog.csv", testKendalValidLog, fmt='%s', delimiter=',')
 
+    evalPop = [] # compiled
+    cTanimoto = toolbox.compile(expr=toolbox.popTanimoto(1)[0])
+    evalPop.append( ('tanimoto',cTanimoto) )
+    pickle.dump(cTanimoto, open(genSummaryDirpath+'/individual_tanimoto.pkl', "wb"),-1)
+    cForbes = toolbox.compile(expr=toolbox.popForbes(1)[0])
+    evalPop.append( ('forbes',cForbes) )
+    pickle.dump(cForbes, open(genSummaryDirpath+'/individual_forbes.pkl', "wb"),-1)
     for idx,i in enumerate(hofLog[-1]):
-        pickle.dump(toolbox.compile(expr=i), open(genSummaryDirpath+'/individual_gp'+str(idx)+'.pkl', "wb"),-1)
-
-    pickle.dump(toolbox.compile(expr=popTanimoto[0]), open(genSummaryDirpath+'/individual_tanimoto.pkl', "wb"),-1)
-    pickle.dump(toolbox.compile(expr=popForbes[0]), open(genSummaryDirpath+'/individual_forbes.pkl', "wb"),-1)
+        ci = toolbox.compile(expr=i)
+        evalPop.append( ('gp'+str(idx),ci) )
+        pickle.dump(ci, open(genSummaryDirpath+'/individual_gp'+str(idx)+'.pkl', "wb"),-1)
     
+    valid = False
+    recallRankMat = None
+    for i in range(cfg.maxKendallTrial):
+        valid,recallRankMat = ff.testKendal([i(1) for i in evalPop], data)
+        if valid == True:
+            break
+
+    fitnessList = []
+    if valid:
+        for i in range(len(evalPop)):
+            fitness = np.mean(recallRankMat[i,:])
+            fitnessList.append(fitness)
+    else:
+        print 'WARN: testKendal in evalPop is invalid'
+
+    fitnessSortedIdx = ...
+
 if __name__ == "__main__":
     start_time = time.time()
     main(sys.argv)
