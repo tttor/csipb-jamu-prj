@@ -14,8 +14,7 @@ def tanimoto(pset, min_, max_, type_=None):
     lsTerm = pset.terminals[type_]
     lsPrim = pset.primitives[type_]
 
-    # TODO fix me
-    expr.append(lsPrim[1])
+    expr.append(lsPrim[3])
     expr.append(lsTerm[0])
     expr.append(lsPrim[0])
     expr.append(lsTerm[0])
@@ -26,8 +25,60 @@ def tanimoto(pset, min_, max_, type_=None):
     return expr
 
 def forbes(pset, min_, max_, type_=None):
-    # TODO complete me
-    pass
+    def condition(height, depth):
+        return depth == height
+
+    if type_ is None:
+        type_ = pset.ret
+
+    expr = []
+    lsTerm = pset.terminals[type_]
+    lsPrim = pset.primitives[type_]
+
+    expr.append(lsPrim[3])
+    expr.append(lsPrim[1])
+    expr.append(lsPrim[2])
+    expr.append(lsPrim[0])
+    expr.append(lsPrim[0])
+    expr.append(lsTerm[0])
+    expr.append(lsTerm[1])
+    expr.append(lsPrim[0])
+    expr.append(lsTerm[2])
+    expr.append(lsTerm[3])
+    expr.append(lsTerm[0])
+    expr.append(lsPrim[2])
+    expr.append(lsPrim[0])
+    expr.append(lsTerm[0])
+    expr.append(lsTerm[1])
+    expr.append(lsPrim[0])
+    expr.append(lsTerm[0])
+    expr.append(lsTerm[2])
+
+    expr.append(lsPrim[1])
+    expr.append(lsPrim[2])
+    expr.append(lsPrim[0])
+    expr.append(lsPrim[0])
+    expr.append(lsTerm[0])
+    expr.append(lsTerm[1])
+    expr.append(lsPrim[0])
+    expr.append(lsTerm[2])
+    expr.append(lsTerm[3])
+    expr.append(lsPrim[8])
+    expr.append(lsPrim[0])
+    expr.append(lsTerm[0])
+    expr.append(lsTerm[1])
+    expr.append(lsPrim[0])
+    expr.append(lsTerm[0])
+    expr.append(lsTerm[2])
+    expr.append(lsPrim[2])
+    expr.append(lsPrim[0])
+    expr.append(lsTerm[0])
+    expr.append(lsTerm[1])
+    expr.append(lsPrim[0])
+    expr.append(lsTerm[0])
+    expr.append(lsTerm[2])
+
+    return expr
 
 # Define primitive set (pSet)
 def protectedDiv(left, right):
@@ -39,6 +90,12 @@ def protectedDiv(left, right):
         elif numpy.isinf(x) or numpy.isnan(x):
             x = 1
     return x
+
+def pow(x):
+    return numpy.power(x, 2)
+
+def powhalf(x):
+    return numpy.power(x, 0.5)
 
 def loadData(datapath):
     """

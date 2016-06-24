@@ -27,5 +27,5 @@ datasetPaths = {'zoo': '../data/zoo/zoo.csv',
 				'zooMinim': '../data/zoo/zooMinim.csv'}
 
 # Logging Config
-xprmtDir = '/home/tor/robotics/prj/csipb-jamu-prj/xprmt/similarity-func'
+xprmtDir = '/home/xprmt/similarity-func'
 nHOF = 1
