@@ -39,7 +39,16 @@ def testKendal(pop, data):
                         b = util.getFeatureB(refString, remString)
                         c = util.getFeatureC(refString, remString)
                         d = util.getFeatureD(refString, remString)
-                        simScore = individual(a,b,c,d)
+                        simScore = individual(a,b,c,d); 
+
+                        if not(simScore>0.0 and simScore<=1.0):
+                            # print simScore
+                            pass
+                        else:
+                            print 'pass'
+                        # assert simScore>0.0 #and simScore<=1.0
+
+
                         simScoreList.append( (simScore,classIdx,remClassIdx) )
 
                 # Sort simScoreList based descending order of SimScore

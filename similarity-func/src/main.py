@@ -147,13 +147,13 @@ def main(argv):
         compiledPop = [toolbox.compile(expr=individual) for individual in offspring]
         for i in range(cfg.maxKendallTrial):
             valid,recallRankMat = ff.testKendal(compiledPop, data)
-            if valid == True:
+            if valid:
                 break
 
         if valid:
             for idx,ind in enumerate(offspring):
                 fitnessVal = np.mean( recallRankMat[idx,:] )
-                ind.fitness.values = float(fitnessVal), # must be a tuple here
+                ind.fitness.values = (float(fitnessVal),) # must be a tuple here
             testKendalValidLog.append('valid')
         else: # ignore this generation
             offspring = pop

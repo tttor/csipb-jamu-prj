@@ -4,7 +4,7 @@ README
 filter individual after mutation and crossover?
 modify the fitness function?
 increase the minimum tree depth?
->> GPSimFunc may return score>1.0, e.g. add(a,d)
+>> GPSimFunc may return score>1.0, e.g. add(a,d), as well as score<0.0
 >> If we use pure division, then GPSimFunc may have zero division. e.g. div(a,d)
 
 > Focusing on tanimoto vs GPSimFunc, 
