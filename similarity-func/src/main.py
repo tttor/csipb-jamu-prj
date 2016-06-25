@@ -116,8 +116,10 @@ def main(argv):
     toolbox.register("popForbes", deapTools.initRepeat, list, toolbox.indForbes)
 
 ### EVOLVE GENERATIONS
+    print 'EVOLVE ...'
+
     pop = toolbox.population(cfg.nIndividual) # init pop   
-    for g in range(cfg.nMaxGen):
+    for g in range(cfg.nMaxGen+1):# +1 as we do not count gen zero
         offspring = pop
 
         if (g > 0):
@@ -180,6 +182,7 @@ def main(argv):
             break
 
 ### POST EVOLUTION
+    print 'post EVOLUTION ...'
     genSummaryDirpath = dirpath + "/gen-summary"
     os.makedirs(genSummaryDirpath) 
 
@@ -190,14 +193,11 @@ def main(argv):
     evalPop = [] # compiled
     cTanimoto = toolbox.compile(expr=toolbox.popTanimoto(1)[0])
     evalPop.append( ('tanimoto',cTanimoto) )
-    # pickle.dump(cTanimoto, open(genSummaryDirpath+'/individual_tanimoto.pkl', "wb"),-1)
-    cForbes = toolbox.compile(expr=toolbox.popForbes(1)[0])
-    evalPop.append( ('forbes',cForbes) )
-    # pickle.dump(cForbes, open(genSummaryDirpath+'/individual_forbes.pkl', "wb"),-1)
+    # cForbes = toolbox.compile(expr=toolbox.popForbes(1)[0])
+    # evalPop.append( ('forbes',cForbes) )
     for idx,i in enumerate(hofLog[-1]):
         ci = toolbox.compile(expr=i)
         evalPop.append( ('gp'+str(idx),ci) )
-        # pickle.dump(ci, open(genSummaryDirpath+'/individual_gp'+str(idx)+'.pkl', "wb"),-1)
     
     valid = False
     recallRankMat = None
