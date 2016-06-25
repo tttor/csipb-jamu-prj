@@ -1,49 +1,49 @@
 import numpy as np
+import sys
+import os
 from sklearn import svm
 from sklearn.metrics import accuracy_score
+from sklearn.cross_validation import train_test_split
 
 import util
 import config as cfg
 
-def protectedDiv(left, right):
-    with np.errstate(divide='ignore',invalid='ignore'):
-        x = np.divide(left, right)
-        if isinstance(x, np.ndarray):
-            x[np.isinf(x)] = 1
-            x[np.isnan(x)] = 1
-        elif np.isinf(x) or np.isnan(x):
-            x = 1
-    return x
+def main(argv):
+    assert len(argv)==3
+    dataName = argv[1]
+    xprmtDir = cfg.xprmtDir+'/'+argv[2]
+    assert os.path.isdir(xprmtDir)
 
-dataPath = cfg.dataPath[4]
-data = np.loadtxt(dataPath, delimiter=',')
+    #
+    data = np.loadtxt(cfg.datasetPaths[dataName], delimiter=',')
+    X = data[:, 1:]
+    y = data[:, 0]
 
-x = data[:, 1:]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
-y = data[:, 0]
+    #
+    funcStrList = []
+    gpFuncFilepath = xprmtDir+'/gen-summary/individualHOF.csv'
+    with open(gpFuncFilepath, 'r') as f:
+        funcStrList = f.readlines()
+    funcStrList.append(util.tanimotoStr())
+    funcStrList = [s.rstrip() for s in funcStrList]
+    funcStrList = [util.expandFuncStr(s) for s in funcStrList]
 
-gram = np.zeros( (len(x), len(x)) )
-clf = svm.SVC(kernel='precomputed')
+    #
+    for f in funcStrList:
+        # tune
+        clf = svm.SVC(kernel='precomputed')
 
-for i in range(len(x)):
-    for j in range(len(x)):
-        a = util.getFeatureA(x[i, :], x[j, :])
-        b = util.getFeatureB(x[i, :], x[j, :])
-        c = util.getFeatureC(x[i, :], x[j, :])
+        # train
+        gram_train = util.computeGram(X_train, f)
+        clf.fit(gram_train, y_train)
 
-        simValue = eval(str(protectedDiv(a, c+c)))
+        # test
+        gram_test = util.computeGram(X_train, f)
+        y_pred = clf.predict(gram_test)
+        acc = accuracy_score(y_train, y_pred)
+        print acc
 
-        gram[i, j] = simValue
-        gram[j, i] = simValue
-
-    i+=1
-
-np.savetxt(cfg.xprmtDir + "gram matrix.csv", gram,
-              fmt='%s', delimiter=",")
-
-clf.fit(gram, y)
-
-# predict on training examples
-y_pred = clf.predict(gram)
-
-print "Skor Akurasi : ", accuracy_score(y, y_pred)*100
+if __name__ == '__main__':
+    main(sys.argv)

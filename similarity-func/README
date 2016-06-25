@@ -1,0 +1,5 @@
+README
+
+> For these problems, should we filter individual after mutation and crossover
+>> GPSimFunc may return score>1.0, e.g. from add(a,d)
+>> If we use pure division, then GPSimFunc may have zero division
