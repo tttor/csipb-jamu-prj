@@ -189,4 +189,4 @@ def main(argv):
 if __name__ == "__main__":
     start_time = time.time()
     main(sys.argv)
-    print("GP done in: %s seconds" % (time.time() - start_time))
+    print("GP done in: %.3f minutes" % ((time.time()-start_time)/60.0))

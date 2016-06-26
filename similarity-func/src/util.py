@@ -17,6 +17,8 @@ def computeGram(X, funcStr):
             c = getFeatureC(x1,x2); d = getFeatureD(x1,x2)
 
             simScore = eval(funcStr); 
+            # print i,j
+            # print simScore
             assert simScore>0.0 
             assert simScore<=1.0
 

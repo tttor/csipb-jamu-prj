@@ -9,7 +9,7 @@ import config as cfg
 def compute(pop,data,dataDict):
     valid = False; recallFitnessList = None
     for i in range(cfg.maxKendallTrial):
-        valid,recallFitnessList = testKendal(pop, data,dataDict)
+        valid,recallFitnessList = getRecallFitness(pop, data,dataDict)
         if valid:
             break
 
@@ -25,7 +25,8 @@ def compute(pop,data,dataDict):
     return (valid,fitnessList)
 
 def getInRangeFitness(pop,data):
-    inRangeFitnessDict = {}
+    assert len(pop)==cfg.nIndividual
+    inRangeFitnessList = [0.0]*len(pop)
     for individualIdx,individual in enumerate(pop):
         for i,sx in enumerate(data):
             for j,sy in enumerate(data[i:]):
@@ -37,16 +38,14 @@ def getInRangeFitness(pop,data):
 
                 inRangeFitness = 0.0
                 if not(util.inRange(simScore)):
-                    inRangeFitness = cfg.nIndividual
-                inRangeFitnessDict[individualIdx] = inRangeFitness
+                    inRangeFitness = cfg.nIndividual #penalize by the size of Pop
 
-    inRangeFitnessList = []
-    for i in range(cfg.nIndividual):
-        inRangeFitnessList.append( inRangeFitnessDict[i] )
+                if inRangeFitness > inRangeFitnessList[individualIdx]:
+                    inRangeFitnessList[individualIdx] = inRangeFitness
 
     return inRangeFitnessList
 
-def testKendal(pop, data, dataDict):
+def getRecallFitness(pop, data, dataDict):
     # Get refERENCE and remAINING idx
     refAndRemIdxDict = defaultdict(tuple)
     for classIdx,classData in dataDict.iteritems():
