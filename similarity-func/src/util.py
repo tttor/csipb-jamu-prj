@@ -3,6 +3,9 @@ from collections import defaultdict
 
 import config as cfg
 
+def inRange(simScore):
+    return (simScore>0.0 and simScore<=1.0)
+
 def computeGram(X, funcStr):
     # print 'computeGram with ', funcStr
     shape = (len(X),len(X))

@@ -62,8 +62,8 @@ def main(argv):
     primitiveSet.addPrimitive(np.subtract, arity=2, name="sub")
     primitiveSet.addPrimitive(np.multiply, arity=2, name="mul")
     primitiveSet.addPrimitive(util.protectedDiv, arity=2, name="pDiv")
-    primitiveSet.addPrimitive(np.minimum, arity=2, name="min")
-    primitiveSet.addPrimitive(np.maximum, arity=2, name="max")
+    # primitiveSet.addPrimitive(np.minimum, arity=2, name="min")
+    # primitiveSet.addPrimitive(np.maximum, arity=2, name="max")
     # primitiveSet.addPrimitive(np.sqrt, arity=1, name="sqrt")
     # primitiveSet.addPrimitive(util.pow, arity=1, name="pow")
     # primitiveSet.addPrimitive(util.powhalf, arity=1, name="powhalf")
@@ -142,20 +142,16 @@ def main(argv):
 
         # Evaluate the entire population
         # print 'Evaluate the entire population ...'
-        valid = False
-        recallRankMat = None
+        valid = False; fitnessList = None
         compiledPop = [toolbox.compile(expr=individual) for individual in offspring]
-        for i in range(cfg.maxKendallTrial):
-            valid,recallRankMat = ff.testKendal(compiledPop, data)
-            if valid:
-                break
+        valid,fitnessList = ff.compute(compiledPop,data)
 
         if valid:
+            assert len(fitnessList)>0
             for idx,ind in enumerate(offspring):
-                fitnessVal = np.mean( recallRankMat[idx,:] )
-                ind.fitness.values = (float(fitnessVal),) # must be a tuple here
+                ind.fitness.values = (fitnessList[idx],) # must be a tuple here
             testKendalValidLog.append('valid')
-        else: # ignore this generation
+        else: # ignore this offspring, reset to the previous generation
             offspring = pop
             testKendalValidLog.append('invalid')
         

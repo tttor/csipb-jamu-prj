@@ -6,33 +6,49 @@ from operator import itemgetter
 
 import config as cfg
 
+def compute(pop,data):
+    valid = False; recallFitnessList = None; inRangeFitnessList = None
+    for i in range(cfg.maxKendallTrial):
+        valid,recallFitnessList,inRangeFitnessList = testKendal(pop, data)
+        if valid:
+            break
+
+    fitnessList = []
+    if valid:
+        for i in range(len(pop)):
+            fitness = recallFitnessList[i] + inRangeFitnessList[i]
+            fitnessList.append(fitness)
+
+    return (valid,fitnessList)
+
 def testKendal(pop, data):
-    # Get ref idx
-    refRemIdxListDict = defaultdict(tuple)
-    for classIdx,dataPerClass in data.iteritems():
-        nSample = len(dataPerClass)
+    # Get refERENCE and remAINING idx
+    refAndRemIdxDict = defaultdict(tuple)
+    for classIdx,classData in data.iteritems():
+        nSample = len(classData)
         nRef = int( cfg.nRefPerClassInPercentage/100.0 * nSample )
         refIdxList = numpy.random.randint(0,nSample, size=nRef)
         remIdxList = [idx for idx in range(nSample) if idx not in refIdxList]
 
-        refRemIdxListDict[classIdx] = (refIdxList,remIdxList)
+        refAndRemIdxDict[classIdx] = (refIdxList,remIdxList)
 
-    # Get Recall Matrix
+    # Get Recall Matrix along with some other fitness
     nIndividual = len(pop); nClass = len(data)
     medianRecallMat = numpy.zeros( (nIndividual,nClass) )
-    for individualIdx,individual in enumerate(pop):
-        medianPerClass = []
+    inRangeFitnessDict = {}
 
+    for individualIdx,individual in enumerate(pop):
         for classIdx, classData in data.iteritems():
+            refIdxList = refAndRemIdxDict[classIdx][0]
             nRecallList = [] # from all refIdx of this class
-            refIdxList = refRemIdxListDict[classIdx][0]
+
             for refIdx in refIdxList:
                 refString = classData[refIdx]
-                simScoreList = [] # each element contains 3-tuple of (simScore, refClassLabel, remClassLabel)
 
                 # Compute simScore for each pair of (ref, rem)
-                for remClassIdx, refRemIdxListTuple in refRemIdxListDict.iteritems():
-                    remIdxList = refRemIdxListTuple[1]
+                simScoreList = [] # each element contains 3-tuple of (simScore, refClassLabel, remClassLabel)
+                for remClassIdx, refAndRemIdx in refAndRemIdxDict.iteritems():
+                    remIdxList = refAndRemIdx[1]
                     for remIdx in remIdxList:
                         remString = data[remClassIdx][remIdx]
                         a = util.getFeatureA(refString, remString)
@@ -40,48 +56,48 @@ def testKendal(pop, data):
                         c = util.getFeatureC(refString, remString)
                         d = util.getFeatureD(refString, remString)
                         simScore = individual(a,b,c,d); 
-
-                        if not(simScore>0.0 and simScore<=1.0):
-                            # print simScore
-                            pass
-                        else:
-                            print 'pass'
-                        # assert simScore>0.0 #and simScore<=1.0
-
-
                         simScoreList.append( (simScore,classIdx,remClassIdx) )
+
+                        # simultaneously get inRangeFitness here
+                        inRangeFitness = 0
+                        if not(util.inRange(simScore)):
+                            inRangeFitness = nIndividual
+                        inRangeFitnessDict[individualIdx] = inRangeFitness
 
                 # Sort simScoreList based descending order of SimScore
                 sortedIdx = sorted(range(len(simScoreList)), key=lambda k: simScoreList[k][0])
 
-                nTop = cfg.nTopInPercentage/100.0 * len(sortedIdx)
-                sortedIdx = sortedIdx[0:int(nTop)]
+                nTop = int(cfg.nTopInPercentage/100.0 * len(sortedIdx))
+                sortedIdx = sortedIdx[0:nTop]
 
                 # Get the number of recall/tp
                 nRecall = 0
                 for i in sortedIdx:
                     refClass = simScoreList[i][1]
                     remClass = simScoreList[i][2]
-
                     if (refClass==remClass):
                         nRecall += 1
+                nRecallList.append(nRecall) # Add true positive value for this class for this refIdx.
 
-                nRecallList.append(nRecall) # Add true positive value for current class.
-
-            median = numpy.median(nRecallList) # Calculate median of true positive value current class
+            median = numpy.median(nRecallList) # Calculate median of nRecall of this class from all refIdx
             medianRecallMat[individualIdx][classIdx] = median
 
-    # Get median recall Ranking Matrix
+    # Get median recall Ranking Matrix and recallFitness (agnostic to iid)
     medianRecallRankMat = numpy.zeros( (nIndividual, nClass) )
     for i in range(nClass):
-        medianRecallListPerClass = medianRecallMat[:,i]
-        sortedIdx = sorted(range(len(medianRecallListPerClass)), key=lambda k: medianRecallListPerClass[k])
+        medianRecallPerClass = medianRecallMat[:,i] # from all individuals
+        sortedIdx = sorted(range(nIndividual), key=lambda k: medianRecallPerClass[k])
 
         rankList = []
         for j in range(nIndividual):
             rank = sortedIdx.index(j)
             rankList.append(rank)
         medianRecallRankMat[:,i] = rankList
+
+    recallFitnessList = []
+    for i in range(nIndividual):
+        recallFitness = numpy.average(medianRecallRankMat[i,:])
+        recallFitnessList.append(recallFitness)
 
     # Test i.i.d (independent and identically distributed)
     # with H0 = two rank lists are independent
@@ -97,8 +113,13 @@ def testKendal(pop, data):
             pValueList.append(pval)
 
     independent = False
-    pValueAvg = numpy.average(pValueList)
-    if pValueAvg <= cfg.pValueAcceptance:
+    if numpy.average(pValueList) <= cfg.pValueAcceptance:
         independent = True
 
-    return (independent, medianRecallRankMat)
+    #
+    inRangeFitnessList = []
+    for i in range(nIndividual):
+        inRangeFitnessList.append(inRangeFitnessDict[i])
+        
+    assert len(recallFitnessList)==len(inRangeFitnessList)
+    return (independent, recallFitnessList, inRangeFitnessList)

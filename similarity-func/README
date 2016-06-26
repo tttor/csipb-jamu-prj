@@ -12,5 +12,11 @@ increase the minimum tree depth?
    all random, some random and some tanimoto, all tanimoto
 >> should we break the tie for the same fitness?
 
+> fitness func
+>> recallFitness
+>> inRangeFitness
+>> ZeroDivFitness
+>> s(x,y)==s(y,x) fitness
+
 > Some requirements for distance functions are:
 TODO
