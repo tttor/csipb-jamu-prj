@@ -163,10 +163,10 @@ def getFeatureD(s1,s2):
     return np.inner(1-s1, 1-s2)
 
 def isConverged(pop):
-    minFitnessVal = np.min([ind.fitness.values[0] for ind in pop])
+    maxFitnessVal = np.max([ind.fitness.values[0] for ind in pop])
     
     converged = False
-    if minFitnessVal<cfg.convergenceThreshold:
+    if maxFitnessVal > cfg.convergenceThreshold:
         converged = True
 
     return converged

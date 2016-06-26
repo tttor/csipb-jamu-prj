@@ -71,8 +71,8 @@ def main(argv):
     # primitiveSet.addEphemeralConstant("const", lambda: 0.5)
 
     # Settting up the fitness and the individuals
-    deapCreator.create("FitnessMin", deapBase.Fitness, weights=(-1.0,)) # -1 because we minimize
-    deapCreator.create("Individual", deapGP.PrimitiveTree, fitness=deapCreator.FitnessMin, primitiveSet=primitiveSet)
+    deapCreator.create("FitnessMax", deapBase.Fitness, weights=(1.0,))
+    deapCreator.create("Individual", deapGP.PrimitiveTree, fitness=deapCreator.FitnessMax, primitiveSet=primitiveSet)
 
     # Setting up the operator of Genetic Programming such as Evaluation, Selection, Crossover, Mutation
     # register the generation functions into a Toolbox

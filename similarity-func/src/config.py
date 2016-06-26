@@ -9,7 +9,7 @@ treeMaxDepth = 3
 subtreeMinDepthMut = 1
 subtreeMaxDepthMut = 1
 
-convergenceThreshold = 0.05
+convergenceThreshold = -0.1
 
 # KendallTest Config
 nRefPerClassInPercentage = 20

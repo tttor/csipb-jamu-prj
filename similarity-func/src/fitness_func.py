@@ -34,9 +34,9 @@ def getInRangeFitness(pop,data):
 
                 inRangeFitness = 0.0
                 if not(util.inRange(simScore)):
-                    inRangeFitness = cfg.nIndividual #penalize by the size of Pop
+                    inRangeFitness = cfg.nIndividual * -1.0 # penalize with the size of Pop
 
-                if inRangeFitness > inRangeFitnessList[individualIdx]:
+                if inRangeFitness < inRangeFitnessList[individualIdx]:
                     inRangeFitnessList[individualIdx] = inRangeFitness
 
     return inRangeFitnessList
@@ -108,7 +108,7 @@ def getRecallFitness(pop, data, dataDict):
 
     recallFitnessList = []
     for i in range(nIndividual):
-        recallFitness = numpy.average(medianRecallRankMat[i,:])
+        recallFitness = numpy.average(medianRecallRankMat[i,:]) * -1.0 # as we maximize the Fitness
         recallFitnessList.append(recallFitness)
 
     # Test i.i.d (independent and identically distributed)
