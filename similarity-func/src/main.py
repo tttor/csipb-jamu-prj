@@ -179,41 +179,41 @@ def main(argv):
 
 ### POST EVOLUTION
     print 'post EVOLUTION ...'
-    genSummaryDirpath = dirpath + "/gen-summary"
+    genSummaryDirpath = dirpath + "/summary"
     os.makedirs(genSummaryDirpath) 
 
-    np.savetxt(genSummaryDirpath + "/individualHOF.csv", [[str(i) for i in j] for j in hofLog], fmt='%s', delimiter=',')
-    np.savetxt(genSummaryDirpath + "/fitnessHOF.csv", [[i.fitness.values for i in j] for j in hofLog], fmt='%s', delimiter=',')
-    np.savetxt(genSummaryDirpath + "/testKendalValidLog.csv", testKendalValidLog, fmt='%s', delimiter=',')
+    np.savetxt(genSummaryDirpath + "/individualHOF.csv", [[str(i) for i in j] for j in hofLog], fmt='%s', delimiter=';')
+    np.savetxt(genSummaryDirpath + "/fitnessHOF.csv", [[i.fitness.values for i in j] for j in hofLog], fmt='%s', delimiter=';')
+    np.savetxt(genSummaryDirpath + "/testKendalValidLog.csv", testKendalValidLog, fmt='%s', delimiter=';')
 
-    evalPop = [] # compiled
-    cTanimoto = toolbox.compile(expr=toolbox.popTanimoto(1)[0])
-    evalPop.append( ('tanimoto',cTanimoto) )
-    # cForbes = toolbox.compile(expr=toolbox.popForbes(1)[0])
-    # evalPop.append( ('forbes',cForbes) )
-    for idx,i in enumerate(hofLog[-1]):
-        ci = toolbox.compile(expr=i)
-        evalPop.append( ('gp'+str(idx),ci) )
+    # evalPop = [] # compiled
+    # cTanimoto = toolbox.compile(expr=toolbox.popTanimoto(1)[0])
+    # evalPop.append( ('tanimoto',cTanimoto) )
+    # # cForbes = toolbox.compile(expr=toolbox.popForbes(1)[0])
+    # # evalPop.append( ('forbes',cForbes) )
+    # for idx,i in enumerate(hofLog[-1]):
+    #     ci = toolbox.compile(expr=i)
+    #     evalPop.append( ('gp'+str(idx),ci) )
     
-    valid = False
-    recallRankMat = None
-    for i in range(cfg.maxKendallTrial):
-        valid,recallRankMat = ff.testKendal([j[1] for j in evalPop], data)
-        if valid == True:
-            break
-    print recallRankMat
+    # valid = False
+    # recallRankMat = None
+    # for i in range(cfg.maxKendallTrial):
+    #     valid,recallRankMat = ff.testKendal([j[1] for j in evalPop], data)
+    #     if valid == True:
+    #         break
+    # print recallRankMat
 
-    fitnessList = []
-    for i in range(len(evalPop)):
-        fitness = np.mean(recallRankMat[i,:])
-        fitnessList.append(fitness)
-    if not(valid):
-        print 'WARN: testKendal in evalPop is invalid'
+    # fitnessList = []
+    # for i in range(len(evalPop)):
+    #     fitness = np.mean(recallRankMat[i,:])
+    #     fitnessList.append(fitness)
+    # if not(valid):
+    #     print 'WARN: testKendal in evalPop is invalid'
 
-    fitnessSortedIdx = sorted(range(len(fitnessList)), key=lambda k: fitnessList[k])
-    np.savetxt(genSummaryDirpath + "/evalFitness_name.csv", [evalPop[idx][0] for idx in fitnessSortedIdx], fmt='%s', delimiter=',')
-    np.savetxt(genSummaryDirpath + "/evalFitness_fitness.csv", [fitnessList[idx] for idx in fitnessSortedIdx], fmt='%s', delimiter=',')
-    np.savetxt(genSummaryDirpath + "/evalFitness_recallRankMat.csv", recallRankMat, fmt='%s', delimiter=',')
+    # fitnessSortedIdx = sorted(range(len(fitnessList)), key=lambda k: fitnessList[k])
+    # np.savetxt(genSummaryDirpath + "/evalFitness_name.csv", [evalPop[idx][0] for idx in fitnessSortedIdx], fmt='%s', delimiter=',')
+    # np.savetxt(genSummaryDirpath + "/evalFitness_fitness.csv", [fitnessList[idx] for idx in fitnessSortedIdx], fmt='%s', delimiter=',')
+    # np.savetxt(genSummaryDirpath + "/evalFitness_recallRankMat.csv", recallRankMat, fmt='%s', delimiter=',')
     
 if __name__ == "__main__":
     start_time = time.time()

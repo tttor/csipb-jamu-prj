@@ -12,7 +12,7 @@ increase the minimum tree depth?
    all random, some random and some tanimoto, all tanimoto
 >> should we break the tie for the same fitness?
 
-> fitness func
+> fitness func (note: ideally, the higher the fitness, the better the individual)
 >> recallFitness
 >> inRangeFitness
 >> ZeroDivFitness

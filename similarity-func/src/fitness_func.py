@@ -7,19 +7,48 @@ from operator import itemgetter
 import config as cfg
 
 def compute(pop,data):
-    valid = False; recallFitnessList = None; inRangeFitnessList = None
+    valid = False; recallFitnessList = None
     for i in range(cfg.maxKendallTrial):
-        valid,recallFitnessList,inRangeFitnessList = testKendal(pop, data)
+        valid,recallFitnessList = testKendal(pop, data)
         if valid:
             break
 
     fitnessList = []
     if valid:
+        inRangeFitnessList = getInRangeFitness(pop,data)
+        assert len(recallFitnessList)==len(inRangeFitnessList)
+
         for i in range(len(pop)):
             fitness = recallFitnessList[i] + inRangeFitnessList[i]
             fitnessList.append(fitness)
 
     return (valid,fitnessList)
+
+def getInRangeFitness(pop,data):
+    data2 = []
+    for classIdx, classData in data.iteritems():
+        data2 = data2 + classData
+
+    inRangeFitnessDict = {}
+    for individualIdx,individual in enumerate(pop):
+        for i,sx in enumerate(data2):
+            for j,sy in enumerate(data2[i:]):
+                a = util.getFeatureA(sx,sy)
+                b = util.getFeatureB(sx,sy)
+                c = util.getFeatureC(sx,sy)
+                d = util.getFeatureD(sx,sy)
+                simScore = individual(a,b,c,d); 
+
+                inRangeFitness = 0.0
+                if not(util.inRange(simScore)):
+                    inRangeFitness = cfg.nIndividual
+                inRangeFitnessDict[individualIdx] = inRangeFitness
+
+    inRangeFitnessList = []
+    for i in range(cfg.nIndividual):
+        inRangeFitnessList.append( inRangeFitnessDict[i] )
+
+    return inRangeFitnessList
 
 def testKendal(pop, data):
     # Get refERENCE and remAINING idx
@@ -35,7 +64,6 @@ def testKendal(pop, data):
     # Get Recall Matrix along with some other fitness
     nIndividual = len(pop); nClass = len(data)
     medianRecallMat = numpy.zeros( (nIndividual,nClass) )
-    inRangeFitnessDict = {}
 
     for individualIdx,individual in enumerate(pop):
         for classIdx, classData in data.iteritems():
@@ -57,12 +85,6 @@ def testKendal(pop, data):
                         d = util.getFeatureD(refString, remString)
                         simScore = individual(a,b,c,d); 
                         simScoreList.append( (simScore,classIdx,remClassIdx) )
-
-                        # simultaneously get inRangeFitness here
-                        inRangeFitness = 0
-                        if not(util.inRange(simScore)):
-                            inRangeFitness = nIndividual
-                        inRangeFitnessDict[individualIdx] = inRangeFitness
 
                 # Sort simScoreList based descending order of SimScore
                 sortedIdx = sorted(range(len(simScoreList)), key=lambda k: simScoreList[k][0])
@@ -116,10 +138,4 @@ def testKendal(pop, data):
     if numpy.average(pValueList) <= cfg.pValueAcceptance:
         independent = True
 
-    #
-    inRangeFitnessList = []
-    for i in range(nIndividual):
-        inRangeFitnessList.append(inRangeFitnessDict[i])
-        
-    assert len(recallFitnessList)==len(inRangeFitnessList)
-    return (independent, recallFitnessList, inRangeFitnessList)
+    return (independent, recallFitnessList)

@@ -14,7 +14,7 @@ convergenceThreshold = 0.05
 # KendallTest Config
 nRefPerClassInPercentage = 20
 nTopInPercentage = 10
-maxKendallTrial = 100
+maxKendallTrial = 10
 pValueAcceptance = 0.01
 
 # Training Data Config

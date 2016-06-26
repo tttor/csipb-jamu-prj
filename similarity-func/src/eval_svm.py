@@ -22,11 +22,13 @@ def main(argv):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
     #
-    funcStrList = []
-    gpFuncFilepath = xprmtDir+'/gen-summary/individualHOF.csv'
+    gpFuncFilepath = xprmtDir+'/summary/individualHOF.csv'
+    contents = []
     with open(gpFuncFilepath, 'r') as f:
-        funcStrList = f.readlines()
+        contents = f.readlines()
+    funcStrList = contents[-1].split(';') # take only the last generation
     funcStrList.append(util.tanimotoStr())
+
     funcStrList = [s.rstrip() for s in funcStrList]
     funcStrList = [util.expandFuncStr(s) for s in funcStrList]
 
