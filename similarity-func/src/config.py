@@ -1,6 +1,6 @@
 # DEAP GP Config
 nIndividual = 100
-nMaxGen = 10
+nMaxGen = 10 # not including the initial generation
 pMut = 0.1
 pCx = 0.5
 

@@ -15,7 +15,7 @@ def main(argv):
     assert os.path.isdir(xprmtDir)
 
     #
-    data = np.loadtxt(cfg.datasetPaths[dataName], delimiter=',')
+    data,dataDict = util.loadData(cfg.datasetPaths[dataName])
     X = data[:, 1:]
     y = data[:, 0]
 

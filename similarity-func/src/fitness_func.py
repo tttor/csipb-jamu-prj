@@ -6,10 +6,10 @@ from operator import itemgetter
 
 import config as cfg
 
-def compute(pop,data):
+def compute(pop,data,dataDict):
     valid = False; recallFitnessList = None
     for i in range(cfg.maxKendallTrial):
-        valid,recallFitnessList = testKendal(pop, data)
+        valid,recallFitnessList = testKendal(pop, data,dataDict)
         if valid:
             break
 
@@ -25,14 +25,10 @@ def compute(pop,data):
     return (valid,fitnessList)
 
 def getInRangeFitness(pop,data):
-    data2 = []
-    for classIdx, classData in data.iteritems():
-        data2 = data2 + classData
-
     inRangeFitnessDict = {}
     for individualIdx,individual in enumerate(pop):
-        for i,sx in enumerate(data2):
-            for j,sy in enumerate(data2[i:]):
+        for i,sx in enumerate(data):
+            for j,sy in enumerate(data[i:]):
                 a = util.getFeatureA(sx,sy)
                 b = util.getFeatureB(sx,sy)
                 c = util.getFeatureC(sx,sy)
@@ -50,10 +46,10 @@ def getInRangeFitness(pop,data):
 
     return inRangeFitnessList
 
-def testKendal(pop, data):
+def testKendal(pop, data, dataDict):
     # Get refERENCE and remAINING idx
     refAndRemIdxDict = defaultdict(tuple)
-    for classIdx,classData in data.iteritems():
+    for classIdx,classData in dataDict.iteritems():
         nSample = len(classData)
         nRef = int( cfg.nRefPerClassInPercentage/100.0 * nSample )
         refIdxList = numpy.random.randint(0,nSample, size=nRef)
@@ -62,23 +58,25 @@ def testKendal(pop, data):
         refAndRemIdxDict[classIdx] = (refIdxList,remIdxList)
 
     # Get Recall Matrix along with some other fitness
-    nIndividual = len(pop); nClass = len(data)
+    nIndividual = len(pop); nClass = len(dataDict)
     medianRecallMat = numpy.zeros( (nIndividual,nClass) )
 
     for individualIdx,individual in enumerate(pop):
-        for classIdx, classData in data.iteritems():
+        for classIdx, classData in dataDict.iteritems():
             refIdxList = refAndRemIdxDict[classIdx][0]
             nRecallList = [] # from all refIdx of this class
 
             for refIdx in refIdxList:
-                refString = classData[refIdx]
+                refStringIdx = classData[refIdx]
+                refString = data[refStringIdx]
 
                 # Compute simScore for each pair of (ref, rem)
                 simScoreList = [] # each element contains 3-tuple of (simScore, refClassLabel, remClassLabel)
                 for remClassIdx, refAndRemIdx in refAndRemIdxDict.iteritems():
                     remIdxList = refAndRemIdx[1]
                     for remIdx in remIdxList:
-                        remString = data[remClassIdx][remIdx]
+                        remStringIdx = dataDict[remClassIdx][remIdx]
+                        remString = data[remStringIdx]
                         a = util.getFeatureA(refString, remString)
                         b = util.getFeatureB(refString, remString)
                         c = util.getFeatureC(refString, remString)

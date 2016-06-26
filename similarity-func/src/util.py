@@ -135,28 +135,14 @@ def powhalf(x):
     return np.power(x, 0.5)
 
 def loadData(datapath):
-    """
-    :param datapath:
-    :return: A dictionary, whose key is a class index (begins at 0)
-            example: data[0] contain a matrix as follows
-            Each dict elemet is a matrix where the i-th row indicates the ith-datum,
-            and j-th column indicates j-th binary value except
-            the last column that indicates the label (class)
-    """
+    data = np.loadtxt(datapath, delimiter=',')
 
-    data_dict = defaultdict(list)
-    try:
-        data = np.loadtxt(datapath, delimiter=',')
-    except:
-        data = np.loadtxt(datapath, delimiter="\t")
+    dataDict = defaultdict(list)
+    for idx, datum in enumerate(data):
+        classIdx = int(datum[0]) # the first element _must_ be classIdx
+        dataDict[classIdx].append(idx) # contain only the idx
 
-    for i in range(0, len(data)):
-        data_dict[int(data[i, 0])].append(data[i, 1:])
-
-    return data_dict
-
-def loadDataJamu():
-    pass
+    return (data,dataDict)
 
 def getFeatureA(s1,s2):
     return np.inner(s1, s2)
