@@ -3,6 +3,12 @@ from collections import defaultdict
 
 import config as cfg
 
+def getSimScore(x1,x2,funcStr):
+    a = getFeatureA(x1,x2); b = getFeatureB(x1,x2)
+    c = getFeatureC(x1,x2); d = getFeatureD(x1,x2)
+
+    return eval(funcStr)
+
 def inRange(simScore):
     return (simScore>0.0 and simScore<=1.0)
 
@@ -16,9 +22,7 @@ def computeGram(X, funcStr):
             a = getFeatureA(x1,x2); b = getFeatureB(x1,x2)
             c = getFeatureC(x1,x2); d = getFeatureD(x1,x2)
 
-            simScore = eval(funcStr); 
-            # print i,j
-            # print simScore
+            simScore = getSimScore(x1,x2,funcStr)
             assert simScore>0.0 
             assert simScore<=1.0
 

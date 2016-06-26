@@ -30,11 +30,7 @@ def getInRangeFitness(pop,data):
     for individualIdx,individual in enumerate(pop):
         for i,sx in enumerate(data):
             for j,sy in enumerate(data[i:]):
-                a = util.getFeatureA(sx,sy)
-                b = util.getFeatureB(sx,sy)
-                c = util.getFeatureC(sx,sy)
-                d = util.getFeatureD(sx,sy)
-                simScore = individual(a,b,c,d); 
+                simScore = util.getSimScore(sx,sy,individual)
 
                 inRangeFitness = 0.0
                 if not(util.inRange(simScore)):
@@ -76,11 +72,8 @@ def getRecallFitness(pop, data, dataDict):
                     for remIdx in remIdxList:
                         remStringIdx = dataDict[remClassIdx][remIdx]
                         remString = data[remStringIdx]
-                        a = util.getFeatureA(refString, remString)
-                        b = util.getFeatureB(refString, remString)
-                        c = util.getFeatureC(refString, remString)
-                        d = util.getFeatureD(refString, remString)
-                        simScore = individual(a,b,c,d); 
+
+                        simScore = util.getSimScore(refString,remString,individual)
                         simScoreList.append( (simScore,classIdx,remClassIdx) )
 
                 # Sort simScoreList based descending order of SimScore

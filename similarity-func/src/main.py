@@ -143,8 +143,9 @@ def main(argv):
         # Evaluate the entire population
         # print 'Evaluate the entire population ...'
         valid = False; fitnessList = None
-        compiledPop = [toolbox.compile(expr=individual) for individual in offspring]
-        valid,fitnessList = ff.compute(compiledPop,data,dataDict)
+        strPop = [str(i) for i in offspring]
+        strPop = [util.expandFuncStr(i) for i in strPop]
+        valid,fitnessList = ff.compute(strPop,data,dataDict)
 
         if valid:
             assert len(fitnessList)>0
