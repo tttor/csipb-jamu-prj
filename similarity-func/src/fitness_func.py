@@ -25,7 +25,10 @@ def compute(pop,data,dataDict):
     return (valid,fitnessList)
 
 def getInRangeFitness(pop,data):
+    if len(pop)!=cfg.nIndividual:
+        print len(pop),cfg.nIndividual
     assert len(pop)==cfg.nIndividual
+    
     inRangeFitnessList = [0.0]*len(pop)
     for individualIdx,individual in enumerate(pop):
         for i,sx in enumerate(data):
@@ -77,14 +80,14 @@ def getRecallFitness(pop, data, dataDict):
                         simScoreList.append( (simScore,classIdx,remClassIdx) )
 
                 # Sort simScoreList based descending order of SimScore
-                sortedIdx = sorted(range(len(simScoreList)), key=lambda k: simScoreList[k][0])
+                sortedSimScoreListIdx = sorted(range(len(simScoreList)), key=lambda k: simScoreList[k][0],reverse=True)
 
-                nTop = int(cfg.nTopInPercentage/100.0 * len(sortedIdx))
-                sortedIdx = sortedIdx[0:nTop]
+                nTop = int(cfg.nTopInPercentage/100.0 * len(sortedSimScoreListIdx))
+                sortedSimScoreListIdx = sortedSimScoreListIdx[0:nTop]
 
                 # Get the number of recall/tp
                 nRecall = 0
-                for i in sortedIdx:
+                for i in sortedSimScoreListIdx:
                     refClass = simScoreList[i][1]
                     remClass = simScoreList[i][2]
                     if (refClass==remClass):
@@ -97,18 +100,19 @@ def getRecallFitness(pop, data, dataDict):
     # Get median recall Ranking Matrix and recallFitness (agnostic to iid)
     medianRecallRankMat = numpy.zeros( (nIndividual, nClass) )
     for i in range(nClass):
-        medianRecallPerClass = medianRecallMat[:,i] # from all individuals
-        sortedIdx = sorted(range(nIndividual), key=lambda k: medianRecallPerClass[k])
+        medRecall = medianRecallMat[:,i] # from all individuals of this class
+        sortedMedRecallIdx = sorted(range(nIndividual), key=lambda k: medRecall[k],reverse=True)# descending
 
         rankList = []
         for j in range(nIndividual):
-            rank = sortedIdx.index(j)
+            rank = sortedMedRecallIdx.index(j)
             rankList.append(rank)
+
         medianRecallRankMat[:,i] = rankList
 
     recallFitnessList = []
     for i in range(nIndividual):
-        recallFitness = numpy.average(medianRecallRankMat[i,:]) * -1.0 # as we maximize the Fitness
+        recallFitness = numpy.average(medianRecallRankMat[i,:]) * -1.0 # inversed as we maximize the Fitness
         recallFitnessList.append(recallFitness)
 
     # Test i.i.d (independent and identically distributed)
