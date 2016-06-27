@@ -26,7 +26,7 @@ def main(argv):
 
     # set D_tr
     datasetName = argv[1]
-    data = util.loadData( cfg.datasetPaths[datasetName] )
+    data, dataDict = util.loadData( cfg.datasetPaths[datasetName] )
 
     # init log
     tag = argv[1]
@@ -62,19 +62,17 @@ def main(argv):
     primitiveSet.addPrimitive(np.subtract, arity=2, name="sub")
     primitiveSet.addPrimitive(np.multiply, arity=2, name="mul")
     primitiveSet.addPrimitive(util.protectedDiv, arity=2, name="pDiv")
-
-    # Adding new primitive set
-    primitiveSet.addPrimitive(np.sqrt, arity=1, name="sqrt")
-    primitiveSet.addPrimitive(util.pow, arity=1, name="pow")
-    primitiveSet.addPrimitive(util.powhalf, arity=1, name="powhalf")
-    primitiveSet.addPrimitive(np.log10, arity=1, name="log")
-    primitiveSet.addPrimitive(np.minimum, arity=2, name="min")
-    primitiveSet.addPrimitive(np.maximum, arity=2, name="max")
+    # primitiveSet.addPrimitive(np.minimum, arity=2, name="min")
+    # primitiveSet.addPrimitive(np.maximum, arity=2, name="max")
+    # primitiveSet.addPrimitive(np.sqrt, arity=1, name="sqrt")
+    # primitiveSet.addPrimitive(util.pow, arity=1, name="pow")
+    # primitiveSet.addPrimitive(util.powhalf, arity=1, name="powhalf")
+    # primitiveSet.addPrimitive(np.log10, arity=1, name="log")
     # primitiveSet.addEphemeralConstant("const", lambda: 0.5)
 
     # Settting up the fitness and the individuals
-    deapCreator.create("FitnessMin", deapBase.Fitness, weights=(-1.0,)) # -1 because we minimize
-    deapCreator.create("Individual", deapGP.PrimitiveTree, fitness=deapCreator.FitnessMin, primitiveSet=primitiveSet)
+    deapCreator.create("FitnessMax", deapBase.Fitness, weights=(1.0,))
+    deapCreator.create("Individual", deapGP.PrimitiveTree, fitness=deapCreator.FitnessMax, primitiveSet=primitiveSet)
 
     # Setting up the operator of Genetic Programming such as Evaluation, Selection, Crossover, Mutation
     # register the generation functions into a Toolbox
@@ -118,8 +116,10 @@ def main(argv):
     toolbox.register("popForbes", deapTools.initRepeat, list, toolbox.indForbes)
 
 ### EVOLVE GENERATIONS
+    print 'EVOLVE ...'
+
     pop = toolbox.population(cfg.nIndividual) # init pop   
-    for g in range(cfg.nMaxGen):
+    for g in range(cfg.nMaxGen+1):# +1 as we do not count gen zero
         offspring = pop
 
         if (g > 0):
@@ -142,20 +142,17 @@ def main(argv):
 
         # Evaluate the entire population
         # print 'Evaluate the entire population ...'
-        valid = False
-        recallRankMat = None
-        for i in range(cfg.maxKendallTrial):
-            compiledPop = [toolbox.compile(expr=individual) for individual in offspring]
-            valid,recallRankMat = ff.testKendal(compiledPop, data)
-            if valid == True:
-                break
+        valid = False; fitnessList = None
+        strPop = [str(i) for i in offspring]
+        strPop = [util.expandFuncStr(i) for i in strPop]
+        valid,fitnessList = ff.compute(strPop,data,dataDict)
 
         if valid:
+            assert len(fitnessList)>0
             for idx,ind in enumerate(offspring):
-                fitnessVal = np.mean( recallRankMat[idx,:] )
-                ind.fitness.values = float(fitnessVal), # must be a tuple here
+                ind.fitness.values = (fitnessList[idx],) # must be a tuple here
             testKendalValidLog.append('valid')
-        else: # ignore this generation
+        else: # ignore this offspring, reset to the previous generation
             offspring = pop
             testKendalValidLog.append('invalid')
         
@@ -182,43 +179,15 @@ def main(argv):
             break
 
 ### POST EVOLUTION
-    genSummaryDirpath = dirpath + "/gen-summary"
+    print 'post EVOLUTION ...'
+    genSummaryDirpath = dirpath + "/summary"
     os.makedirs(genSummaryDirpath) 
 
-    np.savetxt(genSummaryDirpath + "/individualHOF.csv", [[str(i) for i in j] for j in hofLog], fmt='%s', delimiter=',')
-    np.savetxt(genSummaryDirpath + "/fitnessHOF.csv", [[i.fitness.values for i in j] for j in hofLog], fmt='%s', delimiter=',')
-    np.savetxt(genSummaryDirpath + "/testKendalValidLog.csv", testKendalValidLog, fmt='%s', delimiter=',')
-
-    evalPop = [] # compiled
-    cTanimoto = toolbox.compile(expr=toolbox.popTanimoto(1)[0])
-    evalPop.append( ('tanimoto',cTanimoto) )
-    pickle.dump(cTanimoto, open(genSummaryDirpath+'/individual_tanimoto.pkl', "wb"),-1)
-    cForbes = toolbox.compile(expr=toolbox.popForbes(1)[0])
-    evalPop.append( ('forbes',cForbes) )
-    pickle.dump(cForbes, open(genSummaryDirpath+'/individual_forbes.pkl', "wb"),-1)
-    for idx,i in enumerate(hofLog[-1]):
-        ci = toolbox.compile(expr=i)
-        evalPop.append( ('gp'+str(idx),ci) )
-        pickle.dump(ci, open(genSummaryDirpath+'/individual_gp'+str(idx)+'.pkl', "wb"),-1)
-    
-    valid = False
-    recallRankMat = None
-    for i in range(cfg.maxKendallTrial):
-        valid,recallRankMat = ff.testKendal([i(1) for i in evalPop], data)
-        if valid == True:
-            break
-
-    fitnessList = []
-    if valid:
-        for i in range(len(evalPop)):
-            fitness = np.mean(recallRankMat[i,:])
-            fitnessList.append(fitness)
-    else:
-        print 'WARN: testKendal in evalPop is invalid'
-
-    # fitnessSortedIdx = ...
+    np.savetxt(genSummaryDirpath + "/individualHOF.csv", [[str(i) for i in j] for j in hofLog], fmt='%s', delimiter=';')
+    np.savetxt(genSummaryDirpath + "/fitnessHOF.csv", [[i.fitness.values for i in j] for j in hofLog], fmt='%s', delimiter=';')
+    np.savetxt(genSummaryDirpath + "/testKendalValidLog.csv", testKendalValidLog, fmt='%s', delimiter=';')
 
 if __name__ == "__main__":
     start_time = time.time()
     main(sys.argv)
-    print("GP done in: %s seconds" % (time.time() - start_time))
+    print("GP done in: %.3f minutes" % ((time.time()-start_time)/60.0))

@@ -1,0 +1,22 @@
+README
+
+> For these problems, should we:
+filter individual after mutation and crossover?
+modify the fitness function?
+increase the minimum tree depth?
+>> GPSimFunc may return score>1.0, e.g. add(a,d), as well as score<0.0
+>> If we use pure division, then GPSimFunc may have zero division. e.g. div(a,d)
+
+> Focusing on tanimoto vs GPSimFunc, 
+>> there are 3 scenarios in terms of individuals in gen-0:
+   all random, some random and some tanimoto, all tanimoto
+>> should we break the tie for the same fitness?
+
+> fitness func (note: ideally, the higher the fitness, the better the individual)
+>> recallFitness
+>> inRangeFitness
+>> ZeroDivFitness
+>> s(x,y)==s(y,x) fitness
+
+> Some requirements for distance functions are:
+TODO

@@ -1,20 +1,20 @@
 # DEAP GP Config
 nIndividual = 100
-nMaxGen = 10
+nMaxGen = 10 # not including the initial generation
 pMut = 0.1
 pCx = 0.5
 
-treeMinDepth = 1
+treeMinDepth = 2
 treeMaxDepth = 3
 subtreeMinDepthMut = 1
 subtreeMaxDepthMut = 1
 
-convergenceThreshold = 0.05
+convergenceThreshold = -0.1
 
 # KendallTest Config
-nRefPerClassInPercentage = 10
-nTopInPercentage = 10
-maxKendallTrial = 100
+nRefPerClassInPercentage = 20
+nTopInPercentage = 20
+maxKendallTrial = 10
 pValueAcceptance = 0.01
 
 # Training Data Config
@@ -27,5 +27,5 @@ datasetPaths = {'zoo': '../data/zoo/zoo.csv',
 				'zooMinim': '../data/zoo/zooMinim.csv'}
 
 # Logging Config
-xprmtDir = '/home/xprmt/similarity-func'
+xprmtDir = '/home/tor/robotics/prj/csipb-jamu-prj/xprmt/similarity-func'
 nHOF = 1

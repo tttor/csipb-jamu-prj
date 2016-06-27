@@ -6,73 +6,114 @@ from operator import itemgetter
 
 import config as cfg
 
-def testKendal(pop, data):
-    # Get ref idx
-    refRemIdxListDict = defaultdict(tuple)
-    for classIdx,dataPerClass in data.iteritems():
-        nSample = len(dataPerClass)
+def compute(pop,data,dataDict):
+    valid = False; recallFitnessList = None
+    for i in range(cfg.maxKendallTrial):
+        valid,recallFitnessList = getRecallFitness(pop, data,dataDict)
+        if valid:
+            break
+
+    fitnessList = []
+    if valid:
+        inRangeFitnessList = getInRangeFitness(pop,data)
+        assert len(recallFitnessList)==len(inRangeFitnessList)
+
+        for i in range(len(pop)):
+            fitness = recallFitnessList[i] + inRangeFitnessList[i]
+            fitnessList.append(fitness)
+
+    return (valid,fitnessList)
+
+def getInRangeFitness(pop,data):
+    if len(pop)!=cfg.nIndividual:
+        print len(pop),cfg.nIndividual
+    assert len(pop)==cfg.nIndividual
+    
+    inRangeFitnessList = [0.0]*len(pop)
+    for individualIdx,individual in enumerate(pop):
+        for i,sx in enumerate(data):
+            for j,sy in enumerate(data[i:]):
+                simScore = util.getSimScore(sx,sy,individual)
+
+                inRangeFitness = 0.0
+                if not(util.inRange(simScore)):
+                    inRangeFitness = cfg.nIndividual * -1.0 # penalize with the size of Pop
+
+                if inRangeFitness < inRangeFitnessList[individualIdx]:
+                    inRangeFitnessList[individualIdx] = inRangeFitness
+
+    return inRangeFitnessList
+
+def getRecallFitness(pop, data, dataDict):
+    # Get refERENCE and remAINING idx
+    refAndRemIdxDict = defaultdict(tuple)
+    for classIdx,classData in dataDict.iteritems():
+        nSample = len(classData)
         nRef = int( cfg.nRefPerClassInPercentage/100.0 * nSample )
         refIdxList = numpy.random.randint(0,nSample, size=nRef)
         remIdxList = [idx for idx in range(nSample) if idx not in refIdxList]
 
-        refRemIdxListDict[classIdx] = (refIdxList,remIdxList)
+        refAndRemIdxDict[classIdx] = (refIdxList,remIdxList)
 
-    # Get Recall Matrix
-    nIndividual = len(pop); nClass = len(data)
+    # Get Recall Matrix along with some other fitness
+    nIndividual = len(pop); nClass = len(dataDict)
     medianRecallMat = numpy.zeros( (nIndividual,nClass) )
-    for individualIdx,individual in enumerate(pop):
-        medianPerClass = []
 
-        for classIdx, classData in data.iteritems():
+    for individualIdx,individual in enumerate(pop):
+        for classIdx, classData in dataDict.iteritems():
+            refIdxList = refAndRemIdxDict[classIdx][0]
             nRecallList = [] # from all refIdx of this class
-            refIdxList = refRemIdxListDict[classIdx][0]
+
             for refIdx in refIdxList:
-                refString = classData[refIdx]
-                simScoreList = [] # each element contains 3-tuple of (simScore, refClassLabel, remClassLabel)
+                refStringIdx = classData[refIdx]
+                refString = data[refStringIdx]
 
                 # Compute simScore for each pair of (ref, rem)
-                for remClassIdx, refRemIdxListTuple in refRemIdxListDict.iteritems():
-                    remIdxList = refRemIdxListTuple[1]
+                simScoreList = [] # each element contains 3-tuple of (simScore, refClassLabel, remClassLabel)
+                for remClassIdx, refAndRemIdx in refAndRemIdxDict.iteritems():
+                    remIdxList = refAndRemIdx[1]
                     for remIdx in remIdxList:
-                        remString = data[remClassIdx][remIdx]
-                        a = util.getFeatureA(refString, remString)
-                        b = util.getFeatureB(refString, remString)
-                        c = util.getFeatureC(refString, remString)
-                        d = util.getFeatureD(refString, remString)
-                        simScore = individual(a,b,c,d)
+                        remStringIdx = dataDict[remClassIdx][remIdx]
+                        remString = data[remStringIdx]
+
+                        simScore = util.getSimScore(refString,remString,individual)
                         simScoreList.append( (simScore,classIdx,remClassIdx) )
 
                 # Sort simScoreList based descending order of SimScore
-                sortedIdx = sorted(range(len(simScoreList)), key=lambda k: simScoreList[k][0])
+                sortedSimScoreListIdx = sorted(range(len(simScoreList)), key=lambda k: simScoreList[k][0],reverse=True)
 
-                nTop = cfg.nTopInPercentage/100.0 * len(sortedIdx)
-                sortedIdx = sortedIdx[0:int(nTop)]
+                nTop = int(cfg.nTopInPercentage/100.0 * len(sortedSimScoreListIdx))
+                sortedSimScoreListIdx = sortedSimScoreListIdx[0:nTop]
 
                 # Get the number of recall/tp
                 nRecall = 0
-                for i in sortedIdx:
+                for i in sortedSimScoreListIdx:
                     refClass = simScoreList[i][1]
                     remClass = simScoreList[i][2]
-
                     if (refClass==remClass):
                         nRecall += 1
+                nRecallList.append(nRecall) # Add true positive value for this class for this refIdx.
 
-                nRecallList.append(nRecall) # Add true positive value for current class.
-
-            median = numpy.median(nRecallList) # Calculate median of true positive value current class
+            median = numpy.median(nRecallList) # Calculate median of nRecall of this class from all refIdx
             medianRecallMat[individualIdx][classIdx] = median
 
-    # Get median recall Ranking Matrix
+    # Get median recall Ranking Matrix and recallFitness (agnostic to iid)
     medianRecallRankMat = numpy.zeros( (nIndividual, nClass) )
     for i in range(nClass):
-        medianRecallListPerClass = medianRecallMat[:,i]
-        sortedIdx = sorted(range(len(medianRecallListPerClass)), key=lambda k: medianRecallListPerClass[k])
+        medRecall = medianRecallMat[:,i] # from all individuals of this class
+        sortedMedRecallIdx = sorted(range(nIndividual), key=lambda k: medRecall[k],reverse=True)# descending
 
         rankList = []
         for j in range(nIndividual):
-            rank = sortedIdx.index(j)
+            rank = sortedMedRecallIdx.index(j)
             rankList.append(rank)
+
         medianRecallRankMat[:,i] = rankList
+
+    recallFitnessList = []
+    for i in range(nIndividual):
+        recallFitness = numpy.average(medianRecallRankMat[i,:]) * -1.0 # inversed as we maximize the Fitness
+        recallFitnessList.append(recallFitness)
 
     # Test i.i.d (independent and identically distributed)
     # with H0 = two rank lists are independent
@@ -88,8 +129,7 @@ def testKendal(pop, data):
             pValueList.append(pval)
 
     independent = False
-    pValueAvg = numpy.average(pValueList)
-    if pValueAvg <= cfg.pValueAcceptance:
+    if numpy.average(pValueList) <= cfg.pValueAcceptance:
         independent = True
 
-    return (independent, medianRecallRankMat)
+    return (independent, recallFitnessList)
