@@ -8,6 +8,7 @@ from collections import defaultdict
 import os
 import pickle
 import shutil
+import random
 
 # import our costum modules
 import config as cfg
@@ -23,6 +24,8 @@ from deap import gp as deapGP
 def main(argv):
 ##### Init 
     assert len(argv)==2
+    random.seed(123)
+    np.random.seed(123)
 
     # set D_tr
     datasetName = argv[1]
@@ -119,7 +122,7 @@ def main(argv):
     print 'EVOLVE ...'
 
     pop = toolbox.population(cfg.nIndividual) # init pop   
-    for g in range(cfg.nMaxGen+1):# +1 as we do not count gen zero
+    for g in range(cfg.nMaxGen+1):# +1 as we do not count the initial 0-th generation
         offspring = pop
 
         if (g > 0):
