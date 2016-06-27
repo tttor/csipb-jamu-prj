@@ -19,4 +19,7 @@ increase the minimum tree depth?
 >> s(x,y)==s(y,x) fitness
 
 > Some requirements for distance functions are:
-TODO
+1) Non-negativity: d(x, y) >= 0
+2) Identity: d(x, y) = 0 if and only if x == y
+3) Symmetry: d(x, y) = d(y, x)
+4) Triangle Inequality: d(x, y) + d(y, z) >= d(x, z)

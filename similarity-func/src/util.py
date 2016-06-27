@@ -123,7 +123,6 @@ def forbes(pset, min_, max_, type_=None):
 
     return expr
 
-# Define primitive set (pSet)
 def protectedDiv(left, right):
     with np.errstate(divide='ignore',invalid='ignore'):
         x = np.divide(left, right)
@@ -133,6 +132,12 @@ def protectedDiv(left, right):
         elif np.isinf(x) or np.isnan(x):
             x = 1
     return x
+
+# def protectedDiv(left,right):
+#     try:
+#         return left / right
+#     except ZeroDivisionError:
+#         return 1
 
 def pow(x):
     return np.power(x, 2)
