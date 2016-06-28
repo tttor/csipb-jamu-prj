@@ -10,7 +10,9 @@ def compute(individual, data, recallFitnessDict):
     inRangeFitness = getInRangeFitness(individual,data)
     recallFitness = getRecallFitness(individual,recallFitnessDict)
 
-    return (inRangeFitness,recallFitness)
+    fitness = inRangeFitness + recallFitness
+
+    return (fitness,)
 
 def getInRangeFitness(individual,data):
     n = 0
@@ -24,13 +26,11 @@ def getInRangeFitness(individual,data):
             if util.inRange(simScore):
                 nInRange = nInRange + 1
 
-    return float(nInRange)/n
+    return float(nInRange)/n*100.0 # in percentage
 
 def getRecallFitness(individual,recallFitnessDict):
     individualStr = util.expandFuncStr(str(individual))
     assert individualStr in recallFitnessDict, 'individualStr NOT in recallFitnessDict'
 
     fitness,valid = recallFitnessDict[ util.expandFuncStr(str(individual)) ]
-    assert not(fitness<0.0)
-
     return fitness

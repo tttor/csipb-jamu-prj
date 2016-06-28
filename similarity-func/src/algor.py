@@ -118,3 +118,4 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, data, dataDict, recallFitne
             print logbook.stream        
 
     return population, logbook
+    

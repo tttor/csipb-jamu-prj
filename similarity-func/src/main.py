@@ -53,9 +53,7 @@ primitiveSet.addPrimitive(util.protectedDiv, arity=2, name="pDiv")
 # primitiveSet.addEphemeralConstant("const", lambda: 0.5)
 
 # Settting up the fitness and the individuals
-inRangeFitnessWeight = 1.0
-recallFitnessWeight = -1.0
-deapCreator.create("Fitness", deapBase.Fitness, weights=(inRangeFitnessWeight,recallFitnessWeight))
+deapCreator.create("Fitness", deapBase.Fitness, weights=(1.0,))
 deapCreator.create("Individual", deapGP.PrimitiveTree, 
                     fitness=deapCreator.Fitness, primitiveSet=primitiveSet)
 
@@ -119,6 +117,10 @@ def main():
     print("Evolution took %.3f minutes" % ((time.time()-evolStartTime)/60.0))
 
     # post evolution
+    for i in hof:
+        print  str(i)
+        print i.fitness.values
+        
     return pop, log, hof
 
 if __name__ == "__main__":
