@@ -14,6 +14,7 @@ from collections import defaultdict
 import config as cfg
 import util
 import fitness_func as ff
+import algor
 
 # import deap and scoop
 from deap import tools as deapTools
@@ -23,9 +24,11 @@ from deap import gp as deapGP
 from deap import algorithms as deapAlgor
 from scoop import futures as fu
 
-# These vars are made global for performance when using paralel/distributing computing
+# These vars are made global for performance when using paralel/distributed computing
 #### set D_tr
 data, dataDict, dataFeature = util.loadData( cfg.datasetPath )
+nClass = len(dataDict)
+recallRankDict = defaultdict(tuple)
 
 #### init Deap GP
 # Set Operators and Operands 
@@ -50,9 +53,11 @@ primitiveSet.addPrimitive(util.protectedDiv, arity=2, name="pDiv")
 # primitiveSet.addEphemeralConstant("const", lambda: 0.5)
 
 # Settting up the fitness and the individuals
-deapCreator.create("FitnessMax", deapBase.Fitness, weights=(1.0,))
+inRangeFitnessWeight = 1.0
+recallFitnessWeight = -1.0
+deapCreator.create("Fitness", deapBase.Fitness, weights=(inRangeFitnessWeight,recallFitnessWeight))
 deapCreator.create("Individual", deapGP.PrimitiveTree, 
-                    fitness=deapCreator.FitnessMax, primitiveSet=primitiveSet)
+                    fitness=deapCreator.Fitness, primitiveSet=primitiveSet)
 
 # Setting up the operator of Genetic Programming 
 toolbox = deapBase.Toolbox()
@@ -74,7 +79,7 @@ toolbox.register("population", deapTools.initRepeat,
 toolbox.register("compile", deapGP.compile, 
                             pset=primitiveSet)
 
-toolbox.register("evaluate", ff.compute, data=data)
+toolbox.register("evaluate", ff.compute, data=data, recallRankDict=recallRankDict)
 
 toolbox.register("select", deapTools.selRoulette)# : selRandom, selBest, selWorst, selTournament, selDoubleTournament
 
@@ -108,8 +113,9 @@ def main():
 
     # evolution
     evolStartTime = time.time()
-    pop, log = deapAlgor.eaSimple(pop, toolbox, cxpb=cfg.pCx, mutpb=cfg.pMut, ngen=cfg.nMaxGen, 
-                                  stats=mstats, halloffame=hof, verbose=True)
+    pop, log = algor.eaSimple(pop, toolbox, cxpb=cfg.pCx, mutpb=cfg.pMut, ngen=cfg.nMaxGen, 
+                              data=data, dataDict=dataDict, recallRankDict=recallRankDict,
+                              stats=mstats, halloffame=hof, verbose=True)
     print("Evolution took %.3f minutes" % ((time.time()-evolStartTime)/60.0))
 
     # post evolution
