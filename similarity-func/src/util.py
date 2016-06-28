@@ -43,8 +43,8 @@ def expandFuncStr(istr):
 def tanimotoStr():
     return 'pDiv(a, add(a, add(b, c)))'
 
-def forbesStr():
-    return 'div(sub(mul(add(add(a, b), add(c, d)), a), mul(add(a, b), add(a, c)),sub(mul(add(add(a, b), add(c, d)), min(add(a, b), add(a, c)),mul(add(a, b), add(a, c)))'
+# def forbesStr():
+#     return 'div(sub(mul(add(add(a, b), add(c, d)), a), mul(add(a, b), add(a, c)),sub(mul(add(add(a, b), add(c, d)), min(add(a, b), add(a, c)),mul(add(a, b), add(a, c)))'
 
 def tanimoto(pset, min_, max_, type_=None):
     def condition(height, depth):
@@ -67,61 +67,61 @@ def tanimoto(pset, min_, max_, type_=None):
 
     return expr
 
-def forbes(pset, min_, max_, type_=None):
-    def condition(height, depth):
-        return depth == height
+# def forbes(pset, min_, max_, type_=None):
+#     def condition(height, depth):
+#         return depth == height
 
-    if type_ is None:
-        type_ = pset.ret
+#     if type_ is None:
+#         type_ = pset.ret
 
-    expr = []
-    lsTerm = pset.terminals[type_]
-    lsPrim = pset.primitives[type_]
+#     expr = []
+#     lsTerm = pset.terminals[type_]
+#     lsPrim = pset.primitives[type_]
 
-    expr.append(lsPrim[3])
-    expr.append(lsPrim[1])
-    expr.append(lsPrim[2])
-    expr.append(lsPrim[0])
-    expr.append(lsPrim[0])
-    expr.append(lsTerm[0])
-    expr.append(lsTerm[1])
-    expr.append(lsPrim[0])
-    expr.append(lsTerm[2])
-    expr.append(lsTerm[3])
-    expr.append(lsTerm[0])
-    expr.append(lsPrim[2])
-    expr.append(lsPrim[0])
-    expr.append(lsTerm[0])
-    expr.append(lsTerm[1])
-    expr.append(lsPrim[0])
-    expr.append(lsTerm[0])
-    expr.append(lsTerm[2])
+#     expr.append(lsPrim[3])
+#     expr.append(lsPrim[1])
+#     expr.append(lsPrim[2])
+#     expr.append(lsPrim[0])
+#     expr.append(lsPrim[0])
+#     expr.append(lsTerm[0])
+#     expr.append(lsTerm[1])
+#     expr.append(lsPrim[0])
+#     expr.append(lsTerm[2])
+#     expr.append(lsTerm[3])
+#     expr.append(lsTerm[0])
+#     expr.append(lsPrim[2])
+#     expr.append(lsPrim[0])
+#     expr.append(lsTerm[0])
+#     expr.append(lsTerm[1])
+#     expr.append(lsPrim[0])
+#     expr.append(lsTerm[0])
+#     expr.append(lsTerm[2])
 
-    expr.append(lsPrim[1])
-    expr.append(lsPrim[2])
-    expr.append(lsPrim[0])
-    expr.append(lsPrim[0])
-    expr.append(lsTerm[0])
-    expr.append(lsTerm[1])
-    expr.append(lsPrim[0])
-    expr.append(lsTerm[2])
-    expr.append(lsTerm[3])
-    expr.append(lsPrim[4])
-    expr.append(lsPrim[0])
-    expr.append(lsTerm[0])
-    expr.append(lsTerm[1])
-    expr.append(lsPrim[0])
-    expr.append(lsTerm[0])
-    expr.append(lsTerm[2])
-    expr.append(lsPrim[2])
-    expr.append(lsPrim[0])
-    expr.append(lsTerm[0])
-    expr.append(lsTerm[1])
-    expr.append(lsPrim[0])
-    expr.append(lsTerm[0])
-    expr.append(lsTerm[2])
+#     expr.append(lsPrim[1])
+#     expr.append(lsPrim[2])
+#     expr.append(lsPrim[0])
+#     expr.append(lsPrim[0])
+#     expr.append(lsTerm[0])
+#     expr.append(lsTerm[1])
+#     expr.append(lsPrim[0])
+#     expr.append(lsTerm[2])
+#     expr.append(lsTerm[3])
+#     expr.append(lsPrim[4])
+#     expr.append(lsPrim[0])
+#     expr.append(lsTerm[0])
+#     expr.append(lsTerm[1])
+#     expr.append(lsPrim[0])
+#     expr.append(lsTerm[0])
+#     expr.append(lsTerm[2])
+#     expr.append(lsPrim[2])
+#     expr.append(lsPrim[0])
+#     expr.append(lsTerm[0])
+#     expr.append(lsTerm[1])
+#     expr.append(lsPrim[0])
+#     expr.append(lsTerm[0])
+#     expr.append(lsTerm[2])
 
-    return expr
+#     return expr
 
 def protectedDiv(left, right):
     with np.errstate(divide='ignore',invalid='ignore'):
@@ -132,12 +132,6 @@ def protectedDiv(left, right):
         elif np.isinf(x) or np.isnan(x):
             x = 1
     return x
-
-# def protectedDiv(left,right):
-#     try:
-#         return left / right
-#     except ZeroDivisionError:
-#         return 1
 
 def pow(x):
     return np.power(x, 2)
@@ -153,7 +147,19 @@ def loadData(datapath):
         classIdx = int(datum[0]) # the first element _must_ be classIdx
         dataDict[classIdx].append(idx) # contain only the idx
 
-    return (data,dataDict)
+    dataFeature = []
+    for idx,x in enumerate(data):
+        subdataFeature = []
+        for idx2,x2 in enumerate(data):
+            featureDict = {}
+            featureDict['a'] = getFeatureA(x,x2)
+            featureDict['b'] = getFeatureB(x,x2)
+            featureDict['c'] = getFeatureC(x,x2)
+            featureDict['d'] = getFeatureD(x,x2)
+            subdataFeature.append(featureDict)
+        dataFeature.append(subdataFeature)
+    
+    return (data,dataDict,dataFeature)
 
 def getFeatureA(s1,s2):
     return np.inner(s1, s2)

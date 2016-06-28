@@ -6,43 +6,24 @@ from operator import itemgetter
 
 import config as cfg
 
-def compute(pop,data,dataDict):
-    valid = False; recallFitnessList = None
-    for i in range(cfg.maxKendallTrial):
-        valid,recallFitnessList = getRecallFitness(pop, data,dataDict)
-        if valid:
-            break
+def compute(individual, data):
+    inRangeFitness = getInRangeFitness(individual,data)
 
-    fitnessList = []
-    if valid:
-        inRangeFitnessList = getInRangeFitness(pop,data)
-        assert len(recallFitnessList)==len(inRangeFitnessList)
+    return (inRangeFitness,)
 
-        for i in range(len(pop)):
-            fitness = recallFitnessList[i] + inRangeFitnessList[i]
-            fitnessList.append(fitness)
+def getInRangeFitness(individual,data):
+    n = 0
+    nInRange = 0
+    individualStr = util.expandFuncStr(str(individual))
+    for i,sx in enumerate(data):
+        for j,sy in enumerate(data[i:]):
+            simScore = util.getSimScore(sx,sy,individualStr)
+            n = n + 1
 
-    return (valid,fitnessList)
+            if util.inRange(simScore):
+                nInRange = nInRange + 1
 
-def getInRangeFitness(pop,data):
-    if len(pop)!=cfg.nIndividual:
-        print len(pop),cfg.nIndividual
-    assert len(pop)==cfg.nIndividual
-    
-    inRangeFitnessList = [0.0]*len(pop)
-    for individualIdx,individual in enumerate(pop):
-        for i,sx in enumerate(data):
-            for j,sy in enumerate(data[i:]):
-                simScore = util.getSimScore(sx,sy,individual)
-
-                inRangeFitness = 0.0
-                if not(util.inRange(simScore)):
-                    inRangeFitness = cfg.nIndividual * -1.0 # penalize with the size of Pop
-
-                if inRangeFitness < inRangeFitnessList[individualIdx]:
-                    inRangeFitnessList[individualIdx] = inRangeFitness
-
-    return inRangeFitnessList
+    return float(nInRange)/n
 
 def getRecallFitness(pop, data, dataDict):
     # Get refERENCE and remAINING idx
