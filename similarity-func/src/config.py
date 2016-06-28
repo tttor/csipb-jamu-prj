@@ -1,6 +1,6 @@
 # DEAP GP Config
 nIndividual = 100
-nMaxGen = 10 # not including the initial generation
+nMaxGen = 1 # not including the initial generation
 pMut = 0.1
 pCx = 0.5
 
@@ -18,10 +18,12 @@ maxKendallTrial = 10
 pValueAcceptance = 0.01
 
 # Training Data Config
-datasetPaths = {'zoo': '../data/zoo/zoo.csv', 
-				'zooMinim': '../data/zoo/zooMinim.csv'}
-datasetPath = datasetPaths['zooMinim']
+datasetName = 'zooMinim'
+
+datasetDir = '../data'
+datasetPath = datasetDir+'/'+datasetName+'/'+datasetName+'.csv'
 
 # Logging Config
+xprmtTag = datasetName
 xprmtDir = '/home/tor/robotics/prj/csipb-jamu-prj/xprmt/similarity-func'
 nHOF = 1

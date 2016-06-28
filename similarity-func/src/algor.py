@@ -1,3 +1,5 @@
+import os
+import numpy as np
 from deap import tools
 from deap import algorithms as deapAlgor
 
@@ -8,7 +10,7 @@ Shamelessly copied from
 deap-1.0.2/deap/algorithms.py
 '''
 def eaSimple(population, toolbox, cxpb, mutpb, ngen, data, dataDict, recallFitnessDict,
-             stats=None, halloffame=None, verbose=__debug__):
+             xprmtDir=None, stats=None, halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
     
@@ -116,6 +118,12 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, data, dataDict, recallFitne
         logbook.record(gen=gen, **record)
         if verbose:
             print logbook.stream        
+
+        genDir = xprmtDir + "/gen-"+str(gen)
+        os.makedirs(genDir)
+
+        np.savetxt(genDir + "/individual.csv", [f for f in population], fmt='%s')
+        np.savetxt(genDir + "/fitness.csv", [f.fitness.values for f in population], fmt='%s')
 
     return population, logbook
     

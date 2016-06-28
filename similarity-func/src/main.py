@@ -99,6 +99,10 @@ toolbox.register("popTanimoto", deapTools.initRepeat, list, toolbox.indTanimoto)
 def main():
     seed = 318
     random.seed(seed); np.random.seed(seed)
+
+    xprmtDir = cfg.xprmtDir+"/"+"xprmt-"+cfg.xprmtTag+"."+time.strftime("%Y%m%d-%H%M%S")
+    os.makedirs(xprmtDir)
+    shutil.copy2('config.py', xprmtDir+'/config.py')
     
     stats_fit = deapTools.Statistics(lambda ind: ind.fitness.values)
     stats_size = deapTools.Statistics(len)
@@ -110,16 +114,19 @@ def main():
     hof = deapTools.HallOfFame(cfg.nHOF) # from all generation of the whole evolution
 
     # evolution
+    print 'Evolution begins ...'
     evolStartTime = time.time()
     pop, log = algor.eaSimple(pop, toolbox, cxpb=cfg.pCx, mutpb=cfg.pMut, ngen=cfg.nMaxGen, 
                               data=data, dataDict=dataDict, recallFitnessDict=recallFitnessDict,
-                              stats=mstats, halloffame=hof, verbose=True)
+                              xprmtDir=xprmtDir, stats=mstats, halloffame=hof, verbose=True)
     print("Evolution took %.3f minutes" % ((time.time()-evolStartTime)/60.0))
 
     # post evolution
-    for i in hof:
-        print  str(i)
-        print i.fitness.values
+    # print log
+
+    # for i in hof:
+    #     print  str(i)
+    #     print i.fitness.values
         
     return pop, log, hof
 
