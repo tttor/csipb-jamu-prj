@@ -2,7 +2,9 @@ TODO
 > paralel fitness calculation using scoop, try first with getInRangeFitness
 > use FitnessMulti
 > try another evo algorithm, besides easimple()
+> use standard evo algorithm provided in deap
 > try constraint handling
+> precompute a,b,c,d
 
 DONE
 --> use random.seed(seed)
