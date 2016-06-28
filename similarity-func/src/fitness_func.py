@@ -6,9 +6,9 @@ from operator import itemgetter
 
 import config as cfg
 
-def compute(individual, data, recallRankDict):
+def compute(individual, data, recallFitnessDict):
     inRangeFitness = getInRangeFitness(individual,data)
-    recallFitness = getRecallFitness(individual,recallRankDict)
+    recallFitness = getRecallFitness(individual,recallFitnessDict)
 
     return (inRangeFitness,recallFitness)
 
@@ -26,11 +26,11 @@ def getInRangeFitness(individual,data):
 
     return float(nInRange)/n
 
-def getRecallFitness(individual,recallRankDict):
+def getRecallFitness(individual,recallFitnessDict):
     individualStr = util.expandFuncStr(str(individual))
-    assert individualStr in recallRankDict, 'individualStr NOT in recallRankDict'
+    assert individualStr in recallFitnessDict, 'individualStr NOT in recallFitnessDict'
 
-    fitness,valid = recallRankDict[ util.expandFuncStr(str(individual)) ]
+    fitness,valid = recallFitnessDict[ util.expandFuncStr(str(individual)) ]
     assert not(fitness<0.0)
 
     return fitness

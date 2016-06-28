@@ -28,7 +28,7 @@ from scoop import futures as fu
 #### set D_tr
 data, dataDict, dataFeature = util.loadData( cfg.datasetPath )
 nClass = len(dataDict)
-recallRankDict = defaultdict(tuple)
+recallFitnessDict = defaultdict(tuple) # will contain recallFitness values of individuals
 
 #### init Deap GP
 # Set Operators and Operands 
@@ -79,7 +79,7 @@ toolbox.register("population", deapTools.initRepeat,
 toolbox.register("compile", deapGP.compile, 
                             pset=primitiveSet)
 
-toolbox.register("evaluate", ff.compute, data=data, recallRankDict=recallRankDict)
+toolbox.register("evaluate", ff.compute, data=data, recallFitnessDict=recallFitnessDict)
 
 toolbox.register("select", deapTools.selRoulette)# : selRandom, selBest, selWorst, selTournament, selDoubleTournament
 
@@ -114,7 +114,7 @@ def main():
     # evolution
     evolStartTime = time.time()
     pop, log = algor.eaSimple(pop, toolbox, cxpb=cfg.pCx, mutpb=cfg.pMut, ngen=cfg.nMaxGen, 
-                              data=data, dataDict=dataDict, recallRankDict=recallRankDict,
+                              data=data, dataDict=dataDict, recallFitnessDict=recallFitnessDict,
                               stats=mstats, halloffame=hof, verbose=True)
     print("Evolution took %.3f minutes" % ((time.time()-evolStartTime)/60.0))
 
