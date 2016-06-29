@@ -98,6 +98,8 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen,
     if verbose:
         print logbook.stream
 
+    util.saveGenLog(xprmtDir,0,population,subfitnesses,halloffame)
+
     # Begin the generational process
     for gen in range(1, ngen+1):
         # Select the next generation individuals
@@ -135,16 +137,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen,
         if verbose:
             print logbook.stream        
 
-        genDir = xprmtDir + "/gen-"+str(gen)
-        os.makedirs(genDir)
-
-        np.savetxt(genDir + "/individual.csv", [f for f in population], fmt='%s')
-        np.savetxt(genDir + "/fitness.csv", [f.fitness.values for f in population], fmt='%s')
-        np.savetxt(genDir + "/fitnessRecall.csv", [f['recallFitness'] for f in subfitnesses], fmt='%s')
-        np.savetxt(genDir + "/fitnessInRange.csv", [f['inRangeFitness'] for f in subfitnesses], fmt='%s')
-        np.savetxt(genDir + "/fitnessZeroDiv.csv", [f['zeroDivFitness'] for f in subfitnesses], fmt='%s')
-        np.savetxt(genDir + "/fitnessIdentity.csv", [f['identityFitness'] for f in subfitnesses], fmt='%s')
-        np.savetxt(genDir + "/fitnessSimmetry.csv", [f['simmetryFitness'] for f in subfitnesses], fmt='%s')
+        util.saveGenLog(xprmtDir,gen,population,subfitnesses,halloffame)
 
     return population, logbook
     

@@ -41,13 +41,15 @@ def getZeroDivFitness(individualStr):
     zeroDiv = 0.0 # not happen
     np.seterr(invalid='ignore')
     try:
-        eval(individualStr)
+        r = eval(individualStr)
+        if np.isnan(r):
+            zeroDiv = 100.0
     except ZeroDivisionError as err:
         zeroDiv = 100.0
 
     return zeroDiv * -1.0 # inversed as we maximize    
 
-def getIdentityFitness(simScoreMat):
+def getIdentityFitness(simScoreMat):# TODO fix me
     nViolation = 0
     for i in range(simScoreMat.shape[0]):
         for j in range(simScoreMat.shape[1]):

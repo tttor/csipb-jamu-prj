@@ -113,7 +113,7 @@ def main():
     mstats.register("min", np.min); mstats.register("max", np.max)
 
     pop = toolbox.population(n=cfg.nIndividual)
-    hof = deapTools.HallOfFame(cfg.nHOF) # from all generation of the whole evolution
+    hof = deapTools.HallOfFame(cfg.nHOF,similar=util.equalIndividual) # from all generation of the whole evolution
 
     # evolution
     print 'Evolution begins ...'
