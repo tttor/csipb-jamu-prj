@@ -28,7 +28,8 @@ from scoop import futures as fu
 #### set D_tr
 data, dataDict, dataFeature = util.loadData( cfg.datasetPath )
 nClass = len(dataDict)
-recallRankDict = defaultdict(tuple)
+recallFitnessDict = defaultdict(tuple) # will contain recallFitness values of individuals
+simScoreDict = defaultdict(dict) # will contain simScore of individuals
 
 #### init Deap GP
 # Set Operators and Operands 
@@ -53,9 +54,7 @@ primitiveSet.addPrimitive(util.protectedDiv, arity=2, name="pDiv")
 # primitiveSet.addEphemeralConstant("const", lambda: 0.5)
 
 # Settting up the fitness and the individuals
-inRangeFitnessWeight = 1.0
-recallFitnessWeight = -1.0
-deapCreator.create("Fitness", deapBase.Fitness, weights=(inRangeFitnessWeight,recallFitnessWeight))
+deapCreator.create("Fitness", deapBase.Fitness, weights=(1.0,))
 deapCreator.create("Individual", deapGP.PrimitiveTree, 
                     fitness=deapCreator.Fitness, primitiveSet=primitiveSet)
 
@@ -79,7 +78,7 @@ toolbox.register("population", deapTools.initRepeat,
 toolbox.register("compile", deapGP.compile, 
                             pset=primitiveSet)
 
-toolbox.register("evaluate", ff.compute, data=data, recallRankDict=recallRankDict)
+toolbox.register("evaluate", ff.compute, data=data, recallFitnessDict=recallFitnessDict)
 
 toolbox.register("select", deapTools.selRoulette)# : selRandom, selBest, selWorst, selTournament, selDoubleTournament
 
@@ -101,6 +100,10 @@ toolbox.register("popTanimoto", deapTools.initRepeat, list, toolbox.indTanimoto)
 def main():
     seed = 318
     random.seed(seed); np.random.seed(seed)
+
+    xprmtDir = cfg.xprmtDir+"/"+"xprmt-"+cfg.xprmtTag+"."+time.strftime("%Y%m%d-%H%M%S")
+    os.makedirs(xprmtDir)
+    shutil.copy2('config.py', xprmtDir+'/config.py')
     
     stats_fit = deapTools.Statistics(lambda ind: ind.fitness.values)
     stats_size = deapTools.Statistics(len)
@@ -112,13 +115,20 @@ def main():
     hof = deapTools.HallOfFame(cfg.nHOF) # from all generation of the whole evolution
 
     # evolution
+    print 'Evolution begins ...'
     evolStartTime = time.time()
     pop, log = algor.eaSimple(pop, toolbox, cxpb=cfg.pCx, mutpb=cfg.pMut, ngen=cfg.nMaxGen, 
-                              data=data, dataDict=dataDict, recallRankDict=recallRankDict,
-                              stats=mstats, halloffame=hof, verbose=True)
+                              data=data, dataDict=dataDict, recallFitnessDict=recallFitnessDict,
+                              xprmtDir=xprmtDir, stats=mstats, halloffame=hof, verbose=True)
     print("Evolution took %.3f minutes" % ((time.time()-evolStartTime)/60.0))
 
     # post evolution
+    # print log
+
+    # for i in hof:
+    #     print  str(i)
+    #     print i.fitness.values
+        
     return pop, log, hof
 
 if __name__ == "__main__":

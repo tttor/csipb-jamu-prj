@@ -1,5 +1,7 @@
+import os
+import numpy as np
 from deap import tools
-from deap import algorithms as algor
+from deap import algorithms as deapAlgor
 
 import util
 
@@ -7,8 +9,8 @@ import util
 Shamelessly copied from 
 deap-1.0.2/deap/algorithms.py
 '''
-def eaSimple(population, toolbox, cxpb, mutpb, ngen, data, dataDict, recallRankDict,
-             stats=None, halloffame=None, verbose=__debug__):
+def eaSimple(population, toolbox, cxpb, mutpb, ngen, data, dataDict, recallFitnessDict,
+             xprmtDir=None, stats=None, halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
     
@@ -68,23 +70,22 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, data, dataDict, recallRankD
        Basic Algorithms and Operators", 2000.
     """
     logbook = tools.Logbook()
-    logbook.header = ['gen', 'nevals'] + (stats.fields if stats else [])
+    logbook.header = ['gen'] + (stats.fields if stats else [])
 
     # Evaluate the individuals with an invalid fitness
     tmpRecallRankDict = util.getRecallRankDict(population,data,dataDict)
     for key,datum in tmpRecallRankDict.iteritems():
-        recallRankDict[key] = datum
+        recallFitnessDict[key] = datum
 
-    invalid_ind = [ind for ind in population] # all are invalid due to recallFitness
-    fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-    for ind, fit in zip(invalid_ind, fitnesses):
+    fitnesses = toolbox.map(toolbox.evaluate,population)
+    for ind, fit in zip(population, fitnesses):
         ind.fitness.values = fit
-
+     
     if halloffame is not None:
         halloffame.update(population)
 
     record = stats.compile(population) if stats else {}
-    logbook.record(gen=0, nevals=len(invalid_ind), **record)
+    logbook.record(gen=0, **record)
     if verbose:
         print logbook.stream
 
@@ -94,16 +95,15 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, data, dataDict, recallRankD
         offspring = toolbox.select(population, len(population))
         
         # Vary the pool of individuals
-        offspring = algor.varAnd(offspring, toolbox, cxpb, mutpb)
+        offspring = deapAlgor.varAnd(offspring, toolbox, cxpb, mutpb)
         
-        # Evaluate the individuals with an invalid fitness
+        # Evaluate the individuals
         tmpRecallRankDict = util.getRecallRankDict(offspring,data,dataDict)
         for key,datum in tmpRecallRankDict.iteritems():
-            recallRankDict[key] = datum
+            recallFitnessDict[key] = datum
 
-        invalid_ind = [ind for ind in offspring] # all are invalid due to recallFitness
-        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-        for ind, fit in zip(invalid_ind, fitnesses):
+        fitnesses = toolbox.map(toolbox.evaluate,offspring)
+        for ind, fit in zip(offspring, fitnesses):
             ind.fitness.values = fit
         
         # Update the hall of fame with the generated individuals
@@ -115,8 +115,15 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, data, dataDict, recallRankD
         
         # Append the current generation statistics to the logbook
         record = stats.compile(population) if stats else {}
-        logbook.record(gen=gen, nevals=len(invalid_ind), **record)
+        logbook.record(gen=gen, **record)
         if verbose:
             print logbook.stream        
 
+        genDir = xprmtDir + "/gen-"+str(gen)
+        os.makedirs(genDir)
+
+        np.savetxt(genDir + "/individual.csv", [f for f in population], fmt='%s')
+        np.savetxt(genDir + "/fitness.csv", [f.fitness.values for f in population], fmt='%s')
+
     return population, logbook
+    

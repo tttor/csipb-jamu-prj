@@ -16,7 +16,8 @@ increase the minimum tree depth?
 >> recallFitness
 >> inRangeFitness
 >> ZeroDivFitness
->> s(x,y)==s(y,x) fitness
+>> simmetry: s(x,y)==s(y,x) fitness
+>> identity: s(x,y)=0 iff x==y
 
 > Some requirements for distance functions are:
 1) Non-negativity: d(x, y) >= 0

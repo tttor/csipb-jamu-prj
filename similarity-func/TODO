@@ -1,14 +1,19 @@
 TODO
-> how to normalize rank of nRecall
-same individuals should get same scores
-use scipy.stats.percentileofscore? only from unique individual
+> add zero-div fitness
+> log per generation
+> set convergence threshold
 > paralel fitness calculation using scoop, try first with getInRangeFitness
-> use FitnessMulti
 > try another evo algorithm, besides easimple()
-> use standard evo algorithm provided in deap
 > try constraint handling
 > precompute a,b,c,d
+> solve gramTr vs gramTe in svm scikit-learn
 
 DONE
 --> use random.seed(seed)
 use both random.seed() and numpy.random.seed()
+--> use FitnessMulti
+should be avoided, not really know how it works
+--> use standard evo algorithm provided in deap
+--> how to normalize rank of nRecall
+same individuals should get same scores
+use scipy.stats.percentileofscore? only from unique individual
