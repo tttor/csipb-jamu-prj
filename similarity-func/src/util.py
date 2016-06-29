@@ -31,7 +31,7 @@ def getSimScoreMatDict(population, data):
 
     return simScoreMatDict
 
-def getMedianRecallDict(individual, data, dataDict, refAndRemIdxDict):
+def getMedianRecallDict(individualStr, data, dataDict, refAndRemIdxDict):
     medianRecallDict = defaultdict(float)
     for classIdx, classData in dataDict.iteritems():
         refIdxList = refAndRemIdxDict[classIdx][0]
@@ -49,7 +49,7 @@ def getMedianRecallDict(individual, data, dataDict, refAndRemIdxDict):
                     remStringIdx = dataDict[remClassIdx][remIdx]
                     remString = data[remStringIdx]
 
-                    simScore = util.getSimScore(refString,remString,individual)
+                    simScore = util.getSimScore(refString,remString,individualStr)
                     simScoreList.append( (simScore,classIdx,remClassIdx) )
 
             # Sort simScoreList based descending order of SimScore

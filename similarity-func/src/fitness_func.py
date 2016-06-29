@@ -3,14 +3,16 @@ import numpy as np
 import scipy.stats as stats
 from collections import defaultdict
 from operator import itemgetter
+import operator
 
 import config as cfg
 
 def compute(individual, data, recallFitnessDict, simScoreMatDict):
-    inRangeFitness = getInRangeFitness(individual,simScoreMatDict)
     recallFitness = getRecallFitness(individual,recallFitnessDict)
-
-    fitness = inRangeFitness + recallFitness
+    inRangeFitness = getInRangeFitness(individual,simScoreMatDict)
+    zeroDivFitness = getZeroDivFitness(individual)
+    
+    fitness = recallFitness + inRangeFitness + zeroDivFitness
 
     return (fitness,)
 
@@ -37,6 +39,16 @@ def getIdentityFitness():
 def getSimmetryFitness():
     pass
 
-def getZeroDivFitness():
-    pass
-    
+def getZeroDivFitness(individual):
+    a = b = c = d = 0.0
+    individualStr = util.expandFuncStr( str(individual) )
+    individualStr = individualStr.replace('protectedDiv','operator.div')
+
+    zeroDiv = 0.0 # not happen
+    np.seterr(invalid='ignore')
+    try:
+        eval(individualStr)
+    except ZeroDivisionError as err:
+        zeroDiv = 100.0
+
+    return zeroDiv * -1.0 # inversed as we maximize    
