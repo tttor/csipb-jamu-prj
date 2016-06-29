@@ -9,7 +9,8 @@ import util
 Shamelessly copied from 
 deap-1.0.2/deap/algorithms.py
 '''
-def eaSimple(population, toolbox, cxpb, mutpb, ngen, data, dataDict, recallFitnessDict,
+def eaSimple(population, toolbox, cxpb, mutpb, ngen, 
+             data, dataDict, recallFitnessDict, simScoreMatDict,
              xprmtDir=None, stats=None, halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
@@ -77,10 +78,14 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, data, dataDict, recallFitne
     for key,datum in tmpRecallRankDict.iteritems():
         recallFitnessDict[key] = datum
 
+    tmpSimScoreMatDict = util.getSimScoreMatDict(population,data)
+    for key,datum in tmpSimScoreMatDict.iteritems():
+        simScoreMatDict[key] = datum
+
     fitnesses = toolbox.map(toolbox.evaluate,population)
     for ind, fit in zip(population, fitnesses):
         ind.fitness.values = fit
-     
+    
     if halloffame is not None:
         halloffame.update(population)
 
@@ -101,6 +106,10 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, data, dataDict, recallFitne
         tmpRecallRankDict = util.getRecallRankDict(offspring,data,dataDict)
         for key,datum in tmpRecallRankDict.iteritems():
             recallFitnessDict[key] = datum
+
+        tmpSimScoreMatDict = util.getSimScoreMatDict(offspring,data)
+        for key,datum in tmpSimScoreMatDict.iteritems():
+            simScoreMatDict[key] = datum
 
         fitnesses = toolbox.map(toolbox.evaluate,offspring)
         for ind, fit in zip(offspring, fitnesses):

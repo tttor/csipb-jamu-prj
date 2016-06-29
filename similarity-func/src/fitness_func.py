@@ -6,27 +6,23 @@ from operator import itemgetter
 
 import config as cfg
 
-def compute(individual, data, recallFitnessDict):
-    inRangeFitness = getInRangeFitness(individual,data)
+def compute(individual, data, recallFitnessDict, simScoreMatDict):
+    inRangeFitness = getInRangeFitness(individual,simScoreMatDict)
     recallFitness = getRecallFitness(individual,recallFitnessDict)
 
     fitness = inRangeFitness + recallFitness
 
     return (fitness,)
 
-def getInRangeFitness(individual,data):
-    n = 0
-    nInRange = 0
+def getInRangeFitness(individual,simScoreMatDict):
     individualStr = util.expandFuncStr(str(individual))
-    for i,sx in enumerate(data):
-        for j,sy in enumerate(data[i:]):
-            simScore = util.getSimScore(sx,sy,individualStr)
-            n = n + 1
+    assert individualStr in simScoreMatDict, 'individualStr NOT in simScoreMatDict'
 
-            if util.inRange(simScore):
-                nInRange = nInRange + 1
-
-    return float(nInRange)/n*100.0 # in percentage
+    simScoreMat = simScoreMatDict[individualStr]
+    foundIdx = np.where( np.logical_and(simScoreMat>0.0,simScoreMat<=1.0) )
+    nInRange = len( foundIdx[0] )
+    
+    return float(nInRange)/simScoreMat.size*100.0 # in percentage
 
 def getRecallFitness(individual,recallFitnessDict):
     individualStr = util.expandFuncStr(str(individual))

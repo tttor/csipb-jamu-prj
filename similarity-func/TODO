@@ -7,6 +7,7 @@ TODO
 > try constraint handling
 > precompute a,b,c,d
 > solve gramTr vs gramTe in svm scikit-learn
+> what if rankRecall is not independent?
 
 DONE
 --> use random.seed(seed)

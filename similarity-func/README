@@ -13,11 +13,11 @@ increase the minimum tree depth?
 >> should we break the tie for the same fitness?
 
 > fitness func (note: ideally, the higher the fitness, the better the individual)
->> recallFitness
+>> recallFitness: in range (0,1]
 >> inRangeFitness
 >> ZeroDivFitness
 >> simmetry: s(x,y)==s(y,x) fitness
->> identity: s(x,y)=0 iff x==y
+>> identity: s(x,y)=1 iff x==y
 
 > Some requirements for distance functions are:
 1) Non-negativity: d(x, y) >= 0
