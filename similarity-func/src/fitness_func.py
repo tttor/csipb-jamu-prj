@@ -43,16 +43,16 @@ def getZeroDivFitness(individualStr):
     a = b = c = d = 0.0 # assume all are zeroed
     individualStr = individualStr.replace('protectedDiv','operator.div')
 
-    zeroDiv = 0.0 # not happen
+    zeroDivFitness = 100.0 # not happen
     np.seterr(invalid='ignore')
     try:
         r = eval(individualStr)
         if np.isnan(r):
-            zeroDiv = 100.0
+            zeroDivFitness = 0.0
     except ZeroDivisionError as err:
-        zeroDiv = 100.0
+        zeroDivFitness = 0.0
 
-    return zeroDiv * -1.0 # inversed as we maximize    
+    return zeroDivFitness
 
 def getIdentityFitness(simScoreMat):# TODO fix me
     nViolation = 0
