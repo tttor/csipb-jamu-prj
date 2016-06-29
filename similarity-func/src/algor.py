@@ -10,7 +10,7 @@ Shamelessly copied from
 deap-1.0.2/deap/algorithms.py
 '''
 def eaSimple(population, toolbox, cxpb, mutpb, ngen, 
-             data, dataDict, recallFitnessDict, simScoreMatDict,
+             data, dataDict, recallPercentileRankDict, simScoreMatDict,
              xprmtDir=None, stats=None, halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
@@ -76,7 +76,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen,
     # Evaluate the individuals with an invalid fitness
     tmpRecallRankDict = util.getRecallRankDict(population,data,dataDict)
     for key,datum in tmpRecallRankDict.iteritems():
-        recallFitnessDict[key] = datum
+        recallPercentileRankDict[key] = datum
 
     tmpSimScoreMatDict = util.getSimScoreMatDict(population,data)
     for key,datum in tmpSimScoreMatDict.iteritems():
@@ -111,7 +111,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen,
         # Evaluate the individuals
         tmpRecallRankDict = util.getRecallRankDict(offspring,data,dataDict)
         for key,datum in tmpRecallRankDict.iteritems():
-            recallFitnessDict[key] = datum
+            recallPercentileRankDict[key] = datum
 
         tmpOffspring = [i for i in offspring if util.expandFuncStr(str(i)) not in simScoreMatDict]
         tmpSimScoreMatDict = util.getSimScoreMatDict(tmpOffspring,data)

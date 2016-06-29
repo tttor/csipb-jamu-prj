@@ -158,8 +158,7 @@ def getRecallRankDict(pop, data, dataDict):
     #
     recallRankDict = defaultdict(tuple)
     for individualIdx, individual in enumerate(popStr):
-        recallFitness = np.average( medianRecallRankMat[individualIdx,:] )
-        recallFitness = recallFitness * -1.0 # inversed as being maximized
+        recallFitness = list( medianRecallRankMat[individualIdx,:] )# of all classes
         recallRankDict[individual] = (recallFitness,independent)
 
     return recallRankDict

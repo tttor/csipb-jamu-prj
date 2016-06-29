@@ -5,13 +5,13 @@ import operator
 
 import config as cfg
 
-def compute(individual, data, recallFitnessDict, simScoreMatDict):
+def compute(individual, data, recallPercentileRankDict, simScoreMatDict):
     individualStr = util.expandFuncStr(str(individual))
     assert individualStr in simScoreMatDict, 'individualStr NOT in simScoreMatDict'
-    assert individualStr in recallFitnessDict, 'individualStr NOT in recallFitnessDict'
+    assert individualStr in recallPercentileRankDict, 'individualStr NOT in recallPercentileRankDict'
     simScoreMat = simScoreMatDict[individualStr]
 
-    recallFitness = getRecallFitness(individualStr,recallFitnessDict)
+    recallFitness = getRecallFitness(individualStr,recallPercentileRankDict)
     inRangeFitness = getInRangeFitness(simScoreMat)
     zeroDivFitness = getZeroDivFitness(individualStr)
     identityFitness = getIdentityFitness(simScoreMat)
@@ -24,8 +24,13 @@ def compute(individual, data, recallFitnessDict, simScoreMatDict):
 
     return ( (fitness,),fitnessDict )
 
-def getRecallFitness(individualStr,recallFitnessDict):
-    fitness,valid = recallFitnessDict[individualStr]
+def getRecallFitness(individualStr,recallPercentileRankDict):
+    percentileRankList,independent = recallPercentileRankDict[individualStr]
+    percentileRank = np.average(percentileRankList)
+
+    maxPercentile = 100.0
+    fitness = maxPercentile - percentileRank # normalized so that 100.0 is the best
+
     return fitness
 
 def getInRangeFitness(simScoreMat):

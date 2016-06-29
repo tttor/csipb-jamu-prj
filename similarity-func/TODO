@@ -10,6 +10,8 @@ TODO
 > what if rankRecall is not independent?
 > keep random's seed for later reproduction
 > why is pDiv everywhere?
+> recalculate fitness only for invalid individuals; set another fitness property in individuals
+> save logbook
 
 DONE
 --> use random.seed(seed)
@@ -20,3 +22,6 @@ should be avoided, not really know how it works
 --> how to normalize rank of nRecall
 same individuals should get same scores
 use scipy.stats.percentileofscore? only from unique individual
+--> who validates fitness (set fitness.valid=TRUE) after fitness calculation?
+validate by filling it with values
+invalidate if len(fitness.values)==0
