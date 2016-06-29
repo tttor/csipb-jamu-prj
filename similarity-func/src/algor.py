@@ -82,10 +82,14 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen,
     for key,datum in tmpSimScoreMatDict.iteritems():
         simScoreMatDict[key] = datum
 
-    fitnesses = toolbox.map(toolbox.evaluate,population)
+    fitnessDetails = list( toolbox.map(toolbox.evaluate,population) )
+    fitnesses = [f[0] for f in fitnessDetails]; 
+    subfitnesses = [f[1] for f in fitnessDetails]
+
     for ind, fit in zip(population, fitnesses):
         ind.fitness.values = fit
     
+    # 
     if halloffame is not None:
         halloffame.update(population)
 
@@ -111,10 +115,13 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen,
         for key,datum in tmpSimScoreMatDict.iteritems():
             simScoreMatDict[key] = datum
 
-        fitnesses = toolbox.map(toolbox.evaluate,offspring)
+        fitnessDetails = list( toolbox.map(toolbox.evaluate,offspring) )
+        fitnesses = [f[0] for f in fitnessDetails]; 
+        subfitnesses = [f[1] for f in fitnessDetails]
+
         for ind, fit in zip(offspring, fitnesses):
             ind.fitness.values = fit
-        
+
         # Update the hall of fame with the generated individuals
         if halloffame is not None:
             halloffame.update(offspring)
@@ -133,6 +140,11 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen,
 
         np.savetxt(genDir + "/individual.csv", [f for f in population], fmt='%s')
         np.savetxt(genDir + "/fitness.csv", [f.fitness.values for f in population], fmt='%s')
+        np.savetxt(genDir + "/fitnessRecall.csv", [f['recallFitness'] for f in subfitnesses], fmt='%s')
+        np.savetxt(genDir + "/fitnessInRange.csv", [f['inRangeFitness'] for f in subfitnesses], fmt='%s')
+        np.savetxt(genDir + "/fitnessZeroDiv.csv", [f['zeroDivFitness'] for f in subfitnesses], fmt='%s')
+        np.savetxt(genDir + "/fitnessIdentity.csv", [f['identityFitness'] for f in subfitnesses], fmt='%s')
+        np.savetxt(genDir + "/fitnessSimmetry.csv", [f['simmetryFitness'] for f in subfitnesses], fmt='%s')
 
     return population, logbook
     

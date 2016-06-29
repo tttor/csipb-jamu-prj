@@ -18,8 +18,11 @@ def compute(individual, data, recallFitnessDict, simScoreMatDict):
     simmetryFitness = getSimmetryFitness(simScoreMat)
     
     fitness = recallFitness + inRangeFitness + zeroDivFitness + identityFitness + simmetryFitness
+    fitnessDict = {'recallFitness':recallFitness, 'inRangeFitness':inRangeFitness, 
+                   'zeroDivFitness':zeroDivFitness, 'identityFitness':identityFitness,
+                   'simmetryFitness':simmetryFitness }
 
-    return (fitness,)
+    return ( (fitness,),fitnessDict )
 
 def getRecallFitness(individualStr,recallFitnessDict):
     fitness,valid = recallFitnessDict[individualStr]
