@@ -6,7 +6,32 @@ from scipy import stats
 import config as cfg
 import util
 
-def getMedianRecallDict(individual, data, dataDict, refAndRemIdxDict):
+def getSimScoreMat(individualStr, data):
+    nData = len(data)
+    simScoreMat = np.zeros( (nData,nData) )
+
+    for i,x1 in enumerate(data):
+        for j,x2 in enumerate(data):
+            simScore = util.getSimScore(x1,x2,individualStr)
+            simScoreMat[i][j] = simScore
+
+    return simScoreMat
+
+def getSimScoreMatDict(population, data):    
+    # List unique individual
+    populationStr = list(set( [expandFuncStr( str(i) ) for i in population] ))
+    nUniqueIndividual = len(populationStr); assert nUniqueIndividual!=0
+
+    simScoreMatList = list( fu.map(getSimScoreMat,populationStr,[data]*nUniqueIndividual) )
+
+    simScoreMatDict = dict()
+    for idx,simScoreMat in enumerate(simScoreMatList):
+        simScoreMatDict[ populationStr[idx] ] = simScoreMat
+    assert len(simScoreMatDict)!=0, 'empty simScoreMatDict'
+
+    return simScoreMatDict
+
+def getMedianRecallDict(individualStr, data, dataDict, refAndRemIdxDict):
     medianRecallDict = defaultdict(float)
     for classIdx, classData in dataDict.iteritems():
         refIdxList = refAndRemIdxDict[classIdx][0]
@@ -24,7 +49,7 @@ def getMedianRecallDict(individual, data, dataDict, refAndRemIdxDict):
                     remStringIdx = dataDict[remClassIdx][remIdx]
                     remString = data[remStringIdx]
 
-                    simScore = util.getSimScore(refString,remString,individual)
+                    simScore = util.getSimScore(refString,remString,individualStr)
                     simScoreList.append( (simScore,classIdx,remClassIdx) )
 
             # Sort simScoreList based descending order of SimScore
