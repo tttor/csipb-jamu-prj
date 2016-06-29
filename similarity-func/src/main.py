@@ -29,6 +29,7 @@ from scoop import futures as fu
 data, dataDict, dataFeature = util.loadData( cfg.datasetPath )
 nClass = len(dataDict)
 recallFitnessDict = defaultdict(tuple) # will contain recallFitness values of individuals
+simScoreDict = defaultdict(dict) # will contain simScore of individuals
 
 #### init Deap GP
 # Set Operators and Operands 

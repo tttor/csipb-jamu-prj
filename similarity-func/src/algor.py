@@ -97,7 +97,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, data, dataDict, recallFitne
         # Vary the pool of individuals
         offspring = deapAlgor.varAnd(offspring, toolbox, cxpb, mutpb)
         
-        # Evaluate the individuals with an invalid fitness
+        # Evaluate the individuals
         tmpRecallRankDict = util.getRecallRankDict(offspring,data,dataDict)
         for key,datum in tmpRecallRankDict.iteritems():
             recallFitnessDict[key] = datum

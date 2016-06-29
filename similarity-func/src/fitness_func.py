@@ -34,3 +34,13 @@ def getRecallFitness(individual,recallFitnessDict):
 
     fitness,valid = recallFitnessDict[ util.expandFuncStr(str(individual)) ]
     return fitness
+
+def getIdentityFitness():
+    pass
+
+def getSimmetryFitness():
+    pass
+
+def getZeroDivFitness():
+    pass
+    

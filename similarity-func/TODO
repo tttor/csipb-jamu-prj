@@ -2,9 +2,6 @@ TODO
 > add zero-div fitness
 > log per generation
 > set convergence threshold
-> how to normalize rank of nRecall
-same individuals should get same scores
-use scipy.stats.percentileofscore? only from unique individual
 > paralel fitness calculation using scoop, try first with getInRangeFitness
 > try another evo algorithm, besides easimple()
 > try constraint handling
@@ -17,3 +14,6 @@ use both random.seed() and numpy.random.seed()
 --> use FitnessMulti
 should be avoided, not really know how it works
 --> use standard evo algorithm provided in deap
+--> how to normalize rank of nRecall
+same individuals should get same scores
+use scipy.stats.percentileofscore? only from unique individual
