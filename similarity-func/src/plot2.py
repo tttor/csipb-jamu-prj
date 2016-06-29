@@ -8,28 +8,69 @@ width = 3     # the width of the bars
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-KNN = [89.22,86.82,86.82,85.33,83.84]
-rects1 = ax.bar([1, 11, 21, 31,41], KNN, width, color='#1abc9c')
+Tanimoto = [0.39,0.36,0.32,0.35,0.33]
+rects1 = ax.bar([1, 11, 21, 31,41], Tanimoto, width, color='w')
 
-KNN_Tanimoto = [90.43,90.42,87.73,85.93,85.93]
-rects2 = ax.bar([4,14,24,34,44], KNN_Tanimoto, width, color='#f1c40f')
+Forbes = [0.20,0.30,0.47,0.25,0.25]
+rects2 = ax.bar([4,14,24,34,44], Forbes, width, hatch = '////', color='w')
 
-KNN_GP = [88.32,85.92,85.33,84.74,84.44]
-rects3 = ax.bar([7, 17, 27,37,47], KNN_GP, width, color='#3498db')
+GP = [0.28,0.45,0.45,0.44,0.44]
+rects3 = ax.bar([7, 17, 27,37,47], GP, width, hatch = '*****', color='w')
 
 # add some text for labels, title and axes ticks
-ax.set_ylabel('Akurasi (%)')
-ax.set_title('Uji KNN')
+ax.set_ylabel('Fitness Value')
+ax.set_title('Fitness Function All Class')
 ax.set_xticks([5.5, 15.5, 25.5, 35.5, 45.5])
-ax.set_xticklabels(('n = 3', 'n = 5', 'n = 7', 'n = 9', 'n = 11'))
+ax.set_xticklabels(('Data 1', 'Data 2', 'Data 3', 'Data 4', 'Data 5'))
 
 ax.legend((rects1[0], rects2[0], rects3[0]),
-          ('KNN', 'KNN-Tanimoto', 'KNN-GP'), ncol=3)
+          ('Tanimoto', 'Forbes', 'GP'), ncol=3)
 
 def autolabel(rects):
     for rect in rects:
         h = rect.get_height()
-        ax.text(rect.get_x()+rect.get_width()/2.0, 1.05*h, '%d'%int(h),
+        ax.text(rect.get_x()+rect.get_width()/2.0, h, '%d'%int(h),
+                ha='center', va='bottom')
+
+autolabel(rects1)
+autolabel(rects2)
+autolabel(rects3)
+
+plt.ylim(0, 1)
+plt.xlim(0, 52)
+
+
+plt.show()
+
+N = 9
+ind = np.arange(N)  # the x locations for the groups
+width = 3     # the width of the bars
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+
+Tanimoto = [90,93,90,95,91]
+rects1 = ax.bar([1, 11, 21, 31,41], Tanimoto, width, color='w')
+
+Forbes = [89,80,88,85,81]
+rects2 = ax.bar([4,14,24,34,44], Forbes, width, hatch = '////', color='w')
+
+GP = [89,83,82,80,81]
+rects3 = ax.bar([7, 17, 27,37,47], GP, width, hatch = '*****', color='w')
+
+# add some text for labels, title and axes ticks
+ax.set_ylabel('Accuracy (%)')
+ax.set_title('Accuracy for All Class')
+ax.set_xticks([5.5, 15.5, 25.5, 35.5, 45.5])
+ax.set_xticklabels(('Data 1', 'Data 2', 'Data 3', 'Data 4', 'Data 5'))
+
+ax.legend((rects1[0], rects2[0], rects3[0]),
+          ('Tanimoto', 'Forbes', 'GP'), ncol=3)
+
+def autolabel(rects):
+    for rect in rects:
+        h = rect.get_height()
+        ax.text(rect.get_x()+rect.get_width()/2.0, 0.1+h, '%d'%int(h),
                 ha='center', va='bottom')
 
 autolabel(rects1)
