@@ -113,7 +113,8 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen,
         for key,datum in tmpRecallRankDict.iteritems():
             recallFitnessDict[key] = datum
 
-        tmpSimScoreMatDict = util.getSimScoreMatDict(offspring,data)
+        tmpOffspring = [i for i in offspring if util.expandFuncStr(str(i)) not in simScoreMatDict]
+        tmpSimScoreMatDict = util.getSimScoreMatDict(tmpOffspring,data)
         for key,datum in tmpSimScoreMatDict.iteritems():
             simScoreMatDict[key] = datum
 
