@@ -28,7 +28,7 @@ from scoop import futures as fu
 #### set D_tr
 data, dataDict, dataFeature = util.loadData( cfg.datasetPath )
 nClass = len(dataDict)
-recallFitnessDict = defaultdict(tuple) # will contain recallFitness values of individuals
+recallPercentileRankDict = defaultdict(tuple) # will contain recallFitness values of individuals
 simScoreMatDict = dict() # will contain simScore of individuals
 
 #### init Deap GP
@@ -79,7 +79,7 @@ toolbox.register("compile", deapGP.compile,
                             pset=primitiveSet)
 
 toolbox.register("evaluate", ff.compute, data=data, 
-                             recallFitnessDict=recallFitnessDict, simScoreMatDict=simScoreMatDict)
+                             recallPercentileRankDict=recallPercentileRankDict, simScoreMatDict=simScoreMatDict)
 
 toolbox.register("select", deapTools.selRoulette)# : selRandom, selBest, selWorst, selTournament, selDoubleTournament
 
@@ -113,19 +113,23 @@ def main():
     mstats.register("min", np.min); mstats.register("max", np.max)
 
     pop = toolbox.population(n=cfg.nIndividual)
-    hof = deapTools.HallOfFame(cfg.nHOF) # from all generation of the whole evolution
+    hof = deapTools.HallOfFame(cfg.nHOF,similar=util.equalIndividual) # from all generation of the whole evolution
 
     # evolution
     print 'Evolution begins ...'
     evolStartTime = time.time()
     pop, log = algor.eaSimple(pop, toolbox, cxpb=cfg.pCx, mutpb=cfg.pMut, ngen=cfg.nMaxGen, 
                               data=data, dataDict=dataDict, 
-                              recallFitnessDict=recallFitnessDict, simScoreMatDict=simScoreMatDict,
+                              recallPercentileRankDict=recallPercentileRankDict, simScoreMatDict=simScoreMatDict,
                               xprmtDir=xprmtDir, stats=mstats, halloffame=hof, verbose=True)
     print("Evolution took %.3f minutes" % ((time.time()-evolStartTime)/60.0))
 
     # post evolution
-    # print log
+    finalDir = xprmtDir + "/final"
+    os.makedirs(finalDir) 
+
+    np.savetxt(finalDir + "/individualHOF.csv", [str(i) for i in hof], fmt='%s', delimiter=';')
+    np.savetxt(finalDir + "/fitnessHOF.csv", [i.fitness.values for i in hof], fmt='%s', delimiter=';')
 
     # for i in hof:
     #     print  str(i)

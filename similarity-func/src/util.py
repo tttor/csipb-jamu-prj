@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from collections import defaultdict
 from scoop import futures as fu
@@ -5,6 +6,26 @@ from scipy import stats
 
 import config as cfg
 import util
+
+def equalIndividual(i1,i2):
+    eps = 0.00001
+    assert len(i1.fitness.values)==1
+    return (str(i1)==str(i2)) and (abs(i2.fitness.values[0]-i1.fitness.values[0])<eps)
+
+def saveGenLog(xprmtDir,gen,population,subfitnesses,hof):
+    genDir = xprmtDir + "/gen-"+str(gen)
+    os.makedirs(genDir)
+
+    np.savetxt(genDir + "/individual.csv", [f for f in population], fmt='%s')
+    np.savetxt(genDir + "/fitness.csv", [f.fitness.values for f in population], fmt='%s')
+    np.savetxt(genDir + "/fitnessRecall.csv", [f['recallFitness'] for f in subfitnesses], fmt='%s')
+    np.savetxt(genDir + "/fitnessInRange.csv", [f['inRangeFitness'] for f in subfitnesses], fmt='%s')
+    np.savetxt(genDir + "/fitnessZeroDiv.csv", [f['zeroDivFitness'] for f in subfitnesses], fmt='%s')
+    np.savetxt(genDir + "/fitnessIdentity.csv", [f['identityFitness'] for f in subfitnesses], fmt='%s')
+    np.savetxt(genDir + "/fitnessSimmetry.csv", [f['simmetryFitness'] for f in subfitnesses], fmt='%s')
+
+    np.savetxt(genDir + "/individualHOF.csv", [str(i) for i in hof], fmt='%s', delimiter=';')
+    np.savetxt(genDir + "/fitnessHOF.csv", [i.fitness.values for i in hof], fmt='%s', delimiter=';')
 
 def getSimScoreMat(individualStr, data):
     nData = len(data)
@@ -137,8 +158,7 @@ def getRecallRankDict(pop, data, dataDict):
     #
     recallRankDict = defaultdict(tuple)
     for individualIdx, individual in enumerate(popStr):
-        recallFitness = np.average( medianRecallRankMat[individualIdx,:] )
-        recallFitness = recallFitness * -1.0 # inversed as being maximized
+        recallFitness = list( medianRecallRankMat[individualIdx,:] )# of all classes
         recallRankDict[individual] = (recallFitness,independent)
 
     return recallRankDict
