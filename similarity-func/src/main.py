@@ -125,16 +125,9 @@ def main():
     print("Evolution took %.3f minutes" % ((time.time()-evolStartTime)/60.0))
 
     # post evolution
-    finalDir = xprmtDir + "/final"
-    os.makedirs(finalDir) 
-
-    np.savetxt(finalDir + "/individualHOF.csv", [str(i) for i in hof], fmt='%s', delimiter=';')
-    np.savetxt(finalDir + "/fitnessHOF.csv", [i.fitness.values for i in hof], fmt='%s', delimiter=';')
-
-    # for i in hof:
-    #     print  str(i)
-    #     print i.fitness.values
-        
+    with open(xprmtDir+"/log.txt", "wb") as f:
+        f.write(str(log))
+    
     return pop, log, hof
 
 if __name__ == "__main__":
