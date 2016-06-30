@@ -56,17 +56,17 @@ def getZeroDivFitness(individualStr):
 
 def getIdentityFitness(simScoreMat):# TODO fix me
     nViolation = 0
+    eps = 0.00001
     for i in range(simScoreMat.shape[0]):
         for j in range(simScoreMat.shape[1]):
             simScore = simScoreMat[i][j]
             if i==j:
-                if simScore!=1.0:
+                if not((simScore>1.0-eps)and(simScore<1.0+eps)):
                     nViolation = nViolation + 1
             else:
-                if simScore==1.0:
+                if (simScore>1.0-eps)and(simScore<1.0+eps):
                     nViolation = nViolation + 1
-
-    return (simScoreMat.size - nViolation)/simScoreMat.size * 100.0
+    return float((simScoreMat.size - nViolation))/simScoreMat.size * 100.0
 
 def getSimmetryFitness(simScoreMat):
     assert simScoreMat.shape[0]==simScoreMat.shape[1]
