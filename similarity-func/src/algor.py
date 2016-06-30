@@ -10,7 +10,7 @@ Shamelessly copied from
 deap-1.0.2/deap/algorithms.py
 '''
 def eaSimple(population, toolbox, cxpb, mutpb, ngen, 
-             data, dataDict, recallFitnessDict, simScoreMatDict,
+             data, dataDict, recallPercentileRankDict, simScoreMatDict,
              xprmtDir=None, stats=None, halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
@@ -76,16 +76,20 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen,
     # Evaluate the individuals with an invalid fitness
     tmpRecallRankDict = util.getRecallRankDict(population,data,dataDict)
     for key,datum in tmpRecallRankDict.iteritems():
-        recallFitnessDict[key] = datum
+        recallPercentileRankDict[key] = datum
 
     tmpSimScoreMatDict = util.getSimScoreMatDict(population,data)
     for key,datum in tmpSimScoreMatDict.iteritems():
         simScoreMatDict[key] = datum
 
-    fitnesses = toolbox.map(toolbox.evaluate,population)
+    fitnessDetails = list( toolbox.map(toolbox.evaluate,population) )
+    fitnesses = [f[0] for f in fitnessDetails]; 
+    subfitnesses = [f[1] for f in fitnessDetails]
+
     for ind, fit in zip(population, fitnesses):
         ind.fitness.values = fit
     
+    # 
     if halloffame is not None:
         halloffame.update(population)
 
@@ -93,6 +97,8 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen,
     logbook.record(gen=0, **record)
     if verbose:
         print logbook.stream
+
+    util.saveGenLog(xprmtDir,0,population,subfitnesses,halloffame)
 
     # Begin the generational process
     for gen in range(1, ngen+1):
@@ -105,16 +111,20 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen,
         # Evaluate the individuals
         tmpRecallRankDict = util.getRecallRankDict(offspring,data,dataDict)
         for key,datum in tmpRecallRankDict.iteritems():
-            recallFitnessDict[key] = datum
+            recallPercentileRankDict[key] = datum
 
-        tmpSimScoreMatDict = util.getSimScoreMatDict(offspring,data)
+        tmpOffspring = [i for i in offspring if util.expandFuncStr(str(i)) not in simScoreMatDict]
+        tmpSimScoreMatDict = util.getSimScoreMatDict(tmpOffspring,data)
         for key,datum in tmpSimScoreMatDict.iteritems():
             simScoreMatDict[key] = datum
 
-        fitnesses = toolbox.map(toolbox.evaluate,offspring)
+        fitnessDetails = list( toolbox.map(toolbox.evaluate,offspring) )
+        fitnesses = [f[0] for f in fitnessDetails]; 
+        subfitnesses = [f[1] for f in fitnessDetails]
+
         for ind, fit in zip(offspring, fitnesses):
             ind.fitness.values = fit
-        
+
         # Update the hall of fame with the generated individuals
         if halloffame is not None:
             halloffame.update(offspring)
@@ -128,11 +138,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen,
         if verbose:
             print logbook.stream        
 
-        genDir = xprmtDir + "/gen-"+str(gen)
-        os.makedirs(genDir)
-
-        np.savetxt(genDir + "/individual.csv", [f for f in population], fmt='%s')
-        np.savetxt(genDir + "/fitness.csv", [f.fitness.values for f in population], fmt='%s')
+        util.saveGenLog(xprmtDir,gen,population,subfitnesses,halloffame)
 
     return population, logbook
     

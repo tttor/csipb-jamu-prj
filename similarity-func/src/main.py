@@ -6,9 +6,11 @@ import pickle
 import shutil
 import random
 import sys
+import json
 import numpy as np
 from collections import OrderedDict
 from collections import defaultdict
+from datetime import datetime
 
 # import our costum modules
 import config as cfg
@@ -25,10 +27,13 @@ from deap import algorithms as deapAlgor
 from scoop import futures as fu
 
 # These vars are made global for performance when using paralel/distributed computing
-#### set D_tr
+#### set D_tr 
+# TODO split Dtr, Dte
 data, dataDict, dataFeature = util.loadData( cfg.datasetPath )
-nClass = len(dataDict)
-recallFitnessDict = defaultdict(tuple) # will contain recallFitness values of individuals
+param = dict()
+
+#### Set for fitness computation
+recallPercentileRankDict = defaultdict(tuple) # will contain recallFitness values of individuals
 simScoreMatDict = dict() # will contain simScore of individuals
 
 #### init Deap GP
@@ -79,7 +84,7 @@ toolbox.register("compile", deapGP.compile,
                             pset=primitiveSet)
 
 toolbox.register("evaluate", ff.compute, data=data, 
-                             recallFitnessDict=recallFitnessDict, simScoreMatDict=simScoreMatDict)
+                             recallPercentileRankDict=recallPercentileRankDict, simScoreMatDict=simScoreMatDict)
 
 toolbox.register("select", deapTools.selRoulette)# : selRandom, selBest, selWorst, selTournament, selDoubleTournament
 
@@ -99,12 +104,17 @@ toolbox.register("indTanimoto", deapTools.initIterate, deapCreator.Individual, t
 toolbox.register("popTanimoto", deapTools.initRepeat, list, toolbox.indTanimoto)
 
 def main():
-    seed = 318
+    seed = random.randint(0,4294967295)
+    if (cfg.seed!=0):
+        seed = cfg.seed
     random.seed(seed); np.random.seed(seed)
+    param['seed'] = seed
 
     xprmtDir = cfg.xprmtDir+"/"+"xprmt-"+cfg.xprmtTag+"."+time.strftime("%Y%m%d-%H%M%S")
+    param['xprmtDir'] = xprmtDir
     os.makedirs(xprmtDir)
-    shutil.copy2('config.py', xprmtDir+'/config.py')
+    shutil.copy2('config.py', xprmtDir+'/config_used.txt')
+    np.savetxt(xprmtDir+"/data_training.csv", data, delimiter=",")
     
     stats_fit = deapTools.Statistics(lambda ind: ind.fitness.values)
     stats_size = deapTools.Statistics(len)
@@ -113,24 +123,34 @@ def main():
     mstats.register("min", np.min); mstats.register("max", np.max)
 
     pop = toolbox.population(n=cfg.nIndividual)
-    hof = deapTools.HallOfFame(cfg.nHOF) # from all generation of the whole evolution
+    hof = deapTools.HallOfFame(cfg.nHOF,similar=util.equalIndividual) # from all generation of the whole evolution
 
     # evolution
     print 'Evolution begins ...'
+    param['timeStartEvol'] = time.strftime("%Y%m%d-%H:%M:%S")
     evolStartTime = time.time()
     pop, log = algor.eaSimple(pop, toolbox, cxpb=cfg.pCx, mutpb=cfg.pMut, ngen=cfg.nMaxGen, 
                               data=data, dataDict=dataDict, 
-                              recallFitnessDict=recallFitnessDict, simScoreMatDict=simScoreMatDict,
+                              recallPercentileRankDict=recallPercentileRankDict, simScoreMatDict=simScoreMatDict,
                               xprmtDir=xprmtDir, stats=mstats, halloffame=hof, verbose=True)
-    print("Evolution took %.3f minutes" % ((time.time()-evolStartTime)/60.0))
+    evolTime = time.time()-evolStartTime
+    param['evolTime'] = evolTime
+    param['timeEndEvol'] = time.strftime("%Y%m%d-%H:%M:%S")
+    print("Evolution took %.3f minutes" % (float(evolTime)/60.0))
 
     # post evolution
-    # print log
+    param['nGen'] = len(log.select("gen"))
 
-    # for i in hof:
-    #     print  str(i)
-    #     print i.fitness.values
-        
+    with open(xprmtDir+"/log.txt", "wb") as f:
+        f.write(str(log))
+    
+    # with open(xprmtDir+"/log2.txt", "wb") as f:
+    #     f.write('seed= '+str(seed)+'\n')
+    #     f.write( 'nGen= '+str()+'\n' )
+
+    with open(xprmtDir+"/log2.json", 'wb') as f:
+        json.dump(param, f, indent=2, sort_keys=True)
+
     return pop, log, hof
 
 if __name__ == "__main__":
