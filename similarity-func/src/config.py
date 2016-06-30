@@ -1,6 +1,6 @@
 # DEAP GP Config
 nIndividual = 100
-nMaxGen = 100 # not including the initial generation
+nMaxGen = 10 # not including the initial generation
 pMut = 0.3
 pCx = 0.5
 
@@ -18,7 +18,7 @@ maxKendallTrial = 10
 pValueAcceptance = 0.01
 
 # Training Data Config
-datasetName = 'zoo'
+datasetName = 'zooMinim'
 
 datasetDir = '../data'
 datasetPath = datasetDir+'/'+datasetName+'/'+datasetName+'.csv'

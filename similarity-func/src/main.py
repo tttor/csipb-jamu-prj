@@ -111,7 +111,7 @@ def main():
     param['seed'] = seed
 
     xprmtDir = cfg.xprmtDir+"/"+"xprmt-"+cfg.xprmtTag+"."+time.strftime("%Y%m%d-%H%M%S")
-    param['xprmtDir'] = xprmtDir
+    param['xprmtRootDir'] = cfg.xprmtDir; param['xprmtDir'] = xprmtDir
     os.makedirs(xprmtDir)
     shutil.copy2('config.py', xprmtDir+'/config_used.txt')
     np.savetxt(xprmtDir+"/data_training.csv", data, delimiter=",")
@@ -144,14 +144,8 @@ def main():
     with open(xprmtDir+"/log.txt", "wb") as f:
         f.write(str(log))
     
-    # with open(xprmtDir+"/log2.txt", "wb") as f:
-    #     f.write('seed= '+str(seed)+'\n')
-    #     f.write( 'nGen= '+str()+'\n' )
-
     with open(xprmtDir+"/log2.json", 'wb') as f:
         json.dump(param, f, indent=2, sort_keys=True)
-
-    return pop, log, hof
 
 if __name__ == "__main__":
     main()
