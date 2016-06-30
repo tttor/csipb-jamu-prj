@@ -111,6 +111,7 @@ def main():
     param['seed'] = seed
 
     xprmtDir = cfg.xprmtDir+"/"+"xprmt-"+cfg.xprmtTag+"."+time.strftime("%Y%m%d-%H%M%S")
+    param['xprmtDir'] = xprmtDir
     os.makedirs(xprmtDir)
     shutil.copy2('config.py', xprmtDir+'/config_used.txt')
     np.savetxt(xprmtDir+"/data_training.csv", data, delimiter=",")
@@ -126,12 +127,16 @@ def main():
 
     # evolution
     print 'Evolution begins ...'
+    param['timeStartEvol'] = time.strftime("%Y%m%d-%H:%M:%S")
     evolStartTime = time.time()
     pop, log = algor.eaSimple(pop, toolbox, cxpb=cfg.pCx, mutpb=cfg.pMut, ngen=cfg.nMaxGen, 
                               data=data, dataDict=dataDict, 
                               recallPercentileRankDict=recallPercentileRankDict, simScoreMatDict=simScoreMatDict,
                               xprmtDir=xprmtDir, stats=mstats, halloffame=hof, verbose=True)
-    print("Evolution took %.3f minutes" % ((time.time()-evolStartTime)/60.0))
+    evolTime = time.time()-evolStartTime
+    param['evolTime'] = evolTime
+    param['timeEndEvol'] = time.strftime("%Y%m%d-%H:%M:%S")
+    print("Evolution took %.3f minutes" % (float(evolTime)/60.0))
 
     # post evolution
     param['nGen'] = len(log.select("gen"))
