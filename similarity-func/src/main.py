@@ -6,9 +6,11 @@ import pickle
 import shutil
 import random
 import sys
+import json
 import numpy as np
 from collections import OrderedDict
 from collections import defaultdict
+from datetime import datetime
 
 # import our costum modules
 import config as cfg
@@ -25,9 +27,12 @@ from deap import algorithms as deapAlgor
 from scoop import futures as fu
 
 # These vars are made global for performance when using paralel/distributed computing
-#### set D_tr
+#### set D_tr 
+# TODO split Dtr, Dte
 data, dataDict, dataFeature = util.loadData( cfg.datasetPath )
-nClass = len(dataDict)
+param = dict()
+
+#### Set for fitness computation
 recallPercentileRankDict = defaultdict(tuple) # will contain recallFitness values of individuals
 simScoreMatDict = dict() # will contain simScore of individuals
 
@@ -99,12 +104,16 @@ toolbox.register("indTanimoto", deapTools.initIterate, deapCreator.Individual, t
 toolbox.register("popTanimoto", deapTools.initRepeat, list, toolbox.indTanimoto)
 
 def main():
-    seed = 318
+    seed = random.randint(0,4294967295)
+    if (cfg.seed!=0):
+        seed = cfg.seed
     random.seed(seed); np.random.seed(seed)
+    param['seed'] = seed
 
     xprmtDir = cfg.xprmtDir+"/"+"xprmt-"+cfg.xprmtTag+"."+time.strftime("%Y%m%d-%H%M%S")
     os.makedirs(xprmtDir)
-    shutil.copy2('config.py', xprmtDir+'/config.py')
+    shutil.copy2('config.py', xprmtDir+'/config_used.txt')
+    np.savetxt(xprmtDir+"/data_training.csv", data, delimiter=",")
     
     stats_fit = deapTools.Statistics(lambda ind: ind.fitness.values)
     stats_size = deapTools.Statistics(len)
@@ -125,16 +134,18 @@ def main():
     print("Evolution took %.3f minutes" % ((time.time()-evolStartTime)/60.0))
 
     # post evolution
-    finalDir = xprmtDir + "/final"
-    os.makedirs(finalDir) 
+    param['nGen'] = len(log.select("gen"))
 
-    np.savetxt(finalDir + "/individualHOF.csv", [str(i) for i in hof], fmt='%s', delimiter=';')
-    np.savetxt(finalDir + "/fitnessHOF.csv", [i.fitness.values for i in hof], fmt='%s', delimiter=';')
+    with open(xprmtDir+"/log.txt", "wb") as f:
+        f.write(str(log))
+    
+    # with open(xprmtDir+"/log2.txt", "wb") as f:
+    #     f.write('seed= '+str(seed)+'\n')
+    #     f.write( 'nGen= '+str()+'\n' )
 
-    # for i in hof:
-    #     print  str(i)
-    #     print i.fitness.values
-        
+    with open(xprmtDir+"/log2.json", 'wb') as f:
+        json.dump(param, f, indent=2, sort_keys=True)
+
     return pop, log, hof
 
 if __name__ == "__main__":

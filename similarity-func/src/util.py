@@ -24,8 +24,8 @@ def saveGenLog(xprmtDir,gen,population,subfitnesses,hof):
     np.savetxt(genDir + "/fitnessIdentity.csv", [f['identityFitness'] for f in subfitnesses], fmt='%s')
     np.savetxt(genDir + "/fitnessSimmetry.csv", [f['simmetryFitness'] for f in subfitnesses], fmt='%s')
 
-    np.savetxt(genDir + "/individualHOF.csv", [str(i) for i in hof], fmt='%s', delimiter=';')
-    np.savetxt(genDir + "/fitnessHOF.csv", [i.fitness.values for i in hof], fmt='%s', delimiter=';')
+    np.savetxt(genDir + "/hofIndividual.csv", [str(i) for i in hof], fmt='%s', delimiter=';')
+    np.savetxt(genDir + "/hofFitness.csv", [i.fitness.values for i in hof], fmt='%s', delimiter=';')
 
 def getSimScoreMat(individualStr, data):
     nData = len(data)

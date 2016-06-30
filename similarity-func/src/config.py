@@ -1,7 +1,7 @@
 # DEAP GP Config
 nIndividual = 100
-nMaxGen = 3 # not including the initial generation
-pMut = 0.1
+nMaxGen = 1 # not including the initial generation
+pMut = 0.3
 pCx = 0.5
 
 treeMinDepth = 2
@@ -23,7 +23,8 @@ datasetName = 'zooMinim'
 datasetDir = '../data'
 datasetPath = datasetDir+'/'+datasetName+'/'+datasetName+'.csv'
 
-# Logging Config
+# Experiment/Logging Config
+seed = 0
 xprmtTag = datasetName
 xprmtDir = '/home/tor/robotics/prj/csipb-jamu-prj/xprmt/similarity-func'
 nHOF = 3

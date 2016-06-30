@@ -1,17 +1,12 @@
 TODO
-> add zero-div fitness
-> log per generation
 > set convergence threshold
-> paralel fitness calculation using scoop, try first with getInRangeFitness
 > try another evo algorithm, besides easimple()
-> try constraint handling
 > precompute a,b,c,d
 > solve gramTr vs gramTe in svm scikit-learn
 > what if rankRecall is not independent?
-> keep random's seed for later reproduction
 > why is pDiv everywhere?
 > recalculate fitness only for invalid individuals; set another fitness property in individuals
-> save logbook
+> handle invalid gram's element (gp does not guarantee: [0,1)), scaling? invalidate data?
 
 DONE
 --> use random.seed(seed)
@@ -25,3 +20,8 @@ use scipy.stats.percentileofscore? only from unique individual
 --> who validates fitness (set fitness.valid=TRUE) after fitness calculation?
 validate by filling it with values
 invalidate if len(fitness.values)==0
+--> keep random's seed for later reproduction
+--> paralel fitness calculation using scoop, try first with getInRangeFitness
+--> log per generation
+--> add zero-div fitness
+--> save logbook
