@@ -28,6 +28,8 @@ increase the minimum tree depth?
 > setting env
 sudo apt-get install tmux
 sudo apt-get install git
+sudo apt-get install python-numpy
+sudo apt-get install python-scipy
 sudo apt-get install python-dev python-pip
 sudo pip install scoop
 sudo pip install deap
