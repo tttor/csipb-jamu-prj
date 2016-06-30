@@ -9,6 +9,7 @@ import sys
 import numpy as np
 from collections import OrderedDict
 from collections import defaultdict
+from datetime import datetime
 
 # import our costum modules
 import config as cfg
@@ -99,7 +100,9 @@ toolbox.register("indTanimoto", deapTools.initIterate, deapCreator.Individual, t
 toolbox.register("popTanimoto", deapTools.initRepeat, list, toolbox.indTanimoto)
 
 def main():
-    seed = 318
+    seed = random.randint(0,4294967295)
+    if (cfg.seed!=0):
+        seed = cfg.seed
     random.seed(seed); np.random.seed(seed)
 
     xprmtDir = cfg.xprmtDir+"/"+"xprmt-"+cfg.xprmtTag+"."+time.strftime("%Y%m%d-%H%M%S")
@@ -128,6 +131,9 @@ def main():
     with open(xprmtDir+"/log.txt", "wb") as f:
         f.write(str(log))
     
+    with open(xprmtDir+"/log2.txt", "wb") as f:
+        f.write('seed= '+str(seed))
+        
     return pop, log, hof
 
 if __name__ == "__main__":
