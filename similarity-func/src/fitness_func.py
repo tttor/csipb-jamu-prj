@@ -31,19 +31,20 @@ def getRecallFitness(individualStr,recallPercentileRankDict):
     maxPercentile = 100.0
     fitness = maxPercentile - percentileRank # normalized so that 100.0 is the best
 
-    return fitness
+    return fitness # in percentile
 
 def getInRangeFitness(simScoreMat):
     foundIdx = np.where( np.logical_and(simScoreMat>0.0,simScoreMat<=1.0) )
     nInRange = len( foundIdx[0] )
     
-    return float(nInRange)/simScoreMat.size*100.0 # in percentage
+    return float(nInRange)/simScoreMat.size * 100.0 # in percentage
 
 def getZeroDivFitness(individualStr):
     a = b = c = d = 0.0 # assume all are zeroed
     individualStr = individualStr.replace('protectedDiv','operator.div')
 
-    zeroDivFitness = 100.0 # not happen
+    inPercent = 100
+    zeroDivFitness = inPercent # not happen
     np.seterr(invalid='ignore')
     try:
         r = eval(individualStr)
@@ -54,7 +55,7 @@ def getZeroDivFitness(individualStr):
 
     return zeroDivFitness
 
-def getIdentityFitness(simScoreMat):# TODO fix me
+def getIdentityFitness(simScoreMat):
     nViolation = 0
     eps = 0.00001
     for i in range(simScoreMat.shape[0]):
@@ -66,7 +67,7 @@ def getIdentityFitness(simScoreMat):# TODO fix me
             else:
                 if (simScore>1.0-eps)and(simScore<1.0+eps):
                     nViolation = nViolation + 1
-    return float((simScoreMat.size - nViolation))/simScoreMat.size * 100.0
+    return float((simScoreMat.size - nViolation))/simScoreMat.size * 100.0 # in percentage
 
 def getSimmetryFitness(simScoreMat):
     assert simScoreMat.shape[0]==simScoreMat.shape[1]
@@ -77,4 +78,4 @@ def getSimmetryFitness(simScoreMat):
             if simScoreMat[i][j] != simScoreMat[j][i]:
                 nViolation = nViolation + 1
 
-    return (simScoreMat.size - nViolation)/simScoreMat.size * 100.0
+    return float((simScoreMat.size - nViolation))/simScoreMat.size * 100.0 # in percentage
