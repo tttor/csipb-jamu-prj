@@ -24,3 +24,12 @@ increase the minimum tree depth?
 2) Identity: d(x, y) = 0 if and only if x == y
 3) Symmetry: d(x, y) = d(y, x)
 4) Triangle Inequality: d(x, y) + d(y, z) >= d(x, z)
+
+> setting env
+sudo apt-get install tmux
+sudo apt-get install git
+sudo apt-get install python-dev python-pip
+sudo pip install scoop
+sudo pip install deap
+mkdir -p /home/tor/robotics/prj/csipb-jamu-prj/ws
+git clone https://github.com/tttor/csipb-jamu-prj.git
