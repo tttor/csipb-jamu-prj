@@ -6,6 +6,7 @@ TODO
 > what if rankRecall is not independent?
 > why is pDiv everywhere?
 > recalculate fitness only for invalid individuals; set another fitness property in individuals
+> handle invalid gram's element (gp does not guarantee: [0,1)), scaling? invalidate data?
 
 DONE
 --> use random.seed(seed)
