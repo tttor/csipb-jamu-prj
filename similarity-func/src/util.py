@@ -299,29 +299,6 @@ def pow(x):
 def powhalf(x):
     return np.power(x, 0.5)
 
-def loadData(datapath):
-    data = np.loadtxt(datapath, delimiter=',')
-
-    dataDict = defaultdict(list)
-    for idx, datum in enumerate(data):
-        classIdx = int(datum[0]) # the first element _must_ be classIdx
-        dataDict[classIdx].append(idx) # contain only the idx
-    assert (0 in dataDict), 'idx does not begin at 0'
-
-    dataFeature = []
-    for idx,x in enumerate(data):
-        subdataFeature = []
-        for idx2,x2 in enumerate(data):
-            featureDict = {}
-            featureDict['a'] = getFeatureA(x,x2)
-            featureDict['b'] = getFeatureB(x,x2)
-            featureDict['c'] = getFeatureC(x,x2)
-            featureDict['d'] = getFeatureD(x,x2)
-            subdataFeature.append(featureDict)
-        dataFeature.append(subdataFeature)
-    
-    return (data,dataDict,dataFeature)
-
 def getFeatureA(s1,s2):
     return np.inner(s1, s2)
 

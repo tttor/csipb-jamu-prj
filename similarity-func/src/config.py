@@ -1,5 +1,6 @@
 ### Experiment/Logging Config
 seed = 0
+testSize = 0.25
 datasetName = 'zooMinim'
 xprmtDir = '/home/tor/robotics/prj/csipb-jamu-prj/xprmt/similarity-func'
 
