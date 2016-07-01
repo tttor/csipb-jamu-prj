@@ -35,7 +35,7 @@ def getRecallFitness(individualStr,recallPercentileRankDict):
     if not(independent):
         timeStr = time.strftime("%Y%m%d-%H%M%S")
         with open(cfg.xprmtDir+"/warn_not_independent_occurred_at_"+timeStr, "wb") as f:
-            f.write(str(log))
+            f.write( 'warn_not_independent_occurred_at_'+timeStr )
 
     return fitness # in percentile
 
