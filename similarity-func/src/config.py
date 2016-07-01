@@ -19,7 +19,7 @@ treeMaxDepth = 3
 subtreeMinDepthMut = 1
 subtreeMaxDepthMut = 1
 
-nHOF = 3
+nHOF = nIndividual
 # convergenceThreshold = -0.1
 
 ### KendallTest Config
