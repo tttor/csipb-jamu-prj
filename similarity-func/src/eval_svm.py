@@ -12,9 +12,9 @@ import config as cfg
 
 def main(argv):
     assert len(argv)==3
-    xprmtDir = cfg.xprmtDir+'/'+argv[1]
+    xprmtDir = cfg.xprmtDir+'/'+argv[1]; assert os.path.isdir(xprmtDir)
     nTop = int(argv[2])
-    assert os.path.isdir(xprmtDir)
+    metrics = {}
 
     #
     X_train = np.genfromtxt(xprmtDir+'/data/X_train.csv', delimiter=',')
@@ -42,7 +42,9 @@ def main(argv):
 
     funcStrList = [s.rstrip() for s in funcStrList]
     funcStrList = [util.expandFuncStr(s) for s in funcStrList]
+    metrics['funcStr'] = funcStrList
     
+    accuracyList = []
     for f in funcStrList:
         print 'Evaluating ', f
         # tune
@@ -57,11 +59,12 @@ def main(argv):
         y_pred = clf.predict(gram_test)
         np.savetxt(xprmtDir+"/data/y_pred_"+f+".csv", y_pred, delimiter=",")
 
-        metrics = {}
-        metrics['accuracy'] = accuracy_score(y_test, y_pred)
+        accuracyList.append( accuracy_score(y_test, y_pred) )
 
-        with open(xprmtDir+"/data/metrics_"+f+".json", 'wb') as f:
-            json.dump(metrics, f, indent=2, sort_keys=True)
+    metrics['accuracy'] = accuracyList
+
+    with open(xprmtDir+"/data/perf_metrics.json", 'wb') as f:
+        json.dump(metrics, f, indent=2, sort_keys=True)
 
 if __name__ == '__main__':
     main(sys.argv)
