@@ -31,7 +31,9 @@ sudo apt-get install git
 sudo apt-get install python-numpy
 sudo apt-get install python-scipy
 sudo apt-get install python-dev python-pip
+sudo apt-get install python-yaml
 sudo pip install scoop
 sudo pip install deap
+sudo pip install -U scikit-learn
 mkdir -p /home/tor/robotics/prj/csipb-jamu-prj/ws
 git clone https://github.com/tttor/csipb-jamu-prj.git

@@ -7,6 +7,8 @@ TODO
 > why is pDiv everywhere?
 > recalculate fitness only for invalid individuals; set another fitness property in individuals
 > handle invalid gram's element (gp does not guarantee: [0,1)), scaling? invalidate data?
+> handle out-of-memory!
+remove element in dict, use dict.pop()
 
 DONE
 --> use random.seed(seed)
