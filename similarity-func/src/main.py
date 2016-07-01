@@ -128,12 +128,16 @@ def main():
     # evolution
     print 'Evolution begins ...'
     param['timeStartEvol'] = time.strftime("%Y%m%d-%H:%M:%S")
+    with open(xprmtDir+"/log2.json", 'wb') as f:
+        json.dump(param, f, indent=2, sort_keys=True)
+
     evolStartTime = time.time()
     pop, log = algor.eaSimple(pop, toolbox, cxpb=cfg.pCx, mutpb=cfg.pMut, ngen=cfg.nMaxGen, 
                               data=data, dataDict=dataDict, 
                               recallPercentileRankDict=recallPercentileRankDict, simScoreMatDict=simScoreMatDict,
                               xprmtDir=xprmtDir, stats=mstats, halloffame=hof, verbose=True)
     evolTime = time.time()-evolStartTime
+
     param['evolTime'] = evolTime
     param['timeEndEvol'] = time.strftime("%Y%m%d-%H:%M:%S")
     print("Evolution took %.3f minutes" % (float(evolTime)/60.0))
