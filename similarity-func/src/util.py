@@ -172,21 +172,18 @@ def getSimScore(x1,x2,funcStr):
 def inRange(simScore):
     return (simScore>0.0 and simScore<=1.0)
 
-def computeGram(X, funcStr):
+def computeGram(X1, X2, funcStr):
     print 'computeGram with ', funcStr
-    shape = (len(X),len(X))
+    shape = (len(X1),len(X2))
     gram = np.zeros(shape)
 
-    for i, x1 in enumerate(X):
-        for j,x2 in enumerate(X[i:]):
+    for i, x1 in enumerate(X1):
+        for j,x2 in enumerate(X2):
             a = getFeatureA(x1,x2); b = getFeatureB(x1,x2)
             c = getFeatureC(x1,x2); d = getFeatureD(x1,x2)
 
             simScore = getSimScore(x1,x2,funcStr)
-            assert simScore>0.0 
-            assert simScore<=1.0
-
-            gram[i][j] = gram [j][i] = simScore
+            gram[i][j] = simScore
 
     return gram
 
@@ -298,29 +295,6 @@ def pow(x):
 
 def powhalf(x):
     return np.power(x, 0.5)
-
-def loadData(datapath):
-    data = np.loadtxt(datapath, delimiter=',')
-
-    dataDict = defaultdict(list)
-    for idx, datum in enumerate(data):
-        classIdx = int(datum[0]) # the first element _must_ be classIdx
-        dataDict[classIdx].append(idx) # contain only the idx
-    assert (0 in dataDict), 'idx does not begin at 0'
-
-    dataFeature = []
-    for idx,x in enumerate(data):
-        subdataFeature = []
-        for idx2,x2 in enumerate(data):
-            featureDict = {}
-            featureDict['a'] = getFeatureA(x,x2)
-            featureDict['b'] = getFeatureB(x,x2)
-            featureDict['c'] = getFeatureC(x,x2)
-            featureDict['d'] = getFeatureD(x,x2)
-            subdataFeature.append(featureDict)
-        dataFeature.append(subdataFeature)
-    
-    return (data,dataDict,dataFeature)
 
 def getFeatureA(s1,s2):
     return np.inner(s1, s2)

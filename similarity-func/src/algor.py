@@ -109,9 +109,17 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen,
         offspring = deapAlgor.varAnd(offspring, toolbox, cxpb, mutpb)
         
         # Evaluate the individuals
+        for i in recallPercentileRankDict.keys():
+            del recallPercentileRankDict[i]
+
         tmpRecallRankDict = util.getRecallRankDict(offspring,data,dataDict)
         for key,datum in tmpRecallRankDict.iteritems():
             recallPercentileRankDict[key] = datum
+
+        offspringStr = [util.expandFuncStr(str(i)) for i in offspring]
+        keysToDel = [i for i in simScoreMatDict.keys() if i not in offspringStr]
+        for i in keysToDel:
+            del simScoreMatDict[i]
 
         tmpOffspring = [i for i in offspring if util.expandFuncStr(str(i)) not in simScoreMatDict]
         tmpSimScoreMatDict = util.getSimScoreMatDict(tmpOffspring,data)

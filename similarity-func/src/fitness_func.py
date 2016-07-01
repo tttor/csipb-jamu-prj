@@ -2,6 +2,7 @@ import util
 import numpy as np
 import scipy.stats as stats
 import operator
+import time
 
 import config as cfg
 
@@ -31,6 +32,11 @@ def getRecallFitness(individualStr,recallPercentileRankDict):
     maxPercentile = 100.0
     fitness = maxPercentile - percentileRank # normalized so that 100.0 is the best
 
+    if not(independent):
+        timeStr = time.strftime("%Y%m%d-%H%M%S")
+        with open(cfg.xprmtDir+"/warn_not_independent_occurred_at_"+timeStr, "wb") as f:
+            f.write( 'warn_not_independent_occurred_at_'+timeStr )
+
     return fitness # in percentile
 
 def getInRangeFitness(simScoreMat):
@@ -48,7 +54,7 @@ def getZeroDivFitness(individualStr):
     np.seterr(invalid='ignore')
     try:
         r = eval(individualStr)
-        if np.isnan(r):
+        if np.isnan(r) or np.isinf(r):
             zeroDivFitness = 0.0
     except ZeroDivisionError as err:
         zeroDivFitness = 0.0
