@@ -172,21 +172,18 @@ def getSimScore(x1,x2,funcStr):
 def inRange(simScore):
     return (simScore>0.0 and simScore<=1.0)
 
-def computeGram(X, funcStr):
+def computeGram(X1, X2, funcStr):
     print 'computeGram with ', funcStr
-    shape = (len(X),len(X))
+    shape = (len(X1),len(X2))
     gram = np.zeros(shape)
 
-    for i, x1 in enumerate(X):
-        for j,x2 in enumerate(X[i:]):
+    for i, x1 in enumerate(X1):
+        for j,x2 in enumerate(X2):
             a = getFeatureA(x1,x2); b = getFeatureB(x1,x2)
             c = getFeatureC(x1,x2); d = getFeatureD(x1,x2)
 
             simScore = getSimScore(x1,x2,funcStr)
-            assert simScore>0.0 
-            assert simScore<=1.0
-
-            gram[i][j] = gram [j][i] = simScore
+            gram[i][j] = simScore
 
     return gram
 

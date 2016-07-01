@@ -1,7 +1,7 @@
 ### Experiment/Logging Config
 seed = 0
 testSize = 0.25
-datasetName = 'zooMinim'
+datasetName = 'zoo'
 xprmtDir = '/home/tor/robotics/prj/csipb-jamu-prj/xprmt/similarity-func'
 
 datasetDir = '../data'
@@ -10,7 +10,7 @@ xprmtTag = datasetName
 
 ### DEAP GP Config
 nIndividual = 100
-nMaxGen = 1 # not including the initial generation
+nMaxGen = 1000 # not including the initial generation
 pMut = 0.3
 pCx = 0.5
 
@@ -20,7 +20,7 @@ subtreeMinDepthMut = 1
 subtreeMaxDepthMut = 1
 
 nHOF = 3
-convergenceThreshold = -0.1
+# convergenceThreshold = -0.1
 
 ### KendallTest Config
 nRefPerClassInPercentage = 20
