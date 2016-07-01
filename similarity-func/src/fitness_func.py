@@ -53,7 +53,7 @@ def getZeroDivFitness(individualStr):
     np.seterr(invalid='ignore')
     try:
         r = eval(individualStr)
-        if np.isnan(r):
+        if np.isnan(r) or np.isinf(x):
             zeroDivFitness = 0.0
     except ZeroDivisionError as err:
         zeroDivFitness = 0.0
