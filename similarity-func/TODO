@@ -1,10 +1,16 @@
 TODO
+> what if rankRecall is not independent?
+percetileRank should be after independent test
+> handle invalid gram's element (gp does not guarantee: [0,1)), 
+scaling? invalidate data?
+> scale the gram matrix to be in (0,1]
+> for zoo
+run 100 runs with 100 genMax with 100 individuals
+> try other metrics: precision, recall, fscore
+
 > set convergence threshold
 > try another evo algorithm, besides easimple()
 > precompute a,b,c,d
-> solve gramTr vs gramTe in svm scikit-learn
-> what if rankRecall is not independent?
-> handle invalid gram's element (gp does not guarantee: [0,1)), scaling? invalidate data?
 
 DONE
 --> use random.seed(seed)
@@ -25,3 +31,4 @@ invalidate if len(fitness.values)==0
 --> save logbook
 --> handle out-of-memory!
 remove element in dict, use del
+--> solve gramTr vs gramTe in svm scikit-learn

@@ -10,7 +10,7 @@ xprmtTag = datasetName
 
 ### DEAP GP Config
 nIndividual = 100
-nMaxGen = 1000 # not including the initial generation
+nMaxGen = 100 # not including the initial generation
 pMut = 0.3
 pCx = 0.5
 

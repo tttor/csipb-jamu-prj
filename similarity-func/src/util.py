@@ -1,4 +1,5 @@
 import os
+import time
 import numpy as np
 from collections import defaultdict
 from scoop import futures as fu
@@ -154,6 +155,10 @@ def getRecallRankDict(pop, data, dataDict):
     independent = False
     if np.average(pValueList) <= cfg.pValueAcceptance:
         independent = True
+    else:
+        timeStr = time.strftime("%Y%m%d-%H%M%S")
+        with open(cfg.xprmtDir+"/warn_not_independent_occurred_at_"+timeStr, "wb") as f:
+            f.write( 'warn_not_independent_occurred_at_'+timeStr )
 
     #
     recallRankDict = defaultdict(tuple)
@@ -173,7 +178,7 @@ def inRange(simScore):
     return (simScore>0.0 and simScore<=1.0)
 
 def computeGram(X1, X2, funcStr):
-    print 'computeGram with ', funcStr
+    # print 'computeGram with ', funcStr
     shape = (len(X1),len(X2))
     gram = np.zeros(shape)
 
