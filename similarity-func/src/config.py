@@ -2,6 +2,7 @@
 seed = 0
 testSize = 0.25
 datasetName = 'zoo'
+nTanimotoIndividualInPercentage = 0
 xprmtDir = '/home/tor/robotics/prj/csipb-jamu-prj/xprmt/similarity-func'
 
 datasetDir = '../data'

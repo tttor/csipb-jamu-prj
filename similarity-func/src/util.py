@@ -17,7 +17,7 @@ def saveGenLog(xprmtDir,gen,population,subfitnesses,hof):
     genDir = xprmtDir + "/gen-"+str(gen)
     os.makedirs(genDir)
 
-    np.savetxt(genDir + "/individual.csv", [f for f in population], fmt='%s')
+    np.savetxt(genDir + "/individual.csv", [str(f) for f in population], fmt='%s')
     np.savetxt(genDir + "/fitness.csv", [f.fitness.values for f in population], fmt='%s')
     np.savetxt(genDir + "/fitnessRecall.csv", [f['recallFitness'] for f in subfitnesses], fmt='%s')
     np.savetxt(genDir + "/fitnessInRange.csv", [f['inRangeFitness'] for f in subfitnesses], fmt='%s')
