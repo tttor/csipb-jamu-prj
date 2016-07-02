@@ -6,7 +6,6 @@ scaling? invalidate data?
 > scale the gram matrix to be in (0,1]
 > for zoo
 run 100 runs with 100 genMax with 100 individuals
-> try other metrics: precision, recall, fscore
 
 > set convergence threshold
 > try another evo algorithm, besides easimple()
@@ -32,3 +31,4 @@ invalidate if len(fitness.values)==0
 --> handle out-of-memory!
 remove element in dict, use del
 --> solve gramTr vs gramTe in svm scikit-learn
+--> try other metrics: precision, recall, fscore
