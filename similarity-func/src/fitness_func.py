@@ -32,11 +32,6 @@ def getRecallFitness(individualStr,recallPercentileRankDict):
     maxPercentile = 100.0
     fitness = maxPercentile - percentileRank # normalized so that 100.0 is the best
 
-    if not(independent):
-        timeStr = time.strftime("%Y%m%d-%H%M%S")
-        with open(cfg.xprmtDir+"/warn_not_independent_occurred_at_"+timeStr, "wb") as f:
-            f.write( 'warn_not_independent_occurred_at_'+timeStr )
-
     return fitness # in percentile
 
 def getInRangeFitness(simScoreMat):
