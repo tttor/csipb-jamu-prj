@@ -1,7 +1,7 @@
 ### Experiment/Logging Config
 seed = 0
 testSize = 0.25
-datasetName = 'zoo'
+datasetName = 'stahl-maccs'
 nTanimotoIndividualInPercentage = 0
 xprmtDir = '/home/tor/robotics/prj/csipb-jamu-prj/xprmt/similarity-func'
 
