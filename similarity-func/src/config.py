@@ -21,10 +21,11 @@ subtreeMinDepthMut = 1
 subtreeMaxDepthMut = 1
 
 nHOF = nIndividual
+recallFitnessOnlyIfIndependent = False
 # convergenceThreshold = -0.1
 
-### KendallTest Config
+### KendallTauTest Config
 nRefPerClassInPercentage = 20
 nTopInPercentage = 20
-# maxKendallTrial = 10
-pValueAcceptance = 0.01
+maxKendallTauTestTrial = 3
+pValueAcceptance = 0.05

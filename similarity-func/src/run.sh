@@ -1,5 +1,5 @@
 #!/bin/bash
-if [ "$#" -ne 1 ]; then
+if [ "$#" -ne 2 ]; then
   echo "[FATAL] Illegal number of parameters"
   exit 1
 fi
@@ -12,5 +12,9 @@ if [ $1 -eq 0 ]
 then
   	python $EXE
 else 
-	python -m scoop -n $1 $EXE
+	for (( i=1; i <= $2; i++ ))
+	do
+		echo "!!! run $i of $2 ..."
+		python -m scoop -n $1 $EXE
+	done
 fi

@@ -27,11 +27,13 @@ def compute(individual, data, recallPercentileRankDict, simScoreMatDict):
 
 def getRecallFitness(individualStr,recallPercentileRankDict):
     percentileRankList,independent = recallPercentileRankDict[individualStr]
-    percentileRank = np.average(percentileRankList)
+    maxPercentileRank = 100.0
 
-    maxPercentile = 100.0
-    fitness = maxPercentile - percentileRank # normalized so that 100.0 is the best
-
+    percentileRank = maxPercentileRank
+    if independent or not(cfg.recallFitnessOnlyIfIndependent):
+        percentileRank = np.average(percentileRankList)
+    
+    fitness = maxPercentileRank - percentileRank # normalized so that 100.0 is the best
     return fitness # in percentile
 
 def getInRangeFitness(simScoreMat):
