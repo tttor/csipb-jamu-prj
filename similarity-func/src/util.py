@@ -94,77 +94,82 @@ def getMedianRecallDict(individualStr, data, dataDict, refAndRemIdxDict):
     return medianRecallDict
 
 def getRecallRankDict(pop, data, dataDict):
-    # Get refERENCE and remAINING idx
-    refAndRemIdxDict = defaultdict(tuple)
-    for classIdx,classData in dataDict.iteritems():
-        nSample = len(classData)
-        nRef = int( cfg.nRefPerClassInPercentage/100.0 * nSample )
-        refIdxList = np.random.randint(0,nSample, size=nRef)
-        remIdxList = [idx for idx in range(nSample) if idx not in refIdxList]
-
-        refAndRemIdxDict[classIdx] = (refIdxList,remIdxList)
-
     # List unique individual
     popStr = list(set( [expandFuncStr( str(i) ) for i in pop] ))
     nUniqueIndividual = len(popStr); assert nUniqueIndividual!=0
-
-    # Get Recall Matrix along with some other fitness
-    medianRecallDicts = list( fu.map( getMedianRecallDict, popStr,
-                                      [data]*nUniqueIndividual,
-                                      [dataDict]*nUniqueIndividual,
-                                      [refAndRemIdxDict]*nUniqueIndividual ) )
-
-    # Get median recall Ranking Matrix and recallFitness (agnostic to iid)
     nClass = len(dataDict)
-    medianRecallRankMat = np.zeros( (nUniqueIndividual, nClass) )
-    for classIdx in range(nClass):
-        medianRecall = [] # from all individuals of this classIdx
-        for medianRecallDict in medianRecallDicts:
-            assert classIdx in medianRecallDict
-            medianRecall.append( medianRecallDict[classIdx] )
-        assert len(medianRecall)==nUniqueIndividual
-
-        sortedMedianRecallIdx = sorted( range(nUniqueIndividual), 
-                                        key=lambda k: medianRecall[k],reverse=True ) # descending
-
-        individualRanks = [] # in this classIdx
-        for individualIdx in range(nUniqueIndividual):
-            rank = sortedMedianRecallIdx.index(individualIdx)
-            individualRanks.append(rank)
-
-        percentileIndividualRanks = []
-        for rank in individualRanks:
-            percentile = stats.percentileofscore(individualRanks, rank)
-            percentileIndividualRanks.append(percentile)
-
-        medianRecallRankMat[:,classIdx] = percentileIndividualRanks
-
-    # Test i.i.d (independent and identically distributed)
-    # with H0 = two rank lists are independent
-    # Thus id p-value is less than a threshold then we accept H0
-    # If H0 is accepted, then we can average the rank
-    pValueList = []
-    for i in range(nClass-1):
-        for j in range(i+1,nClass):
-            x1 = medianRecallRankMat[:, i]
-            x2 = medianRecallRankMat[:, j]
-
-            tau, pval = stats.kendalltau(x1, x2)
-            pValueList.append(pval)
 
     independent = False
-    if np.average(pValueList) <= cfg.pValueAcceptance:
-        independent = True
-    else:
+    recallRankMat = None
+    for trial in range(cfg.maxKendallTauTestTrial):
+        # Get refERENCE and remAINING idx
+        refAndRemIdxDict = defaultdict(tuple)
+        for classIdx,classData in dataDict.iteritems():
+            nSample = len(classData)
+            nRef = int( cfg.nRefPerClassInPercentage/100.0 * nSample )
+            refIdxList = np.random.randint(0,nSample, size=nRef)
+            remIdxList = [idx for idx in range(nSample) if idx not in refIdxList]
+
+            refAndRemIdxDict[classIdx] = (refIdxList,remIdxList)
+
+        # Get Recall Matrix along with some other fitness
+        medianRecallDicts = list( fu.map( getMedianRecallDict, popStr,
+                                          [data]*nUniqueIndividual,
+                                          [dataDict]*nUniqueIndividual,
+                                          [refAndRemIdxDict]*nUniqueIndividual ) )
+
+        # Get median recall Ranking Matrix and recallFitness (agnostic to iid)
+        recallRankMat = np.zeros( (nUniqueIndividual, nClass) )
+        for classIdx in range(nClass):
+            medianRecall = [] # from all individuals of this classIdx
+            for medianRecallDict in medianRecallDicts:
+                medianRecall.append( medianRecallDict[classIdx] )
+            assert len(medianRecall)==nUniqueIndividual
+
+            sortedMedianRecallIdx = sorted( range(nUniqueIndividual), 
+                                            key=lambda k: medianRecall[k],reverse=True ) # descending
+
+            individualRanks = [] # in this classIdx
+            for individualIdx in range(nUniqueIndividual):
+                rank = sortedMedianRecallIdx.index(individualIdx)
+                individualRanks.append(rank)
+
+            recallRankMat[:,classIdx] = individualRanks
+
+        # Test i.i.d (independent and identically distributed)
+        # with H0 = two rank lists are independent
+        # Thus id p-value is less than a threshold then we accept H0
+        # If H0 is accepted, then we can average the rank
+        pValueList = []
+        for i in range(nClass-1):
+            for j in range(i+1,nClass):
+                x1 = recallRankMat[:, i]
+                x2 = recallRankMat[:, j]
+
+                tau, pval = stats.kendalltau(x1, x2)
+                pValueList.append(pval)
+
+        if np.average(pValueList) <= cfg.pValueAcceptance:
+            independent = True
+            break
+
+    if not(independent):
         timeStr = time.strftime("%Y%m%d-%H%M%S")
         with open(cfg.xprmtDir+"/warn_not_independent_occurred_at_"+timeStr, "wb") as f:
             f.write( 'warn_not_independent_occurred_at_'+timeStr )
 
     #
+    percentileRecallRankMat = np.zeros(recallRankMat.shape)
+    for classIdx in range(nClass):
+        for individualIdx in range(nUniqueIndividual):
+            rank = recallRankMat[individualIdx,classIdx]
+            percentile = stats.percentileofscore(recallRankMat[:,classIdx],rank) #TODO optimize!
+            percentileRecallRankMat[individualIdx,classIdx] = percentile
+
     recallRankDict = defaultdict(tuple)
     for individualIdx, individual in enumerate(popStr):
-        recallFitness = list( medianRecallRankMat[individualIdx,:] )# of all classes
-        recallRankDict[individual] = (recallFitness,independent)
+        recallRankDict[individual] = (list( percentileRecallRankMat[individualIdx,:] ),# of all classes
+                                      independent)
 
     return recallRankDict
     

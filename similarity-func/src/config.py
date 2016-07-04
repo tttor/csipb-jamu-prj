@@ -26,5 +26,5 @@ nHOF = nIndividual
 ### KendallTest Config
 nRefPerClassInPercentage = 20
 nTopInPercentage = 20
-# maxKendallTrial = 10
-pValueAcceptance = 0.01
+maxKendallTauTestTrial = 3
+pValueAcceptance = 0.05
