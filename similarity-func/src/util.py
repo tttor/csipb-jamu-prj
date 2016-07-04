@@ -174,9 +174,6 @@ def getSimScore(x1,x2,funcStr):
 
     return eval(funcStr)
 
-def inRange(simScore):
-    return (simScore>0.0 and simScore<=1.0)
-
 def computeGram(X1, X2, funcStr):
     # print 'computeGram with ', funcStr
     shape = (len(X1),len(X2))
@@ -191,6 +188,43 @@ def computeGram(X1, X2, funcStr):
             gram[i][j] = simScore
 
     return gram
+
+def protectedDiv(left, right):
+    with np.errstate(divide='ignore',invalid='ignore'):
+        x = np.divide(left, right)
+        if isinstance(x, np.ndarray):
+            x[np.isinf(x)] = 1
+            x[np.isnan(x)] = 1
+        elif np.isinf(x) or np.isnan(x):
+            x = 1
+    return x
+
+def pow(x):
+    return np.power(x, 2)
+
+def powhalf(x):
+    return np.power(x, 0.5)
+
+def getFeatureA(s1,s2):
+    return np.inner(s1, s2)
+
+def getFeatureB(s1,s2):
+    return np.inner(s1, 1-s2)
+
+def getFeatureC(s1,s2):
+    return np.inner(1-s1, s2)
+
+def getFeatureD(s1,s2):
+    return np.inner(1-s1, 1-s2)
+
+def isConverged(pop):
+    maxFitnessVal = np.max([ind.fitness.values[0] for ind in pop])
+    
+    converged = False
+    if maxFitnessVal > cfg.convergenceThreshold:
+        converged = True
+
+    return converged
 
 def expandFuncStr(istr):
     expansionDict = {'add': 'np.add', 'sub': 'np.subtract', 'mul': 'np.multiply',
@@ -284,40 +318,3 @@ def tanimoto(pset, min_, max_, type_=None):
 #     expr.append(lsTerm[2])
 
 #     return expr
-
-def protectedDiv(left, right):
-    with np.errstate(divide='ignore',invalid='ignore'):
-        x = np.divide(left, right)
-        if isinstance(x, np.ndarray):
-            x[np.isinf(x)] = 1
-            x[np.isnan(x)] = 1
-        elif np.isinf(x) or np.isnan(x):
-            x = 1
-    return x
-
-def pow(x):
-    return np.power(x, 2)
-
-def powhalf(x):
-    return np.power(x, 0.5)
-
-def getFeatureA(s1,s2):
-    return np.inner(s1, s2)
-
-def getFeatureB(s1,s2):
-    return np.inner(s1, 1-s2)
-
-def getFeatureC(s1,s2):
-    return np.inner(1-s1, s2)
-
-def getFeatureD(s1,s2):
-    return np.inner(1-s1, 1-s2)
-
-def isConverged(pop):
-    maxFitnessVal = np.max([ind.fitness.values[0] for ind in pop])
-    
-    converged = False
-    if maxFitnessVal > cfg.convergenceThreshold:
-        converged = True
-
-    return converged

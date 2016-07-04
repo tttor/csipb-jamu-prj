@@ -3,13 +3,13 @@ TODO
 percetileRank should be after independent test
 > handle invalid gram's element (gp does not guarantee: [0,1)), 
 scaling? invalidate data?
-> scale the gram matrix to be in (0,1]
+scale the gram matrix to be in (0,1]
 > for zoo
 run 100 runs with 100 genMax with 100 individuals
 
 > set convergence threshold
 > try another evo algorithm, besides easimple()
-> precompute a,b,c,d
+> precompute a,b,c,d, for further speed-up?
 
 DONE
 --> use random.seed(seed)
