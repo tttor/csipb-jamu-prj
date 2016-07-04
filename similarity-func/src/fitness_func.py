@@ -30,7 +30,7 @@ def getRecallFitness(individualStr,recallPercentileRankDict):
     maxPercentileRank = 100.0
 
     percentileRank = maxPercentileRank
-    if independent:
+    if independent or not(cfg.recallFitnessOnlyIfIndependent):
         percentileRank = np.average(percentileRankList)
     
     fitness = maxPercentileRank - percentileRank # normalized so that 100.0 is the best

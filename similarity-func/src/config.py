@@ -11,7 +11,7 @@ xprmtTag = datasetName
 
 ### DEAP GP Config
 nIndividual = 100
-nMaxGen = 1 # not including the initial generation
+nMaxGen = 100 # not including the initial generation
 pMut = 0.3
 pCx = 0.5
 
@@ -21,9 +21,10 @@ subtreeMinDepthMut = 1
 subtreeMaxDepthMut = 1
 
 nHOF = nIndividual
+recallFitnessOnlyIfIndependent = False
 # convergenceThreshold = -0.1
 
-### KendallTest Config
+### KendallTauTest Config
 nRefPerClassInPercentage = 20
 nTopInPercentage = 20
 maxKendallTauTestTrial = 3
