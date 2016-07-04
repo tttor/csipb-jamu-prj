@@ -151,15 +151,16 @@ def main():
     mstats.register("avg", np.mean); mstats.register("std", np.std)
     mstats.register("min", np.min); mstats.register("max", np.max)
 
+    # Init
+    pop = toolbox.population(n=cfg.nIndividual)
     hof = deapTools.HallOfFame(cfg.nHOF,similar=util.equalIndividual) # from all generations over the whole evolution
-    pop = toolbox.populationTanimoto(n=cfg.nIndividual) #pop = toolbox.population(n=cfg.nIndividual)
 
     nTanimotoIndividual = int(cfg.nTanimotoIndividualInPercentage/100.0*cfg.nIndividual)
     tanimotoPop = toolbox.populationTanimoto(n=nTanimotoIndividual)
 
-    idxToReplaceList = np.random.randint(cfg.nIndividual, size=nTanimotoIndividual)
+    individualIdxToReplaceList = np.random.randint(cfg.nIndividual, size=nTanimotoIndividual)
     for i,ind in enumerate(tanimotoPop):
-      idxToReplace = idxToReplaceList[i]
+      idxToReplace = individualIdxToReplaceList[i]
       pop[idxToReplace] = ind 
 
     # evolution
