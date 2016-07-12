@@ -1,4 +1,5 @@
 TODO
+> fix racall fitness, to rank directly the percentile
 > handle invalid gram's element (gp does not guarantee: [0,1)), 
 scaling? invalidate data?
 scale the gram matrix to be in (0,1]
