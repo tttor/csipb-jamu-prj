@@ -24,8 +24,10 @@ nHOF = nIndividual
 recallFitnessOnlyIfIndependent = False
 # convergenceThreshold = -0.1
 
-### KendallTauTest Config
+### fitness recall config
 nRefPerClassInPercentage = 20
 nTopInPercentage = 20
+
+### KendallTauTest Config
 maxKendallTauTestTrial = 3
 pValueAcceptance = 0.05
