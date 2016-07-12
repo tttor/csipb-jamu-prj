@@ -1,4 +1,5 @@
 import os
+import time
 import numpy as np
 from collections import defaultdict
 from scoop import futures as fu
@@ -16,7 +17,7 @@ def saveGenLog(xprmtDir,gen,population,subfitnesses,hof):
     genDir = xprmtDir + "/gen-"+str(gen)
     os.makedirs(genDir)
 
-    np.savetxt(genDir + "/individual.csv", [f for f in population], fmt='%s')
+    np.savetxt(genDir + "/individual.csv", [str(f) for f in population], fmt='%s')
     np.savetxt(genDir + "/fitness.csv", [f.fitness.values for f in population], fmt='%s')
     np.savetxt(genDir + "/fitnessRecall.csv", [f['recallFitness'] for f in subfitnesses], fmt='%s')
     np.savetxt(genDir + "/fitnessInRange.csv", [f['inRangeFitness'] for f in subfitnesses], fmt='%s')
@@ -93,73 +94,82 @@ def getMedianRecallDict(individualStr, data, dataDict, refAndRemIdxDict):
     return medianRecallDict
 
 def getRecallRankDict(pop, data, dataDict):
-    # Get refERENCE and remAINING idx
-    refAndRemIdxDict = defaultdict(tuple)
-    for classIdx,classData in dataDict.iteritems():
-        nSample = len(classData)
-        nRef = int( cfg.nRefPerClassInPercentage/100.0 * nSample )
-        refIdxList = np.random.randint(0,nSample, size=nRef)
-        remIdxList = [idx for idx in range(nSample) if idx not in refIdxList]
-
-        refAndRemIdxDict[classIdx] = (refIdxList,remIdxList)
-
     # List unique individual
     popStr = list(set( [expandFuncStr( str(i) ) for i in pop] ))
     nUniqueIndividual = len(popStr); assert nUniqueIndividual!=0
-
-    # Get Recall Matrix along with some other fitness
-    medianRecallDicts = list( fu.map( getMedianRecallDict, popStr,
-                                      [data]*nUniqueIndividual,
-                                      [dataDict]*nUniqueIndividual,
-                                      [refAndRemIdxDict]*nUniqueIndividual ) )
-
-    # Get median recall Ranking Matrix and recallFitness (agnostic to iid)
     nClass = len(dataDict)
-    medianRecallRankMat = np.zeros( (nUniqueIndividual, nClass) )
-    for classIdx in range(nClass):
-        medianRecall = [] # from all individuals of this classIdx
-        for medianRecallDict in medianRecallDicts:
-            assert classIdx in medianRecallDict
-            medianRecall.append( medianRecallDict[classIdx] )
-        assert len(medianRecall)==nUniqueIndividual
-
-        sortedMedianRecallIdx = sorted( range(nUniqueIndividual), 
-                                        key=lambda k: medianRecall[k],reverse=True ) # descending
-
-        individualRanks = [] # in this classIdx
-        for individualIdx in range(nUniqueIndividual):
-            rank = sortedMedianRecallIdx.index(individualIdx)
-            individualRanks.append(rank)
-
-        percentileIndividualRanks = []
-        for rank in individualRanks:
-            percentile = stats.percentileofscore(individualRanks, rank)
-            percentileIndividualRanks.append(percentile)
-
-        medianRecallRankMat[:,classIdx] = percentileIndividualRanks
-
-    # Test i.i.d (independent and identically distributed)
-    # with H0 = two rank lists are independent
-    # Thus id p-value is less than a threshold then we accept H0
-    # If H0 is accepted, then we can average the rank
-    pValueList = []
-    for i in range(nClass-1):
-        for j in range(i+1,nClass):
-            x1 = medianRecallRankMat[:, i]
-            x2 = medianRecallRankMat[:, j]
-
-            tau, pval = stats.kendalltau(x1, x2)
-            pValueList.append(pval)
 
     independent = False
-    if np.average(pValueList) <= cfg.pValueAcceptance:
-        independent = True
+    recallRankMat = None
+    for trial in range(cfg.maxKendallTauTestTrial):
+        # Get refERENCE and remAINING idx
+        refAndRemIdxDict = defaultdict(tuple)
+        for classIdx,classData in dataDict.iteritems():
+            nSample = len(classData)
+            nRef = int( cfg.nRefPerClassInPercentage/100.0 * nSample )
+            refIdxList = np.random.randint(0,nSample, size=nRef)
+            remIdxList = [idx for idx in range(nSample) if idx not in refIdxList]
+
+            refAndRemIdxDict[classIdx] = (refIdxList,remIdxList)
+
+        # Get Recall Matrix along with some other fitness
+        medianRecallDicts = list( fu.map( getMedianRecallDict, popStr,
+                                          [data]*nUniqueIndividual,
+                                          [dataDict]*nUniqueIndividual,
+                                          [refAndRemIdxDict]*nUniqueIndividual ) )
+
+        # Get median recall Ranking Matrix and recallFitness (agnostic to iid)
+        recallRankMat = np.zeros( (nUniqueIndividual, nClass) )
+        for classIdx in range(nClass):
+            medianRecall = [] # from all individuals of this classIdx
+            for medianRecallDict in medianRecallDicts:
+                medianRecall.append( medianRecallDict[classIdx] )
+            assert len(medianRecall)==nUniqueIndividual
+
+            sortedMedianRecallIdx = sorted( range(nUniqueIndividual), 
+                                            key=lambda k: medianRecall[k],reverse=True ) # descending
+
+            individualRanks = [] # in this classIdx
+            for individualIdx in range(nUniqueIndividual):
+                rank = sortedMedianRecallIdx.index(individualIdx)
+                individualRanks.append(rank)
+
+            recallRankMat[:,classIdx] = individualRanks
+
+        # Test i.i.d (independent and identically distributed)
+        # with H0 = two rank lists are independent
+        # Thus id p-value is less than a threshold then we accept H0
+        # If H0 is accepted, then we can average the rank
+        pValueList = []
+        for i in range(nClass-1):
+            for j in range(i+1,nClass):
+                x1 = recallRankMat[:, i]
+                x2 = recallRankMat[:, j]
+
+                tau, pval = stats.kendalltau(x1, x2)
+                pValueList.append(pval)
+
+        if np.average(pValueList) <= cfg.pValueAcceptance:
+            independent = True
+            break
+
+    if not(independent):
+        timeStr = time.strftime("%Y%m%d-%H%M%S")
+        with open(cfg.xprmtDir+"/warn_not_independent_occurred_at_"+timeStr, "wb") as f:
+            f.write( 'warn_not_independent_occurred_at_'+timeStr )
 
     #
+    percentileRecallRankMat = np.zeros(recallRankMat.shape)
+    for classIdx in range(nClass):
+        for individualIdx in range(nUniqueIndividual):
+            rank = recallRankMat[individualIdx,classIdx]
+            percentile = stats.percentileofscore(recallRankMat[:,classIdx],rank) #TODO optimize!
+            percentileRecallRankMat[individualIdx,classIdx] = percentile
+
     recallRankDict = defaultdict(tuple)
     for individualIdx, individual in enumerate(popStr):
-        recallFitness = list( medianRecallRankMat[individualIdx,:] )# of all classes
-        recallRankDict[individual] = (recallFitness,independent)
+        recallRankDict[individual] = (list( percentileRecallRankMat[individualIdx,:] ),# of all classes
+                                      independent)
 
     return recallRankDict
     
@@ -169,11 +179,8 @@ def getSimScore(x1,x2,funcStr):
 
     return eval(funcStr)
 
-def inRange(simScore):
-    return (simScore>0.0 and simScore<=1.0)
-
 def computeGram(X1, X2, funcStr):
-    print 'computeGram with ', funcStr
+    # print 'computeGram with ', funcStr
     shape = (len(X1),len(X2))
     gram = np.zeros(shape)
 
@@ -186,6 +193,43 @@ def computeGram(X1, X2, funcStr):
             gram[i][j] = simScore
 
     return gram
+
+def protectedDiv(left, right):
+    with np.errstate(divide='ignore',invalid='ignore'):
+        x = np.divide(left, right)
+        if isinstance(x, np.ndarray):
+            x[np.isinf(x)] = 1
+            x[np.isnan(x)] = 1
+        elif np.isinf(x) or np.isnan(x):
+            x = 1
+    return x
+
+def pow(x):
+    return np.power(x, 2)
+
+def powhalf(x):
+    return np.power(x, 0.5)
+
+def getFeatureA(s1,s2):
+    return np.inner(s1, s2)
+
+def getFeatureB(s1,s2):
+    return np.inner(s1, 1-s2)
+
+def getFeatureC(s1,s2):
+    return np.inner(1-s1, s2)
+
+def getFeatureD(s1,s2):
+    return np.inner(1-s1, 1-s2)
+
+def isConverged(pop):
+    maxFitnessVal = np.max([ind.fitness.values[0] for ind in pop])
+    
+    converged = False
+    if maxFitnessVal > cfg.convergenceThreshold:
+        converged = True
+
+    return converged
 
 def expandFuncStr(istr):
     expansionDict = {'add': 'np.add', 'sub': 'np.subtract', 'mul': 'np.multiply',
@@ -279,40 +323,3 @@ def tanimoto(pset, min_, max_, type_=None):
 #     expr.append(lsTerm[2])
 
 #     return expr
-
-def protectedDiv(left, right):
-    with np.errstate(divide='ignore',invalid='ignore'):
-        x = np.divide(left, right)
-        if isinstance(x, np.ndarray):
-            x[np.isinf(x)] = 1
-            x[np.isnan(x)] = 1
-        elif np.isinf(x) or np.isnan(x):
-            x = 1
-    return x
-
-def pow(x):
-    return np.power(x, 2)
-
-def powhalf(x):
-    return np.power(x, 0.5)
-
-def getFeatureA(s1,s2):
-    return np.inner(s1, s2)
-
-def getFeatureB(s1,s2):
-    return np.inner(s1, 1-s2)
-
-def getFeatureC(s1,s2):
-    return np.inner(1-s1, s2)
-
-def getFeatureD(s1,s2):
-    return np.inner(1-s1, 1-s2)
-
-def isConverged(pop):
-    maxFitnessVal = np.max([ind.fitness.values[0] for ind in pop])
-    
-    converged = False
-    if maxFitnessVal > cfg.convergenceThreshold:
-        converged = True
-
-    return converged

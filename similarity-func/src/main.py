@@ -121,9 +121,17 @@ toolbox.register("mutate", deapGP.mutUniform,
                             pset=primitiveSet)
 toolbox.decorate("mutate", deapGP.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
-toolbox.register("exprTanimoto", util.tanimoto, pset=primitiveSet, min_=cfg.treeMinDepth, max_=cfg.treeMaxDepth)
-toolbox.register("indTanimoto", deapTools.initIterate, deapCreator.Individual, toolbox.exprTanimoto)
-toolbox.register("popTanimoto", deapTools.initRepeat, list, toolbox.indTanimoto)
+toolbox.register("exprTanimoto", util.tanimoto, 
+                                 pset=primitiveSet, 
+                                min_=cfg.treeMinDepth, max_=cfg.treeMaxDepth)
+
+toolbox.register("individualTanimoto", deapTools.initIterate, 
+                                       deapCreator.Individual, 
+                                       toolbox.exprTanimoto)
+
+toolbox.register("populationTanimoto", deapTools.initRepeat, 
+                                       list, 
+                                       toolbox.individualTanimoto)
 
 def main():
     xprmtDir = cfg.xprmtDir+"/"+"xprmt-"+cfg.xprmtTag+"."+time.strftime("%Y%m%d-%H%M%S")
@@ -143,8 +151,17 @@ def main():
     mstats.register("avg", np.mean); mstats.register("std", np.std)
     mstats.register("min", np.min); mstats.register("max", np.max)
 
+    # Init
     pop = toolbox.population(n=cfg.nIndividual)
-    hof = deapTools.HallOfFame(cfg.nHOF,similar=util.equalIndividual) # from all generation of the whole evolution
+    hof = deapTools.HallOfFame(cfg.nHOF,similar=util.equalIndividual) # from all generations over the whole evolution
+
+    nTanimotoIndividual = int(cfg.nTanimotoIndividualInPercentage/100.0*cfg.nIndividual)
+    tanimotoPop = toolbox.populationTanimoto(n=nTanimotoIndividual)
+
+    individualIdxToReplaceList = np.random.randint(cfg.nIndividual, size=nTanimotoIndividual)
+    for i,ind in enumerate(tanimotoPop):
+      idxToReplace = individualIdxToReplaceList[i]
+      pop[idxToReplace] = ind 
 
     # evolution
     print 'Evolution begins ...'

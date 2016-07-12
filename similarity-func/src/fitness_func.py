@@ -27,16 +27,13 @@ def compute(individual, data, recallPercentileRankDict, simScoreMatDict):
 
 def getRecallFitness(individualStr,recallPercentileRankDict):
     percentileRankList,independent = recallPercentileRankDict[individualStr]
-    percentileRank = np.average(percentileRankList)
+    maxPercentileRank = 100.0
 
-    maxPercentile = 100.0
-    fitness = maxPercentile - percentileRank # normalized so that 100.0 is the best
-
-    if not(independent):
-        timeStr = time.strftime("%Y%m%d-%H%M%S")
-        with open(cfg.xprmtDir+"/warn_not_independent_occurred_at_"+timeStr, "wb") as f:
-            f.write( 'warn_not_independent_occurred_at_'+timeStr )
-
+    percentileRank = maxPercentileRank
+    if independent or not(cfg.recallFitnessOnlyIfIndependent):
+        percentileRank = np.average(percentileRankList)
+    
+    fitness = maxPercentileRank - percentileRank # normalized so that 100.0 is the best
     return fitness # in percentile
 
 def getInRangeFitness(simScoreMat):
