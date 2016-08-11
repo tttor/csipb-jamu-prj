@@ -1,12 +1,28 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-N = 9
+targetDir = '/home/banua/xprmt/xprmt-icacsis16/accuracy'
+
+data = np.loadtxt(targetDir+'/matrixAccuracy.csv', delimiter='\t')
+
+print data
+
+N = data.shape[0]
+
+stddev = [np.std(data[i, :]) for i in range(N)]
+data = [np.average(data[i, :]) for i in range(N)]
+
 ind = np.arange(N)  # the x locations for the groups
+
 width = 3     # the width of the bars
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
+
+for i in data:
+
+
+assert False
 
 Tanimoto = [0.39,0.36,0.32,0.35,0.33]
 rects1 = ax.bar([1, 11, 21, 31,41], Tanimoto, width, color='w')
