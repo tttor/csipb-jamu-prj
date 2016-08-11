@@ -3,7 +3,7 @@ seed = 0
 testSize = 0.25
 datasetName = 'stahl-maccs'
 nTanimotoIndividualInPercentage = 0
-xprmtDir = '/home/tor/robotics/prj/csipb-jamu-prj/xprmt/similarity-func'
+xprmtDir = '/home/banua/xprmt/xprmt-icacsis16/0002'
 
 datasetDir = '../data'
 datasetPath = datasetDir+'/'+datasetName+'/'+datasetName+'.csv'

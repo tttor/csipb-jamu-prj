@@ -1,1 +1,4 @@
 *.pyc
+old.*
+*.csv
+.vscode/
