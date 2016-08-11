@@ -1,11 +1,8 @@
 TODO
-> fix racall fitness, to rank directly the percentile
 > handle invalid gram's element (gp does not guarantee: [0,1)), 
 scaling? invalidate data?
 scale the gram matrix to be in (0,1]
-> for zoo
-run 100 runs with 100 genMax with 100 individuals
-> preprocess/reduce dataset jamu
+
 > set convergence threshold
 > try another evo algorithm, besides easimple()
 > precompute a,b,c,d, for further speed-up?
@@ -34,3 +31,7 @@ remove element in dict, use del
 --> what if rankRecall is not independent?
 percetileRank should be after independent test
 recallFitness is set to min
+--> for zoo
+run 100 runs with 100 genMax with 100 individuals
+--> preprocess/reduce dataset jamu
+--> fix racall fitness, to rank directly the percentile, (canceled)
