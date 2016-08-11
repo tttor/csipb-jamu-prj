@@ -1,4 +1,4 @@
 *.pyc
-*.old.py
+old.*
 *.csv
 .vscode/
