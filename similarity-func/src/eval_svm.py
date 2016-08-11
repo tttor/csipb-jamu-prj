@@ -4,18 +4,41 @@ import json
 import yaml
 import numpy as np
 from collections import defaultdict
+from scoop import futures as fu
 
 from sklearn import svm
 from sklearn.metrics import accuracy_score
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import precision_recall_fscore_support
+from sklearn.preprocessing import RobustScaler
 
 import util
 import config as cfg
 
+def tuneTrainTest(f, X_train, y_train, X_test, y_test):
+    print 'Evaluating ', f
+
+    # tune
+    clf = svm.SVC(kernel='precomputed')
+    
+    # train
+    gram_train = util.computeGram(X_train, X_train, f)
+    clf.fit(gram_train, y_train)
+
+    # test
+    gram_test = util.computeGram(X_test, X_train, f)
+    y_pred = clf.predict(gram_test)
+    # np.savetxt(xprmtDir+"/data/y_pred_"+f+".csv", y_pred, delimiter=",")
+
+    acc = accuracy_score(y_test, y_pred)
+    precision, recall, fscore, support = precision_recall_fscore_support(y_test, y_pred,
+                                                                         average='micro')
+    return (acc, precision, recall, fscore, support)
+
 def main(argv):
     assert len(argv)==3
-    xprmtDir = cfg.xprmtDir+'/'+argv[1]; assert os.path.isdir(xprmtDir)
+    xprmtDir = cfg.xprmtDir+'/'+argv[1]; print xprmtDir; assert os.path.isdir(xprmtDir)
+
     nTop = int(argv[2])
     metrics = defaultdict(list)
 
@@ -46,28 +69,16 @@ def main(argv):
     funcStrList = [s.rstrip() for s in funcStrList]
     funcStrList = [util.expandFuncStr(s) for s in funcStrList]
     metrics['funcStr'] = funcStrList
-    
-    for f in funcStrList:
-        print 'Evaluating ', f
-        # tune
-        clf = svm.SVC(kernel='precomputed')
 
-        # train
-        gram_train = util.computeGram(X_train, X_train, f)
-        clf.fit(gram_train, y_train)
+    nIndividual = len(funcStrList)
+    perfList = fu.map (tuneTrainTest,funcStrList, [X_train]*nIndividual, [y_train]*nIndividual, [X_test]*nIndividual, [y_test]*nIndividual)
 
-        # test
-        gram_test = util.computeGram(X_test, X_train, f)
-        y_pred = clf.predict(gram_test)
-        np.savetxt(xprmtDir+"/data/y_pred_"+f+".csv", y_pred, delimiter=",")
-
-        metrics['accuracy'].append( accuracy_score(y_test, y_pred) )
-        precision, recall, fscore, support = precision_recall_fscore_support(y_test, y_pred, 
-                                                                             average='micro')
-        metrics['precision'].append(precision)
-        metrics['recall'].append(recall)
-        metrics['fscore'].append(fscore)
-        metrics['support'].append(support)
+    for p in perfList:
+        metrics['accuracy'].append( p[0])
+        metrics['precision'].append(p[1])
+        metrics['recall'].append(p[2])
+        metrics['fscore'].append([3])
+        metrics['support'].append([4])
 
     with open(xprmtDir+"/data/perf_metrics.json", 'wb') as f:
         json.dump(metrics, f, indent=2, sort_keys=True)
