@@ -1,16 +1,18 @@
 ### Experiment/Logging Config
 seed = 0
 testSize = 0.25
-datasetName = 'stahl-maccs'
-nTanimotoIndividualInPercentage = 0
-xprmtDir = '/home/banua/xprmt/xprmt-icacsis16/0002'
 
+datasetName = 'jamu'
+nMaxSampleEachClass = 100
+
+xprmtDir = '/home/tor/robotics/prj/csipb-jamu-prj/xprmt/similarity-func'
 datasetDir = '../data'
 datasetPath = datasetDir+'/'+datasetName+'/'+datasetName+'.csv'
 xprmtTag = datasetName
 
 ### DEAP GP Config
 nIndividual = 100
+nTanimotoIndividualInPercentage = 0
 nMaxGen = 100 # not including the initial generation
 pMut = 0.3
 pCx = 0.5

@@ -39,9 +39,40 @@ param['seed'] = seed
 
 #### set D_tr 
 rawData = np.loadtxt(cfg.datasetPath, delimiter=',')
-y = rawData[:, 0] # the first column is the class label!
-X = rawData[:, 1:]
+yRaw = rawData[:, 0] # the first column is the class label!
+XRaw = rawData[:, 1:]
 
+rawDataIdxDict = defaultdict(list)
+for i in range(rawData.shape[0]):
+    rawDataIdxDict[ yRaw[i] ].append(i)
+
+chosenIdxDict = defaultdict(list)
+nChosenSample = 0
+for classIdx,idxList in rawDataIdxDict.iteritems():
+    chosenIdxList = [i for i in idxList]
+    nSample = len(idxList)
+
+    if nSample > cfg.nMaxSampleEachClass:
+        del chosenIdxList[:]
+        chosenIdxIdxList = list(np.random.randint(nSample, size=cfg.nMaxSampleEachClass))
+        for i in chosenIdxIdxList:
+            chosenIdxList.append( idxList[i] )
+
+    chosenIdxDict[classIdx] = chosenIdxList
+    nChosenSample += len(chosenIdxList)
+
+y = np.empty( (nChosenSample,1) )
+X = np.empty( (nChosenSample,XRaw.shape[1]) )
+
+fillingIdx = 0
+for classIdx, chosenIdxList in chosenIdxDict.iteritems():
+    for i in chosenIdxList:
+        y[fillingIdx,:] = yRaw[i]
+        X[fillingIdx,:] = XRaw[i]
+        fillingIdx += 1
+assert (y.shape[0]==X.shape[0]==nChosenSample)
+
+# Split test, train
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=cfg.testSize, 
                                                     random_state=random.randint(0,100000), stratify=y)
 y_train = y_train.reshape( (y_train.shape[0],1) )
