@@ -5,7 +5,7 @@ testSize = 0.25
 datasetName = 'jamu'
 nMaxSampleEachClass = 100
 
-xprmtDir = '/home/tor/robotics/prj/csipb-jamu-prj/xprmt/similarity-func'
+xprmtDir = '/home/banua/xprmt'
 datasetDir = '../data'
 datasetPath = datasetDir+'/'+datasetName+'/'+datasetName+'.csv'
 xprmtTag = datasetName

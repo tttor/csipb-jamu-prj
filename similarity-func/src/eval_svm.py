@@ -10,23 +10,33 @@ from sklearn import svm
 from sklearn.metrics import accuracy_score
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import precision_recall_fscore_support
-from sklearn.preprocessing import RobustScaler
+from sklearn.preprocessing import minmax_scale
 
 import util
 import config as cfg
+
+def scale(x):
+    m, n = x.shape
+    x = np.reshape(x, (m*n, 1))
+    x = minmax_scale(x, feature_range=(0, 1), axis=0)
+    data = np.reshape(x, (m, n))
+
+    return data
 
 def tuneTrainTest(f, X_train, y_train, X_test, y_test):
     print 'Evaluating ', f
 
     # tune
     clf = svm.SVC(kernel='precomputed')
-    
+
     # train
     gram_train = util.computeGram(X_train, X_train, f)
+    # gram_train = scale(gram_train)
     clf.fit(gram_train, y_train)
 
     # test
     gram_test = util.computeGram(X_test, X_train, f)
+    # gram_test = scale(gram_test)
     y_pred = clf.predict(gram_test)
     # np.savetxt(xprmtDir+"/data/y_pred_"+f+".csv", y_pred, delimiter=",")
 
