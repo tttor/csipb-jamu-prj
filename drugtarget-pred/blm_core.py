@@ -11,12 +11,16 @@ class BLM:
     dataX = []
     dataY = []
     nData = 0
+    proteinKernel = None
+    proteinKernelMeta = None
+    drugKernel = None
+    drugKernelMeta = None
 
-    def __init__(self, fpath):
-        self._load(fpath)
+    def __init__(self, fpath, drugKernelFpath, proteinKernelFpath):
+        self._loadBinding(fpath)
+        self._loadKernel(drugKernelFpath, proteinKernelFpath)
 
     def eval(self):
-        print('hello world')
         # kf = KFold(self.nData, n_folds=self.nData) #equivalent to the Leave One Out strategy
         kf = KFold(self.nData, n_folds=10) 
 
@@ -49,7 +53,7 @@ class BLM:
 
         return (DtrProteinX, DtrProteinY)
 
-    def _load(self, fpath):
+    def _loadBinding(self, fpath):
         content = []
         with open(fpath) as f:
             content = f.readlines()
@@ -76,3 +80,29 @@ class BLM:
 
         assert(len(self.dataX)==len(self.dataY))
         self.nData = len(self.dataX)
+
+    def _loadKernel(self, drugKernelFpath, proteinKernelFpath):
+        self.proteinKernelMeta, self.proteinKernel = self._readKernelFile(proteinKernelFpath)
+        self.drugKernelMeta, self.drugKernel = self._readKernelFile(drugKernelFpath)
+        
+    def _readKernelFile(self, fpath):
+        with open(fpath) as f:
+            content = f.readlines()
+
+        kernelMeta = []
+        kernel = None
+        for idx,c in enumerate(content):
+            if idx==0:
+                kernelMeta = [i.strip() for i in c.split()]
+                n = len(kernelMeta)
+                kernel = np.zeros((n,n),dtype=float)
+            else:
+                valStr = [i.strip() for i in c.split()]
+                assert(valStr[0]==kernelMeta[idx-1])
+                del valStr[0]
+                i = idx - 1
+                for j,v in enumerate(valStr):
+                    kernel[i][j] = float(v)
+
+        return (kernelMeta, kernel)
+
