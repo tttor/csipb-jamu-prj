@@ -31,10 +31,10 @@ class BLM:
 
             print( len(DtrProteinX) )
             print( len(DtrProteinY) )
-            # clfOfProtein = svm.SVC() 
-            # clfOfProtein.fit(DtrProteinX,DtrProteinY)
+            # clfOfProtein = svm.SVC(kernel='precomputed') 
+            # clfOfProtein.fit(gramTr,DtrProteinY)
 
-            # DpredProteinY = clfOfProtein.predict(DtestProteinX)
+            # DpredProteinY = clfOfProtein.predict(gramTest)
             break
 
     def _makeDtrOfProtein(self, DtestX, DtrX, DtrY):
@@ -47,7 +47,7 @@ class BLM:
                 DtrProteinX.append(d)
                 DtrProteinY.append( DtrY[idx] )
 
-        return (DtrX, DtrY)
+        return (DtrProteinX, DtrProteinY)
 
     def _load(self, fpath):
         content = []

@@ -4,7 +4,7 @@ import time
 from blm_core import BLM
 
 def main():
-    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/yamanishi/ground-truth/bind_orfhsa_drug_e.txt'
+    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/yamanishi/ground-truth/bind_orfhsa_drug_nr.txt'
     blm = BLM(fpath)
     blm.eval()
 
