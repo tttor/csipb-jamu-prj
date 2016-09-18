@@ -10,15 +10,14 @@ from sklearn.cross_validation import StratifiedKFold
 from sklearn import svm
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import average_precision_score
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import precision_score
 
 class BLM:
-    dataX = []
-    dataY = []
-    nData = 0
-    proteinSimMat = None
-    proteinSimMatMeta = None
-    drugSimMat = None
-    drugSimMatMeta = None
+    dataX = []; dataY = []; nData = 0
+    proteinSimMat = None; proteinSimMatMeta = None
+    drugSimMat = None; drugSimMatMeta = None
 
     def __init__(self, fpath, drugSimMatFpath, proteinSimMatFpath):
         self._loadBinding(fpath)
@@ -32,44 +31,70 @@ class BLM:
         for idx, kf in enumerate(kfList):
             trIdxList, testIdxList = kf
 
-            DtestX = [self.dataX[i] for i in testIdxList]
-            DtestY = [self.dataY[i] for i in testIdxList]
+            xTest = [self.dataX[i] for i in testIdxList]
+            yTest = [self.dataY[i] for i in testIdxList]
 
-            DtrX = [self.dataX[i] for i in trIdxList]
-            DtrY = [self.dataY[i] for i in trIdxList]
+            xTr = [self.dataX[i] for i in trIdxList]
+            yTr = [self.dataY[i] for i in trIdxList]
 
             #
-            DtrOfProteinSetX,DtrOfProteinSetY = self._makeDtrOfProteinSet(DtestX,DtrX,DtrY)
-            DtrOfProteinSetX = [i[1] for i in DtrOfProteinSetX]
-            DtestX = [i[1] for i in DtestX]
-            
+            yPredOfProteinSet = self._predict('usingProteinSet', xTest, xTr, yTr)
+            yPredOfDrugSet = self._predict('usingDrugSet', xTest, xTr, yTr)
+            assert(len(yPredOfDrugSet)==len(yPredOfProteinSet))
+
             #
-            gramTr = self._makeGram(DtrOfProteinSetX, DtrOfProteinSetX, self.proteinSimMat, self.proteinSimMatMeta)
-            gramTest = self._makeGram(DtestX,DtrOfProteinSetX, self.proteinSimMat, self.proteinSimMatMeta)
+            yPred = []
+            for i in range(len(yPredOfDrugSet)):
+                yPred.append( max(yPredOfDrugSet[i],yPredOfProteinSet[i]) )
 
-            clfOfProteinSet = svm.SVC(kernel='precomputed')
-            clfOfProteinSet.fit(gramTr,DtrOfProteinSetY)
+            #
+            self._computePrecisionRecall(yTest, yPred, outDir+'/pr_curve_fold_'+str(idx+1)+'.png')
+            # accuracy = accuracy_score(yTest, yPred)
+            # precision = precision_score(yTest, yPred)
+            # recall = recall_score(yTest, yPred)
             
-            DpredYOfProteinSet = clfOfProteinSet.predict(gramTest)
-            assert(len(DpredYOfProteinSet)==len(DtestY))
-
-            self._computePrecisionRecall(DtestY, DpredYOfProteinSet, outDir+'/pr_curve_fold_'+str(idx+1)+'.png')
             # break
 
-    def _makeDtrOfProteinSet(self, DtestX, DtrX, DtrY):
-        DtrOfProteinSetX = []
-        DtrOfProteinSetY = []
+    def _predict(self, type, xTest, xTr, yTr):
+        # get _local_ (w.r.t. testData) training data
+        xTrLocal = []
+        yTrLocal = []
 
-        testDrugList = [d[0] for d in DtestX]
-        testDrugList = list(set(testDrugList))
+        simMat = None
+        simMatMeta = None
+        
+        refIdx = None
+        if type=='usingDrugSet':
+            refIdx = 1 # ref is protein in xTest
+            simMat = self.drugSimMat
+            simMatMeta = self.drugSimMatMeta
+        elif type=='usingProteinSet':
+            refIdx = 0 # ref is drug in xTest
+            simMat = self.proteinSimMat
+            simMatMeta = self.proteinSimMatMeta
+        else:
+            assert(False)
 
-        # enforce local training data
-        for idx,d in enumerate(DtrX):
-            if (d[0] in testDrugList):
-                DtrOfProteinSetX.append(d)
-                DtrOfProteinSetY.append( DtrY[idx] )
+        refList = [d[refIdx] for d in xTest] 
+        for idx,d in enumerate(xTr):
+            if (d[refIdx] in refList):
+                xTrLocal.append(d)
+                yTrLocal.append( yTr[idx] )
 
-        return (DtrOfProteinSetX, DtrOfProteinSetY)
+        # Use only either drug or protein of X
+        xTrLocal = [i[int(not refIdx)] for i in xTrLocal]
+        xTestLocal = [i[int(not refIdx)] for i in xTest]
+
+        #
+        gramTr = self._makeGram(xTrLocal, xTrLocal, simMat, simMatMeta)
+        gramTest = self._makeGram(xTestLocal,xTrLocal, simMat, simMatMeta)
+
+        #
+        clf = svm.SVC(kernel='precomputed')
+        clf.fit(gramTr,yTrLocal)
+
+        yPred = clf.predict(gramTest)
+        return yPred
 
     def _loadBinding(self, fpath):
         content = []
@@ -136,7 +161,7 @@ class BLM:
                 ii = meta.index(x1)
                 jj = meta.index(x2)
                 
-                gram[i][j] = self.proteinSimMat[ii][jj]
+                gram[i][j] = simMat[ii][jj]
 
         return gram
 
@@ -152,4 +177,4 @@ class BLM:
         plt.xlim([0.0, 1.0])
         plt.title('Precision-Recall example: AUC={0:0.2f}'.format(averagePrecision))
         plt.legend(loc="lower left")
-        plt.savefig(curveFpath)
+        plt.savefig(curveFpath, bbox_inches='tight')
