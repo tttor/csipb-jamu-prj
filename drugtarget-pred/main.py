@@ -9,7 +9,7 @@ def main():
     drugKernelFpath = '/home/tor/jamu/dataset/yamanishi/similarity-mat/compound/nr_simmat_dc.txt'
 
     blm = BLM(fpath, drugKernelFpath, proteinKernelFpath)
-    # blm.eval()
+    blm.eval()
 
 if __name__ == '__main__':
     start_time = time.time()
