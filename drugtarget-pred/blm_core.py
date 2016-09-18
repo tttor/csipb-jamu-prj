@@ -55,7 +55,7 @@ class BLM:
             # precision = precision_score(yTest, yPred)
             # recall = recall_score(yTest, yPred)
             
-            break
+            # break
 
     def _predict(self, type, xTest, xTr, yTr):
         # get _local_ (w.r.t. testData) training data
@@ -164,6 +164,7 @@ class BLM:
                 jj = meta.index(x2)
                 
                 gram[i][j] = simMat[ii][jj]
+                assert(gram[i][j] >= 0)
 
         return gram
 
