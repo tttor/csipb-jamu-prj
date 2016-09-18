@@ -9,6 +9,7 @@ from sklearn.cross_validation import KFold
 from sklearn.cross_validation import StratifiedKFold
 from sklearn import svm
 from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import recall_score
@@ -49,11 +50,12 @@ class BLM:
 
             #
             self._computePrecisionRecall(yTest, yPred, outDir+'/pr_curve_fold_'+str(idx+1)+'.png')
+            self._computeROC(yTest, yPred, outDir+'/roc_curve_fold_'+str(idx+1)+'.png')
             # accuracy = accuracy_score(yTest, yPred)
             # precision = precision_score(yTest, yPred)
             # recall = recall_score(yTest, yPred)
             
-            # break
+            break
 
     def _predict(self, type, xTest, xTr, yTr):
         # get _local_ (w.r.t. testData) training data
@@ -178,3 +180,20 @@ class BLM:
         plt.title('Precision-Recall example: AUC={0:0.2f}'.format(averagePrecision))
         plt.legend(loc="lower left")
         plt.savefig(curveFpath, bbox_inches='tight')
+
+    def _computeROC(self, yTrue, yPred, curveFpath):
+        fpr, tpr, _ = roc_curve(yTrue, yPred)
+        roc_auc = auc(fpr, tpr)
+
+        plt.figure()
+        plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
+        plt.plot([0, 1], [0, 1], 'k--')
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('Receiver operating characteristic example')
+        plt.legend(loc="lower right")
+        plt.savefig(curveFpath, bbox_inches='tight')
+
+
