@@ -5,6 +5,7 @@ BLM Framework by Yamanishi and Beakley
 import numpy as np
 from collections import defaultdict
 from sklearn.cross_validation import KFold
+from sklearn.cross_validation import StratifiedKFold
 from sklearn import svm
 
 class BLM:
@@ -22,7 +23,8 @@ class BLM:
 
     def eval(self):
         # kf = KFold(self.nData, n_folds=self.nData) #equivalent to the Leave One Out strategy
-        kf = KFold(self.nData, n_folds=10) 
+        # kf = KFold(self.nData, n_folds=10, shuffle=True) 
+        kf = StratifiedKFold(self.dataY, n_folds=10, shuffle=True)
 
         for trIdxList, testIdxList in kf:
             DtestX = [self.dataX[i] for i in testIdxList]
@@ -31,35 +33,21 @@ class BLM:
             DtrX = [self.dataX[i] for i in trIdxList]
             DtrY = [self.dataY[i] for i in trIdxList]
 
-            print(len(DtestX))
-            print(len(DtrX))
-
-            print(len(self.proteinSimMatMeta))
-
             #
-            DtrOfProteinSetX,DtrOfProteinSetY = self._makeDtrOfProtein(DtestX,DtrX,DtrY)
-
-            print('len(DtrOfProteinSetX= %s' %len(DtrOfProteinSetX))
-
-
+            DtrOfProteinSetX,DtrOfProteinSetY = self._makeDtrOfProteinSet(DtestX,DtrX,DtrY)
             DtrOfProteinSetX = [i[1] for i in DtrOfProteinSetX]
             DtestX = [i[1] for i in DtestX]
+            
             #
-
             gramTr = self._makeGram(DtrOfProteinSetX, DtrOfProteinSetX, self.proteinSimMat, self.proteinSimMatMeta)
             gramTest = self._makeGram(DtestX,DtrOfProteinSetX, self.proteinSimMat, self.proteinSimMatMeta)
 
-            # clfOfProtein = svm.SVC(kernel='precomputed')
-            # clfOfProtein.fit(gramTr,DtrOfProteinSetY)
+            clfOfProtein = svm.SVC(kernel='precomputed')
+            clfOfProtein.fit(gramTr,DtrOfProteinSetY)
             
+            DpredProteinY = clfOfProtein.predict(gramTest)
 
-            # print(gramTr.shape)
-            # print(gramTest.shape)
-            # DpredProteinY = clfOfProtein.predict(gramTest)
-
-            # break
-
-    def _makeDtrOfProtein(self, DtestX, DtrX, DtrY):
+    def _makeDtrOfProteinSet(self, DtestX, DtrX, DtrY):
         DtrOfProteinSetX = []
         DtrOfProteinSetY = []
 
