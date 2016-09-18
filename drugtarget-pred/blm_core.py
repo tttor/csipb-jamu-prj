@@ -14,6 +14,8 @@ from sklearn.metrics import average_precision_score
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import precision_score
+from scipy import interp
+from scoop import futures as fu
 
 class BLM:
     dataX = []; dataY = []; nData = 0
@@ -28,6 +30,12 @@ class BLM:
         # kfList = KFold(self.nData, n_folds=self.nData) #equivalent to the Leave One Out strategy
         # kfList = KFold(self.nData, n_folds=10, shuffle=True) 
         kfList = StratifiedKFold(self.dataY, n_folds=10, shuffle=True)
+
+        meanTpr = 0.0
+        meanFpr = np.linspace(0, 1, 100)
+        meanPrecision = 0.0
+        meanRecall = 0.0
+        meanAUCPR = 0.0
 
         for idx, kf in enumerate(kfList):
             trIdxList, testIdxList = kf
@@ -48,14 +56,47 @@ class BLM:
             for i in range(len(yPredOfDrugSet)):
                 yPred.append( max(yPredOfDrugSet[i],yPredOfProteinSet[i]) )
 
-            #
-            self._computePrecisionRecall(yTest, yPred, outDir+'/pr_curve_fold_'+str(idx+1)+'.png')
-            self._computeROC(yTest, yPred, outDir+'/roc_curve_fold_'+str(idx+1)+'.png')
-            # accuracy = accuracy_score(yTest, yPred)
-            # precision = precision_score(yTest, yPred)
-            # recall = recall_score(yTest, yPred)
-            
-            # break
+            # Compute ROC curve and area the curve
+            fpr, tpr, _ = roc_curve(yTest, yPred)
+            meanTpr += interp(meanFpr, fpr, tpr)
+            meanTpr[0] = 0.0
+
+            precision, recall, _ = precision_recall_curve(yTest, yPred)
+            AUCPR = average_precision_score(yTest, yPred, average='micro')
+            meanPrecision += precision
+            meanRecall += recall
+            meanAUCPR += AUCPR
+
+        # ROC curve
+        meanTpr /= len(kfList)
+        meanTpr[-1] = 1.0
+        mean_auc = auc(meanFpr, meanTpr)
+
+        plt.clf()
+        plt.plot(meanFpr, meanTpr, 'k--',
+                 label='Mean ROC (area = %0.2f)' % mean_auc, lw=2)
+        plt.xlim([-0.05, 1.05])
+        plt.ylim([-0.05, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('Receiver operating characteristic')
+        plt.legend(loc="lower right")
+        plt.savefig(outDir+'/roc_curve.png', bbox_inches='tight')
+
+        #
+        meanPrecision /= len(kfList)
+        meanRecall /= len(kfList)
+        meanAUCPR /= len(kfList)
+
+        plt.clf()
+        plt.plot(meanRecall, meanPrecision, label='Precision-Recall curve')
+        plt.xlabel('Recall')
+        plt.ylabel('Precision')
+        plt.ylim([0.0, 1.05])
+        plt.xlim([0.0, 1.0])
+        plt.title('Precision-Recall: AUC={0:0.2f}'.format(meanAUCPR))
+        plt.legend(loc="lower left")
+        plt.savefig(outDir+'/pr_curve.png', bbox_inches='tight')
 
     def _predict(self, type, xTest, xTr, yTr):
         # get _local_ (w.r.t. testData) training data
@@ -167,34 +208,3 @@ class BLM:
                 assert(gram[i][j] >= 0)
 
         return gram
-
-    def _computePrecisionRecall(self, yTrue, yPred, curveFpath):
-        precision, recall, thresholds = precision_recall_curve(yTrue, yPred)
-        averagePrecision = average_precision_score(yTrue, yPred, average='micro')
-
-        plt.clf()
-        plt.plot(recall, precision, label='Precision-Recall curve')
-        plt.xlabel('Recall')
-        plt.ylabel('Precision')
-        plt.ylim([0.0, 1.05])
-        plt.xlim([0.0, 1.0])
-        plt.title('Precision-Recall example: AUC={0:0.2f}'.format(averagePrecision))
-        plt.legend(loc="lower left")
-        plt.savefig(curveFpath, bbox_inches='tight')
-
-    def _computeROC(self, yTrue, yPred, curveFpath):
-        fpr, tpr, _ = roc_curve(yTrue, yPred)
-        roc_auc = auc(fpr, tpr)
-
-        plt.figure()
-        plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
-        plt.plot([0, 1], [0, 1], 'k--')
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.05])
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title('Receiver operating characteristic example')
-        plt.legend(loc="lower right")
-        plt.savefig(curveFpath, bbox_inches='tight')
-
-
