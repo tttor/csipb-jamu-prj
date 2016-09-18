@@ -11,14 +11,14 @@ class BLM:
     dataX = []
     dataY = []
     nData = 0
-    proteinKernel = None
-    proteinKernelMeta = None
-    drugKernel = None
-    drugKernelMeta = None
+    proteinSimMat = None
+    proteinSimMatMeta = None
+    drugSimMat = None
+    drugSimMatMeta = None
 
-    def __init__(self, fpath, drugKernelFpath, proteinKernelFpath):
+    def __init__(self, fpath, drugSimMatFpath, proteinSimMatFpath):
         self._loadBinding(fpath)
-        self._loadKernel(drugKernelFpath, proteinKernelFpath)
+        self._loadSimMat(drugSimMatFpath, proteinSimMatFpath)
 
     def eval(self):
         # kf = KFold(self.nData, n_folds=self.nData) #equivalent to the Leave One Out strategy
@@ -31,27 +31,48 @@ class BLM:
             DtrX = [self.dataX[i] for i in trIdxList]
             DtrY = [self.dataY[i] for i in trIdxList]
 
-            DtrProteinX,DtrProteinY = self._makeDtrOfProtein(DtestX,DtrX,DtrY)
+            print(len(DtestX))
+            print(len(DtrX))
 
-            print( len(DtrProteinX) )
-            print( len(DtrProteinY) )
-            # clfOfProtein = svm.SVC(kernel='precomputed') 
-            # clfOfProtein.fit(gramTr,DtrProteinY)
+            print(len(self.proteinSimMatMeta))
 
+            #
+            DtrOfProteinSetX,DtrOfProteinSetY = self._makeDtrOfProtein(DtestX,DtrX,DtrY)
+
+            print('len(DtrOfProteinSetX= %s' %len(DtrOfProteinSetX))
+
+
+            DtrOfProteinSetX = [i[1] for i in DtrOfProteinSetX]
+            DtestX = [i[1] for i in DtestX]
+            #
+
+            gramTr = self._makeGram(DtrOfProteinSetX, DtrOfProteinSetX, self.proteinSimMat, self.proteinSimMatMeta)
+            gramTest = self._makeGram(DtestX,DtrOfProteinSetX, self.proteinSimMat, self.proteinSimMatMeta)
+
+            # clfOfProtein = svm.SVC(kernel='precomputed')
+            # clfOfProtein.fit(gramTr,DtrOfProteinSetY)
+            
+
+            # print(gramTr.shape)
+            # print(gramTest.shape)
             # DpredProteinY = clfOfProtein.predict(gramTest)
-            break
+
+            # break
 
     def _makeDtrOfProtein(self, DtestX, DtrX, DtrY):
-        DtrProteinX = []
-        DtrProteinY = []
-        testDrugList = [d[0] for d in DtestX]
+        DtrOfProteinSetX = []
+        DtrOfProteinSetY = []
 
+        testDrugList = [d[0] for d in DtestX]
+        testDrugList = list(set(testDrugList))
+
+        # enforce local training data
         for idx,d in enumerate(DtrX):
             if (d[0] in testDrugList):
-                DtrProteinX.append(d)
-                DtrProteinY.append( DtrY[idx] )
+                DtrOfProteinSetX.append(d)
+                DtrOfProteinSetY.append( DtrY[idx] )
 
-        return (DtrProteinX, DtrProteinY)
+        return (DtrOfProteinSetX, DtrOfProteinSetY)
 
     def _loadBinding(self, fpath):
         content = []
@@ -73,36 +94,51 @@ class BLM:
         proteinList = list(set(proteinList))
         assert(len(drugList)==len(drugProteinDict))
 
-        self.dataX = [(i,j) for i in range(len(drugList)) for j in range(len(proteinList))]
+        self.dataX = [(i,j) for i in drugList for j in proteinList]
         for x in self.dataX:
-            targetProteinList = drugProteinDict[ drugList[x[0]] ]
-            self.dataY.append(int( proteinList[x[1]] in targetProteinList ))
+            targetProteinList = drugProteinDict[ x[0] ]
+            self.dataY.append(int( x[1] in targetProteinList ))
 
         assert(len(self.dataX)==len(self.dataY))
         self.nData = len(self.dataX)
 
-    def _loadKernel(self, drugKernelFpath, proteinKernelFpath):
-        self.proteinKernelMeta, self.proteinKernel = self._readKernelFile(proteinKernelFpath)
-        self.drugKernelMeta, self.drugKernel = self._readKernelFile(drugKernelFpath)
+    def _loadSimMat(self, drugSimMatFpath, proteinSimMatFpath):
+        self.proteinSimMatMeta, self.proteinSimMat = self._readSimMat(proteinSimMatFpath)
+        self.drugSimMatMeta, self.drugSimMat = self._readSimMat(drugSimMatFpath)
         
-    def _readKernelFile(self, fpath):
+    def _readSimMat(self, fpath):
         with open(fpath) as f:
             content = f.readlines()
 
-        kernelMeta = []
-        kernel = None
+        simMatMeta = []
+        simMat = None
         for idx,c in enumerate(content):
             if idx==0:
-                kernelMeta = [i.strip() for i in c.split()]
-                n = len(kernelMeta)
-                kernel = np.zeros((n,n),dtype=float)
+                simMatMeta = [i.strip() for i in c.split()]
+                n = len(simMatMeta)
+                simMat = np.zeros((n,n),dtype=float)
             else:
                 valStr = [i.strip() for i in c.split()]
-                assert(valStr[0]==kernelMeta[idx-1])
+                assert(valStr[0]==simMatMeta[idx-1])
                 del valStr[0]
                 i = idx - 1
                 for j,v in enumerate(valStr):
-                    kernel[i][j] = float(v)
+                    simMat[i][j] = float(v)
 
-        return (kernelMeta, kernel)
+        return (simMatMeta, simMat)
 
+    def _makeGram(self, X1, X2, simMat, meta):
+        shape = (len(X1),len(X2))
+        gram = np.zeros(shape)
+
+        for i, x1 in enumerate(X1):
+            for j, x2 in enumerate(X2):
+                x1 = x1.replace(':','')
+                x2 = x2.replace(':','')
+                
+                ii = meta.index(x1)
+                jj = meta.index(x2)
+                
+                gram[i][j] = self.proteinSimMat[ii][jj]
+
+        return gram
