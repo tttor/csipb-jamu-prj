@@ -3,10 +3,13 @@ BLM Framework by Yamanishi and Beakley
 '''
 
 import numpy as np
+import matplotlib.pyplot as plt
 from collections import defaultdict
 from sklearn.cross_validation import KFold
 from sklearn.cross_validation import StratifiedKFold
 from sklearn import svm
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import average_precision_score
 
 class BLM:
     dataX = []
@@ -21,12 +24,14 @@ class BLM:
         self._loadBinding(fpath)
         self._loadSimMat(drugSimMatFpath, proteinSimMatFpath)
 
-    def eval(self):
-        # kf = KFold(self.nData, n_folds=self.nData) #equivalent to the Leave One Out strategy
-        # kf = KFold(self.nData, n_folds=10, shuffle=True) 
-        kf = StratifiedKFold(self.dataY, n_folds=10, shuffle=True)
+    def eval(self, outDir):
+        # kfList = KFold(self.nData, n_folds=self.nData) #equivalent to the Leave One Out strategy
+        # kfList = KFold(self.nData, n_folds=10, shuffle=True) 
+        kfList = StratifiedKFold(self.dataY, n_folds=10, shuffle=True)
 
-        for trIdxList, testIdxList in kf:
+        for idx, kf in enumerate(kfList):
+            trIdxList, testIdxList = kf
+
             DtestX = [self.dataX[i] for i in testIdxList]
             DtestY = [self.dataY[i] for i in testIdxList]
 
@@ -42,10 +47,14 @@ class BLM:
             gramTr = self._makeGram(DtrOfProteinSetX, DtrOfProteinSetX, self.proteinSimMat, self.proteinSimMatMeta)
             gramTest = self._makeGram(DtestX,DtrOfProteinSetX, self.proteinSimMat, self.proteinSimMatMeta)
 
-            clfOfProtein = svm.SVC(kernel='precomputed')
-            clfOfProtein.fit(gramTr,DtrOfProteinSetY)
+            clfOfProteinSet = svm.SVC(kernel='precomputed')
+            clfOfProteinSet.fit(gramTr,DtrOfProteinSetY)
             
-            DpredProteinY = clfOfProtein.predict(gramTest)
+            DpredYOfProteinSet = clfOfProteinSet.predict(gramTest)
+            assert(len(DpredYOfProteinSet)==len(DtestY))
+
+            self._computePrecisionRecall(DtestY, DpredYOfProteinSet, outDir+'/pr_curve_fold_'+str(idx+1)+'.png')
+            # break
 
     def _makeDtrOfProteinSet(self, DtestX, DtrX, DtrY):
         DtrOfProteinSetX = []
@@ -130,3 +139,17 @@ class BLM:
                 gram[i][j] = self.proteinSimMat[ii][jj]
 
         return gram
+
+    def _computePrecisionRecall(self, yTrue, yPred, curveFpath):
+        precision, recall, thresholds = precision_recall_curve(yTrue, yPred)
+        averagePrecision = average_precision_score(yTrue, yPred, average='micro')
+
+        plt.clf()
+        plt.plot(recall, precision, label='Precision-Recall curve')
+        plt.xlabel('Recall')
+        plt.ylabel('Precision')
+        plt.ylim([0.0, 1.05])
+        plt.xlim([0.0, 1.0])
+        plt.title('Precision-Recall example: AUC={0:0.2f}'.format(averagePrecision))
+        plt.legend(loc="lower left")
+        plt.savefig(curveFpath)
