@@ -14,6 +14,8 @@ from sklearn.metrics import average_precision_score
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import precision_score
+from scipy import interp
+from scoop import futures as fu
 
 class BLM:
     dataX = []; dataY = []; nData = 0
@@ -25,37 +27,77 @@ class BLM:
         self._loadSimMat(drugSimMatFpath, proteinSimMatFpath)
 
     def eval(self, outDir):
-        # kfList = KFold(self.nData, n_folds=self.nData) #equivalent to the Leave One Out strategy
-        # kfList = KFold(self.nData, n_folds=10, shuffle=True) 
-        kfList = StratifiedKFold(self.dataY, n_folds=10, shuffle=True)
+        nFolds = self.nData
+        kfList = KFold(self.nData, n_folds=nFolds, shuffle=True) 
+        # kfList = StratifiedKFold(self.dataY, n_folds=nFolds, shuffle=True)
 
-        for idx, kf in enumerate(kfList):
-            trIdxList, testIdxList = kf
+        kfResult = fu.map(self._evalPerFold, kfList, [self.dataX]*nFolds, [self.dataY]*nFolds)
 
-            xTest = [self.dataX[i] for i in testIdxList]
-            yTest = [self.dataY[i] for i in testIdxList]
+        # meanTpr = 0.0
+        # meanFpr = np.linspace(0, 1, 100)
+        # meanPrecision = 0.0
+        # meanRecall = 0.0
+        # meanAUCPR = 0.0
 
-            xTr = [self.dataX[i] for i in trIdxList]
-            yTr = [self.dataY[i] for i in trIdxList]
+        # for i in kfResult:
+        #     print(i)
 
-            #
-            yPredOfProteinSet = self._predict('usingProteinSet', xTest, xTr, yTr)
-            yPredOfDrugSet = self._predict('usingDrugSet', xTest, xTr, yTr)
-            assert(len(yPredOfDrugSet)==len(yPredOfProteinSet))
+        # # ROC curve
+        # meanTpr /= len(kfList)
+        # meanTpr[-1] = 1.0
+        # mean_auc = auc(meanFpr, meanTpr)
 
-            #
-            yPred = []
-            for i in range(len(yPredOfDrugSet)):
-                yPred.append( max(yPredOfDrugSet[i],yPredOfProteinSet[i]) )
+        # plt.clf()
+        # plt.plot(meanFpr, meanTpr, 'k--',
+        #          label='Mean ROC (area = %0.2f)' % mean_auc, lw=2)
+        # plt.xlim([-0.05, 1.05])
+        # plt.ylim([-0.05, 1.05])
+        # plt.xlabel('False Positive Rate')
+        # plt.ylabel('True Positive Rate')
+        # plt.title('Receiver operating characteristic')
+        # plt.legend(loc="lower right")
+        # plt.savefig(outDir+'/roc_curve.png', bbox_inches='tight')
 
-            #
-            self._computePrecisionRecall(yTest, yPred, outDir+'/pr_curve_fold_'+str(idx+1)+'.png')
-            self._computeROC(yTest, yPred, outDir+'/roc_curve_fold_'+str(idx+1)+'.png')
-            # accuracy = accuracy_score(yTest, yPred)
-            # precision = precision_score(yTest, yPred)
-            # recall = recall_score(yTest, yPred)
-            
-            # break
+        # #
+        # meanPrecision /= len(kfList)
+        # meanRecall /= len(kfList)
+        # meanAUCPR /= len(kfList)
+
+        # plt.clf()
+        # plt.plot(meanRecall, meanPrecision, label='Precision-Recall curve')
+        # plt.xlabel('Recall')
+        # plt.ylabel('Precision')
+        # plt.ylim([0.0, 1.05])
+        # plt.xlim([0.0, 1.0])
+        # plt.title('Precision-Recall: AUC={0:0.2f}'.format(meanAUCPR))
+        # plt.legend(loc="lower left")
+        # plt.savefig(outDir+'/pr_curve.png', bbox_inches='tight')
+
+    def _evalPerFold(self, kf, dataX, dataY):
+        trIdxList, testIdxList = kf
+        xTest = [dataX[i] for i in testIdxList]
+        yTest = [dataY[i] for i in testIdxList]
+
+        xTr = [dataX[i] for i in trIdxList]
+        yTr = [dataY[i] for i in trIdxList]
+
+        #
+        yPredOfProteinSet = self._predict('usingProteinSetAsTrainingData', xTest, xTr, yTr)
+        yPredOfDrugSet = self._predict('usingDrugSetAsTrainingData', xTest, xTr, yTr)
+        assert(len(yPredOfDrugSet)==len(yPredOfProteinSet))
+
+        #
+        yPred = []
+        for i in range(len(yPredOfDrugSet)):
+            yPred.append( max(yPredOfDrugSet[i],yPredOfProteinSet[i]) )
+
+        # # Compute ROC curve and PR curve
+        # fpr, tpr, _ = roc_curve(yTest, yPred)
+        # precision, recall, _ = precision_recall_curve(yTest, yPred)
+        # AUCPR = average_precision_score(yTest, yPred, average='micro')
+
+        # return (fpr, tpr, precision, recall, AUCPR)
+        return 0
 
     def _predict(self, type, xTest, xTr, yTr):
         # get _local_ (w.r.t. testData) training data
@@ -66,11 +108,11 @@ class BLM:
         simMatMeta = None
         
         refIdx = None
-        if type=='usingDrugSet':
+        if type=='usingDrugSetAsTrainingData':
             refIdx = 1 # ref is protein in xTest
             simMat = self.drugSimMat
             simMatMeta = self.drugSimMatMeta
-        elif type=='usingProteinSet':
+        elif type=='usingProteinSetAsTrainingData':
             refIdx = 0 # ref is drug in xTest
             simMat = self.proteinSimMat
             simMatMeta = self.proteinSimMatMeta
@@ -83,19 +125,25 @@ class BLM:
                 xTrLocal.append(d)
                 yTrLocal.append( yTr[idx] )
 
-        # Use only either drug or protein of X
-        xTrLocal = [i[int(not refIdx)] for i in xTrLocal]
-        xTestLocal = [i[int(not refIdx)] for i in xTest]
-
         #
-        gramTr = self._makeGram(xTrLocal, xTrLocal, simMat, simMatMeta)
-        gramTest = self._makeGram(xTestLocal,xTrLocal, simMat, simMatMeta)
+        yPred = None
+        if (len(set(yTrLocal))==2): # as for binary clf
+            # Use only either drug or protein only from x(drug,protein)
+            xTrLocal = [i[int(not refIdx)] for i in xTrLocal]
+            xTestLocal = [i[int(not refIdx)] for i in xTest]
 
-        #
-        clf = svm.SVC(kernel='precomputed')
-        clf.fit(gramTr,yTrLocal)
+            #
+            gramTr = self._makeGram(xTrLocal, xTrLocal, simMat, simMatMeta)
+            gramTest = self._makeGram(xTestLocal,xTrLocal, simMat, simMatMeta)
 
-        yPred = clf.predict(gramTest)
+            #
+            clf = svm.SVC(kernel='precomputed')
+            clf.fit(gramTr,yTrLocal)
+
+            yPred = clf.predict(gramTest)
+        else:
+            yPred = [None]*len(xTest)
+            
         return yPred
 
     def _loadBinding(self, fpath):
@@ -167,34 +215,3 @@ class BLM:
                 assert(gram[i][j] >= 0)
 
         return gram
-
-    def _computePrecisionRecall(self, yTrue, yPred, curveFpath):
-        precision, recall, thresholds = precision_recall_curve(yTrue, yPred)
-        averagePrecision = average_precision_score(yTrue, yPred, average='micro')
-
-        plt.clf()
-        plt.plot(recall, precision, label='Precision-Recall curve')
-        plt.xlabel('Recall')
-        plt.ylabel('Precision')
-        plt.ylim([0.0, 1.05])
-        plt.xlim([0.0, 1.0])
-        plt.title('Precision-Recall example: AUC={0:0.2f}'.format(averagePrecision))
-        plt.legend(loc="lower left")
-        plt.savefig(curveFpath, bbox_inches='tight')
-
-    def _computeROC(self, yTrue, yPred, curveFpath):
-        fpr, tpr, _ = roc_curve(yTrue, yPred)
-        roc_auc = auc(fpr, tpr)
-
-        plt.figure()
-        plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
-        plt.plot([0, 1], [0, 1], 'k--')
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.05])
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title('Receiver operating characteristic example')
-        plt.legend(loc="lower right")
-        plt.savefig(curveFpath, bbox_inches='tight')
-
-
