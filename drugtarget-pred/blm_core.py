@@ -28,12 +28,17 @@ class BLM:
         self._loadBinding(fpath)
         self._loadSimMat(drugSimMatFpath, proteinSimMatFpath)
 
-    def eval(self, outDir):
-        nFolds = self.nData
-        kfList = KFold(self.nData, n_folds=nFolds, shuffle=True) 
-
-        # nFolds = 10
-        # kfList = StratifiedKFold(self.dataY, n_folds=nFolds, shuffle=True)
+    def eval(self, type, outDir):
+        nFolds = None
+        kfList = None
+        if type=='loocv':
+            nFolds = self.nData
+            kfList = KFold(self.nData, n_folds=nFolds, shuffle=True) 
+        elif type=='kfcv':
+            nFolds = 10
+            kfList = StratifiedKFold(self.dataY, n_folds=nFolds, shuffle=True)
+        else:
+            assert(False)
 
         #
         kfResult = fu.map(self._evalPerFold, kfList, [self.dataX]*nFolds, [self.dataY]*nFolds)
