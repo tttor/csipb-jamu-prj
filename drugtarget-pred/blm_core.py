@@ -4,11 +4,13 @@ BLM Framework by Yamanishi and Beakley
 
 import numpy as np
 import matplotlib.pyplot as plt
+import json
 from collections import defaultdict
 from sklearn.cross_validation import KFold
 from sklearn.cross_validation import StratifiedKFold
 from sklearn import svm
 from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import accuracy_score
@@ -29,49 +31,92 @@ class BLM:
     def eval(self, outDir):
         nFolds = self.nData
         kfList = KFold(self.nData, n_folds=nFolds, shuffle=True) 
+
+        # nFolds = 10
         # kfList = StratifiedKFold(self.dataY, n_folds=nFolds, shuffle=True)
 
+        #
         kfResult = fu.map(self._evalPerFold, kfList, [self.dataX]*nFolds, [self.dataY]*nFolds)
 
-        # meanTpr = 0.0
-        # meanFpr = np.linspace(0, 1, 100)
-        # meanPrecision = 0.0
-        # meanRecall = 0.0
-        # meanAUCPR = 0.0
+        # Combine the results from across all folds
+        predResults = defaultdict(list)
+        predOfDrugSet = []
+        predOfProteinSet = []
+        predOfDrugAndProteinSet = []
 
-        # for i in kfResult:
-        #     print(i)
+        for result in kfResult:
+            yPredOfDrugSet, yPredOfProteinSet, yTest = result
 
-        # # ROC curve
-        # meanTpr /= len(kfList)
-        # meanTpr[-1] = 1.0
-        # mean_auc = auc(meanFpr, meanTpr)
+            for i, y in enumerate(yTest):
+                yd = yPredOfDrugSet[i]
+                yp = yPredOfProteinSet[i]
 
-        # plt.clf()
-        # plt.plot(meanFpr, meanTpr, 'k--',
-        #          label='Mean ROC (area = %0.2f)' % mean_auc, lw=2)
-        # plt.xlim([-0.05, 1.05])
-        # plt.ylim([-0.05, 1.05])
-        # plt.xlabel('False Positive Rate')
-        # plt.ylabel('True Positive Rate')
-        # plt.title('Receiver operating characteristic')
-        # plt.legend(loc="lower right")
-        # plt.savefig(outDir+'/roc_curve.png', bbox_inches='tight')
+                if yd!=None:
+                    predResults['ofDrugSet'].append((yd,y))
 
-        # #
-        # meanPrecision /= len(kfList)
-        # meanRecall /= len(kfList)
-        # meanAUCPR /= len(kfList)
+                if yp!=None:
+                    predResults['ofProteinSet'].append((yp,y))
 
-        # plt.clf()
-        # plt.plot(meanRecall, meanPrecision, label='Precision-Recall curve')
-        # plt.xlabel('Recall')
-        # plt.ylabel('Precision')
-        # plt.ylim([0.0, 1.05])
-        # plt.xlim([0.0, 1.0])
-        # plt.title('Precision-Recall: AUC={0:0.2f}'.format(meanAUCPR))
-        # plt.legend(loc="lower left")
-        # plt.savefig(outDir+'/pr_curve.png', bbox_inches='tight')
+                if yd!=None and yp!=None:
+                    predResults['ofDrugAndProteinSet'].append( (max(yd,yp),y) )
+
+        # Compute ROC curve and PR curve
+        perf = dict.fromkeys(predResults.keys())
+        perf2 = dict.fromkeys(predResults.keys())
+
+        for key, value in predResults.iteritems():
+            yPred = [v[0] for v in value]
+            yTest = [v[1] for v in value]
+
+            fpr, tpr, _ = roc_curve(yTest, yPred)
+            rocAUC = roc_auc_score(yTest, yPred)
+
+            precision, recall, _ = precision_recall_curve(yTest, yPred)
+            prAUC = average_precision_score(yTest, yPred, average='micro')
+
+            lineType = None
+            if key=='ofDrugSet':
+                lineType = 'r-'
+            elif key=='ofProteinSet':
+                lineType = 'b--'
+            elif key=='ofDrugAndProteinSet':
+                lineType = 'g:'
+            else:
+                lineType = 'k-.'
+
+            perf[key] = {'fpr': fpr, 'tpr': tpr, 'rocAUC': rocAUC,
+                         'precision': precision, 'recall': recall, 'prAUC': prAUC,
+                         'lineType': lineType}
+            perf2[key] = {'rocAUC': rocAUC,'prAUC': prAUC}
+
+        with open(outDir+'/perf.json', 'w') as fp:
+            json.dump(perf2, fp, indent=2, sort_keys=True)
+
+        plt.clf()
+        plt.figure()
+        for key, locPerf in perf.iteritems():
+            plt.plot(locPerf['fpr'], locPerf['tpr'], locPerf['lineType'],
+                    label=key+' (area = %0.2f)' % locPerf['rocAUC'], lw=2)
+        plt.xlim([-0.05, 1.05])
+        plt.ylim([-0.05, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('Receiver operating characteristic (ROC) Curve')
+        plt.legend(loc="lower right")
+        plt.savefig(outDir+'/roc_curve.png', bbox_inches='tight')
+
+        plt.clf()
+        plt.figure()
+        for key, locPerf in perf.iteritems():
+            plt.plot(locPerf['recall'], locPerf['precision'], locPerf['lineType'],
+                    label= key+' (area = %0.2f)' % locPerf['prAUC'], lw=2)
+        plt.ylim([-0.05, 1.05])
+        plt.xlim([-0.05, 1.05])
+        plt.xlabel('Recall')
+        plt.ylabel('Precision')
+        plt.title('Precision-Recall Curve')
+        plt.legend(loc="lower left")
+        plt.savefig(outDir+'/pr_curve.png', bbox_inches='tight')
 
     def _evalPerFold(self, kf, dataX, dataY):
         trIdxList, testIdxList = kf
@@ -84,20 +129,9 @@ class BLM:
         #
         yPredOfProteinSet = self._predict('usingProteinSetAsTrainingData', xTest, xTr, yTr)
         yPredOfDrugSet = self._predict('usingDrugSetAsTrainingData', xTest, xTr, yTr)
-        assert(len(yPredOfDrugSet)==len(yPredOfProteinSet))
+        assert(len(yPredOfDrugSet)==len(yPredOfProteinSet)==len(yTest))
 
-        #
-        yPred = []
-        for i in range(len(yPredOfDrugSet)):
-            yPred.append( max(yPredOfDrugSet[i],yPredOfProteinSet[i]) )
-
-        # # Compute ROC curve and PR curve
-        # fpr, tpr, _ = roc_curve(yTest, yPred)
-        # precision, recall, _ = precision_recall_curve(yTest, yPred)
-        # AUCPR = average_precision_score(yTest, yPred, average='micro')
-
-        # return (fpr, tpr, precision, recall, AUCPR)
-        return 0
+        return (yPredOfDrugSet, yPredOfProteinSet, yTest)
 
     def _predict(self, type, xTest, xTr, yTr):
         # get _local_ (w.r.t. testData) training data
