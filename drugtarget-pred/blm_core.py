@@ -41,7 +41,16 @@ class BLM:
             assert(False)
 
         #
-        kfResult = fu.map(self._evalPerFold, kfList, [self.dataX]*nFolds, [self.dataY]*nFolds)
+        xTestList = []; yTestList = []
+        xTrList = []; yTrList = []
+        for trIdxList, testIdxList in kfList:
+            xTestList.append( [self.dataX[i] for i in testIdxList] )
+            yTestList.append( [self.dataY[i] for i in testIdxList] )
+
+            xTrList.append( [self.dataX[i] for i in trIdxList] )
+            yTrList.append( [self.dataY[i] for i in trIdxList] )
+
+        kfResult = fu.map(self._evalPerFold, xTestList, yTestList, xTrList, yTrList)
 
         # Combine the results from across all folds
         predResults = defaultdict(list)
@@ -123,14 +132,7 @@ class BLM:
         plt.legend(loc="lower left")
         plt.savefig(outDir+'/pr_curve.png', bbox_inches='tight')
 
-    def _evalPerFold(self, kf, dataX, dataY):
-        trIdxList, testIdxList = kf
-        xTest = [dataX[i] for i in testIdxList]
-        yTest = [dataY[i] for i in testIdxList]
-
-        xTr = [dataX[i] for i in trIdxList]
-        yTr = [dataY[i] for i in trIdxList]
-
+    def _evalPerFold(self, xTest, yTest, xTr, yTr):
         #
         yPredOfProteinSet = self._predict('usingProteinSetAsTrainingData', xTest, xTr, yTr)
         yPredOfDrugSet = self._predict('usingDrugSetAsTrainingData', xTest, xTr, yTr)
