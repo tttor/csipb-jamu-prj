@@ -166,24 +166,48 @@ class BLM:
                 xTrLocal.append(dp)
                 yTrLocal.append( yTr[idx] )
 
-        #
+        # if a drug or a protein is new that have no known connection,
+        # then, we follow NII procedure by Mei, 2012
+        # yTrLocalNII = []
+        # if (len(set(yTrLocal))==1): # set(yTrLocal) = {0} (unknown interaction)
+        #     targetList = [[dp[not refIdx] for dp in xTr]]
+        #     targetList = list(set(targetList))
+
+        #     neighborRefList = [dp[refIdx] for dp in xTr]
+        #     neighborRefList = list(set(neighborRefList))
+
+        #     for j in targetList:
+        #         sum = 0.0
+        #         for h in neighborRefList:
+        #             interaction = 
+
+        #             sum += interaction[j,h] * simScore[j,h]
+
+        #     #normalize to be in [0,1]
+
+        # Make gram mat
+        # Use only either drug or protein only from x(drug,protein)
+        xTrLocal = [i[int(not refIdx)] for i in xTrLocal]
+        xTestLocal = [i[int(not refIdx)] for i in xTest]
+        
+        gramTr = self._makeGram(xTrLocal, xTrLocal, simMat, simMatMeta)
+        gramTest = self._makeGram(xTestLocal,xTrLocal, simMat, simMatMeta)
+
+        # Predict
         yPred = None
+        # yPredNII = None
         if (len(set(yTrLocal))==2): # as for binary clf where nClass=2
-            # Use only either drug or protein only from x(drug,protein)
-            xTrLocal = [i[int(not refIdx)] for i in xTrLocal]
-            xTestLocal = [i[int(not refIdx)] for i in xTest]
-
-            #
-            gramTr = self._makeGram(xTrLocal, xTrLocal, simMat, simMatMeta)
-            gramTest = self._makeGram(xTestLocal,xTrLocal, simMat, simMatMeta)
-
-            #
             clf = svm.SVC(kernel='precomputed')
             clf.fit(gramTr,yTrLocal)
 
             yPred = clf.predict(gramTest)
+            # yPredNII = [None]*len(xTest)
         else:
+            # clf = svm.SVC(kernel='precomputed')
+            # clf.fit(gramTr,yTrLocalNII)
+
             yPred = [None]*len(xTest)
+            # yPredNII = clf.predict(gramTest)
             
         return yPred
 
