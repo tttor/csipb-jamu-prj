@@ -21,11 +21,12 @@ from scoop import futures as fu
 
 class BLM:
     dataX = []; dataY = []; nData = 0
-    proteinSimMat = None; proteinSimMatMeta = None
-    drugSimMat = None; drugSimMatMeta = None
+    drugSimMat = None; proteinSimMat = None
+    drugList = []; proteinList = []
+    adjMat = None
 
     def __init__(self, fpath, drugSimMatFpath, proteinSimMatFpath):
-        self._loadBinding(fpath)
+        self._loadInteraction(fpath)
         self._loadSimMat(drugSimMatFpath, proteinSimMatFpath)
 
     def eval(self, type, outDir):
@@ -50,7 +51,8 @@ class BLM:
             xTrList.append( [self.dataX[i] for i in trIdxList] )
             yTrList.append( [self.dataY[i] for i in trIdxList] )
 
-        kfResult = fu.map(self._evalPerFold, xTestList, yTestList, xTrList, yTrList)
+        kfResult = fu.map(self._evalPerFold, xTestList, yTestList, xTrList, yTrList,
+                          [self.drugList]*nFolds, [self.proteinList]*nFolds)# TODO not to pass these lists?
 
         # Combine the results from across all folds
         predResults = defaultdict(list)
@@ -132,28 +134,25 @@ class BLM:
         plt.legend(loc="lower left")
         plt.savefig(outDir+'/pr_curve.png', bbox_inches='tight')
 
-    def _evalPerFold(self, xTest, yTest, xTr, yTr):
-        #
-        yPredOfProteinSet = self._predict('usingProteinSetAsTrainingData', xTest, xTr, yTr)
-        yPredOfDrugSet = self._predict('usingDrugSetAsTrainingData', xTest, xTr, yTr)
-        assert(len(yPredOfDrugSet)==len(yPredOfProteinSet)==len(yTest))
+    def _evalPerFold(self, xTest, yTest, xTr, yTr, drugList, proteinList):
+        yPredOfDrugSet = self._predict('usingDrugSetAsTrainingData', xTest, xTr, yTr,drugList)
+        yPredOfProteinSet = self._predict('usingProteinSetAsTrainingData', xTest, xTr, yTr,proteinList)
 
+        assert(len(yPredOfDrugSet)==len(yPredOfProteinSet)==len(yTest))
         return (yPredOfDrugSet, yPredOfProteinSet, yTest)
 
-    def _predict(self, type, xTest, xTr, yTr):
+    def _predict(self, type, xTest, xTr, yTr, meta):
         # set based on 2 possible types,i.e
         # a) 'usingDrugSetAsTrainingData':# =local model of a protein
         # b) type=='usingProteinSetAsTrainingData':# =local model of a drug
-        simMat = None; simMatMeta = None
+        simMat = None
         refIdx = None # either drug(=0) or protein(=1) of a tuple xTest(drug,protein)
         if type=='usingDrugSetAsTrainingData':# =local model of a protein
             refIdx = 1 
             simMat = self.drugSimMat
-            simMatMeta = self.drugSimMatMeta
         elif type=='usingProteinSetAsTrainingData':# =local model of a drug
             refIdx = 0 
             simMat = self.proteinSimMat
-            simMatMeta = self.proteinSimMatMeta
         else:
             assert(False)
 
@@ -189,9 +188,9 @@ class BLM:
         # Use only either drug or protein only from x(drug,protein)
         xTrLocal = [i[int(not refIdx)] for i in xTrLocal]
         xTestLocal = [i[int(not refIdx)] for i in xTest]
-        
-        gramTr = self._makeGram(xTrLocal, xTrLocal, simMat, simMatMeta)
-        gramTest = self._makeGram(xTestLocal,xTrLocal, simMat, simMatMeta)
+
+        gramTr = self._makeGram(xTrLocal, xTrLocal, simMat, meta)
+        gramTest = self._makeGram(xTestLocal,xTrLocal, simMat, meta)
 
         # Predict
         yPred = None
@@ -211,37 +210,42 @@ class BLM:
             
         return yPred
 
-    def _loadBinding(self, fpath):
-        content = []
+    def _loadInteraction(self, fpath):
+        lines = []
         with open(fpath) as f:
-            content = f.readlines()
+            lines = f.readlines()
 
-        drugList = []
-        proteinList = []
-        drugProteinDict = defaultdict(list)
-        for c in content:
-            tmp = [i.strip() for i in c.split()]
+        self.drugList = [i.strip() for i in lines[0].split()]
+        del lines[0]
+        
+        nDrugs = len(self.drugList); nProteins = len(lines)
+        self.adjMat = np.zeros( (nDrugs,nProteins) )
+        for i,line in enumerate(lines):
+            cols = [c.strip() for c in line.split()]
             
-            proteinList.append(tmp[0])
-            drugList.append(tmp[1])
+            self.proteinList.append(cols[0])
+            del cols[0]
 
-            drugProteinDict[tmp[1]].append( tmp[0] )
+            for j,c in enumerate(cols):
+                self.adjMat[j][i] = int(c)
 
-        drugList = list(set(drugList))
-        proteinList = list(set(proteinList))
-        assert(len(drugList)==len(drugProteinDict))
-
-        self.dataX = [(i,j) for i in drugList for j in proteinList]
+        # Make data
+        self.dataX = [(i,j) for i in self.drugList for j in self.proteinList]
         for x in self.dataX:
-            targetProteinList = drugProteinDict[ x[0] ]
-            self.dataY.append(int( x[1] in targetProteinList ))
+            i = self.drugList.index(x[0])
+            j = self.proteinList.index(x[1])
 
+            self.dataY.append( self.adjMat[i][j])
+        
         assert(len(self.dataX)==len(self.dataY))
         self.nData = len(self.dataX)
 
     def _loadSimMat(self, drugSimMatFpath, proteinSimMatFpath):
-        self.proteinSimMatMeta, self.proteinSimMat = self._readSimMat(proteinSimMatFpath)
-        self.drugSimMatMeta, self.drugSimMat = self._readSimMat(drugSimMatFpath)
+        meta, self.proteinSimMat = self._readSimMat(proteinSimMatFpath)
+        assert meta==self.proteinList
+
+        meta, self.drugSimMat = self._readSimMat(drugSimMatFpath)
+        assert meta==self.drugList
         
     def _readSimMat(self, fpath):
         with open(fpath) as f:
