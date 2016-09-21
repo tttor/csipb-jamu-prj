@@ -7,6 +7,7 @@ from blm_core import BLM
 from datetime import datetime
 
 def main(argv):
+    assert len(argv)==7
     interactionFpath = argv[1]
     drugKernelFpath = argv[2]
     proteinKernelFpath = argv[3]
