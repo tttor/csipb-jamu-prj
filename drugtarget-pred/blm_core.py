@@ -139,34 +139,34 @@ class BLM:
         return (yPredOfDrugSet, yPredOfProteinSet, yTest)
 
     def _predict(self, type, xTest, xTr, yTr):
-        # get _local_ (w.r.t. testData) training data
-        xTrLocal = []
-        yTrLocal = []
-
-        simMat = None
-        simMatMeta = None
-        
-        refIdx = None
-        if type=='usingDrugSetAsTrainingData':
-            refIdx = 1 # ref is protein in xTest
+        # set based on 2 possible types,i.e
+        # a) 'usingDrugSetAsTrainingData':# =local model of a protein
+        # b) type=='usingProteinSetAsTrainingData':# =local model of a drug
+        simMat = None; simMatMeta = None
+        refIdx = None # either drug(=0) or protein(=1) of a tuple xTest(drug,protein)
+        if type=='usingDrugSetAsTrainingData':# =local model of a protein
+            refIdx = 1 
             simMat = self.drugSimMat
             simMatMeta = self.drugSimMatMeta
-        elif type=='usingProteinSetAsTrainingData':
-            refIdx = 0 # ref is drug in xTest
+        elif type=='usingProteinSetAsTrainingData':# =local model of a drug
+            refIdx = 0 
             simMat = self.proteinSimMat
             simMatMeta = self.proteinSimMatMeta
         else:
             assert(False)
 
-        refList = [d[refIdx] for d in xTest] 
-        for idx,d in enumerate(xTr):
-            if (d[refIdx] in refList):
-                xTrLocal.append(d)
+        # get _local_ training data (w.r.t. testData)
+        xTrLocal = []; yTrLocal = []
+        refList = [ dp[refIdx] for dp in xTest ] # of those we build the local model
+        refList = list(set(refList))
+        for idx,dp in enumerate(xTr):
+            if (dp[refIdx] in refList):
+                xTrLocal.append(dp)
                 yTrLocal.append( yTr[idx] )
 
         #
         yPred = None
-        if (len(set(yTrLocal))==2): # as for binary clf
+        if (len(set(yTrLocal))==2): # as for binary clf where nClass=2
             # Use only either drug or protein only from x(drug,protein)
             xTrLocal = [i[int(not refIdx)] for i in xTrLocal]
             xTestLocal = [i[int(not refIdx)] for i in xTest]
