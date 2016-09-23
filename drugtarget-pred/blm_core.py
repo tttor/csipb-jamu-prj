@@ -165,8 +165,8 @@ class BLM:
                 xTrLocal.append(dp)
                 yTrLocal.append( yTr[idx] )
 
-        # if a drug or a protein is new that have no known connection,
-        # then, we follow NII procedure by Mei, 2012
+        # if a drug or a protein is new, it has no known connection,
+        # then, we follow the NII procedure by Mei, 2012
         yTrLocalNII = []
         if (len(set(yTrLocal))==1): # set(yTrLocal) = {0} (unknown interaction)
             targetList = [[dp[not refIdx] for dp in xTr]]
@@ -176,23 +176,25 @@ class BLM:
             neighborRefList = list(set(neighborRefList))
 
             for x in xTest:
-                for j in targetList:
-                    sum = 0.0
-                    for h in neighborRefList:
+                for t in targetList:
+                    ip = 0.0 # interaction profile from all neighbors
+                    for n in neighborRefList:
                         interaction = None
                         simScore = None
-                        if type='usingDrugSetAsTrainingData':
-                            interaction = self.adjMat[self.drugList.index(j)][self.proteinList.index(h)]
-                            simScore = self.proteinSimMat[self.proteinList.inded][]
-                        elif type='usingProteinSetAsTrainingData':
-                            interaction = self.adjMat(self.drugList.index(h),
-                                                      self.proteinList.index(j))
+                        if type='usingDrugSetAsTrainingData':# drug is target
+                            interaction = self.adjMat[self.drugList.index(t)][self.proteinList.index(n)]
+                            simScore = self.proteinSimMat[self.proteinList.index(x)][self.proteinList.index(n)]
+                        elif type='usingProteinSetAsTrainingData':# protein is target
+                            interaction = self.adjMat(self.drugList.index(n),self.proteinList.index(t))
+                            simScore = self.drugSimMat[self.proteinList.index(x)][self.proteinList.index(n)]
                         else:
                             assert False
 
-                        sum += interaction[j,h] * simScore[j,h]
-
-                #normalize to be in [0,1]
+                        ip = (interaction*simScore)
+                    yTrLocalNII.append()
+            
+            #normalize such that sum(ip) in [0,1]
+            assert len(yTrLocalNII)==len(yTrLocal)
 
         # Make gram mat
         # Use only either drug or protein only from x(drug,protein)
