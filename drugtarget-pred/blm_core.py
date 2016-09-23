@@ -167,22 +167,32 @@ class BLM:
 
         # if a drug or a protein is new that have no known connection,
         # then, we follow NII procedure by Mei, 2012
-        # yTrLocalNII = []
-        # if (len(set(yTrLocal))==1): # set(yTrLocal) = {0} (unknown interaction)
-        #     targetList = [[dp[not refIdx] for dp in xTr]]
-        #     targetList = list(set(targetList))
+        yTrLocalNII = []
+        if (len(set(yTrLocal))==1): # set(yTrLocal) = {0} (unknown interaction)
+            targetList = [[dp[not refIdx] for dp in xTr]]
+            targetList = list(set(targetList))
 
-        #     neighborRefList = [dp[refIdx] for dp in xTr]
-        #     neighborRefList = list(set(neighborRefList))
+            neighborRefList = [dp[refIdx] for dp in xTr]
+            neighborRefList = list(set(neighborRefList))
 
-        #     for j in targetList:
-        #         sum = 0.0
-        #         for h in neighborRefList:
-        #             interaction = 
+            for x in xTest:
+                for j in targetList:
+                    sum = 0.0
+                    for h in neighborRefList:
+                        interaction = None
+                        simScore = None
+                        if type='usingDrugSetAsTrainingData':
+                            interaction = self.adjMat[self.drugList.index(j)][self.proteinList.index(h)]
+                            simScore = self.proteinSimMat[self.proteinList.inded][]
+                        elif type='usingProteinSetAsTrainingData':
+                            interaction = self.adjMat(self.drugList.index(h),
+                                                      self.proteinList.index(j))
+                        else:
+                            assert False
 
-        #             sum += interaction[j,h] * simScore[j,h]
+                        sum += interaction[j,h] * simScore[j,h]
 
-        #     #normalize to be in [0,1]
+                #normalize to be in [0,1]
 
         # Make gram mat
         # Use only either drug or protein only from x(drug,protein)
