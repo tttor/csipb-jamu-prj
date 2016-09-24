@@ -77,8 +77,8 @@ class BLM:
                     predResults['usingDrugAndProteinSet'].append( (max(yd,yp),y) )
                 
                 #
-                predResults['usingDrugAndProteinSetNII'].append( (max(yd,yp,ydnii,ypnii),y) )
-                assert max(yd,yp,ydnii,ypnii)!=None
+                ynii = max(yd,yp,ydnii,ypnii); assert ynii!=None
+                predResults['usingDrugAndProteinSetNII'].append( (ynii,y) )
 
         # Compute ROC curve and PR curve
         perf = dict.fromkeys(predResults.keys())
@@ -151,7 +151,6 @@ class BLM:
         # set based on 2 possible types,i.e
         # a) 'usingDrugSetAsTrainingData':# =local model of a protein
         # b) 'usingProteinSetAsTrainingData':# =local model of a drug
-        refNeighborListT = (drugList, proteinList)
         simMatT = (self.drugSimMat, self.proteinSimMat)
         metaT = (drugList, proteinList)
 
@@ -178,12 +177,12 @@ class BLM:
         if (len(set(yTrLocal))==1): # set(yTrLocal) = {0} (unknown interaction)
             for idx, y in enumerate(yTrLocal):
                 x = xTrLocal[idx]
-                neighbors = [i for i in refNeighborListT[refIdx] if i != x[refIdx]]
+                neighbors = [i for i in metaT[refIdx] if i != x[refIdx]]
 
                 ip = 0.0 # interaction profile from all neighbors
                 for n in neighbors:
-                    idx1 = refNeighborListT[refIdx].index(n)
-                    idx2 = refNeighborListT[refIdx].index( x[refIdx] )
+                    idx1 = metaT[refIdx].index(n)
+                    idx2 = metaT[refIdx].index( x[refIdx] )
                     simScore = simMatT[refIdx][idx1][idx2]
 
                     nt = [None]*2 
@@ -218,16 +217,14 @@ class BLM:
                                   simMatT[not(refIdx)], metaT[not(refIdx)])
 
         # Predict
-        yPred = None
-        yPredNII = None
+        yPred = None; yPredNII = None
+        clf = svm.SVC(kernel='precomputed')
         if (len(set(yTrLocal))==2): # as for binary clf where nClass=2
-            clf = svm.SVC(kernel='precomputed')
             clf.fit(gramTr,yTrLocal)
 
             yPred = clf.predict(gramTest)
             yPredNII = [None]*len(xTest)
         else:
-            clf = svm.SVC(kernel='precomputed')
             clf.fit(gramTr,yTrLocalNII)
 
             yPred = [None]*len(xTest)
