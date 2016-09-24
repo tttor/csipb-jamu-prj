@@ -16,6 +16,7 @@ from sklearn.metrics import average_precision_score
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import precision_score
+from sklearn.preprocessing import MinMaxScaler
 from scipy import interp
 from scoop import futures as fu
 
@@ -135,90 +136,99 @@ class BLM:
         plt.savefig(outDir+'/pr_curve.png', bbox_inches='tight')
 
     def _evalPerFold(self, xTest, yTest, xTr, yTr, drugList, proteinList):
-        yPredOfDrugSet = self._predict('usingDrugSetAsTrainingData', xTest, xTr, yTr,drugList)
-        yPredOfProteinSet = self._predict('usingProteinSetAsTrainingData', xTest, xTr, yTr,proteinList)
+        yPredOfDrugSet = self._predict('usingDrugSetAsTrainingData', xTest, xTr, yTr, 
+                                        drugList, proteinList)
+        yPredOfProteinSet = self._predict('usingProteinSetAsTrainingData', xTest, xTr, yTr,
+                                           drugList, proteinList)
 
         assert(len(yPredOfDrugSet)==len(yPredOfProteinSet)==len(yTest))
         return (yPredOfDrugSet, yPredOfProteinSet, yTest)
 
-    def _predict(self, type, xTest, xTr, yTr, meta):
+    def _predict(self, type, xTest, xTr, yTr, drugList, proteinList):
         # set based on 2 possible types,i.e
         # a) 'usingDrugSetAsTrainingData':# =local model of a protein
-        # b) type=='usingProteinSetAsTrainingData':# =local model of a drug
-        simMat = None
-        refIdx = None # either drug(=0) or protein(=1) of a tuple xTest(drug,protein)
-        if type=='usingDrugSetAsTrainingData':# =local model of a protein
-            refIdx = 1 
-            simMat = self.drugSimMat
-        elif type=='usingProteinSetAsTrainingData':# =local model of a drug
-            refIdx = 0 
-            simMat = self.proteinSimMat
-        else:
-            assert(False)
+        # b) 'usingProteinSetAsTrainingData':# =local model of a drug
+        refNeighborListT = (drugList, proteinList)
+        simMatT = (self.drugSimMat, self.proteinSimMat)
+        metaT = (drugList, proteinList)
 
-        # get _local_ training data (w.r.t. testData)
+        refIdx = None # either drug(=0) or protein(=1) of a tuple xTest(drug,protein)
+        if type=='usingProteinSetAsTrainingData':# =local model of a drug
+            refIdx = 0 
+        elif type=='usingDrugSetAsTrainingData':# =local model of a protein
+            refIdx = 1 
+        else:
+            assert False
+
+        # get _local_ training data (w.r.t. xTest)
         xTrLocal = []; yTrLocal = []
         refList = [ dp[refIdx] for dp in xTest ] # of those we build the local model
-        refList = list(set(refList))
-        for idx,dp in enumerate(xTr):
+        refList = list(set(refList)) # to avoid duplicate on (xTrLocal and yTrLocal)
+        for idx,dp in enumerate(xTr):# impose locality constraints in the xTr
             if (dp[refIdx] in refList):
                 xTrLocal.append(dp)
                 yTrLocal.append( yTr[idx] )
 
-        # if a drug or a protein is new, it has no known connection,
+        # if a drug or a protein is new, it has _no_ known connection,
         # then, we follow the NII procedure by Mei, 2012
         yTrLocalNII = []
         if (len(set(yTrLocal))==1): # set(yTrLocal) = {0} (unknown interaction)
-            targetList = [[dp[not refIdx] for dp in xTr]]
-            targetList = list(set(targetList))
+            for idx, y in enumerate(yTrLocal):
+                x = xTrLocal[idx]
+                neighbors = [i for i in refNeighborListT[refIdx] if i != x[refIdx]]
 
-            neighborRefList = [dp[refIdx] for dp in xTr]
-            neighborRefList = list(set(neighborRefList))
+                ip = 0.0 # interaction profile from all neighbors
+                for n in neighbors:
+                    idx1 = refNeighborListT[refIdx].index(n)
+                    idx2 = refNeighborListT[refIdx].index( x[refIdx] )
+                    simScore = simMatT[refIdx][idx1][idx2]
 
-            for x in xTest:
-                for t in targetList:
-                    ip = 0.0 # interaction profile from all neighbors
-                    for n in neighborRefList:
-                        interaction = None
-                        simScore = None
-                        if type='usingDrugSetAsTrainingData':# drug is target
-                            interaction = self.adjMat[self.drugList.index(t)][self.proteinList.index(n)]
-                            simScore = self.proteinSimMat[self.proteinList.index(x)][self.proteinList.index(n)]
-                        elif type='usingProteinSetAsTrainingData':# protein is target
-                            interaction = self.adjMat(self.drugList.index(n),self.proteinList.index(t))
-                            simScore = self.drugSimMat[self.proteinList.index(x)][self.proteinList.index(n)]
-                        else:
-                            assert False
+                    nt = [None]*2 
+                    nt[refIdx] = n
+                    nt[not(refIdx)] = x[not(refIdx)]
 
-                        ip = (interaction*simScore)
-                    yTrLocalNII.append()
+                    drugIdx = drugList.index(nt[0])
+                    proteinIdx = proteinList.index(nt[1])
+                    interaction = self.adjMat[drugIdx][proteinIdx]
+
+                    ip += (interaction*simScore)
+                yTrLocalNII.append(ip)
             
-            #normalize such that sum(ip) in [0,1]
+            #normalize such that each element of yTrLocalNII in [0,1]
             assert len(yTrLocalNII)==len(yTrLocal)
+
+            mms = MinMaxScaler((0,1))
+            yTrLocalNIIArr = np.asarray(yTrLocalNII)
+            yTrLocalNIIArr = yTrLocalNIIArr.reshape(-1,1)
+            yTrLocalNIIArr = mms.fit_transform(yTrLocalNIIArr)
+            yTrLocalNIIArr = [i[0] for i in yTrLocalNIIArr.tolist()]
+            yTrLocalNII = [int(i>=0.5) for i in yTrLocalNIIArr]
 
         # Make gram mat
         # Use only either drug or protein only from x(drug,protein)
-        xTrLocal = [i[int(not refIdx)] for i in xTrLocal]
-        xTestLocal = [i[int(not refIdx)] for i in xTest]
+        xTrLocal = [i[int(not(refIdx))] for i in xTrLocal]
+        xTestLocal = [i[int(not(refIdx))] for i in xTest]
 
-        gramTr = self._makeGram(xTrLocal, xTrLocal, simMat, meta)
-        gramTest = self._makeGram(xTestLocal,xTrLocal, simMat, meta)
+        gramTr = self._makeGram(xTrLocal, xTrLocal, 
+                                simMatT[not(refIdx)], metaT[not(refIdx)])
+        gramTest = self._makeGram(xTestLocal,xTrLocal, 
+                                  simMatT[not(refIdx)], metaT[not(refIdx)])
 
         # Predict
         yPred = None
-        # yPredNII = None
+        yPredNII = None
         if (len(set(yTrLocal))==2): # as for binary clf where nClass=2
             clf = svm.SVC(kernel='precomputed')
             clf.fit(gramTr,yTrLocal)
 
             yPred = clf.predict(gramTest)
-            # yPredNII = [None]*len(xTest)
+            yPredNII = [None]*len(xTest)
         else:
-            # clf = svm.SVC(kernel='precomputed')
-            # clf.fit(gramTr,yTrLocalNII)
+            clf = svm.SVC(kernel='precomputed')
+            clf.fit(gramTr,yTrLocalNII)
 
             yPred = [None]*len(xTest)
-            # yPredNII = clf.predict(gramTest)
+            yPredNII = clf.predict(gramTest)
             
         return yPred
 
