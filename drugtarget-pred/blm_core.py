@@ -57,25 +57,28 @@ class BLM:
 
         # Combine the results from across all folds
         predResults = defaultdict(list)
-        predOfDrugSet = []
-        predOfProteinSet = []
-        predOfDrugAndProteinSet = []
-
         for result in kfResult:
-            yPredOfDrugSet, yPredOfProteinSet, yTest = result
+            yPredD, yPredP, yTest = result
+            yPredD, yPredDNII = yPredD
+            yPredP, yPredPNII = yPredP
 
             for i, y in enumerate(yTest):
-                yd = yPredOfDrugSet[i]
-                yp = yPredOfProteinSet[i]
+                yd = yPredD[i]; ydnii = yPredDNII[i]
+                yp = yPredP[i]; ypnii = yPredPNII[i]
 
+                #
                 if yd!=None:
-                    predResults['ofDrugSet'].append((yd,y))
+                    predResults['usingDrugSet'].append((yd,y))
 
                 if yp!=None:
-                    predResults['ofProteinSet'].append((yp,y))
+                    predResults['usingProteinSet'].append((yp,y))
 
                 if yd!=None and yp!=None:
-                    predResults['ofDrugAndProteinSet'].append( (max(yd,yp),y) )
+                    predResults['usingDrugAndProteinSet'].append( (max(yd,yp),y) )
+                
+                #
+                predResults['usingDrugAndProteinSetNII'].append( (max(yd,yp,ydnii,ypnii),y) )
+                assert max(yd,yp,ydnii,ypnii)!=None
 
         # Compute ROC curve and PR curve
         perf = dict.fromkeys(predResults.keys())
@@ -92,19 +95,19 @@ class BLM:
             prAUC = average_precision_score(yTest, yPred, average='micro')
 
             lineType = None
-            if key=='ofDrugSet':
+            if key=='usingDrugSet':
                 lineType = 'r-'
-            elif key=='ofProteinSet':
+            elif key=='usingProteinSet':
                 lineType = 'b--'
-            elif key=='ofDrugAndProteinSet':
+            elif key=='usingDrugAndProteinSet':
                 lineType = 'g:'
-            else:
+            elif key=='usingDrugAndProteinSetNII':
                 lineType = 'k-.'
 
             perf[key] = {'fpr': fpr, 'tpr': tpr, 'rocAUC': rocAUC,
                          'precision': precision, 'recall': recall, 'prAUC': prAUC,
                          'lineType': lineType}
-            perf2[key] = {'rocAUC': rocAUC,'prAUC': prAUC}
+            perf2[key] = {'rocAUC': rocAUC,'prAUC': prAUC, 'nTest': len(yTest)}
 
         with open(outDir+'/perf.json', 'w') as fp:
             json.dump(perf2, fp, indent=2, sort_keys=True)
@@ -136,13 +139,13 @@ class BLM:
         plt.savefig(outDir+'/pr_curve.png', bbox_inches='tight')
 
     def _evalPerFold(self, xTest, yTest, xTr, yTr, drugList, proteinList):
-        yPredOfDrugSet = self._predict('usingDrugSetAsTrainingData', xTest, xTr, yTr, 
+        yPredUsingDrugSet = self._predict('usingDrugSetAsTrainingData', xTest, xTr, yTr, 
                                         drugList, proteinList)
-        yPredOfProteinSet = self._predict('usingProteinSetAsTrainingData', xTest, xTr, yTr,
+        yPredUsingProteinSet = self._predict('usingProteinSetAsTrainingData', xTest, xTr, yTr,
                                            drugList, proteinList)
 
-        assert(len(yPredOfDrugSet)==len(yPredOfProteinSet)==len(yTest))
-        return (yPredOfDrugSet, yPredOfProteinSet, yTest)
+        assert(len(yPredUsingDrugSet[0])==len(yPredUsingProteinSet[0])==len(yTest))
+        return (yPredUsingDrugSet, yPredUsingProteinSet, yTest)
 
     def _predict(self, type, xTest, xTr, yTr, drugList, proteinList):
         # set based on 2 possible types,i.e
@@ -230,7 +233,7 @@ class BLM:
             yPred = [None]*len(xTest)
             yPredNII = clf.predict(gramTest)
             
-        return yPred
+        return (yPred, yPredNII)
 
     def _loadInteraction(self, fpath):
         lines = []
