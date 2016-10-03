@@ -8,15 +8,74 @@ db = MySQLdb.connect("localhost","root","123","ijah" )
 cursor = db.cursor()
 
 def main():
-    data = parseDrugbank() 
-    insertDrug(data)
+    drugProteinDict = parseDrugbank() 
+    insertDrug(drugProteinDict)
+    insertCompoundVsProtein(drugProteinDict)
     db.close()
 
-def insertDrug(data):
+def insertCompoundVsProtein(drugProteinDict):
     idx = 0
-    for i,v in data.iteritems():
+    for i,v in drugProteinDict.iteritems():
         idx += 1
-        print 'inserting idx=',str(idx),'of', str(len(data))
+        print 'inserting i=', str(idx), 'of', str(len(drugProteinDict))
+
+        qf = 'SELECT com_id FROM compound WHERE com_drugbank_id ='
+        qm = '"' + i + '"'
+        qr = ''
+        sql = qf+qm+qr
+
+        try:
+            cursor.execute(sql)
+            db.commit()
+        except:
+            assert False, 'dbErr'
+            db.rollback()
+        comId = cursor.fetchone()[0]
+        comId = '"'+comId+'"'
+
+        for p in v['targetProtein']:
+            qf = 'SELECT pro_id FROM protein WHERE pro_uniprot_id ='
+            qm = '"' + p + '"'
+            qr = ''
+            sql = qf+qm+qr
+            # print sql
+
+            try:
+                cursor.execute(sql)
+                db.commit()
+            except:
+                assert False, 'dbErr'
+                db.rollback()
+
+            resp = cursor.fetchone()
+            if resp!=None:
+                proId = resp[0]
+                proId = '"'+proId+'"'
+
+                weight = str(1.0)
+                weight = '"'+weight+'"'
+
+                factOrPred = 'fact'
+                factOrPred = '"'+factOrPred+'"'                
+
+                #
+                qf = 'INSERT INTO compound_vs_protein (com_id,pro_id,weight,type) VALUES ('
+                qm = comId+','+proId+','+weight+','+factOrPred
+                qr = ')'
+                sql = qf+qm+qr
+
+                try:
+                    cursor.execute(sql)
+                    db.commit()
+                except:
+                    assert False, 'dbErr'
+                    db.rollback()
+
+def insertDrug(drugProteinDict):
+    idx = 0
+    for i,v in drugProteinDict.iteritems():
+        idx += 1
+        print 'inserting idx=',str(idx),'of', str(len(drugProteinDict))
         
         comId = str(idx)
         comId = comId.zfill(8)
@@ -39,7 +98,7 @@ def insertDrug(data):
 def parseDrugbank():
     dpFpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/durgbank_20161002/uniprot_links.csv'
 
-    data = dict()
+    drugProteinDict = dict()
     idx = 0
     with open(dpFpath) as infile:        
         first = True
@@ -75,15 +134,15 @@ def parseDrugbank():
 
                 if hot != drugbankId:
                     hot = drugbankId
-                    data[hot] = defaultdict(list)
+                    drugProteinDict[hot] = defaultdict(list)
 
-                if len(data[hot]['name'])==0:
-                    data[hot]['name'] = name
+                if len(drugProteinDict[hot]['name'])==0:
+                    drugProteinDict[hot]['name'] = name
 
-                data[hot]['targetProtein'].append(uniprotId)
+                drugProteinDict[hot]['targetProtein'].append(uniprotId)
             first = False
     
-    return data
+    return drugProteinDict
 
 if __name__ == '__main__':
     start_time = time.time()
