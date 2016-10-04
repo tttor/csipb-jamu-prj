@@ -8,7 +8,7 @@ db = MySQLdb.connect("localhost","root","123","ijah" )
 cursor = db.cursor()
 
 def main():
-    drugProteinDict = parseDrugbank() 
+    drugProteinDict = parseDrugbankUniprotlinks() 
     insertDrug(drugProteinDict)
     insertCompoundVsProtein(drugProteinDict)
     db.close()
@@ -95,7 +95,7 @@ def insertDrug(drugProteinDict):
             assert False, 'dbErr'
             db.rollback()
 
-def parseDrugbank():
+def parseDrugbankUniprotlinks():
     dpFpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/durgbank_20161002/uniprot_links.csv'
 
     drugProteinDict = dict()
