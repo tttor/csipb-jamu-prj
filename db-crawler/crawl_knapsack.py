@@ -16,10 +16,7 @@ outDir = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003'
 def main():
     plantCompoundDict = None
     plantCompoundDict = parseKnapsack()
-    # fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003/knapsack_jsp_plant_vs_compound.201610041222.json'  
-    # with open(fpath) as json_data:
-    #     plantCompoundDict = yaml.load(json_data)
-
+    # fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003/knapsack_jsp_plant_vs_compound.201610041222.pkl'  
     # with open(fpath, 'rb') as handle:
     #     plantCompoundDict = pickle.load(handle)
 
@@ -35,7 +32,7 @@ def main():
 
 
     # insertPlants(plantCompoundDict.keys())
-    # insertCompounds()
+    # insertCompounds(plantCompoundDict.values())
     # insertPlantVsCompound()
     db.close()
 
@@ -85,7 +82,7 @@ def parseKnapsack():
             for pos,col in enumerate(cols):
                 datum.append(str(col.get_text()))
 
-            if len(datum)!=0:
+            if len(datum)==6:
                 comKnapsackId = datum[0]
                 comCasId = datum[1]
                 comName = datum[2]
@@ -97,7 +94,7 @@ def parseKnapsack():
                     plantNameWords = plantNameWords[0:2]
                     plantName = ' '.join(plantNameWords)
 
-                    compoundDatum = ( comCasId, comName, comFormula )
+                    compoundDatum = ( comKnapsackId, comCasId, comName, comFormula )
                     plantCompoundDict[plantName].append( compoundDatum )
 
     jsonFpath = outDir+'/knapsack_jsp_plant_vs_compound_'+str(now.date())+str(now.time())+'.json'
@@ -133,6 +130,9 @@ def insertPlants(plantList):
             print('mySQL Error: '+str(e))
             db.rollback()
             assert False, 'dbErr'
+
+        if idx>10:
+            break
 
 # def insertCompound():
 
