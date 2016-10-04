@@ -1,9 +1,12 @@
 import time
 import json
+import yaml
 import MySQLdb
+import pickle
 from collections import defaultdict
 from bs4 import BeautifulSoup
 from urllib2 import urlopen
+from datetime import datetime
 
 db = MySQLdb.connect("localhost","root","123","ijah" )
 cursor = db.cursor()
@@ -11,8 +14,27 @@ cursor = db.cursor()
 outDir = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003'
 
 def main():
-    parseKnapsack()
-    # insertPlants()
+    plantCompoundDict = None
+    plantCompoundDict = parseKnapsack()
+    # fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003/knapsack_jsp_plant_vs_compound.201610041222.json'  
+    # with open(fpath) as json_data:
+    #     plantCompoundDict = yaml.load(json_data)
+
+    # with open(fpath, 'rb') as handle:
+    #     plantCompoundDict = pickle.load(handle)
+
+    # plantList = plantCompoundDict.keys()
+    # x = []
+    # for p in plantList:
+    #     words = p.split()
+    #     if (len(words)!=2):
+    #         x.append(p)
+
+    # print len(x)
+    # print x[0]
+
+
+    # insertPlants(plantCompoundDict.keys())
     # insertCompounds()
     # insertPlantVsCompound()
     db.close()
@@ -42,6 +64,7 @@ def parseKnapsack():
     # crawl knapsack
     BASE_URL = 'http://kanaya.naist.jp/knapsack_jsp/result.jsp?sname=organism&word='
     plantCompoundDict = defaultdict(list)
+    now = datetime.now()
 
     for idx,p in enumerate(seedPlantList):
         idx += 1
@@ -68,30 +91,48 @@ def parseKnapsack():
                 comName = datum[2]
                 comFormula = datum[3]
                 plantName = datum[5]
+                
+                plantNameWords = plantName.split()
+                if len(plantNameWords)>1:
+                    plantNameWords = plantNameWords[0:2]
+                    plantName = ' '.join(plantNameWords)
 
-                compoundDatum = ( comCasId, comName, comFormula )
-                plantCompoundDict[plantName].append( compoundDatum )
+                    compoundDatum = ( comCasId, comName, comFormula )
+                    plantCompoundDict[plantName].append( compoundDatum )
 
-    with open(outDir+'/knapsack_jsp_plant_vs_compound.json', 'w') as fp:
-        json.dump(plantCompoundDict, fp, indent=2, sort_keys=True)
+    jsonFpath = outDir+'/knapsack_jsp_plant_vs_compound_'+str(now.date())+str(now.time())+'.json'
+    with open(jsonFpath, 'w') as f:
+        json.dump(plantCompoundDict, f, indent=2, sort_keys=True)
+
+    pklFpath = outDir+'/knapsack_jsp_plant_vs_compound_'+str(now.date())+str(now.time())+'.pkl'
+    with open(pklFpath, 'wb') as f:
+        pickle.dump(plantCompoundDict, f)
 
     return plantCompoundDict
 
-# def insertPlants(plantList):
-#     for idx, p in enumerate(plantList):
-#         plaId = 
-#         qf = 'INSERT INTO plant (pla_id,pla_name) VALUES ('
-#         qm = plaId+','+plaName
-#         qr = ')'
-#         sql = qf+qm+qr
-#         # print sql
+def insertPlants(plantList):
+    nPlant = len(plantList)
+    for idx, p in enumerate(plantList):
+        plaId = str(idx+1)
+        plaId = plaId.zfill(8)
+        plaId = '"'+'PLA'+plaId+'"'
+        print 'inserting ', plaId, 'of', str(nPlant)
 
-#         try:
-#             cursor.execute(sql)
-#             db.commit()
-#         except:
-#             assert False, 'dbErr'
-#             db.rollback()
+        plaName = '"'+p+'"'
+
+        qf = 'INSERT INTO plant (pla_id,pla_name) VALUES ('
+        qm = plaId+','+plaName
+        qr = ')'
+        sql = qf+qm+qr
+        # print sql
+
+        try:
+            cursor.execute(sql)
+            db.commit()
+        except (MySQLdb.Error, MySQLdb.Warning) as e:
+            print('mySQL Error: '+str(e))
+            db.rollback()
+            assert False, 'dbErr'
 
 # def insertCompound():
 
