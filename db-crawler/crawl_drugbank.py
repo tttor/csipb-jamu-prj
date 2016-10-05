@@ -141,7 +141,7 @@ def insertDrug(drugData):
     for i,v in drugData.iteritems():
         if len(v['uniprotTargets'])!=0:
             idx += 1
-            print 'inserting idx=',str(idx),'of at most', str(len(drugData))
+            print 'inserting', i, 'idx=',str(idx),'of at most', str(len(drugData))
             
             comId = str(idx); comId = comId.zfill(8); comId = 'COM'+comId
             comDrugbankId = i
