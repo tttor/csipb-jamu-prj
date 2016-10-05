@@ -20,12 +20,12 @@ def main():
     # drugProteinDict = parseUniprotlinkFile() # contain drug-protein binding info
 
     # drugbankIdList = drugProteinDict.keys()
-    # drugbankIdList = ['DB01627','DB05101','DB05107','DB08423','DB05127']
+    drugbankIdList = ['DB01627','DB05101','DB05107','DB08423','DB05127']
 
-    # drugData = parseDrugWebpage(drugbankIdList)
+    drugData = parseDrugWebpage(drugbankIdList)
+    
     # drugData = parseSmiles(drugbankIdList)
-
-    fixSmiles()
+    # fixSmiles()
 
     ##########
     # insertDrug(drugData)
