@@ -22,9 +22,9 @@ def main():
     # drugbankIdList = drugProteinDict.keys()
     # drugbankIdList = ['DB01627','DB05101','DB05107','DB08423','DB05127']
     # drugData = parseDrugWebpage(drugbankIdList)
-
     # drugData = parseSmiles(drugbankIdList)
-    # fixSmiles()
+
+    # fixDrugData()
 
     ##########
     fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl'
@@ -36,7 +36,7 @@ def main():
     #
     db.close()
 
-def fixSmiles(): 
+def fixDrugData(): 
     badWords = ['email','class="wrap"','.smiles','href']
     old = None
     smilesDict = None
@@ -68,6 +68,11 @@ def fixSmiles():
                 new[k]['SMILES'] = smilesDict[k]
         else:
             new[k]['SMILES'] = smilesDict[k]
+
+        for k2,v2 in v.iteritems():
+            for b in badWords:
+                if b in v2:
+                    new[k][k2] = 'not-available'
     
     assert(len(old)==len(new))
     fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl' 
