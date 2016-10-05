@@ -262,7 +262,7 @@ def parseDrugWebpage(drugbankIdList): # e.g. http://www.drugbank.ca/drugs/DB0510
             keys = ['InChI Key','CAS number','Chemical Formula','SMILES']
 
             for k in keys:
-                if (k in trStr) and ('.smiles' not in trStr) and ('class="wrap"' not in trStr):
+                if (k in trStr)and('.smiles' not in trStr)and('class="wrap"' not in trStr)and('href' not in trStr):
                     trStr = trStr.split('<td>')[1].replace('</td></tr>','')
                     trStr = trStr.replace('InChIKey=','')
                     trStr = trStr.replace('<div class="wrap">','').replace('</div>','')
