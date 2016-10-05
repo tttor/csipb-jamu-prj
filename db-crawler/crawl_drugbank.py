@@ -20,21 +20,23 @@ def main():
     # drugProteinDict = parseUniprotlinkFile() # contain drug-protein binding info
 
     # drugbankIdList = drugProteinDict.keys()
-    drugbankIdList = ['DB01627','DB05101','DB05107','DB08423','DB05127']
-
-    drugData = parseDrugWebpage(drugbankIdList)
-    
+    # drugbankIdList = ['DB01627','DB05101','DB05107','DB08423','DB05127']
+    # drugData = parseDrugWebpage(drugbankIdList)
     # drugData = parseSmiles(drugbankIdList)
-    # fixSmiles()
+
+    # fixDrugData()
 
     ##########
-    # insertDrug(drugData)
+    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl'
+    with open(fpath, 'rb') as handle:
+        drugData = pickle.load(handle)
+    insertDrug(drugData)
     # insertCompoundVsProtein(drugData)
 
     #
     db.close()
 
-def fixSmiles(): 
+def fixDrugData(): 
     badWords = ['email','class="wrap"','.smiles','href']
     old = None
     smilesDict = None
@@ -66,6 +68,11 @@ def fixSmiles():
                 new[k]['SMILES'] = smilesDict[k]
         else:
             new[k]['SMILES'] = smilesDict[k]
+
+        for k2,v2 in v.iteritems():
+            for b in badWords:
+                if b in v2:
+                    new[k][k2] = 'not-available'
     
     assert(len(old)==len(new))
     fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl' 
@@ -139,16 +146,33 @@ def insertDrug(drugData):
     for i,v in drugData.iteritems():
         if len(v['uniprotTargets'])!=0:
             idx += 1
-            print 'inserting idx=',str(idx),'of at most', str(len(drugData))
+            print 'inserting', i, 'idx=',str(idx),'of at most', str(len(drugData))
             
-            comId = str(idx)
-            comId = comId.zfill(8)
-            comId = '"'+'COM'+comId+'"'
-            comName = '"'+v['name']+'"'
-            comDrugbankId = '"'+i+'"'
+            comId = str(idx); comId = comId.zfill(8); comId = 'COM'+comId
+            comDrugbankId = i
+            na = 'not-available'
+            
+            insertVals = []
+            insertVals.append(comId)
+            insertVals.append(comDrugbankId)
 
-            qf = 'INSERT INTO compound (com_id,com_drugbank_id,com_name) VALUES ('
-            qm = comId+','+comDrugbankId+','+comName
+            insertKeys = ['CAS number', 'pubchemCid', 'InChI Key', 'Chemical Formula', 
+                          'SMILES','com_knapsack_id','com_kegg_id']
+            for k in insertKeys:
+                if k in v.keys():
+                    insertVals.append(v[k])
+                else:
+                    insertVals.append(na)
+
+            assert len(insertVals)==9
+            insertVals = ['"'+iv+'"' for iv in insertVals ]
+
+            qf = '''INSERT INTO compound (com_id,com_drugbank_id,
+                                          com_cas_id,com_pubchem_id, 
+                                          com_inchikey, com_formula, com_smiles,
+                                          com_knapsack_id, com_kegg_id)
+                 VALUES ('''
+            qm = ','.join(insertVals)
             qr = ')'
             sql = qf+qm+qr
             # print sql
@@ -235,7 +259,7 @@ def parseDrugWebpage(drugbankIdList): # e.g. http://www.drugbank.ca/drugs/DB0510
 
         #
         datum = defaultdict(list)
-        datum['name'] = str(soup.title.string).split()[1].strip()
+        # datum['name'] = str(soup.title.string).split()[1].strip()
 
         trList = soup.find_all('tr')
         for tr in trList:
@@ -243,7 +267,7 @@ def parseDrugWebpage(drugbankIdList): # e.g. http://www.drugbank.ca/drugs/DB0510
             keys = ['InChI Key','CAS number','Chemical Formula','SMILES']
 
             for k in keys:
-                if (k in trStr) and ('.smiles' not in trStr) and ('class="wrap"' not in trStr):
+                if (k in trStr)and('.smiles' not in trStr)and('class="wrap"' not in trStr)and('href' not in trStr):
                     trStr = trStr.split('<td>')[1].replace('</td></tr>','')
                     trStr = trStr.replace('InChIKey=','')
                     trStr = trStr.replace('<div class="wrap">','').replace('</div>','')

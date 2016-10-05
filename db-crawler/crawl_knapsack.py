@@ -9,12 +9,12 @@ from bs4 import BeautifulSoup
 from urllib2 import urlopen
 from datetime import datetime
 
+outDir = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003'
 db = MySQLdb.connect("localhost","root","123","ijah" )
 cursor = db.cursor()
 
-outDir = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003'
-
 def main():
+    #################
     plantCompoundDict = None
     # plantCompoundDict = parseKnapsack()
     fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003/knapsack_jsp_plant_vs_compound_2016-10-04_16:34:06.468234.pkl'  
@@ -23,12 +23,14 @@ def main():
 
     # insertPlants(plantCompoundDict.keys())
 
+    #################
     compoundDict = {}
     for comList in plantCompoundDict.values():
         for kId,cas,name,form in comList:
-            compoundDict[kId] = (cas,name,form)
+            compoundDict[kId] = (cas,form)
     insertCompound(compoundDict)
 
+    ################
     # insertPlantVsCompound()
     db.close()
 
@@ -120,13 +122,55 @@ def insertPlants(plantList):
         q = qf+qm+qr
         util.mysqlCommit(q)
 
-# def insertCompound(compoundDict):
-#     for k,v in compoundDict.iteritems():
-#         qf = 'INSERT INTO plant (pla_id,pla_name) VALUES ('
-#         qm = plaId+','+plaName
-#         qr = ')'
-#         q = qf+qm+qr
-#         util.mysqlCommit(q)
+def insertCompound(compoundDict):
+    # get the last of the current comId, after inserting from drugbank
+    comIdStr = 'COM00006661'
+    comId = int(comIdStr.strip('COM'))
+
+    #
+    idx = 0
+    nCom = len(compoundDict)
+    matchList = []
+    for k,v in compoundDict.iteritems():
+        idx += 1
+        print 'insert/updating', k, 'idx=',str(idx), 'of', nCom
+
+        cas,form = v
+        # assert(cas!='' and form!='')
+        # assert(cas!='not-available' and form!='not-available')
+
+        qf = 'SELECT * FROM compound WHERE com_cas_id='
+        qm = '"'+cas+'"'
+        qr = ''
+        q = qf+qm+qr
+        casMatch = util.mysqlCommit(db, cursor,q)
+
+        qf = 'SELECT * FROM compound WHERE com_formula='
+        qm = '"'+form+'"'
+        qr = ''
+        q = qf+qm+qr
+        formMatch = util.mysqlCommit(db, cursor,q)
+
+        if casMatch!=None or formMatch!=None:# match
+            matchList.append( (cas,form) )
+        else:
+            comId += 1
+            comIdStr = 'COM'+str(comId).zfill(8)
+
+            insertVals = [comIdStr,cas,form]
+            insertVals = ['not-available' if i=='' else i for i in insertVals]
+            insertVals = ['"'+i+'"' for i in insertVals]
+
+            qf = 'INSERT INTO compound (com_id,com_cas_id,com_formula) VALUES ('
+            qm =','.join(insertVals)
+            qr = ')'
+            q = qf+qm+qr
+            util.mysqlCommit(db,cursor,q)
+
+    fpath = outDir+'/knapsack_compound_match_with_drugbank.lst'
+    with open(fpath,'w') as f:
+        for m in matchList:
+            f.write(s+'\n')
 
 # def insertPlantVsCompound():
 #     pass
