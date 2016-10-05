@@ -18,7 +18,7 @@ def main():
     drugProteinDict = parseUniprotlinkFile() # contain drug-protein binding info
 
     drugbankIdList = drugProteinDict.keys()
-    # drugbankIdList = ['DB05101','DB05107','DB08423','DB05127']
+    # drugbankIdList = ['DB01627','DB05101','DB05107','DB08423','DB05127']
     drugData = parseDrugWebpage(drugbankIdList)
 
     # insertDrug(drugProteinDict)
@@ -170,7 +170,7 @@ def parseDrugWebpage(drugbankIdList): # e.g. http://www.drugbank.ca/drugs/DB0510
 
     nDbId = len(drugbankIdList)
     for idx, dbId in enumerate(drugbankIdList):
-        print 'parsing idx=', str(idx+1), 'of', str(nDbId)
+        print 'parsing', dbId, 'idx=', str(idx+1), 'of', str(nDbId)
 
         baseURL = 'http://www.drugbank.ca/drugs/'
         url = baseURL+dbId
@@ -192,7 +192,7 @@ def parseDrugWebpage(drugbankIdList): # e.g. http://www.drugbank.ca/drugs/DB0510
             keys = ['InChI Key','CAS number','Chemical Formula','SMILES']
 
             for k in keys:
-                if (k in trStr) and ('.smiles' not in trStr):
+                if (k in trStr) and ('.smiles' not in trStr) and ('class="wrap"' not in trStr):
                     trStr = trStr.split('<td>')[1].replace('</td></tr>','')
                     trStr = trStr.replace('InChIKey=','')
                     trStr = trStr.replace('<div class="wrap">','').replace('</div>','')
