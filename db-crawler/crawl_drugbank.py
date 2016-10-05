@@ -30,6 +30,41 @@ def main():
     #
     db.close()
 
+def fixSmiles(): 
+    badWords = ['email','class="wrap"','.smiles','href']
+    old = None
+    smilesDict = None
+
+    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl' 
+    with open(fpath, 'rb') as handle:
+        old = pickle.load(handle)
+
+    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_smiles_2016-10-05_12:35:37.724557.json' 
+    with open(fpath, 'rb') as handle:
+        smilesDict = pickle.load(handle)
+
+    for k,v in old.iteritems():
+        oldSmiles = k['SMILES']
+
+        bad = False
+        for b in badWords:
+            if b in oldSmiles:
+                bad = True
+                break
+        
+        if bad:
+            k['SMILES'] = smilesDict[drugbankId]
+        else:
+            k['SMILES'] = oldSmiles
+    
+    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl' 
+    with open(pklFpath, 'wb') as f:
+        pickle.dump(old, f)
+
+    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.json' 
+    with open(fpath, 'w') as f:
+        json.dump(old, f, indent=2, sort_keys=True)
+
 def insertCompoundVsProtein(drugProteinDict):
     idx = 0
     for i,v in drugProteinDict.iteritems():
