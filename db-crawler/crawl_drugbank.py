@@ -165,11 +165,10 @@ def insertDrug(drugData):
                                           com_cas_id,com_pubchem_id, 
                                           com_inchikey, com_formula, com_smiles)
                  VALUES ('''
-
             qm = ','.join(insertVals)
             qr = ')'
             sql = qf+qm+qr
-            print sql
+            # print sql
 
             util.mysqlCommit(db, cursor, sql)
 
@@ -253,7 +252,7 @@ def parseDrugWebpage(drugbankIdList): # e.g. http://www.drugbank.ca/drugs/DB0510
 
         #
         datum = defaultdict(list)
-        datum['name'] = str(soup.title.string).split()[1].strip()
+        # datum['name'] = str(soup.title.string).split()[1].strip()
 
         trList = soup.find_all('tr')
         for tr in trList:
