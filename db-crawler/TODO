@@ -1,7 +1,7 @@
 TODO
 
 --> crawl drug info from drugbank webpage
-> insert compound from db
+--> insert compound from db
 > insert compound from knapsack
 > check com-prot connection
 > get comp-prot from bioassay pubchem

@@ -151,19 +151,21 @@ def insertDrug(drugData):
             insertVals.append(comId)
             insertVals.append(comDrugbankId)
 
-            insertKeys = ['CAS number', 'pubchemCid', 'InChI Key', 'Chemical Formula', 'SMILES']
+            insertKeys = ['CAS number', 'pubchemCid', 'InChI Key', 'Chemical Formula', 
+                          'SMILES','com_knapsack_id','com_kegg_id']
             for k in insertKeys:
                 if k in v.keys():
                     insertVals.append(v[k])
                 else:
                     insertVals.append(na)
 
-            assert len(insertVals)==8
+            assert len(insertVals)==9
             insertVals = ['"'+iv+'"' for iv in insertVals ]
 
             qf = '''INSERT INTO compound (com_id,com_drugbank_id,
                                           com_cas_id,com_pubchem_id, 
-                                          com_inchikey, com_formula, com_smiles)
+                                          com_inchikey, com_formula, com_smiles,
+                                          com_knapsack_id, com_kegg_id)
                  VALUES ('''
             qm = ','.join(insertVals)
             qr = ')'
