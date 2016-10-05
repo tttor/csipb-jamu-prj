@@ -188,6 +188,7 @@ def parseDrugWebpage(drugbankIdList): # e.g. http://www.drugbank.ca/drugs/DB0510
 
         #
         datum = defaultdict(list)
+        datum['name'] = str(soup.title.string)
 
         trList = soup.find_all('tr')
         for tr in trList:
