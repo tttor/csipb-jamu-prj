@@ -16,16 +16,20 @@ db = MySQLdb.connect("localhost","root","123","ijah" )
 cursor = db.cursor()
 
 def main():
-    drugProteinDict = parseUniprotlinkFile() # contain drug-protein binding info
+    #########
+    # drugProteinDict = parseUniprotlinkFile() # contain drug-protein binding info
 
-    drugbankIdList = drugProteinDict.keys()
+    # drugbankIdList = drugProteinDict.keys()
     # drugbankIdList = ['DB01627','DB05101','DB05107','DB08423','DB05127']
 
     # drugData = parseDrugWebpage(drugbankIdList)
-    drugData = parseSmiles(drugbankIdList)
+    # drugData = parseSmiles(drugbankIdList)
 
-    # insertDrug(drugProteinDict)
-    # insertCompoundVsProtein(drugProteinDict)
+    fixSmiles()
+
+    ##########
+    # insertDrug(drugData)
+    # insertCompoundVsProtein(drugData)
 
     #
     db.close()
@@ -35,35 +39,42 @@ def fixSmiles():
     old = None
     smilesDict = None
 
-    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl' 
+    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.ori.pkl' 
     with open(fpath, 'rb') as handle:
         old = pickle.load(handle)
 
-    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_smiles_2016-10-05_12:35:37.724557.json' 
+    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_smiles_2016-10-05_12:35:37.724557.pkl' 
     with open(fpath, 'rb') as handle:
         smilesDict = pickle.load(handle)
 
+    nOld = len(old)
+    new = old
+    idx = 0
     for k,v in old.iteritems():
-        oldSmiles = k['SMILES']
+        idx += 1
+        print 'fixing', k, 'idx=', str(idx), 'of', nOld
 
-        bad = False
-        for b in badWords:
-            if b in oldSmiles:
-                bad = True
-                break
-        
-        if bad:
-            k['SMILES'] = smilesDict[drugbankId]
+        if 'SMILES' in v.keys():
+            oldSmiles = v['SMILES']
+            bad = False
+            for b in badWords:
+                if b in oldSmiles:
+                    bad = True
+                    break
+
+            if bad:
+                new[k]['SMILES'] = smilesDict[k]
         else:
-            k['SMILES'] = oldSmiles
+            new[k]['SMILES'] = smilesDict[k]
     
+    assert(len(old)==len(new))
     fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl' 
-    with open(pklFpath, 'wb') as f:
-        pickle.dump(old, f)
+    with open(fpath, 'wb') as f:
+        pickle.dump(new, f)
 
     fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.json' 
     with open(fpath, 'w') as f:
-        json.dump(old, f, indent=2, sort_keys=True)
+        json.dump(new, f, indent=2, sort_keys=True)
 
 def insertCompoundVsProtein(drugProteinDict):
     idx = 0
@@ -123,18 +134,19 @@ def insertCompoundVsProtein(drugProteinDict):
                     assert False, 'dbErr'
                     db.rollback()
 
-def insertDrug(drugProteinDict):
+def insertDrug(drugData):
     idx = 0
-    for i,v in drugProteinDict.iteritems():
-        if len(v['targetProtein'])!=0:
+    for i,v in drugData.iteritems():
+        if len(v['uniprotTargets'])!=0:
             idx += 1
-            print 'inserting idx=',str(idx),'of at most', str(len(drugProteinDict))
+            print 'inserting idx=',str(idx),'of at most', str(len(drugData))
             
             comId = str(idx)
             comId = comId.zfill(8)
             comId = '"'+'COM'+comId+'"'
             comName = '"'+v['name']+'"'
             comDrugbankId = '"'+i+'"'
+
             qf = 'INSERT INTO compound (com_id,com_drugbank_id,com_name) VALUES ('
             qm = comId+','+comDrugbankId+','+comName
             qr = ')'
