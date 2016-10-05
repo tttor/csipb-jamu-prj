@@ -18,7 +18,7 @@ def main():
     drugProteinDict = parseUniprotlinkFile() # contain drug-protein binding info
 
     drugbankIdList = drugProteinDict.keys()
-    # drugbankIdList = ['DB05107','DB08423','DB05127']
+    # drugbankIdList = ['DB05101','DB05107','DB08423','DB05127']
     drugData = parseDrugWebpage(drugbankIdList)
 
     # insertDrug(drugProteinDict)
@@ -186,27 +186,23 @@ def parseDrugWebpage(drugbankIdList): # e.g. http://www.drugbank.ca/drugs/DB0510
         #
         datum = defaultdict(list)
 
-        rowData = []
         trList = soup.find_all('tr')
         for tr in trList:
             trStr = str(tr)
-            if 'InChI Key' in trStr or 'CAS' in trStr or 'Chemical Formula' in trStr or 'SMILES' in trStr:
-                rowData.append(trStr)
+            keys = ['InChI Key','CAS number','Chemical Formula','SMILES']
 
-        if len(rowData)>4:
-            rowData = rowData[1:5]
-        rowData = [d.split('<td>')[1].replace('</td></tr>','') for d in rowData]
-        rowData = [d.replace('<div class="wrap">','').replace('</div>','') for d in rowData]
-        rowData = [d.replace('InChIKey=','').replace('</div>','') for d in rowData]
-        rowData = [d.replace('<sub>','').replace('</sub>','') for d in rowData]
-        rowData = ['not-available' if ('wishart-not-available' in d) else d for d in rowData]
+            for k in keys:
+                if (k in trStr) and ('.smiles' not in trStr):
+                    trStr = trStr.split('<td>')[1].replace('</td></tr>','')
+                    trStr = trStr.replace('InChIKey=','')
+                    trStr = trStr.replace('<div class="wrap">','').replace('</div>','')
+                    trStr = trStr.replace('<sub>','').replace('</sub>','')
 
-        assert len(rowData)==4
-        datum['name'] = str(soup.title.string).split()[1]
-        datum['CAS'] = rowData[0]
-        datum['formula'] = rowData[1]
-        datum['InChIKey'] = rowData[2]
-        datum['SMILES'] = rowData[3]
+                    if ('wishart-not-available' in trStr) or trStr=='':
+                        trStr = 'not-available'
+
+                    # print trStr
+                    datum[k] = trStr
 
         aList = soup.find_all('a')
         cidBaseUrl = 'http://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid='
@@ -226,7 +222,7 @@ def parseDrugWebpage(drugbankIdList): # e.g. http://www.drugbank.ca/drugs/DB0510
 
         comData[dbId] = datum
 
-        if (idx%100)==0 or idx==(nDbId-1):
+        if ((idx+1)%100)==0 or idx==(nDbId-1):
             jsonFpath = outDir+'/drugbank_drug_data_'+str(now.date())+'_'+str(now.time())+'.json'
             with open(jsonFpath, 'w') as f:
                 json.dump(comData, f, indent=2, sort_keys=True)
