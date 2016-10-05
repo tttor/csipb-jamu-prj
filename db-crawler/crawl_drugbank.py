@@ -20,15 +20,17 @@ def main():
     # drugProteinDict = parseUniprotlinkFile() # contain drug-protein binding info
 
     # drugbankIdList = drugProteinDict.keys()
-    drugbankIdList = ['DB01627','DB05101','DB05107','DB08423','DB05127']
+    # drugbankIdList = ['DB01627','DB05101','DB05107','DB08423','DB05127']
+    # drugData = parseDrugWebpage(drugbankIdList)
 
-    drugData = parseDrugWebpage(drugbankIdList)
-    
     # drugData = parseSmiles(drugbankIdList)
     # fixSmiles()
 
     ##########
-    # insertDrug(drugData)
+    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl'
+    with open(fpath, 'rb') as handle:
+        drugData = pickle.load(handle)
+    insertDrug(drugData)
     # insertCompoundVsProtein(drugData)
 
     #
@@ -141,17 +143,33 @@ def insertDrug(drugData):
             idx += 1
             print 'inserting idx=',str(idx),'of at most', str(len(drugData))
             
-            comId = str(idx)
-            comId = comId.zfill(8)
-            comId = '"'+'COM'+comId+'"'
-            comName = '"'+v['name']+'"'
-            comDrugbankId = '"'+i+'"'
+            comId = str(idx); comId = comId.zfill(8); comId = 'COM'+comId
+            comDrugbankId = i
+            na = 'not-available'
+            
+            insertVals = []
+            insertVals.append(comId)
+            insertVals.append(comDrugbankId)
 
-            qf = 'INSERT INTO compound (com_id,com_drugbank_id,com_name) VALUES ('
-            qm = comId+','+comDrugbankId+','+comName
+            insertKeys = ['CAS number', 'pubchemCid', 'InChI Key', 'Chemical Formula', 'SMILES']
+            for k in insertKeys:
+                if k in v.keys():
+                    insertVals.append(v[k])
+                else:
+                    insertVals.append(na)
+
+            assert len(insertVals)==8
+            insertVals = ['"'+iv+'"' for iv in insertVals ]
+
+            qf = '''INSERT INTO compound (com_id,com_drugbank_id,
+                                          com_cas_id,com_pubchem_id, 
+                                          com_inchikey, com_formula, com_smiles)
+                 VALUES ('''
+
+            qm = ','.join(insertVals)
             qr = ')'
             sql = qf+qm+qr
-            # print sql
+            print sql
 
             util.mysqlCommit(db, cursor, sql)
 
