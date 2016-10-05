@@ -1,0 +1,12 @@
+TODO
+
+> crawl drug info from drugbank webpage
+> insert compound from knapsack
+> check com-prot connection
+> get comp-prot from bioassay pubchem
+Ask Amir for the data
+> calc compound similarity
+tanimoto, ask Amir
+simcomp, KEGG
+> calc protein similarity
+> run prediction using blm-nii framework

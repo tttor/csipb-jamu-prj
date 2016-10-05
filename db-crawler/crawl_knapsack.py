@@ -3,6 +3,7 @@ import json
 import yaml
 import MySQLdb
 import pickle
+import dbcrawler_util as util
 from collections import defaultdict
 from bs4 import BeautifulSoup
 from urllib2 import urlopen
@@ -12,14 +13,6 @@ db = MySQLdb.connect("localhost","root","123","ijah" )
 cursor = db.cursor()
 
 outDir = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003'
-
-def sqlCommit(query):
-    try:
-        cursor.execute(query)
-        db.commit()
-    except (MySQLdb.Error, MySQLdb.Warning) as e:
-        db.rollback()
-        assert False, 'mySQL Error: '+str(e)
 
 def main():
     plantCompoundDict = None
@@ -125,7 +118,7 @@ def insertPlants(plantList):
         qm = plaId+','+plaName
         qr = ')'
         q = qf+qm+qr
-        sqlCommit(q)
+        util.mysqlCommit(q)
 
 # def insertCompound(compoundDict):
 #     for k,v in compoundDict.iteritems():
@@ -133,7 +126,7 @@ def insertPlants(plantList):
 #         qm = plaId+','+plaName
 #         qr = ')'
 #         q = qf+qm+qr
-#         sqlCommit(q)
+#         util.mysqlCommit(q)
 
 # def insertPlantVsCompound():
 #     pass
