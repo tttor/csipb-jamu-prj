@@ -4,6 +4,7 @@ import time
 import pickle
 import json
 import MySQLdb
+import httplib
 import urllib2 as urllib
 from collections import defaultdict
 import dbcrawler_util as util
@@ -19,7 +20,9 @@ def main():
 
     drugbankIdList = drugProteinDict.keys()
     # drugbankIdList = ['DB01627','DB05101','DB05107','DB08423','DB05127']
-    drugData = parseDrugWebpage(drugbankIdList)
+
+    # drugData = parseDrugWebpage(drugbankIdList)
+    drugData = parseSmiles(drugbankIdList)
 
     # insertDrug(drugProteinDict)
     # insertCompoundVsProtein(drugProteinDict)
@@ -232,6 +235,44 @@ def parseDrugWebpage(drugbankIdList): # e.g. http://www.drugbank.ca/drugs/DB0510
                 pickle.dump(comData, f)
 
     return comData
+
+def parseSmiles(drugbankIdList):
+    now = datetime.now()
+    nDbId = len(drugbankIdList)
+    baseURL = 'http://www.drugbank.ca/structures/structures/small_molecule_drugs/'
+
+    smiles = dict() 
+    for idx, dbId in enumerate(drugbankIdList):
+        print 'parsing', dbId, 'idx=', str(idx+1), 'of', str(nDbId)
+
+        s = 'not-available'
+        url = baseURL+dbId+'.smiles'
+        try: 
+            s = urllib.urlopen(url)
+        except urllib.HTTPError, e:
+            print('HTTPError = ' + str(e.code))
+        except urllib.URLError, e:
+            print('URLError = ' + str(e.reason))
+        except httplib.HTTPException, e:
+            print('HTTPException')
+        except Exception:
+            import traceback
+            print('generic exception: ' + traceback.format_exc())
+
+        s = bs(s, 'html.parser')
+        smiles[dbId] = str(s)
+
+        if ((idx+1)%100)==0 or idx==(nDbId-1):
+            jsonFpath = outDir+'/drugbank_drug_smiles_'+str(now.date())+'_'+str(now.time())+'.json'
+            with open(jsonFpath, 'w') as f:
+                json.dump(smiles, f, indent=2, sort_keys=True)
+
+            pklFpath = outDir+'/drugbank_drug_smiles_'+str(now.date())+'_'+str(now.time())+'.pkl'
+            with open(pklFpath, 'wb') as f:
+                pickle.dump(smiles, f)
+
+    # print smiles
+    return smiles
 
 # def parseDrugbankVocab():
 #     fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_vocabulary.csv'
