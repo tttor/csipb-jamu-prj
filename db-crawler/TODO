@@ -2,7 +2,11 @@ TODO
 
 --> crawl drug info from drugbank webpage
 --> insert compound from db
-> insert compound from knapsack
+--> insert compound from knapsack
+> crawl kegg compound looking for
+<a href="/dbget-bin/www_bget?dr:D00030">D00030</a>
+<a href="http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=C00001377">C00001377</a>
+> insert plant-vs-compound from knapsack
 > check com-prot connection
 > get comp-prot from bioassay pubchem
 Ask Amir for the data
@@ -11,3 +15,5 @@ tanimoto, ask Amir
 simcomp, KEGG
 > calc protein similarity
 > run prediction using blm-nii framework
+> crawl knapsack based on cid
+http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=C00007564

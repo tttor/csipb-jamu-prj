@@ -136,32 +136,34 @@ def insertCompound(compoundDict):
         print 'insert/updating', k, 'idx=',str(idx), 'of', nCom
 
         cas,form = v
-        # assert(cas!='' and form!='')
-        # assert(cas!='not-available' and form!='not-available')
 
-        qf = 'SELECT * FROM compound WHERE com_cas_id='
-        qm = '"'+cas+'"'
-        qr = ''
-        q = qf+qm+qr
-        casMatch = util.mysqlCommit(db, cursor,q)
+        casMatch = None
+        if cas!='':
+            qf = 'SELECT * FROM compound WHERE com_cas_id='
+            qm = '"'+cas+'"'
+            qr = ''
+            q = qf+qm+qr
+            casMatch = util.mysqlCommit(db, cursor,q)
+        # print casMatch
 
-        qf = 'SELECT * FROM compound WHERE com_formula='
-        qm = '"'+form+'"'
-        qr = ''
-        q = qf+qm+qr
-        formMatch = util.mysqlCommit(db, cursor,q)
+        if casMatch!=None:
+            # print 'match'
+            matchList.append(cas)
 
-        if casMatch!=None or formMatch!=None:# match
-            matchList.append( (cas,form) )
+            qf = 'UPDATE compound SET com_knapsack_id='
+            qm = '"'+k+'"'
+            qr = 'WHERE com_cas_id='+'"'+cas+'"'
+            q = qf+qm+qr
+            util.mysqlCommit(db,cursor,q)
         else:
             comId += 1
             comIdStr = 'COM'+str(comId).zfill(8)
 
-            insertVals = [comIdStr,cas,form]
+            insertVals = [comIdStr,cas,k]
             insertVals = ['not-available' if i=='' else i for i in insertVals]
             insertVals = ['"'+i+'"' for i in insertVals]
 
-            qf = 'INSERT INTO compound (com_id,com_cas_id,com_formula) VALUES ('
+            qf = 'INSERT INTO compound (com_id,com_cas_id,com_knapsack_id) VALUES ('
             qm =','.join(insertVals)
             qr = ')'
             q = qf+qm+qr
@@ -170,10 +172,10 @@ def insertCompound(compoundDict):
     fpath = outDir+'/knapsack_compound_match_with_drugbank.lst'
     with open(fpath,'w') as f:
         for m in matchList:
-            f.write(s+'\n')
+            f.write(str(m)+'\n')
 
-# def insertPlantVsCompound():
-#     pass
+def insertPlantVsCompound():
+    pass
 
 if __name__ == '__main__':
     start_time = time.time()
