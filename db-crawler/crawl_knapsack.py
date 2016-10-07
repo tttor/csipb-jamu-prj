@@ -94,7 +94,10 @@ def parseKnapsack():
                     plantName = plantName.capitalize()
 
                     compoundDatum = ( comKnapsackId, comCasId, comName, comFormula )
-                    plantCompoundDict[plantName].append( compoundDatum )
+
+                    existingCom = [ c[0] for c in plantCompoundDict[plantName]]
+                    if comKnapsackId not in existingCom:
+                        plantCompoundDict[plantName].append( compoundDatum )
 
     jsonFpath = outDir+'/knapsack_jsp_plant_vs_compound_'+str(now.date())+'_'+str(now.time())+'.json'
     with open(jsonFpath, 'w') as f:
