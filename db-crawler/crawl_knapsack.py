@@ -23,15 +23,15 @@ def main():
 
     # insertPlants(plantCompoundDict.keys())
 
-    #################
-    compoundDict = {}
-    for comList in plantCompoundDict.values():
-        for kId,cas,name,form in comList:
-            compoundDict[kId] = (cas,form)
-    insertCompound(compoundDict)
+    # #################
+    # compoundDict = {}
+    # for comList in plantCompoundDict.values():
+    #     for kId,cas,name,form in comList:
+    #         compoundDict[kId] = (cas,form)
+    # insertCompound(compoundDict)
 
     ################
-    # insertPlantVsCompound()
+    insertPlantVsCompound(plantCompoundDict)
     db.close()
 
 def parseKnapsack():
@@ -174,10 +174,40 @@ def insertCompound(compoundDict):
         for m in matchList:
             f.write(str(m)+'\n')
 
-def insertPlantVsCompound():
-    pass
+def insertPlantVsCompound(plantCompoundDict):
+    idx = 0
+    pc = plantCompoundDict
+    n = len(pc)
+    for p,v in pc.iteritems():
+        idx += 1
+        print 'inserting', p, 'idx=', str(idx), 'of', str(n)
+
+        qf = 'SELECT pla_id FROM plant WHERE pla_name ='
+        qm = '"'+p+'"'
+        qr = ''
+        q = qf+qm+qr
+        plaId = util.mysqlCommit(db,cursor,q)[0]
+
+        for c in v:
+            qf = 'SELECT com_id FROM compound WHERE com_knapsack_id ='
+            qm = '"' + c[0] + '"'
+            qr = ''
+            q = qf+qm+qr
+            comId = util.mysqlCommit(db,cursor,q)[0]
+            assert comId!=None
+
+            src = 'knapsack.kanaya.naist.jp'
+            insertVals = [plaId,comId,src]
+            insertVals = ['"'+i+'"' for i in insertVals]
+
+            qf = 'INSERT INTO plant_vs_compound (pla_id,com_id,source) VALUES ('
+            qm = ','.join(insertVals)
+            qr = ')'
+            q = qf+qm+qr
+            util.mysqlCommit(db,cursor,q)
 
 if __name__ == '__main__':
     start_time = time.time()
     main()
     print("--- %s seconds ---" % (time.time() - start_time))
+    
