@@ -183,21 +183,25 @@ def insertPlantVsCompound(plantCompoundDict):
     n = len(pc)
     for p,v in pc.iteritems():
         idx += 1
-        print 'inserting', p, 'idx=', str(idx), 'of', str(n)
 
         qf = 'SELECT pla_id FROM plant WHERE pla_name ='
         qm = '"'+p+'"'
         qr = ''
         q = qf+qm+qr
-        plaId = util.mysqlCommit(db,cursor,q)[0]
+        plaId = util.mysqlCommit(db,cursor,q); assert plaId!=None
+        plaId = plaId[0]
 
-        for c in v:
+        comList = [c[0] for c in v]
+        comList = list(set(comList))
+        for c in comList:
+            print 'inserting', p, 'vs', c, 'idx=', str(idx), 'of', str(n)
+
             qf = 'SELECT com_id FROM compound WHERE com_knapsack_id ='
-            qm = '"' + c[0] + '"'
+            qm = '"' + c + '"'
             qr = ''
             q = qf+qm+qr
-            comId = util.mysqlCommit(db,cursor,q)[0]
-            assert comId!=None
+            comId = util.mysqlCommit(db,cursor,q); assert comId!=None
+            comId = comId[0]
 
             src = 'knapsack.kanaya.naist.jp'
             insertVals = [plaId,comId,src]
