@@ -127,7 +127,7 @@ def insertPlants(plantList):
 
 def insertCompound(compoundDict):
     # get the last of the current comId, after inserting from drugbank
-    comIdStr = 'COM00006661'
+    comIdStr = 'COM00006661' #TODO unhardcode
     comId = int(comIdStr.strip('COM'))
 
     #
@@ -178,9 +178,11 @@ def insertCompound(compoundDict):
             f.write(str(m)+'\n')
 
 def insertPlantVsCompound(plantCompoundDict):
-    idx = 0
     pc = plantCompoundDict
-    n = len(pc)
+    src = 'knapsack.kanaya.naist.jp'
+    log = []; logFpath = outDir+'/insertPlantVsCompound.log'
+
+    n = len(pc); idx = 0; 
     for p,v in pc.iteritems():
         idx += 1
 
@@ -188,30 +190,37 @@ def insertPlantVsCompound(plantCompoundDict):
         qm = '"'+p+'"'
         qr = ''
         q = qf+qm+qr
-        plaId = util.mysqlCommit(db,cursor,q); assert plaId!=None
-        plaId = plaId[0]
+        plaIdR = util.mysqlCommit(db,cursor,q); 
 
-        comList = [c[0] for c in v]
-        comList = list(set(comList))
+        comList = list( set([c[0] for c in v]) )
         for c in comList:
-            print 'inserting', p, 'vs', c, 'idx=', str(idx), 'of', str(n)
+            msg = 'inserting '+ p+ ' vs '+ c+ ' idx= '+ str(idx)+ ' of '+ str(n)
+            print msg
 
             qf = 'SELECT com_id FROM compound WHERE com_knapsack_id ='
             qm = '"' + c + '"'
             qr = ''
             q = qf+qm+qr
-            comId = util.mysqlCommit(db,cursor,q); assert comId!=None
-            comId = comId[0]
+            comIdR = util.mysqlCommit(db,cursor,q); 
 
-            src = 'knapsack.kanaya.naist.jp'
-            insertVals = [plaId,comId,src]
-            insertVals = ['"'+i+'"' for i in insertVals]
+            if plaIdR!=None and comIdR!=None:
+                plaId = plaIdR[0]
+                comId = comIdR[0]
 
-            qf = 'INSERT INTO plant_vs_compound (pla_id,com_id,source) VALUES ('
-            qm = ','.join(insertVals)
-            qr = ')'
-            q = qf+qm+qr
-            util.mysqlCommit(db,cursor,q)
+                insertVals = [plaId,comId,src]
+                insertVals = ['"'+i+'"' for i in insertVals]
+
+                qf = 'INSERT INTO plant_vs_compound (pla_id,com_id,source) VALUES ('
+                qm = ','.join(insertVals)
+                qr = ')'
+                q = qf+qm+qr
+                util.mysqlCommit(db,cursor,q)
+            else:
+                log.append('FAIL: '+msg)
+
+    with open(logFpath,'w') as f:
+        for i in log:
+            f.write(str(i)+'\n')
 
 if __name__ == '__main__':
     start_time = time.time()
