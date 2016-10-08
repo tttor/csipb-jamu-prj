@@ -23,15 +23,15 @@ def main():
 
     # insertPlants(plantCompoundDict.keys())
 
-    #################
-    compoundDict = {}
-    for comList in plantCompoundDict.values():
-        for kId,cas,name,form in comList:
-            compoundDict[kId] = (cas,form)
-    insertCompound(compoundDict)
+    # #################
+    # compoundDict = {}
+    # for comList in plantCompoundDict.values():
+    #     for kId,cas,name,form in comList:
+    #         compoundDict[kId] = (cas,form)
+    # insertCompound(compoundDict)
 
     ################
-    # insertPlantVsCompound()
+    insertPlantVsCompound(plantCompoundDict)
     db.close()
 
 def parseKnapsack():
@@ -94,7 +94,10 @@ def parseKnapsack():
                     plantName = plantName.capitalize()
 
                     compoundDatum = ( comKnapsackId, comCasId, comName, comFormula )
-                    plantCompoundDict[plantName].append( compoundDatum )
+
+                    existingCom = [ c[0] for c in plantCompoundDict[plantName]]
+                    if comKnapsackId not in existingCom:
+                        plantCompoundDict[plantName].append( compoundDatum )
 
     jsonFpath = outDir+'/knapsack_jsp_plant_vs_compound_'+str(now.date())+'_'+str(now.time())+'.json'
     with open(jsonFpath, 'w') as f:
@@ -124,7 +127,7 @@ def insertPlants(plantList):
 
 def insertCompound(compoundDict):
     # get the last of the current comId, after inserting from drugbank
-    comIdStr = 'COM00006661'
+    comIdStr = 'COM00006661' #TODO unhardcode
     comId = int(comIdStr.strip('COM'))
 
     #
@@ -174,10 +177,53 @@ def insertCompound(compoundDict):
         for m in matchList:
             f.write(str(m)+'\n')
 
-def insertPlantVsCompound():
-    pass
+def insertPlantVsCompound(plantCompoundDict):
+    pc = plantCompoundDict
+    src = 'knapsack.kanaya.naist.jp'
+    log = []; logFpath = outDir+'/insertPlantVsCompound.log'
+
+    n = len(pc); idx = 0; 
+    for p,v in pc.iteritems():
+        idx += 1
+
+        qf = 'SELECT pla_id FROM plant WHERE pla_name ='
+        qm = '"'+p+'"'
+        qr = ''
+        q = qf+qm+qr
+        plaIdR = util.mysqlCommit(db,cursor,q); 
+
+        comList = list( set([c[0] for c in v]) )
+        for c in comList:
+            msg = 'inserting '+ p+ ' vs '+ c+ ' idx= '+ str(idx)+ ' of '+ str(n)
+            print msg
+
+            qf = 'SELECT com_id FROM compound WHERE com_knapsack_id ='
+            qm = '"' + c + '"'
+            qr = ''
+            q = qf+qm+qr
+            comIdR = util.mysqlCommit(db,cursor,q); 
+
+            if plaIdR!=None and comIdR!=None:
+                plaId = plaIdR[0]
+                comId = comIdR[0]
+
+                insertVals = [plaId,comId,src]
+                insertVals = ['"'+i+'"' for i in insertVals]
+
+                qf = 'INSERT INTO plant_vs_compound (pla_id,com_id,source) VALUES ('
+                qm = ','.join(insertVals)
+                qr = ')'
+                q = qf+qm+qr
+                util.mysqlCommit(db,cursor,q)
+            else:
+                log.append('FAIL: '+msg)
+
+    with open(logFpath,'w') as f:
+        for i in log:
+            f.write(str(i)+'\n')
 
 if __name__ == '__main__':
     start_time = time.time()
     main()
     print("--- %s seconds ---" % (time.time() - start_time))
+    

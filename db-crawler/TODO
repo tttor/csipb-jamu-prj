@@ -3,17 +3,31 @@ TODO
 --> crawl drug info from drugbank webpage
 --> insert compound from db
 --> insert compound from knapsack
-> crawl kegg compound looking for
+
+--> crawl kegg compound, for more compoung-protein match
 <a href="/dbget-bin/www_bget?dr:D00030">D00030</a>
 <a href="http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=C00001377">C00001377</a>
-> insert plant-vs-compound from knapsack
-> check com-prot connection
-> get comp-prot from bioassay pubchem
-Ask Amir for the data
+!have sampled some, and we get the same as we direcly link knapsack and drugbank via cas-od!
+
+--> insert plant-vs-compound from knapsack
+!warn: inconsistent 
+C00051723 has cas= 619-62-5
+C00050780 has cas= 619-62-5
+http://www.flavornet.org/info/619-62-5.html
+
+--> insert compound protein
+--> fix pro-vs-dis
+
+> run dummy predictor
+
 > calc compound similarity
 tanimoto, ask Amir
 simcomp, KEGG
+
 > calc protein similarity
 > run prediction using blm-nii framework
 > crawl knapsack based on cid
 http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=C00007564
+
+> get comp-prot from bioassay pubchem
+Ask Amir for the data

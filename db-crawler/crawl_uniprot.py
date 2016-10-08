@@ -3,7 +3,12 @@
 import time
 import json
 import MySQLdb
+import dbcrawler_util as util
 from collections import defaultdict
+
+dirPath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/uniprot/uniprot_human_dat_20160928'
+db = MySQLdb.connect("localhost","root","123","ijah" )
+cursor = db.cursor()
 
 def main():
     proteinDiseaseDict, proteinList, diseaseList = parseUniprotData()
@@ -11,58 +16,51 @@ def main():
     # insertProtein(proteinList)
     insertProteinVsDisease(proteinDiseaseDict)
 
-def insertProteinVsDisease(proteinDiseaseDict):
-    db = MySQLdb.connect("localhost","root","123","ijah" )
-    cursor = db.cursor()
+    db.close()
 
+def insertProteinVsDisease(proteinDiseaseDict):
+    src = 'uniprot.org'
+    n = len(proteinDiseaseDict)
+    log = []; logFpath = dirPath+'/insertProteinVsDisease.log'
     idx = 0
-    for i,v in proteinDiseaseDict.iteritems():
+    for p,v in proteinDiseaseDict.iteritems():
         idx += 1
-        print 'inserting i=', str(idx), 'of', str(len(proteinDiseaseDict))
 
         qf = 'SELECT pro_id FROM protein WHERE pro_uniprot_abbrv ='
-        qm = '"' + i + '"'
+        qm = '"' + p + '"'
         qr = ''
-        sql = qf+qm+qr
-
-        try:
-            cursor.execute(sql)
-            db.commit()
-        except:
-            assert False, 'dbErr'
-            db.rollback()
-        proId = cursor.fetchone()[0]
-        proId = '"'+proId+'"'
+        q = qf+qm+qr
+        proIdR = util.mysqlCommit(db,cursor,q)
         
-        for i in v['disease']:
+        for d in v['disease']:
+            msg = 'inserting '+ p+ ' vs '+ d[1]+ 'idx= '+ str(idx)+ ' of '+ str(n)
+            print msg
+
             qf = 'SELECT dis_id FROM disease WHERE dis_omim_id ='
-            qm = '"' + i[2] + '"'
+            qm = '"' + d[2] + '"'
             qr = ''
-            sql = qf+qm+qr
+            q = qf+qm+qr
+            disIdR = util.mysqlCommit(db,cursor,q)
 
-            try:
-                cursor.execute(sql)
-                db.commit()
-            except:
-                assert False, 'dbErr'
-                db.rollback()
-            disId = cursor.fetchone()[0]
-            disId = '"'+disId+'"'
+            if proIdR!=None and disIdR!=None:
+                proId = proIdR[0]
+                disId = disIdR[0]
+            
+                insertVals = [proId, disId, src]
+                insertVals = ['"'+i+'"' for i in insertVals]
 
-            #
-            qf = 'INSERT INTO protein_vs_disease (pro_id,dis_id) VALUES ('
-            qm = proId+','+disId
-            qr = ')'
-            sql = qf+qm+qr
+                qf = 'INSERT INTO protein_vs_disease (pro_id,dis_id,pro_vs_dis_source) VALUES ('
+                qm = ','.join(insertVals)
+                qr = ')'
+                q = qf+qm+qr
 
-            try:
-                cursor.execute(sql)
-                db.commit()
-            except:
-                assert False, 'dbErr'
-                db.rollback()
+                util.mysqlCommit(db,cursor,q)
+            else:
+                log.append('FAIL: '+msg)
 
-    db.close()
+    with open(logFpath,'w') as f:
+        for i in log:
+            f.write(str(i)+'\n')
 
 def insertProtein(proteinList):
     db = MySQLdb.connect("localhost","root","123","ijah" )
@@ -126,9 +124,8 @@ def insertDisease(diseaseList):
     db.close()
 
 def parseUniprotData():
-    path = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/uniprot/uniprot_human_dat_20160928/uniprot_sprot_human.dat'
-    outDir = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/uniprot/uniprot_human_dat_20160928'
-
+    path = dirPath+'/uniprot_sprot_human.dat'
+    
     data = dict()
     with open(path) as infile:
         hot = None
@@ -200,7 +197,7 @@ def parseUniprotData():
     diseaseList = list(set(diseaseList))
     assert(len(proteinList)==len(data2))
     
-    with open(outDir+'/uniprot_sprot_human.json', 'w') as fp:
+    with open(dirPath+'/uniprot_sprot_human.json', 'w') as fp:
         json.dump(data2, fp, indent=2, sort_keys=True)
 
     return (data2, proteinList, diseaseList)
