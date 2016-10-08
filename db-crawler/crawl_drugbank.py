@@ -115,7 +115,7 @@ def insertDrugVsProtein(drugProteinDict):
                 insertVals = ['"'+j+'"' for j in insertVals]
 
                 qf = '''INSERT INTO compound_vs_protein (com_id,pro_id,
-                                                         com_vs_pro_weight,com_vs_pro_source) 
+                                                         weight,source) 
                         VALUES ('''
                 qm = ','.join(insertVals)
                 qr = ')'

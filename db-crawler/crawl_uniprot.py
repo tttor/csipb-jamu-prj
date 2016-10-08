@@ -33,7 +33,7 @@ def insertProteinVsDisease(proteinDiseaseDict):
         proIdR = util.mysqlCommit(db,cursor,q)
         
         for d in v['disease']:
-            msg = 'inserting '+ p+ ' vs '+ d+ 'idx= '+ str(idx)+ ' of '+ str(n)
+            msg = 'inserting '+ p+ ' vs '+ d[1]+ 'idx= '+ str(idx)+ ' of '+ str(n)
             print msg
 
             qf = 'SELECT dis_id FROM disease WHERE dis_omim_id ='
