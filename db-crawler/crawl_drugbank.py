@@ -30,8 +30,8 @@ def main():
     fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl'
     with open(fpath, 'rb') as handle:
         drugData = pickle.load(handle)
-    insertDrug(drugData)
-    # insertCompoundVsProtein(drugData)
+    # insertDrug(drugData)
+    insertDrugVsProtein(drugData)
 
     #
     db.close()
@@ -83,63 +83,52 @@ def fixDrugData():
     with open(fpath, 'w') as f:
         json.dump(new, f, indent=2, sort_keys=True)
 
-def insertCompoundVsProtein(drugProteinDict):
+def insertDrugVsProtein(drugProteinDict):
     idx = 0
+    log = []; logFpath = outDir+'/insertDrugVsProtein.log'
+    src = 'drugbank.ca'; weight = '1.0'
     for i,v in drugProteinDict.iteritems():
         idx += 1
-        print 'inserting i=', str(idx), 'of', str(len(drugProteinDict))
 
         qf = 'SELECT com_id FROM compound WHERE com_drugbank_id ='
         qm = '"' + i + '"'
         qr = ''
         sql = qf+qm+qr
+        comIdR = util.mysqlCommit(db,cursor,sql);
 
-        try:
-            cursor.execute(sql)
-            db.commit()
-        except:
-            assert False, 'dbErr'
-            db.rollback()
-        comId = cursor.fetchone()[0]
-        comId = '"'+comId+'"'
+        pList = list(set(v['uniprotTargets']))
+        for p in pList:
+            msg = 'inserting '+ i+ ' vs '+ p+' idx= '+ str(idx)+ ' of '+ str(len(drugProteinDict))
+            print msg
 
-        for p in v['targetProtein']:
             qf = 'SELECT pro_id FROM protein WHERE pro_uniprot_id ='
             qm = '"' + p + '"'
             qr = ''
             sql = qf+qm+qr
-            # print sql
+            proIdR = util.mysqlCommit(db,cursor,sql);
 
-            try:
-                cursor.execute(sql)
-                db.commit()
-            except:
-                assert False, 'dbErr'
-                db.rollback()
+            if comIdR!=None and proIdR!=None:
+                proId = proIdR[0]
+                comId = comIdR[0]
 
-            resp = cursor.fetchone()
-            if resp!=None:
-                proId = resp[0]
-                proId = '"'+proId+'"'
+                insertVals = [comId,proId,weight,src]
+                insertVals = ['"'+j+'"' for j in insertVals]
 
-                weight = str(1.0)
-                weight = '"'+weight+'"'
-
-                factOrPred = 'fact'
-                factOrPred = '"'+factOrPred+'"'                
-
-                #
-                qf = 'INSERT INTO compound_vs_protein (com_id,pro_id,weight,type) VALUES ('
-                qm = comId+','+proId+','+weight+','+factOrPred
+                qf = '''INSERT INTO compound_vs_protein (com_id,pro_id,
+                                                         com_vs_pro_weight,com_vs_pro_source) 
+                        VALUES ('''
+                qm = ','.join(insertVals)
                 qr = ')'
                 sql = qf+qm+qr
+                util.mysqlCommit(db,cursor,sql)
+            else:
+                msg = 'FAIL: '+msg
+                print msg
+                log.append(msg)
 
-                try:
-                    cursor.execute(sql)
-                    db.commit()
-                except:
-                    assert False, 'dbErr'
-                    db.rollback()
+    with open(logFpath,'w') as f:
+        for l in log:
+            f.write(str(l)+'\n')
 
 def insertDrug(drugData):
     idx = 0
