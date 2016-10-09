@@ -1,0 +1,11 @@
+TODO
+
+--> run dummy predictor
+
+> calc compound similarity
+tanimoto, convert smiley to fingerprint
+simcomp, KEGG KCF
+
+> calc protein similarity
+
+> run prediction using blm-nii framework

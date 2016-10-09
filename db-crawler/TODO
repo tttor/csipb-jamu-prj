@@ -1,5 +1,12 @@
 TODO
 
+> crawl knapsack based on cid
+http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=C00007564
+
+> get comp-prot from bioassay pubchem
+Ask Amir for the data
+
+DONE
 --> crawl drug info from drugbank webpage
 --> insert compound from db
 --> insert compound from knapsack
@@ -17,18 +24,3 @@ http://www.flavornet.org/info/619-62-5.html
 
 --> insert compound protein
 --> fix pro-vs-dis
-
---> run dummy predictor
-
-> calc compound similarity
-tanimoto, ask Amir
-simcomp, KEGG
-
-> calc protein similarity
-> run prediction using blm-nii framework
-
-> crawl knapsack based on cid
-http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=C00007564
-
-> get comp-prot from bioassay pubchem
-Ask Amir for the data

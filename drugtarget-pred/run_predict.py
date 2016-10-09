@@ -8,7 +8,7 @@ cursor = db.cursor()
 
 def main():
     # TODO get comId and proId from DB
-    maxComId = 21994
+    maxComId = 1000 #21994
     comList = range(1,maxComId+1)
     comList = ['COM'+str(i).zfill(8) for i in comList]
 
