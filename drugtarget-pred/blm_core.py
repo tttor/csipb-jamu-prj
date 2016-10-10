@@ -26,9 +26,9 @@ class BLM:
     drugList = []; proteinList = []
     adjMat = None
 
-    def __init__(self, fpath=None, drugSimMatFpath=None, proteinSimMatFpath=None):
-        if fpath!=None and drugSimMatFpath!=None and proteinSimMatFpath!=None:
-            self._loadInteraction(fpath)
+    def __init__(self, bindingFpath=None, drugSimMatFpath=None, proteinSimMatFpath=None):
+        if bindingFpath!=None and drugSimMatFpath!=None and proteinSimMatFpath!=None:
+            self._loadInteraction(bindingFpath)
             self._loadSimMat(drugSimMatFpath, proteinSimMatFpath)
 
     def predict(self, com, pro):
