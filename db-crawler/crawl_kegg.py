@@ -3,6 +3,7 @@ import time
 import pickle
 import json
 import sys
+import os
 import MySQLdb
 import httplib
 import urllib2 as urllib
@@ -12,10 +13,39 @@ from datetime import datetime
 from bs4 import BeautifulSoup as bs
 
 baseDir = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010'
+db = MySQLdb.connect("localhost","root","123","ijah" )
+cursor = db.cursor()
 
 def main(argv):
-    lo = int(argv[1]); hi = int(argv[2])
-    parseCompoundWebpage(lo,hi)
+    # lo = int(argv[1]); hi = int(argv[2])
+    # parseCompoundWebpage(lo,hi)
+
+    dirpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010x'
+    insertCompoundData(dirpath)
+
+def insertCompoundData(dirpath):
+    data = {}
+    for filename in os.listdir(dirpath):
+        if filename.endswith(".pkl"): 
+            fpath = os.path.join(dirpath, filename)
+            d = {}
+            with open(fpath, 'rb') as handle:
+                d = pickle.load(handle)
+
+            n = len(data)
+            for k,v in d.iteritems():
+                data[k] = v
+            assert len(data)==(n+len(d))
+
+    print len(data)
+    for k,d in data.iteritems():
+        casId = d['casId']
+        casId = casId.split()[0]# for handling those having multiple CAS
+        knapsackId = d['knapsackId']
+
+        #TODO
+
+
 
 def parseCompoundWebpage(loIdx, hiIdx):
     baseFpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010/'
@@ -78,3 +108,5 @@ def parseCompoundWebpage(loIdx, hiIdx):
 
 if __name__ == '__main__':
     main(sys.argv)
+    db.close()
+
