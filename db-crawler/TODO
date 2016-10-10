@@ -1,4 +1,9 @@
-TODO
+TODO ###########################################################################
+
+> crawl kegg for compound
+same as D?
+knapsack ID?
+(Mol? KCF?) can be downloaded later with links
 
 > crawl knapsack based on cid
 http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=C00007564
@@ -6,7 +11,7 @@ http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=C00007564
 > get comp-prot from bioassay pubchem
 Ask Amir for the data
 
-DONE
+DONE ###########################################################################
 --> crawl drug info from drugbank webpage
 --> insert compound from db
 --> insert compound from knapsack
