@@ -2,6 +2,7 @@
 import time
 import pickle
 import json
+import sys
 import MySQLdb
 import httplib
 import urllib2 as urllib
@@ -12,8 +13,9 @@ from bs4 import BeautifulSoup as bs
 
 baseDir = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010'
 
-def main():
-    parseCompoundWebpage(1,3)
+def main(argv):
+    lo = int(argv[1]); hi = int(argv[2])
+    parseCompoundWebpage(lo,hi)
 
 def parseCompoundWebpage(loIdx, hiIdx):
     baseFpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010/'
@@ -75,4 +77,4 @@ def parseCompoundWebpage(loIdx, hiIdx):
     return data
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
