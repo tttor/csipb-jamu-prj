@@ -17,13 +17,14 @@ db = MySQLdb.connect("localhost","root","123","ijah" )
 cursor = db.cursor()
 
 def main(argv):
-    lo = int(argv[1]); hi = int(argv[2])
-    parseCompoundWebpage(lo,hi)
+    # lo = int(argv[1]); hi = int(argv[2])
+    # parseCompoundWebpage(lo,hi)
 
-    # dirpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010x'
-    # insertCompoundData(dirpath)
+    dirpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010x'
+    insertCompoundData(dirpath)
 
 def insertCompoundData(dirpath):
+    # Load Kegg compound data
     data = {}
     for filename in os.listdir(dirpath):
         if filename.endswith(".pkl"): 
@@ -32,18 +33,87 @@ def insertCompoundData(dirpath):
             with open(fpath, 'rb') as handle:
                 d = pickle.load(handle)
 
-            n = len(data)
             for k,v in d.iteritems():
-                data[k] = v
-            assert len(data)==(n+len(d))
-
+                if len(v)!=0:
+                    data[k] = v
     print len(data)
-    for k,d in data.iteritems():
-        casId = d['casId']
-        casId = casId.split()[0]# for handling those having multiple CAS
-        knapsackId = d['knapsackId']
 
-        #TODO
+    # Load Kegg drug data, to infer their drugbank equivalent
+    drugData = {}
+    # TODO
+
+    # Update or Insert
+    comId = 21994 # TODO unhardcode
+    insertList = []
+
+    for keggId,d in data.iteritems():
+        knapsackId = 'not-available'
+        if 'knapsackId' in d.keys():
+            knapsackId = d['knapsackId']
+
+        drugbankId = 'not-available'
+        if 'keggDrugId' in d.keys():
+            drugbankId = drugData[ d['keggDrugId'] ][...]
+
+        casId = 'not-available'
+        if 'casId' in d.keys()
+            casId = d['casId']
+
+        insert = False
+
+        if knapsackId!='not-available':
+            # update based on knapsackID, assume exist
+            qf = 'UPDATE  compound'
+            qm = 'SET '+ 'com_kegg_id=' + '"'+keggId+'"'
+            if casId!='not-available':
+                qm = qm + ' com_cas_id=' + '"'+casId+'"'
+            if drugbankId!='not-available':
+                qm = qm + ' com_drugbank_id=' + '"'+drugbankId+'"'
+            qr = 'WHERE com_knapsack_id='+ '"' + knapsackId + '"'
+            q = qf+qm+qr
+            resp = util.mysqlCommit(db,cursor,q)
+
+            if cursor.rowcount==0:# not exist, then insert
+                insert = True
+            else:
+                insert = False
+
+        if drugbank!='not-available':
+            # update based on knapsackID, assume exist
+            qf = 'UPDATE  compound'
+            qm = 'SET '+ 'com_kegg_id=' + '"'+keggId+'"'
+            if casId!='not-available':
+                qm = qm + ' com_cas_id=' + '"'+casId+'"'
+            if drugbankId!='not-available':
+                qm = qm + ' com_drugbank_id=' + '"'+drugbankId+'"'
+            qr = 'WHERE com_drugbank_id='+ '"' + drugbankId + '"'
+            q = qf+qm+qr
+            resp = util.mysqlCommit(db,cursor,q)
+
+            if cursor.rowcount==0:
+                insert = True
+            else:
+                insert = False
+
+        if insert:
+            comId += 1
+            comId = 'COM'+ comId.zfill(8)
+
+            insertVals = [comId, casId,drugbankId,knapsackId,keggId]
+            insertVals = ['"'+i+'"' for i in insertVals]
+
+            qf = '''INSERT INTO compound (com_id,com_cas_id,com_drugbank_id,
+                                          com_knapsack_id,com_kegg_id) '''
+            qr = 'VALUES (' + ','.join(insertVals) + ')'
+            q = qf + qr
+            resp = util.mysqlCommit(db,cursor,q) 
+
+            insertList.append(q)
+
+    insertListFpath = baseDir + '/insertion_from_keggComData.lst'
+    with open(insertListFpath,'w') as f:
+        for l in insertListFpath:
+            f.write(str(l)+'\n')
 
 def parseCompoundWebpage(loIdx, hiIdx):
     baseFpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010/'
