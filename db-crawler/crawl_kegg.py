@@ -20,8 +20,11 @@ def main(argv):
     # lo = int(argv[1]); hi = int(argv[2])
     # parseCompoundWebpage(lo,hi)
 
-    dirpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010x'
-    insertCompoundData(dirpath)
+    fpath = baseDir+'/drug'
+    parseDrugFile(fpath)
+
+    # dirpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010x'
+    # insertCompoundData(dirpath)
 
 def insertCompoundData(dirpath):
     # Load Kegg compound data
@@ -56,7 +59,7 @@ def insertCompoundData(dirpath):
             drugbankId = drugData[ d['keggDrugId'] ][...]
 
         casId = 'not-available'
-        if 'casId' in d.keys()
+        if 'casId' in d.keys():
             casId = d['casId']
 
         insert = False
@@ -114,6 +117,42 @@ def insertCompoundData(dirpath):
     with open(insertListFpath,'w') as f:
         for l in insertListFpath:
             f.write(str(l)+'\n')
+
+def parseDrugFile(fpath):
+    hot = ''; n = 0; lookfor = False
+    data = {}; now = datetime.now()
+    with open(fpath) as infile:        
+        for line in infile:
+            n += 1
+            words = line.split()
+
+            if words[0]=='ENTRY':
+                assert len(words)==3 or len(words)==4
+                hot = words[1]
+                data[hot] = defaultdict(list)
+            elif words[0]=='REMARK' and words[1]=='Same' and words[2]=='as:':
+                del words[0]; del words[0]; del words[0]
+                cList = [w for w in words if 'C' in w]
+                data[hot]['keggComId'] += cList
+            elif words[0]=='DBLINKS':
+                if 'DrugBank:' in words:
+                    data[hot]['drugbankId'] = words[-1]
+                else:
+                    lookfor = True
+            elif lookfor:
+                if words[0]=='DrugBank:':
+                    data[hot]['drugbankId'] = words[-1]
+                    lookfor = False
+
+    jsonFpath = baseDir+'/keggdrug_data_'+str(now.date())+'_'+str(now.time())+'.json'
+    with open(jsonFpath, 'w') as f:
+        json.dump(data, f, indent=2, sort_keys=True)
+
+    pklFpath = baseDir+'/keggdrug_data_'+str(now.date())+'_'+str(now.time())+'.pkl'
+    with open(pklFpath, 'wb') as f:
+        pickle.dump(data, f)
+
+    return data
 
 def parseCompoundWebpage(loIdx, hiIdx):
     baseFpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010/'
