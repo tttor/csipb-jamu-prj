@@ -120,11 +120,10 @@ def insertCompoundData(comDataDpath,drugDataFpath):
             insertVals = [comIdStr, casId,drugbankId,knapsackId,keggId]
             insertVals = ['"'+i+'"' for i in insertVals]
 
-            qf = '''INSERT INTO compound (com_id,com_cas_id,com_drugbank_id,
-                                          com_knapsack_id,com_kegg_id) '''
-            qr = 'VALUES (' + ','.join(insertVals) + ')'
+            qf = 'INSERT INTO compound (com_id,com_cas_id,com_drugbank_id,com_knapsack_id,com_kegg_id)'
+            qr = ' VALUES (' + ','.join(insertVals) + ')'
             q = qf + qr
-            # resp = util.mysqlCommit(db,cursor,q) 
+            resp = util.mysqlCommit(db,cursor,q) 
 
             insertList.append(q)
 
