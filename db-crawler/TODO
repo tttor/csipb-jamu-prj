@@ -1,6 +1,5 @@
 TODO ###########################################################################
-
-
+> separate crawling vs inserting/updating code
 
 > crawl knapsack based on cid
 http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=C00007564
@@ -10,6 +9,9 @@ based on knapsackID got from KEGGC, crawl knapsack to enrich plan-compound
 
 > get comp-prot from bioassay pubchem
 Ask Amir for the data
+
+> dis_omim_id (and abbrv) should be unique
+duplicate on http://www.omim.org/entry/607628
 
 DONE ###########################################################################
 > crawl kegg for compound
