@@ -17,33 +17,156 @@ db = MySQLdb.connect("localhost","root","123","ijah" )
 cursor = db.cursor()
 
 def main(argv):
-    lo = int(argv[1]); hi = int(argv[2])
-    parseCompoundWebpage(lo,hi)
+    # lo = int(argv[1]); hi = int(argv[2])
+    # parseCompoundWebpage(lo,hi)
 
-    # dirpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010x'
-    # insertCompoundData(dirpath)
+    # fpath = baseDir+'/drug'
+    # parseDrugFile(fpath)
 
-def insertCompoundData(dirpath):
+    comDataDpath = baseDir+'/keggCom_20161010_1-80K'
+    drugDataFpath = baseDir+'/keggdrug_data_2016-10-11_16:58:04.683546.pkl'
+    insertCompoundData(comDataDpath,drugDataFpath)
+
+def insertCompoundData(comDataDpath,drugDataFpath):
+    # Load Kegg compound data
     data = {}
-    for filename in os.listdir(dirpath):
+    for filename in os.listdir(comDataDpath):
         if filename.endswith(".pkl"): 
-            fpath = os.path.join(dirpath, filename)
-            d = {}
+            fpath = os.path.join(comDataDpath, filename)
+            dPerFile = {}
             with open(fpath, 'rb') as handle:
-                d = pickle.load(handle)
+                dPerFile = pickle.load(handle)
 
-            n = len(data)
-            for k,v in d.iteritems():
-                data[k] = v
-            assert len(data)==(n+len(d))
+            for k,v in dPerFile.iteritems():
+                if len(v)!=0:
+                    data[k] = v
 
-    print len(data)
-    for k,d in data.iteritems():
-        casId = d['casId']
-        casId = casId.split()[0]# for handling those having multiple CAS
-        knapsackId = d['knapsackId']
+    sortedK = data.keys()
+    sortedK.sort()
+    fpath = baseDir + '/keggComData_validComId.lst'
+    with open(fpath,'w') as f:
+        for k in sortedK:
+            f.write(str(k)+'\n')
 
-        #TODO
+    # Load Kegg drug data, to infer their drugbank equivalent
+    drugData = None
+    with open(drugDataFpath, 'rb') as handle:
+        drugData = pickle.load(handle)
+
+    # Update or Insert
+    comId = 21994 # TODO unhardcode
+    insertList = []
+
+    n = len(data)
+    idx = 0
+    for keggId,d in data.iteritems():
+        idx += 1
+        print 'insert/update keggId=', keggId, 'idx=', idx, 'of', n
+
+        knapsackId = 'not-available'
+        if 'knapsackId' in d.keys():
+            knapsackId = d['knapsackId']
+
+        drugbankId = 'not-available'
+        if 'keggDrugId' in d.keys():
+            _ = drugData[ d['keggDrugId'] ]['drugbankId']
+            if len(_)!=0:
+                drugbankId = _ 
+
+        casId = 'not-available'
+        if 'casId' in d.keys():
+            casId = d['casId']
+
+        insert = False
+
+        if knapsackId!='not-available':
+            # update based on knapsackID, assume exist
+            qf = 'UPDATE compound '
+            qm = 'SET '+ 'com_kegg_id=' + '"'+keggId+'"'
+            if casId!='not-available':
+                qm = qm + ',' + ' com_cas_id=' + '"'+casId+'"'
+            if drugbankId!='not-available':
+                qm = qm + ',' + ' com_drugbank_id=' + '"'+drugbankId+'"'
+            qr = ' WHERE com_knapsack_id='+ '"' + knapsackId + '"'
+            q = qf+qm+qr
+            resp = util.mysqlCommit(db,cursor,q)
+
+            if cursor.rowcount==0:# not exist, then insert
+                insert = True
+            else:
+                insert = False
+
+        if drugbankId!='not-available':
+            # update based on knapsackID, assume exist
+            qf = 'UPDATE  compound '
+            qm = 'SET '+ 'com_kegg_id=' + '"'+keggId+'"'
+            if casId!='not-available':
+                qm = qm + ','+ ' com_cas_id=' + '"'+casId+'"'
+            if knapsackId!='not-available':
+                qm = qm + ','+ ' com_knapsack_id=' + '"'+knapsackId+'"'
+            qr = ' WHERE com_drugbank_id='+ '"' + drugbankId + '"'
+            q = qf+qm+qr
+            resp = util.mysqlCommit(db,cursor,q)
+
+            if cursor.rowcount==0:
+                insert = True
+            else:
+                insert = False
+
+        if insert:
+            comId += 1
+            comIdStr = 'COM'+ str(comId).zfill(8)
+
+            insertVals = [comIdStr, casId,drugbankId,knapsackId,keggId]
+            insertVals = ['"'+i+'"' for i in insertVals]
+
+            qf = 'INSERT INTO compound (com_id,com_cas_id,com_drugbank_id,com_knapsack_id,com_kegg_id)'
+            qr = ' VALUES (' + ','.join(insertVals) + ')'
+            q = qf + qr
+            resp = util.mysqlCommit(db,cursor,q) 
+
+            insertList.append(q)
+
+    insertListFpath = baseDir + '/insertion_from_keggComData.lst'
+    with open(insertListFpath,'w') as f:
+        for l in insertList:
+            f.write(str(l)+'\n')
+
+def parseDrugFile(fpath):
+    hot = ''; n = 0; lookfor = False
+    data = {}; now = datetime.now()
+    with open(fpath) as infile:        
+        for line in infile:
+            n += 1
+            words = line.split()
+
+            if words[0]=='ENTRY':
+                assert len(words)==3 or len(words)==4
+                hot = words[1]
+                data[hot] = defaultdict(list)
+            elif words[0]=='REMARK' and words[1]=='Same' and words[2]=='as:':
+                del words[0]; del words[0]; del words[0]
+                cList = [w for w in words if 'C' in w]
+                data[hot]['keggComId'] += cList
+            elif words[0]=='DBLINKS':
+                if 'DrugBank:' in words:
+                    data[hot]['drugbankId'] = words[-1]
+                else:
+                    lookfor = True
+            elif lookfor:
+                if words[0]=='DrugBank:':
+                    data[hot]['drugbankId'] = words[-1]
+                    lookfor = False
+
+    jsonFpath = baseDir+'/keggdrug_data_'+str(now.date())+'_'+str(now.time())+'.json'
+    with open(jsonFpath, 'w') as f:
+        json.dump(data, f, indent=2, sort_keys=True)
+
+    pklFpath = baseDir+'/keggdrug_data_'+str(now.date())+'_'+str(now.time())+'.pkl'
+    with open(pklFpath, 'wb') as f:
+        pickle.dump(data, f)
+
+    return data
 
 def parseCompoundWebpage(loIdx, hiIdx):
     baseFpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010/'
