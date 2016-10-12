@@ -3,11 +3,8 @@ TODO ###########################################################################
 > calc compound similarity
 >>tanimoto, convert smiley to fingerprint
 >>simcomp, KEGG KCF
-use api with curl with smiles
+use api with curl with smiles, or MOL
 use api with keggC-ID vs knapsack DB
-
-> based on knapsackID got from KEGGC,
-crawl knapsack to enrich plan-compound
 
 > calc protein similarity
 

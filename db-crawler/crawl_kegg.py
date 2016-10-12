@@ -23,9 +23,11 @@ def main(argv):
     # fpath = baseDir+'/drug'
     # parseDrugFile(fpath)
 
-    comDataDpath = baseDir+'/keggCom_20161010_1-80K'
-    drugDataFpath = baseDir+'/keggdrug_data_2016-10-11_16:58:04.683546.pkl'
-    insertCompoundData(comDataDpath,drugDataFpath)
+    # comDataDpath = baseDir+'/keggCom_20161010_1-80K'
+    # drugDataFpath = baseDir+'/keggdrug_data_2016-10-11_16:58:04.683546.pkl'
+    # insertCompoundData(comDataDpath,drugDataFpath)
+
+    parseSimcomp()
 
 def insertCompoundData(comDataDpath,drugDataFpath):
     # Load Kegg compound data
@@ -237,6 +239,64 @@ def parseCompoundWebpage(loIdx, hiIdx):
                 pickle.dump(data, f)
 
     return data
+
+def parseSimcomp():
+    # http://www.genome.jp/tools/gn_tools_api.html
+    baseURL = 'http://rest.genome.jp/simcomp/'
+    database = 'compound' # KEGG compunds
+
+    # ideally: 7 decimal digits as they output up to 6 decimal digits 
+    # (but float to string uses scientific notation for more than 4 digits)
+    cutoff = 0.0001 
+
+    # Get all valid keggComID
+    comDict = {'C00022': 'COM00000759'}
+
+    #
+    for keggId,_ in comDict.iteritems():
+        url = baseURL+keggId+'/'+database+'/cutoff='+str(cutoff)
+        print url
+
+        html = None
+        try: 
+            html = urllib.urlopen(url)
+        except urllib.HTTPError, e:
+            print('HTTPError = ' + str(e.code))
+        except urllib.URLError, e:
+            print('URLError = ' + str(e.reason))
+        except httplib.HTTPException, e:
+            print('HTTPException')
+        except Exception:
+            import traceback
+            print('generic exception: ' + traceback.format_exc())
+
+        if html==None:
+            continue
+
+        soup = bs(html,'html.parser')
+        words = str(soup).split(); assert len(words)%2==0
+
+        simcomp = []
+        for i,keggId2 in enumerate(words):
+            if i%2==0:
+                comId = comDict[keggId2]
+                score = words[i+1]
+                simcomp.append( comId+'='+score )
+
+        simcompStr = '\n'.join(simcomp)
+        print simcompStr
+
+        # qf = 'UPDATE  compound '
+        # qm = 'SET '+ 'com_simcomp=' + '"'+keggId+'"'
+        # qr = ' WHERE com_drugbank_id='+ '"' + drugbankId + '"'
+        # q = qf+qm+qr
+        # resp = util.mysqlCommit(db,cursor,q)
+
+        # print soup
+        # for line in str(soup):
+        #     print line
+            # break
+
 
 if __name__ == '__main__':
     main(sys.argv)
