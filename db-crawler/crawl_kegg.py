@@ -23,7 +23,7 @@ def main(argv):
     # fpath = baseDir+'/drug'
     # parseDrugFile(fpath)
 
-    comDataDpath = baseDir+'/keggCom_20161010x'
+    comDataDpath = baseDir+'/keggCom_20161010_1-80K'
     drugDataFpath = baseDir+'/keggdrug_data_2016-10-11_16:58:04.683546.pkl'
     insertCompoundData(comDataDpath,drugDataFpath)
 
@@ -33,14 +33,20 @@ def insertCompoundData(comDataDpath,drugDataFpath):
     for filename in os.listdir(comDataDpath):
         if filename.endswith(".pkl"): 
             fpath = os.path.join(comDataDpath, filename)
-            d = {}
+            dPerFile = {}
             with open(fpath, 'rb') as handle:
-                d = pickle.load(handle)
+                dPerFile = pickle.load(handle)
 
-            for k,v in d.iteritems():
+            for k,v in dPerFile.iteritems():
                 if len(v)!=0:
                     data[k] = v
-    # print len(data)
+
+    sortedK = data.keys()
+    sortedK.sort()
+    fpath = baseDir + '/keggComData_validComId.lst'
+    with open(fpath,'w') as f:
+        for k in sortedK:
+            f.write(str(k)+'\n')
 
     # Load Kegg drug data, to infer their drugbank equivalent
     drugData = None
