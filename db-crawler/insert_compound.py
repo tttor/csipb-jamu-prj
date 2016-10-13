@@ -22,11 +22,11 @@ def main():
     # idx = 0
     # idx = insertComFromDrugbank(idx)
 
-    idx = 6714
-    idx = insertComFromKnapsack(idx)
+    # idx = 6714
+    # idx = insertComFromKnapsack(idx)
 
-    # idx = ??
-    # idx = insertComFromKegg(idx)
+    idx = 21792
+    idx = insertComFromKegg(idx)
 
 def insertComFromDrugbank(comIdx):
     drugData = None
@@ -120,8 +120,8 @@ def insertComFromKnapsack(comIdx):
     return comIdx
 
 def insertComFromKegg(comIdx):
-    comDataDpath = baseDir+'/keggCom_20161010_1-80K'
-    drugDataFpath = baseDir+'/keggdrug_data_2016-10-11_16:58:04.683546.pkl'
+    comDataDpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010/keggCom_20161010_1-100K'
+    drugDataFpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010/keggdrug_data_2016-10-11_16:58:04.683546.pkl'
 
     # Load Kegg compound data
     data = {}
@@ -138,7 +138,7 @@ def insertComFromKegg(comIdx):
 
     sortedK = data.keys()
     sortedK.sort()
-    fpath = baseDir + '/keggComData_validComId.lst'
+    fpath = outDir + '/keggComData_validComId.lst'
     with open(fpath,'w') as f:
         for k in sortedK:
             f.write(str(k)+'\n')
@@ -220,7 +220,7 @@ def insertComFromKegg(comIdx):
 
             insertList.append(q)
 
-    insertListFpath = baseDir + '/insertion_from_keggComData.lst'
+    insertListFpath = outDir + '/insertion_from_keggComData.lst'
     with open(insertListFpath,'w') as f:
         for l in insertList:
             f.write(str(l)+'\n')
