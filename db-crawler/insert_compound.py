@@ -25,8 +25,46 @@ def main():
     # idx = int(util.mysqlGetMax(db,cursor,table='compound',col='com_id').strip('COM'))
     # idx = insertComFromKnapsack(idx)
 
-    idx = int(util.mysqlGetMax(db,cursor,table='compound',col='com_id').strip('COM'))
-    idx = insertComFromKegg(idx)
+    # idx = int(util.mysqlGetMax(db,cursor,table='compound',col='com_id').strip('COM'))
+    # idx = insertComFromKegg(idx)
+
+    insertSimcomp()
+
+def insertSimcomp():
+    dirpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010/simcomp'
+
+    # SELECT com_id FROM `compound` where com_kegg_id!=''
+    q = 'SELECT com_id,com_kegg_id FROM `compound` where com_kegg_id!=""'
+    resp = util.mysqlCommit(db,cursor,q, True)
+
+    kegg2ComIdMap = {}
+    for i in resp:
+        kegg2ComIdMap[i[1]] = i[0]
+
+    #
+    for filename in os.listdir(dirpath):
+        if filename.endswith(".sim"):
+            keggId = filename.split('_')[1].strip('.sim').strip()
+            fpath = os.path.join(dirpath, filename)
+
+            simcomp = []
+            with open(fpath) as infile:
+                for line in infile:
+                    words = line.split('=')
+                    words = [i.strip() for i in words]
+                    keggId2 = words[0]
+                    if keggId2 in kegg2ComIdMap.keys():
+                        comId = kegg2ComIdMap[keggId2]
+                        score = words[1]
+                        simcomp.append( comId+':'+keggId2+'='+score)
+
+            if len(simcomp)!=0:
+                simcompStr = '\n'.join(simcomp)
+                simcompStr = '"'+simcompStr+'"'
+                qf = 'UPDATE compound SET com_simcomp='+simcompStr
+                qr = ' WHERE com_kegg_id='+'"'+keggId+'"'
+                q = qf+qr
+                util.mysqlCommit(db,cursor,q)
 
 def insertComFromDrugbank(comIdx):
     drugData = None

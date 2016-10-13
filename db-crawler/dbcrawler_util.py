@@ -1,12 +1,15 @@
 # util.py
 import MySQLdb
 
-def mysqlCommit(db, cursor, query):
+def mysqlCommit(db, cursor, query, fetchall=False):
     try:
         cursor.execute(query)
         db.commit()
 
-        return cursor.fetchone()
+        if fetchall:
+            return cursor.fetchall()
+        else:
+            return cursor.fetchone()
     except (MySQLdb.Error, MySQLdb.Warning) as e:
         db.rollback()
         assert False, 'mySQL Error: '+str(e)
