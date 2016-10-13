@@ -13,8 +13,6 @@ from datetime import datetime
 from bs4 import BeautifulSoup as bs
 
 baseDir = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010'
-db = MySQLdb.connect("localhost","root","123","ijah" )
-cursor = db.cursor()
 
 def main(argv):
     # lo = int(argv[1]); hi = int(argv[2])
@@ -23,116 +21,7 @@ def main(argv):
     # fpath = baseDir+'/drug'
     # parseDrugFile(fpath)
 
-    # comDataDpath = baseDir+'/keggCom_20161010_1-80K'
-    # drugDataFpath = baseDir+'/keggdrug_data_2016-10-11_16:58:04.683546.pkl'
-    # insertCompoundData(comDataDpath,drugDataFpath)
-
     parseSimcomp()
-
-def insertCompoundData(comDataDpath,drugDataFpath):
-    # Load Kegg compound data
-    data = {}
-    for filename in os.listdir(comDataDpath):
-        if filename.endswith(".pkl"): 
-            fpath = os.path.join(comDataDpath, filename)
-            dPerFile = {}
-            with open(fpath, 'rb') as handle:
-                dPerFile = pickle.load(handle)
-
-            for k,v in dPerFile.iteritems():
-                if len(v)!=0:
-                    data[k] = v
-
-    sortedK = data.keys()
-    sortedK.sort()
-    fpath = baseDir + '/keggComData_validComId.lst'
-    with open(fpath,'w') as f:
-        for k in sortedK:
-            f.write(str(k)+'\n')
-
-    # Load Kegg drug data, to infer their drugbank equivalent
-    drugData = None
-    with open(drugDataFpath, 'rb') as handle:
-        drugData = pickle.load(handle)
-
-    # Update or Insert
-    comId = 21994 # TODO unhardcode
-    insertList = []
-
-    n = len(data)
-    idx = 0
-    for keggId,d in data.iteritems():
-        idx += 1
-        print 'insert/update keggId=', keggId, 'idx=', idx, 'of', n
-
-        knapsackId = 'not-available'
-        if 'knapsackId' in d.keys():
-            knapsackId = d['knapsackId']
-
-        drugbankId = 'not-available'
-        if 'keggDrugId' in d.keys():
-            _ = drugData[ d['keggDrugId'] ]['drugbankId']
-            if len(_)!=0:
-                drugbankId = _ 
-
-        casId = 'not-available'
-        if 'casId' in d.keys():
-            casId = d['casId']
-
-        insert = False
-
-        if knapsackId!='not-available':
-            # update based on knapsackID, assume exist
-            qf = 'UPDATE compound '
-            qm = 'SET '+ 'com_kegg_id=' + '"'+keggId+'"'
-            if casId!='not-available':
-                qm = qm + ',' + ' com_cas_id=' + '"'+casId+'"'
-            if drugbankId!='not-available':
-                qm = qm + ',' + ' com_drugbank_id=' + '"'+drugbankId+'"'
-            qr = ' WHERE com_knapsack_id='+ '"' + knapsackId + '"'
-            q = qf+qm+qr
-            resp = util.mysqlCommit(db,cursor,q)
-
-            if cursor.rowcount==0:# not exist, then insert
-                insert = True
-            else:
-                insert = False
-
-        if drugbankId!='not-available':
-            # update based on knapsackID, assume exist
-            qf = 'UPDATE  compound '
-            qm = 'SET '+ 'com_kegg_id=' + '"'+keggId+'"'
-            if casId!='not-available':
-                qm = qm + ','+ ' com_cas_id=' + '"'+casId+'"'
-            if knapsackId!='not-available':
-                qm = qm + ','+ ' com_knapsack_id=' + '"'+knapsackId+'"'
-            qr = ' WHERE com_drugbank_id='+ '"' + drugbankId + '"'
-            q = qf+qm+qr
-            resp = util.mysqlCommit(db,cursor,q)
-
-            if cursor.rowcount==0:
-                insert = True
-            else:
-                insert = False
-
-        if insert:
-            comId += 1
-            comIdStr = 'COM'+ str(comId).zfill(8)
-
-            insertVals = [comIdStr, casId,drugbankId,knapsackId,keggId]
-            insertVals = ['"'+i+'"' for i in insertVals]
-
-            qf = 'INSERT INTO compound (com_id,com_cas_id,com_drugbank_id,com_knapsack_id,com_kegg_id)'
-            qr = ' VALUES (' + ','.join(insertVals) + ')'
-            q = qf + qr
-            resp = util.mysqlCommit(db,cursor,q) 
-
-            insertList.append(q)
-
-    insertListFpath = baseDir + '/insertion_from_keggComData.lst'
-    with open(insertListFpath,'w') as f:
-        for l in insertList:
-            f.write(str(l)+'\n')
 
 def parseDrugFile(fpath):
     hot = ''; n = 0; lookfor = False
@@ -300,5 +189,3 @@ def parseSimcomp():
 
 if __name__ == '__main__':
     main(sys.argv)
-    db.close()
-

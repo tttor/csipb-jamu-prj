@@ -1,4 +1,5 @@
 # insert_compound.py
+import os
 import time
 import json
 import yaml
@@ -10,16 +11,24 @@ from bs4 import BeautifulSoup
 from urllib2 import urlopen
 from datetime import datetime
 
-outDir = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003'
+outDir = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/db-log'
 db = MySQLdb.connect("localhost","root","123","ijah" )
 cursor = db.cursor()
 
 def main():
-    idx = 0
-    insertComFromDrugbank(idx)
-    # insertComFromKnapsack()
+    if not os.path.exists(outDir):
+        os.makedirs(outDir)
 
-def insertComFromDrugbank(idx):
+    # idx = 0
+    # idx = insertComFromDrugbank(idx)
+
+    idx = 6714
+    idx = insertComFromKnapsack(idx)
+
+    # idx = ??
+    # idx = insertComFromKegg(idx)
+
+def insertComFromDrugbank(comIdx):
     drugData = None
     fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl'
     with open(fpath, 'rb') as handle:
@@ -29,18 +38,18 @@ def insertComFromDrugbank(idx):
         if len(v['uniprotTargets'])==0:
             continue
 
-        idx += 1
-        print 'inserting', i, 'idx=',str(idx),'of at most', str(len(drugData))
-        
-        comId = str(idx); comId = comId.zfill(8); comId = 'COM'+comId
+        comIdx += 1
+        print 'inserting', i, 'comIdx=',str(comIdx),'of at most', str(len(drugData))
+
+        comId = str(comIdx); comId = comId.zfill(8); comId = 'COM'+comId
         comDrugbankId = i
         na = ''
-        
+
         insertVals = []
         insertVals.append(comId)
         insertVals.append(comDrugbankId)
 
-        insertKeys = ['CAS number', 'pubchemCid', 'InChI Key', 
+        insertKeys = ['CAS number', 'pubchemCid', 'InChI Key',
                       'SMILES','com_knapsack_id','com_kegg_id', 'com_simcomp']
         for k in insertKeys:
             if k in v.keys():
@@ -48,11 +57,11 @@ def insertComFromDrugbank(idx):
             else:
                 insertVals.append(na)
 
-        insertVals = ['' if 'not-available' in i else i for i in insertVals]
+        insertVals = ['' if '' in i else i for i in insertVals]
         insertVals = ['"'+iv+'"' for iv in insertVals ]; assert len(insertVals)==9
 
         qf = '''INSERT INTO compound (com_id, com_drugbank_id,
-                                      com_cas_id, com_pubchem_id, com_inchikey, 
+                                      com_cas_id, com_pubchem_id, com_inchikey,
                                       com_smiles, com_knapsack_id, com_kegg_id, com_simcomp)
              VALUES ('''
         qm = ','.join(insertVals)
@@ -60,44 +69,28 @@ def insertComFromDrugbank(idx):
         sql = qf+qm+qr
         util.mysqlCommit(db, cursor, sql)
 
-    return idx
+    return comIdx
 
-def insertComFromKnapsack():
+def insertComFromKnapsack(comIdx):
     plantCompoundDict = None
-    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003/knapsack_jsp_plant_vs_compound_2016-10-04_16:34:06.468234.pkl'  
+    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003/knapsack_jsp_plant_vs_compound_2016-10-04_16:34:06.468234.pkl'
     with open(fpath, 'rb') as handle:
         plantCompoundDict = pickle.load(handle)
 
     compoundDict = {}
     for comList in plantCompoundDict.values():
         for kId,cas,name,form in comList:
-            compoundDict[kId] = (cas,form)
-    insertCompound(compoundDict)
+            compoundDict[kId] = cas
 
-    # get the last of the current comId, after inserting from drugbank
-    comIdStr = 'COM00006661' #TODO unhardcode
-    comId = int(comIdStr.strip('COM'))
-
-    #
     idx = 0
     nCom = len(compoundDict)
     matchList = []
-    for k,v in compoundDict.iteritems():
+    for k,cas in compoundDict.iteritems():
         idx += 1
         print 'insert/updating', k, 'idx=',str(idx), 'of', nCom
 
-        cas,form = v
-
-        casMatch = None
-        if cas!='':
-            qf = 'SELECT * FROM compound WHERE com_cas_id='
-            qm = '"'+cas+'"'
-            qr = ''
-            q = qf+qm+qr
-            casMatch = util.mysqlCommit(db, cursor,q)
-        # print casMatch
-
-        if casMatch!=None:
+        if util.mysqlExist(db, cursor,
+                           table='compound', where='com_cas_id='+'"'+cas+'"'):
             # print 'match'
             matchList.append(cas)
 
@@ -107,11 +100,10 @@ def insertComFromKnapsack():
             q = qf+qm+qr
             util.mysqlCommit(db,cursor,q)
         else:
-            comId += 1
-            comIdStr = 'COM'+str(comId).zfill(8)
+            comIdx += 1
+            comIdStr = 'COM'+str(comIdx).zfill(8)
 
             insertVals = [comIdStr,cas,k]
-            insertVals = ['not-available' if i=='' else i for i in insertVals]
             insertVals = ['"'+i+'"' for i in insertVals]
 
             qf = 'INSERT INTO compound (com_id,com_cas_id,com_knapsack_id) VALUES ('
@@ -124,6 +116,116 @@ def insertComFromKnapsack():
     with open(fpath,'w') as f:
         for m in matchList:
             f.write(str(m)+'\n')
+
+    return comIdx
+
+def insertComFromKegg(comIdx):
+    comDataDpath = baseDir+'/keggCom_20161010_1-80K'
+    drugDataFpath = baseDir+'/keggdrug_data_2016-10-11_16:58:04.683546.pkl'
+
+    # Load Kegg compound data
+    data = {}
+    for filename in os.listdir(comDataDpath):
+        if filename.endswith(".pkl"):
+            fpath = os.path.join(comDataDpath, filename)
+            dPerFile = {}
+            with open(fpath, 'rb') as handle:
+                dPerFile = pickle.load(handle)
+
+            for k,v in dPerFile.iteritems():
+                if len(v)!=0:
+                    data[k] = v
+
+    sortedK = data.keys()
+    sortedK.sort()
+    fpath = baseDir + '/keggComData_validComId.lst'
+    with open(fpath,'w') as f:
+        for k in sortedK:
+            f.write(str(k)+'\n')
+
+    # Load Kegg drug data, to infer their drugbank equivalent
+    drugData = None
+    with open(drugDataFpath, 'rb') as handle:
+        drugData = pickle.load(handle)
+
+    # Update or Insert
+    insertList = []
+
+    n = len(data)
+    idx = 0
+    for keggId,d in data.iteritems():
+        idx += 1
+        print 'insert/update keggId=', keggId, 'idx=', idx, 'of', n
+
+        knapsackId = ''
+        if 'knapsackId' in d.keys():
+            knapsackId = d['knapsackId']
+
+        drugbankId = ''
+        if 'keggDrugId' in d.keys():
+            _ = drugData[ d['keggDrugId'] ]['drugbankId']
+            if len(_)!=0:
+                drugbankId = _
+
+        casId = ''
+        if 'casId' in d.keys():
+            casId = d['casId']
+
+        insert = False
+
+        if knapsackId!='':
+            # check if exist
+            if util.mysqlExist(db, cursor,
+                               table='compound',where='com_knapsack_id='+'"'+knapsackId+'"'):
+                # update based on knapsackID
+                qf = 'UPDATE compound '
+                qm = 'SET '+ 'com_kegg_id=' + '"'+keggId+'"'
+                if casId!='':
+                    qm = qm + ',' + ' com_cas_id=' + '"'+casId+'"'
+                if drugbankId!='':
+                    qm = qm + ',' + ' com_drugbank_id=' + '"'+drugbankId+'"'
+                qr = ' WHERE com_knapsack_id='+ '"' + knapsackId + '"'
+                q = qf+qm+qr
+                resp = util.mysqlCommit(db,cursor,q)
+            else:
+                insert = True
+
+        if drugbankId!='':
+            if util.mysqlExist(db, cursor,
+                               table='compound',where='com_drugbank_id='+'"'+drugbankId+'"'):
+                # update based on drugbankId
+                qf = 'UPDATE  compound '
+                qm = 'SET '+ 'com_kegg_id=' + '"'+keggId+'"'
+                if casId!='':
+                    qm = qm + ','+ ' com_cas_id=' + '"'+casId+'"'
+                if knapsackId!='':
+                    qm = qm + ','+ ' com_knapsack_id=' + '"'+knapsackId+'"'
+                qr = ' WHERE com_drugbank_id='+ '"' + drugbankId + '"'
+                q = qf+qm+qr
+                resp = util.mysqlCommit(db,cursor,q)
+            else:
+                insert = True
+
+        if insert:
+            comIdx += 1
+            comIdStr = 'COM'+ str(comIdx).zfill(8)
+
+            insertVals = [comIdStr, casId,drugbankId,knapsackId,keggId]
+            insertVals = ['"'+i+'"' for i in insertVals]
+
+            qf = 'INSERT INTO compound (com_id,com_cas_id,com_drugbank_id,com_knapsack_id,com_kegg_id)'
+            qr = ' VALUES (' + ','.join(insertVals) + ')'
+            q = qf + qr
+            resp = util.mysqlCommit(db,cursor,q)
+
+            insertList.append(q)
+
+    insertListFpath = baseDir + '/insertion_from_keggComData.lst'
+    with open(insertListFpath,'w') as f:
+        for l in insertList:
+            f.write(str(l)+'\n')
+
+    return comIdx
 
 if __name__ == '__main__':
     main()
