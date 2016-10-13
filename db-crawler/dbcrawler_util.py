@@ -16,3 +16,13 @@ def mysqlExist(db,cursor,table,where):
     exist = mysqlCommit(db, cursor,q)
 
     return (exist!=None)
+
+def mysqlGetMax(db,cursor,table,col):
+    q = 'SELECT MAX('+col+') AS m FROM '+table
+    resp = mysqlCommit(db,cursor,q)
+    resp = resp[0]
+
+    if resp==None:
+        resp = '0'
+
+    return resp

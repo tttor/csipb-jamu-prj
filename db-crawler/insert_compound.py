@@ -19,14 +19,14 @@ def main():
     if not os.path.exists(outDir):
         os.makedirs(outDir)
 
-    # idx = 0
-    # idx = insertComFromDrugbank(idx)
+    idx = int(util.mysqlGetMax(db,cursor,table='compound',col='com_id').strip('COM'))
+    idx = insertComFromDrugbank(idx)
 
-    # idx = 6714
+    # idx = int(util.mysqlGetMax(db,cursor,table='compound',col='com_id').strip('COM'))
     # idx = insertComFromKnapsack(idx)
 
-    idx = 21792
-    idx = insertComFromKegg(idx)
+    # idx = int(util.mysqlGetMax(db,cursor,table='compound',col='com_id').strip('COM'))
+    # idx = insertComFromKegg(idx)
 
 def insertComFromDrugbank(comIdx):
     drugData = None
@@ -57,7 +57,7 @@ def insertComFromDrugbank(comIdx):
             else:
                 insertVals.append(na)
 
-        insertVals = ['' if '' in i else i for i in insertVals]
+        insertVals = ['' if len(i)==0 else i for i in insertVals]
         insertVals = ['"'+iv+'"' for iv in insertVals ]; assert len(insertVals)==9
 
         qf = '''INSERT INTO compound (com_id, com_drugbank_id,
