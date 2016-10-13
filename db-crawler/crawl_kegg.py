@@ -26,7 +26,7 @@ def main(argv):
 def parseDrugFile(fpath):
     hot = ''; n = 0; lookfor = False
     data = {}; now = datetime.now()
-    with open(fpath) as infile:        
+    with open(fpath) as infile:
         for line in infile:
             n += 1
             words = line.split()
@@ -78,7 +78,7 @@ def parseCompoundWebpage(loIdx, hiIdx):
         html = None
         # with open(url, 'r') as content_file:
         #     html = content_file.read()
-        try: 
+        try:
             html = urllib.urlopen(url)
         except urllib.HTTPError, e:
             print('HTTPError = ' + str(e.code))
@@ -93,7 +93,7 @@ def parseCompoundWebpage(loIdx, hiIdx):
         datum = {}
         if html!=None:
             soup = bs(html,'html.parser')
-            
+
             hrefDict = {}
             hrefDict['keggDrugId'] = '/dbget-bin/www_bget?dr:'
             hrefDict['pubchemSid'] = 'http://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?sid='
@@ -105,9 +105,9 @@ def parseCompoundWebpage(loIdx, hiIdx):
                 for k,h in hrefDict.iteritems():
                     if h in href:
                         datum[k] = href.strip(h)
-        
+
             if 'knapsackId' in datum.keys():
-                datum['knapsackId'] = 'C'+datum['knapsackId']        
+                datum['knapsackId'] = 'C'+datum['knapsackId']
 
             divList = soup.find_all('div')
             for d in divList:
@@ -131,61 +131,56 @@ def parseCompoundWebpage(loIdx, hiIdx):
 
 def parseSimcomp():
     # http://www.genome.jp/tools/gn_tools_api.html
+    # url = 'http://rest.genome.jp/simcomp/C00022/compound/cutoff=0.1'
     baseURL = 'http://rest.genome.jp/simcomp/'
     database = 'compound' # KEGG compunds
 
-    # ideally: 7 decimal digits as they output up to 6 decimal digits 
+    outDir = baseDir+'/simcomp'
+    if not os.path.exists(outDir):
+        os.makedirs(outDir)
+
+    # ideally: cutoff is 7-decimal digit as kegg outputs up to 6 decimal digits
     # (but float to string uses scientific notation for more than 4 digits)
-    cutoff = 0.0001 
+    cutoff = 0.0001
 
     # Get all valid keggComID
-    comDict = {'C00022': 'COM00000759'}
+    fpath = baseDir+'/keggComData_validComId.lst'
+    with open(fpath) as infile:
+        for line in infile:
+            keggId = line.strip()
+            url = baseURL+keggId+'/'+database+'/cutoff='+str(cutoff)
+            print url
 
-    #
-    for keggId,_ in comDict.iteritems():
-        url = baseURL+keggId+'/'+database+'/cutoff='+str(cutoff)
-        print url
+            html = None
+            try:
+                html = urllib.urlopen(url)
+            except urllib.HTTPError, e:
+                print('HTTPError = ' + str(e.code))
+            except urllib.URLError, e:
+                print('URLError = ' + str(e.reason))
+            except httplib.HTTPException, e:
+                print('HTTPException')
+            except Exception:
+                import traceback
+                print('generic exception: ' + traceback.format_exc())
 
-        html = None
-        try: 
-            html = urllib.urlopen(url)
-        except urllib.HTTPError, e:
-            print('HTTPError = ' + str(e.code))
-        except urllib.URLError, e:
-            print('URLError = ' + str(e.reason))
-        except httplib.HTTPException, e:
-            print('HTTPException')
-        except Exception:
-            import traceback
-            print('generic exception: ' + traceback.format_exc())
+            if html==None:
+                continue
 
-        if html==None:
-            continue
+            soup = bs(html,'html.parser')
+            words = str(soup).split(); assert len(words)%2==0
 
-        soup = bs(html,'html.parser')
-        words = str(soup).split(); assert len(words)%2==0
+            simcomp = []
+            for i,keggId2 in enumerate(words):
+                if i%2==0:
+                    target = words[i]
+                    score = words[i+1]
+                    simcomp.append( target+'='+score )
 
-        simcomp = []
-        for i,keggId2 in enumerate(words):
-            if i%2==0:
-                comId = comDict[keggId2]
-                score = words[i+1]
-                simcomp.append( comId+'='+score )
-
-        simcompStr = '\n'.join(simcomp)
-        print simcompStr
-
-        # qf = 'UPDATE  compound '
-        # qm = 'SET '+ 'com_simcomp=' + '"'+keggId+'"'
-        # qr = ' WHERE com_drugbank_id='+ '"' + drugbankId + '"'
-        # q = qf+qm+qr
-        # resp = util.mysqlCommit(db,cursor,q)
-
-        # print soup
-        # for line in str(soup):
-        #     print line
-            # break
-
+            fpath = outDir+'/simcomp_'+keggId
+            with open(fpath,'w') as f:
+                for s in simcomp:
+                    f.write(str(s)+'\n')
 
 if __name__ == '__main__':
     main(sys.argv)

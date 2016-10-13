@@ -1,4 +1,6 @@
 TODO ###########################################################################
+> remove 'not-available'
+
 > separate crawling vs inserting/updating code
 
 > crawl knapsack based on cid
@@ -29,7 +31,7 @@ knapsack ID?
 !have sampled some, and we get the same as we direcly link knapsack and drugbank via cas-od!
 
 --> insert plant-vs-compound from knapsack
-!warn: inconsistent 
+!warn: inconsistent
 C00051723 has cas= 619-62-5
 C00050780 has cas= 619-62-5
 http://www.flavornet.org/info/619-62-5.html
