@@ -12,7 +12,7 @@ import dbcrawler_util as util
 from datetime import datetime
 from bs4 import BeautifulSoup as bs
 
-baseDir = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010'
+baseDir = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161014'
 
 def main(argv):
     # lo = int(argv[1]); hi = int(argv[2])
@@ -21,7 +21,8 @@ def main(argv):
     # fpath = baseDir+'/drug'
     # parseDrugFile(fpath)
 
-    parseSimcomp()
+    lo = int(argv[1]); hi = int(argv[2])
+    parseSimcomp(lo,hi)
 
 def parseDrugFile(fpath):
     hot = ''; n = 0; lookfor = False
@@ -129,7 +130,7 @@ def parseCompoundWebpage(loIdx, hiIdx):
 
     return data
 
-def parseSimcomp():
+def parseSimcomp(lo, hi):
     # http://www.genome.jp/tools/gn_tools_api.html
     # url = 'http://rest.genome.jp/simcomp/C00022/compound/cutoff=0.1'
     baseURL = 'http://rest.genome.jp/simcomp/'
@@ -145,42 +146,48 @@ def parseSimcomp():
 
     # Get all valid keggComID
     fpath = baseDir+'/keggComData_validComId.lst'
-    with open(fpath) as infile:
-        for line in infile:
-            keggId = line.strip()
-            url = baseURL+keggId+'/'+database+'/cutoff='+str(cutoff)
-            print url
 
-            html = None
-            try:
-                html = urllib.urlopen(url)
-            except urllib.HTTPError, e:
-                print('HTTPError = ' + str(e.code))
-            except urllib.URLError, e:
-                print('URLError = ' + str(e.reason))
-            except httplib.HTTPException, e:
-                print('HTTPException')
-            except Exception:
-                import traceback
-                print('generic exception: ' + traceback.format_exc())
+    keggIdList = None
+    with open(fpath) as f:
+        keggIdList = f.readlines()
+    keggIdList = keggIdList[lo:hi]
+    keggIdList = [i.strip() for i in keggIdList]
+    n = len(keggIdList)
 
-            if html==None:
-                continue
+    for j,keggId in enumerate(keggIdList):
+        url = baseURL+keggId+'/'+database+'/cutoff='+str(cutoff)
+        print 'parsing url=', url, 'idx=', str(j+1), 'of', str(n)
 
-            soup = bs(html,'html.parser')
-            words = str(soup).split(); assert len(words)%2==0
+        html = None
+        try:
+            html = urllib.urlopen(url)
+        except urllib.HTTPError, e:
+            print('HTTPError = ' + str(e.code))
+        except urllib.URLError, e:
+            print('URLError = ' + str(e.reason))
+        except httplib.HTTPException, e:
+            print('HTTPException')
+        except Exception:
+            import traceback
+            print('generic exception: ' + traceback.format_exc())
 
-            simcomp = []
-            for i,keggId2 in enumerate(words):
-                if i%2==0:
-                    target = words[i]
-                    score = words[i+1]
-                    simcomp.append( target+'='+score )
+        if html==None:
+            continue
 
-            fpath = outDir+'/simcomp_'+keggId
-            with open(fpath,'w') as f:
-                for s in simcomp:
-                    f.write(str(s)+'\n')
+        soup = bs(html,'html.parser')
+        words = str(soup).split(); assert len(words)%2==0
+
+        simcomp = []
+        for i,keggId2 in enumerate(words):
+            if i%2==0:
+                target = words[i]
+                score = words[i+1]
+                simcomp.append( target+'='+score )
+
+        fpath = outDir+'/simcomp_'+keggId
+        with open(fpath,'w') as f:
+            for s in simcomp:
+                f.write(str(s)+'\n')
 
 if __name__ == '__main__':
     main(sys.argv)
