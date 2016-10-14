@@ -1,17 +1,26 @@
 TODO ###########################################################################
+> remove 'not-available'
 
+> separate crawling vs inserting/updating code
+
+> crawl knapsack based on cid
+http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=C00007564
+those CIDs are obtained while crawling kegg
+delete if those cids are not associated with any plant (or should we mix: plant + animalia)
+based on knapsackID got from KEGGC, crawl knapsack to enrich plan-compound
+
+> get comp-prot from bioassay pubchem
+Ask Amir for the data
+
+> dis_omim_id (and abbrv) should be unique
+duplicate on http://www.omim.org/entry/607628
+
+DONE ###########################################################################
 > crawl kegg for compound
 same as D?
 knapsack ID?
 (Mol? KCF?) can be downloaded later with links
 
-> crawl knapsack based on cid
-http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=C00007564
-
-> get comp-prot from bioassay pubchem
-Ask Amir for the data
-
-DONE ###########################################################################
 --> crawl drug info from drugbank webpage
 --> insert compound from db
 --> insert compound from knapsack
@@ -22,7 +31,7 @@ DONE ###########################################################################
 !have sampled some, and we get the same as we direcly link knapsack and drugbank via cas-od!
 
 --> insert plant-vs-compound from knapsack
-!warn: inconsistent 
+!warn: inconsistent
 C00051723 has cas= 619-62-5
 C00050780 has cas= 619-62-5
 http://www.flavornet.org/info/619-62-5.html

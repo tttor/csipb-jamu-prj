@@ -13,8 +13,6 @@ from datetime import datetime
 from bs4 import BeautifulSoup as bs
 
 baseDir = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010'
-db = MySQLdb.connect("localhost","root","123","ijah" )
-cursor = db.cursor()
 
 def main(argv):
     # lo = int(argv[1]); hi = int(argv[2])
@@ -23,119 +21,12 @@ def main(argv):
     # fpath = baseDir+'/drug'
     # parseDrugFile(fpath)
 
-    comDataDpath = baseDir+'/keggCom_20161010_1-80K'
-    drugDataFpath = baseDir+'/keggdrug_data_2016-10-11_16:58:04.683546.pkl'
-    insertCompoundData(comDataDpath,drugDataFpath)
-
-def insertCompoundData(comDataDpath,drugDataFpath):
-    # Load Kegg compound data
-    data = {}
-    for filename in os.listdir(comDataDpath):
-        if filename.endswith(".pkl"): 
-            fpath = os.path.join(comDataDpath, filename)
-            dPerFile = {}
-            with open(fpath, 'rb') as handle:
-                dPerFile = pickle.load(handle)
-
-            for k,v in dPerFile.iteritems():
-                if len(v)!=0:
-                    data[k] = v
-
-    sortedK = data.keys()
-    sortedK.sort()
-    fpath = baseDir + '/keggComData_validComId.lst'
-    with open(fpath,'w') as f:
-        for k in sortedK:
-            f.write(str(k)+'\n')
-
-    # Load Kegg drug data, to infer their drugbank equivalent
-    drugData = None
-    with open(drugDataFpath, 'rb') as handle:
-        drugData = pickle.load(handle)
-
-    # Update or Insert
-    comId = 21994 # TODO unhardcode
-    insertList = []
-
-    n = len(data)
-    idx = 0
-    for keggId,d in data.iteritems():
-        idx += 1
-        print 'insert/update keggId=', keggId, 'idx=', idx, 'of', n
-
-        knapsackId = 'not-available'
-        if 'knapsackId' in d.keys():
-            knapsackId = d['knapsackId']
-
-        drugbankId = 'not-available'
-        if 'keggDrugId' in d.keys():
-            _ = drugData[ d['keggDrugId'] ]['drugbankId']
-            if len(_)!=0:
-                drugbankId = _ 
-
-        casId = 'not-available'
-        if 'casId' in d.keys():
-            casId = d['casId']
-
-        insert = False
-
-        if knapsackId!='not-available':
-            # update based on knapsackID, assume exist
-            qf = 'UPDATE compound '
-            qm = 'SET '+ 'com_kegg_id=' + '"'+keggId+'"'
-            if casId!='not-available':
-                qm = qm + ',' + ' com_cas_id=' + '"'+casId+'"'
-            if drugbankId!='not-available':
-                qm = qm + ',' + ' com_drugbank_id=' + '"'+drugbankId+'"'
-            qr = ' WHERE com_knapsack_id='+ '"' + knapsackId + '"'
-            q = qf+qm+qr
-            resp = util.mysqlCommit(db,cursor,q)
-
-            if cursor.rowcount==0:# not exist, then insert
-                insert = True
-            else:
-                insert = False
-
-        if drugbankId!='not-available':
-            # update based on knapsackID, assume exist
-            qf = 'UPDATE  compound '
-            qm = 'SET '+ 'com_kegg_id=' + '"'+keggId+'"'
-            if casId!='not-available':
-                qm = qm + ','+ ' com_cas_id=' + '"'+casId+'"'
-            if knapsackId!='not-available':
-                qm = qm + ','+ ' com_knapsack_id=' + '"'+knapsackId+'"'
-            qr = ' WHERE com_drugbank_id='+ '"' + drugbankId + '"'
-            q = qf+qm+qr
-            resp = util.mysqlCommit(db,cursor,q)
-
-            if cursor.rowcount==0:
-                insert = True
-            else:
-                insert = False
-
-        if insert:
-            comId += 1
-            comIdStr = 'COM'+ str(comId).zfill(8)
-
-            insertVals = [comIdStr, casId,drugbankId,knapsackId,keggId]
-            insertVals = ['"'+i+'"' for i in insertVals]
-
-            qf = 'INSERT INTO compound (com_id,com_cas_id,com_drugbank_id,com_knapsack_id,com_kegg_id)'
-            qr = ' VALUES (' + ','.join(insertVals) + ')'
-            q = qf + qr
-            resp = util.mysqlCommit(db,cursor,q) 
-
-            insertList.append(q)
-
-    insertListFpath = baseDir + '/insertion_from_keggComData.lst'
-    with open(insertListFpath,'w') as f:
-        for l in insertList:
-            f.write(str(l)+'\n')
+    parseSimcomp()
 
 def parseDrugFile(fpath):
     hot = ''; n = 0; lookfor = False
     data = {}; now = datetime.now()
-    with open(fpath) as infile:        
+    with open(fpath) as infile:
         for line in infile:
             n += 1
             words = line.split()
@@ -187,7 +78,7 @@ def parseCompoundWebpage(loIdx, hiIdx):
         html = None
         # with open(url, 'r') as content_file:
         #     html = content_file.read()
-        try: 
+        try:
             html = urllib.urlopen(url)
         except urllib.HTTPError, e:
             print('HTTPError = ' + str(e.code))
@@ -202,7 +93,7 @@ def parseCompoundWebpage(loIdx, hiIdx):
         datum = {}
         if html!=None:
             soup = bs(html,'html.parser')
-            
+
             hrefDict = {}
             hrefDict['keggDrugId'] = '/dbget-bin/www_bget?dr:'
             hrefDict['pubchemSid'] = 'http://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?sid='
@@ -214,9 +105,9 @@ def parseCompoundWebpage(loIdx, hiIdx):
                 for k,h in hrefDict.iteritems():
                     if h in href:
                         datum[k] = href.strip(h)
-        
+
             if 'knapsackId' in datum.keys():
-                datum['knapsackId'] = 'C'+datum['knapsackId']        
+                datum['knapsackId'] = 'C'+datum['knapsackId']
 
             divList = soup.find_all('div')
             for d in divList:
@@ -238,7 +129,58 @@ def parseCompoundWebpage(loIdx, hiIdx):
 
     return data
 
+def parseSimcomp():
+    # http://www.genome.jp/tools/gn_tools_api.html
+    # url = 'http://rest.genome.jp/simcomp/C00022/compound/cutoff=0.1'
+    baseURL = 'http://rest.genome.jp/simcomp/'
+    database = 'compound' # KEGG compunds
+
+    outDir = baseDir+'/simcomp'
+    if not os.path.exists(outDir):
+        os.makedirs(outDir)
+
+    # ideally: cutoff is 7-decimal digit as kegg outputs up to 6 decimal digits
+    # (but float to string uses scientific notation for more than 4 digits)
+    cutoff = 0.0001
+
+    # Get all valid keggComID
+    fpath = baseDir+'/keggComData_validComId.lst'
+    with open(fpath) as infile:
+        for line in infile:
+            keggId = line.strip()
+            url = baseURL+keggId+'/'+database+'/cutoff='+str(cutoff)
+            print url
+
+            html = None
+            try:
+                html = urllib.urlopen(url)
+            except urllib.HTTPError, e:
+                print('HTTPError = ' + str(e.code))
+            except urllib.URLError, e:
+                print('URLError = ' + str(e.reason))
+            except httplib.HTTPException, e:
+                print('HTTPException')
+            except Exception:
+                import traceback
+                print('generic exception: ' + traceback.format_exc())
+
+            if html==None:
+                continue
+
+            soup = bs(html,'html.parser')
+            words = str(soup).split(); assert len(words)%2==0
+
+            simcomp = []
+            for i,keggId2 in enumerate(words):
+                if i%2==0:
+                    target = words[i]
+                    score = words[i+1]
+                    simcomp.append( target+'='+score )
+
+            fpath = outDir+'/simcomp_'+keggId
+            with open(fpath,'w') as f:
+                for s in simcomp:
+                    f.write(str(s)+'\n')
+
 if __name__ == '__main__':
     main(sys.argv)
-    db.close()
-

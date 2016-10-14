@@ -130,44 +130,6 @@ def insertDrugVsProtein(drugProteinDict):
         for l in log:
             f.write(str(l)+'\n')
 
-def insertDrug(drugData):
-    idx = 0
-    for i,v in drugData.iteritems():
-        if len(v['uniprotTargets'])!=0:
-            idx += 1
-            print 'inserting', i, 'idx=',str(idx),'of at most', str(len(drugData))
-            
-            comId = str(idx); comId = comId.zfill(8); comId = 'COM'+comId
-            comDrugbankId = i
-            na = 'not-available'
-            
-            insertVals = []
-            insertVals.append(comId)
-            insertVals.append(comDrugbankId)
-
-            insertKeys = ['CAS number', 'pubchemCid', 'InChI Key', 'Chemical Formula', 
-                          'SMILES','com_knapsack_id','com_kegg_id']
-            for k in insertKeys:
-                if k in v.keys():
-                    insertVals.append(v[k])
-                else:
-                    insertVals.append(na)
-
-            assert len(insertVals)==9
-            insertVals = ['"'+iv+'"' for iv in insertVals ]
-
-            qf = '''INSERT INTO compound (com_id,com_drugbank_id,
-                                          com_cas_id,com_pubchem_id, 
-                                          com_inchikey, com_formula, com_smiles,
-                                          com_knapsack_id, com_kegg_id)
-                 VALUES ('''
-            qm = ','.join(insertVals)
-            qr = ')'
-            sql = qf+qm+qr
-            # print sql
-
-            util.mysqlCommit(db, cursor, sql)
-
 def parseUniprotlinkFile():
     dpFpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/uniprot_links.csv'
 

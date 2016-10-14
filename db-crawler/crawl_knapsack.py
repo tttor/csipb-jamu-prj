@@ -9,10 +9,6 @@ from bs4 import BeautifulSoup
 from urllib2 import urlopen
 from datetime import datetime
 
-outDir = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003'
-db = MySQLdb.connect("localhost","root","123","ijah" )
-cursor = db.cursor()
-
 def main():
     #################
     plantCompoundDict = None
@@ -22,13 +18,6 @@ def main():
         plantCompoundDict = pickle.load(handle)
 
     # insertPlants(plantCompoundDict.keys())
-
-    # #################
-    # compoundDict = {}
-    # for comList in plantCompoundDict.values():
-    #     for kId,cas,name,form in comList:
-    #         compoundDict[kId] = (cas,form)
-    # insertCompound(compoundDict)
 
     ################
     insertPlantVsCompound(plantCompoundDict)
@@ -124,58 +113,6 @@ def insertPlants(plantList):
         qr = ')'
         q = qf+qm+qr
         util.mysqlCommit(q)
-
-def insertCompound(compoundDict):
-    # get the last of the current comId, after inserting from drugbank
-    comIdStr = 'COM00006661' #TODO unhardcode
-    comId = int(comIdStr.strip('COM'))
-
-    #
-    idx = 0
-    nCom = len(compoundDict)
-    matchList = []
-    for k,v in compoundDict.iteritems():
-        idx += 1
-        print 'insert/updating', k, 'idx=',str(idx), 'of', nCom
-
-        cas,form = v
-
-        casMatch = None
-        if cas!='':
-            qf = 'SELECT * FROM compound WHERE com_cas_id='
-            qm = '"'+cas+'"'
-            qr = ''
-            q = qf+qm+qr
-            casMatch = util.mysqlCommit(db, cursor,q)
-        # print casMatch
-
-        if casMatch!=None:
-            # print 'match'
-            matchList.append(cas)
-
-            qf = 'UPDATE compound SET com_knapsack_id='
-            qm = '"'+k+'"'
-            qr = 'WHERE com_cas_id='+'"'+cas+'"'
-            q = qf+qm+qr
-            util.mysqlCommit(db,cursor,q)
-        else:
-            comId += 1
-            comIdStr = 'COM'+str(comId).zfill(8)
-
-            insertVals = [comIdStr,cas,k]
-            insertVals = ['not-available' if i=='' else i for i in insertVals]
-            insertVals = ['"'+i+'"' for i in insertVals]
-
-            qf = 'INSERT INTO compound (com_id,com_cas_id,com_knapsack_id) VALUES ('
-            qm =','.join(insertVals)
-            qr = ')'
-            q = qf+qm+qr
-            util.mysqlCommit(db,cursor,q)
-
-    fpath = outDir+'/knapsack_compound_match_with_drugbank.lst'
-    with open(fpath,'w') as f:
-        for m in matchList:
-            f.write(str(m)+'\n')
 
 def insertPlantVsCompound(plantCompoundDict):
     pc = plantCompoundDict
