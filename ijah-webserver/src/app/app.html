@@ -1,0 +1,68 @@
+<!--HEADER ROW-->
+<div id="header-row">
+    <div class="container">
+        <div class="row">
+            <!--LOGO-->
+            <div class="col-sm-3 col-md-3">
+              <a class="navbar navbar-left" [routerLink]=" ['./home'] "><img src="img/logo.png" class="img-responsive"></a>
+            </div>
+            <!-- /LOGO -->
+            <!-- MAIN NAVIGATION -->
+            <div class="col-sm-9 col-md-9">
+            <div class="navbar navbar-right">
+                <div class="navbar-header"><a data-target=".navbar-responsive-collapse" data-toggle="collapse" class="navbar-toggle"><span class="glyphicon glyphicon-bar"></span><span class="glyphicon glyphicon-bar"></span><span class="glyphicon glyphicon-bar"></span></a>
+                </div>
+                <div class="navbar-collapse collapse navbar-responsive-collapse">
+                    <ul class="nav navbar-nav">
+                      <li class="active"><a [routerLink]=" ['./home'] ">Home</a>
+                      </li>
+                      <li class="active"><a [routerLink]=" ['./manual'] ">Manual</a>
+                      </li>
+                      <li class="active"><a [routerLink]=" ['./downloads'] ">Downloads</a>
+                      </li>
+                      <li class="active"><a [routerLink]=" ['./help-faq'] ">Help/FAQ</a>
+                      </li>
+                      <li class="active"><a [routerLink]=" ['./disclaimer'] ">Disclaimer</a>
+                      </li>
+                      <li class="active"><a href="http://apps.cs.ipb.ac.id/ijah/ijahv1">Ijahv1</a>
+                      </li>
+                      <li class="active"><a [routerLink]=" ['./about'] ">About Us</a>
+                      </li>
+
+                    </ul>
+                </div>
+            </div>
+            </div>
+            <!-- MAIN NAVIGATION -->
+        </div>
+    </div>
+</div>
+<!-- /HEADER ROW -->
+
+<div class="container">
+  <!--   ==================================================-->
+  <div class="row" >
+
+      <!-- Radio -->
+      <main>
+        <router-outlet></router-outlet>
+      </main>
+
+  </div>
+
+</div>
+
+<!--Footer
+==========================-->
+<footer class="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-8 col-md-8 foot">© Copyright 2016, <a href="http://biofarmaka.ipb.ac.id">Tropical Biopharmaca Research Center</a> & <a href="http://cs.ipb.ac.id">Computer Science Department IPB</a><br>
+          <span style="width:20px">Best Viewed with Google Chrome on Desktops</span>
+        </div>
+        <!-- <div class="col-md-4">
+          <a href="http://www.worldflagcounter.com/details/CW"><img src="http://www.worldflagcounter.com/CW/" alt="Flag Counter"></a>
+        </div> -->
+      </div>
+    </div>
+</footer>

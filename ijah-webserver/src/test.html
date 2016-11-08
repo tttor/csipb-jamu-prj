@@ -1,0 +1,181 @@
+<html>
+<head>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+<body>
+ <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+ <script type="text/javascript" src="assets/js/jquery.js"></script>
+ <script type="text/javascript" src="assets/js/h2c/html2canvas.js"></script>
+ <script type="text/javascript" src="assets/js/filesaver.js"></script>
+ <script type="text/javascript" src="assets/js/jszip.min.js"></script>
+
+<div onload="render()">
+  <div id="html-content-holder">
+    <div class="text-center graph" id="sankey_multiple" style="height: 600px; background-color:white;"></div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="text-left col-md-3">
+    <b>Plants</b>
+  </div>
+  <div class="text-center col-md-3">
+    <b>Compounds</b>
+  </div>
+  <div class="text-center col-md-3">
+    <b>Proteins</b>
+  </div>
+  <div class="col-md-3 text-right">
+    <b>Diseases</b>
+  </div>
+</div>
+
+<a id="btn-Convert-Html2Image" class="btn btn-primary col-md-4 col-md-offset-4 text-center">Download As PNG</a>
+
+<br />
+<div class="row">
+
+</div>
+
+<script>
+
+  (function () {
+
+    var element = $("#html-content-holder"); // global variable
+    var getCanvas; // global variable
+
+      $("#btn-Convert-Html2Image").on('click', function () {
+
+        html2canvas(element, {
+        onrendered: function (canvas) {
+               $("#previewImage").append(canvas);
+               getCanvas = canvas;
+            }
+        });
+
+        var imgageData = getCanvas.toDataURL("image/png");
+        // Now browser starts downloading it instead of just showing it
+        var newData = imgageData.replace(/^data:image\/png/, "data:application/octet-stream");
+        $("#btn-Convert-Html2Image").attr("download", "graph_predict.png").attr("href", newData);
+
+    });
+
+
+    var zip = new JSZip();
+    zip.file("Hello.txt", "Hello world\n");
+
+
+    // Blob
+    var blobLink = document.getElementById('blob');
+    if (JSZip.support.blob) {
+      function downloadWithBlob() {
+        zip.generateAsync({type:"blob"}).then(function (blob) {
+          saveAs(blob, "hello.zip");
+        }, function (err) {
+            blobLink.innerHTML += " " + err;
+        });
+        return false;
+      }
+    } else {
+      blobLink.innerHTML += " (not supported on this browser)";
+    }
+
+    // data URI
+    function downloadWithDataURI() {
+      zip.generateAsync({type:"base64"}).then(function (base64) {
+        window.location = "data:application/zip;base64," + base64;
+      }, function (err) {
+        // shouldn't happen with a base64...
+      });
+    }
+    var dataUriLink = document.getElementById('data_uri');
+
+  })();
+</script>
+
+<script
+
+<script async type="text/javascript">
+  var init = function() {
+    // var test = JSON.stringify([
+    //    [ 'Brazil', 'Portugal', 5 ],
+    //    [ 'Brazil', 'France', 1 ],
+    //    [ 'Brazil', 'Spain', 1 ],
+    //    [ 'Brazil', 'England', 1 ],
+    //    [ 'Canada', 'Portugal', 1 ],
+    //    [ 'Canada', 'France', 5 ],
+    //    [ 'Canada', 'England', 1 ],
+    //    [ 'Mexico', 'Portugal', 1 ],
+    //    [ 'Mexico', 'France', 1 ],
+    //    [ 'Mexico', 'Spain', 5 ],
+    //    [ 'Mexico', 'England', 1 ],
+    //    [ 'USA', 'Portugal', 1 ],
+    //    [ 'USA', 'France', 1 ],
+    //    [ 'USA', 'Spain', 1 ],
+    //    [ 'USA', 'England', 5 ],
+    //    [ 'Portugal', 'Angola', 2 ],
+    //    [ 'Portugal', 'Senegal', 1 ],
+    //    [ 'Portugal', 'Morocco', 1 ],
+    //    [ 'Portugal', 'South Africa', 3 ],
+    //    [ 'France', 'Angola', 1 ],
+    //    [ 'France', 'Senegal', 3 ],
+    //    [ 'France', 'Mali', 3 ],
+    //    [ 'France', 'Morocco', 3 ],
+    //    [ 'France', 'South Africa', 1 ],
+    //    [ 'Spain', 'Senegal', 1 ],
+    //    [ 'Spain', 'Morocco', 3 ],
+    //    [ 'Spain', 'South Africa', 1 ],
+    //    [ 'England', 'Angola', 1 ],
+    //    [ 'England', 'Senegal', 1 ],
+    //    [ 'England', 'Morocco', 2 ],
+    //    [ 'England', 'South Africa', 7 ],
+    //    [ 'South Africa', 'China', 5 ],
+    //    [ 'South Africa', 'India', 1 ],
+    //    [ 'South Africa', 'Japan', 3 ],
+    //    [ 'Angola', 'China', 5 ],
+    //    [ 'Angola', 'India', 1 ],
+    //    [ 'Angola', 'Japan', 3 ],
+    //    [ 'Senegal', 'China', 5 ],
+    //    [ 'Senegal', 'India', 1 ],
+    //    [ 'Senegal', 'Japan', 3 ],
+    //    [ 'Mali', 'China', 5 ],
+    //    [ 'Mali', 'India', 1 ],
+    //    [ 'Mali', 'Japan', 3 ],
+    //   [ 'Indonesia', 'Spain', 5 ],
+    //    [ 'Morocco', 'China', 5 ],
+    //    [ 'Morocco', 'India', 1 ],
+    //    [ 'Morocco', 'Japan', 3 ]
+    // ]);
+    // localStorage.setItem('data', test);
+
+    // console.log(JSON.parse(localStorage.getItem('data')));
+
+    google.charts.load("current", {packages:["sankey"]});
+    google.charts.setOnLoadCallback(drawChart);
+     function drawChart() {
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'From');
+      data.addColumn('string', 'To');
+      data.addColumn('number', 'Weight');
+      data.addRows(JSON.parse(localStorage.getItem('data')) );
+
+      // Set chart options
+      var options = {
+        width: 1150,
+        sankey: {
+          node: { label: {
+             color: '#34495e',
+             bold: true} } },
+      };
+
+      // Instantiate and draw our chart, passing in some options.
+      var chart = new google.visualization.Sankey(document.getElementById('sankey_multiple'));
+      chart.draw(data, options);
+     }
+  }
+  window.onload = init;
+
+
+</script>
+</body>
+</html>
