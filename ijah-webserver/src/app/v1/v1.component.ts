@@ -2,12 +2,12 @@ import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'about',
+  selector: 'v1',
   styles: [`
   `],
-  templateUrl: './about.template.html'
+  templateUrl: './v1.html'
 })
-export class About {
+export class V1 {
   localState;
   constructor(public route: ActivatedRoute) {
 

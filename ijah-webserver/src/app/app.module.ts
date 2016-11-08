@@ -17,6 +17,7 @@ import { About } from './about';
 import { Help } from './help';
 import { Disclaimer } from './disclaimer';
 import { Download } from './download';
+import { V1 } from './v1';
 import { NoContent } from './no-content';
 
 // Application wide providers
@@ -37,6 +38,7 @@ const APP_PROVIDERS = [
     Help,
     Disclaimer,
     Download,
+    V1,
     NoContent
   ],
   imports: [ // import Angular's modules
