@@ -1,0 +1,11 @@
+db_protein_disease
+
+UNIPROT
+http://www.uniprot.org/
+ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/
+
+KEGG
+http://www.kegg.jp/dbget-bin/www_bget?ds:H00003
+http://www.kegg.jp/dbget-bin/www_bget?hsa:2322
+http://www.uniprot.org/uniprot/P36888
+

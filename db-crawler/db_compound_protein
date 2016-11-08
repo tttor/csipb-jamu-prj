@@ -1,0 +1,59 @@
+db_compound_protein
+db_drug_target
+
+===
+DATABASE WEBSERVER
+
+DRUGBANK
+http://www.drugbank.ca/
+contains UniprotID
+
+SUPERTARGET + MATADOR
+http://insilico.charite.de/supertarget/
+http://insilico.charite.de/supertarget/index.php?site=drug_target&id=4594-CP2D6_HUMAN
+
+TRANSFORMER
+http://bioinformatics.charite.de/transformer/
+http://bioinformatics.charite.de/supercyp/
+
+Antibioticome
+http://magarveylab.ca/antibioticome
+
+Therapeutic Target Database
+http://bidd.nus.edu.sg/group/cjttd/
+
+BindingDB
+http://www.bindingdb.org/bind/index.jsp
+
+STITCH
+
+KEGG
+http://www.drugbank.ca/drugs/DB00149
+http://www.genome.jp/dbget-bin/www_bget?dr:D00030
+http://www.genome.jp/dbget-bin/www_bget?cpd:C00123
+
+PolySearch
+http://wishart.biology.ualberta.ca/polysearch/index.htm
+
+TTD
+http://bidd.nus.edu.sg/group/cjttd/TTD.asp
+
+KEGG Drugs
+
+ChEMBL
+https://www.ebi.ac.uk/chembl
+
+BindingDB:
+https://www.bindingdb.org
+
+PDTD
+http://www.dddc.ac.cn/pdtd/
+
+===
+PREDICTING WEBSERVER
+
+SuperPred
+http://prediction.charite.de
+
+DINIES
+http://www.genome.jp/tools/dinies/
