@@ -26,26 +26,16 @@ def main():
 
     # fixDrugData()
 
-    ##########
-    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl'
-    with open(fpath, 'rb') as handle:
-        drugData = pickle.load(handle)
-    # insertDrug(drugData)
-    insertDrugVsProtein(drugData)
-
-    #
-    db.close()
-
-def fixDrugData(): 
+def fixDrugData():
     badWords = ['email','class="wrap"','.smiles','href']
     old = None
     smilesDict = None
 
-    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.ori.pkl' 
+    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.ori.pkl'
     with open(fpath, 'rb') as handle:
         old = pickle.load(handle)
 
-    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_smiles_2016-10-05_12:35:37.724557.pkl' 
+    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_smiles_2016-10-05_12:35:37.724557.pkl'
     with open(fpath, 'rb') as handle:
         smilesDict = pickle.load(handle)
 
@@ -73,62 +63,15 @@ def fixDrugData():
             for b in badWords:
                 if b in v2:
                     new[k][k2] = 'not-available'
-    
+
     assert(len(old)==len(new))
-    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl' 
+    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl'
     with open(fpath, 'wb') as f:
         pickle.dump(new, f)
 
-    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.json' 
+    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.json'
     with open(fpath, 'w') as f:
         json.dump(new, f, indent=2, sort_keys=True)
-
-def insertDrugVsProtein(drugProteinDict):
-    idx = 0
-    log = []; logFpath = outDir+'/insertDrugVsProtein.log'
-    src = 'drugbank.ca'; weight = '1.0'
-    for i,v in drugProteinDict.iteritems():
-        idx += 1
-
-        qf = 'SELECT com_id FROM compound WHERE com_drugbank_id ='
-        qm = '"' + i + '"'
-        qr = ''
-        sql = qf+qm+qr
-        comIdR = util.mysqlCommit(db,cursor,sql);
-
-        pList = list(set(v['uniprotTargets']))
-        for p in pList:
-            msg = 'inserting '+ i+ ' vs '+ p+' idx= '+ str(idx)+ ' of '+ str(len(drugProteinDict))
-            print msg
-
-            qf = 'SELECT pro_id FROM protein WHERE pro_uniprot_id ='
-            qm = '"' + p + '"'
-            qr = ''
-            sql = qf+qm+qr
-            proIdR = util.mysqlCommit(db,cursor,sql);
-
-            if comIdR!=None and proIdR!=None:
-                proId = proIdR[0]
-                comId = comIdR[0]
-
-                insertVals = [comId,proId,weight,src]
-                insertVals = ['"'+j+'"' for j in insertVals]
-
-                qf = '''INSERT INTO compound_vs_protein (com_id,pro_id,
-                                                         weight,source) 
-                        VALUES ('''
-                qm = ','.join(insertVals)
-                qr = ')'
-                sql = qf+qm+qr
-                util.mysqlCommit(db,cursor,sql)
-            else:
-                msg = 'FAIL: '+msg
-                print msg
-                log.append(msg)
-
-    with open(logFpath,'w') as f:
-        for l in log:
-            f.write(str(l)+'\n')
 
 def parseUniprotlinkFile():
     dpFpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/uniprot_links.csv'
@@ -136,18 +79,18 @@ def parseUniprotlinkFile():
     now = datetime.now()
     drugProteinDict = dict()
     idx = 0
-    with open(dpFpath) as infile:        
+    with open(dpFpath) as infile:
         first = True
         hot = ''
         for line in infile:
             if not(first):
                 idx += 1
                 print 'parsing idx=', idx
-                
+
                 line = line.strip();
                 quoteIdx = [i for i,c in enumerate(line) if c=='"']; assert(len(quoteIdx)%2==0)
                 quoteIdx = [j for i,j in enumerate(quoteIdx) if i%2==0] # take only odd-indexed idx
-                
+
                 words = line.split('"')
                 words2 = []
                 for w in words:
@@ -159,11 +102,11 @@ def parseUniprotlinkFile():
                         words2.append(w2)
                 line = ' '.join(words2)
 
-                words = line.split(','); 
+                words = line.split(',');
                 words = words[0:4]
                 words = [w.strip() for w in words]
                 words = [w.replace('$',',') for w in words]
-                
+
                 drugbankId = words[0]
                 name = words[1]
                 uniprotId = words[3]
@@ -177,7 +120,7 @@ def parseUniprotlinkFile():
 
                 drugProteinDict[hot]['targetProtein'].append(uniprotId)
             first = False
-    
+
     jsonFpath = outDir+'/drugbank_drug_vs_protein_'+str(now.date())+'_'+str(now.time())+'.json'
     with open(jsonFpath, 'w') as f:
         json.dump(drugProteinDict, f, indent=2, sort_keys=True)
@@ -200,7 +143,7 @@ def parseDrugWebpage(drugbankIdList): # e.g. http://www.drugbank.ca/drugs/DB0510
         baseURL = 'http://www.drugbank.ca/drugs/'
         url = baseURL+dbId
         html = urllib.urlopen(url)
-        # baseFpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/' 
+        # baseFpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/'
         # fpath = baseFpath+dbId+ '.html'
         # with open(fpath, 'r') as content_file:
         #     html = content_file.read()
@@ -264,13 +207,13 @@ def parseSmiles(drugbankIdList):
     nDbId = len(drugbankIdList)
     baseURL = 'http://www.drugbank.ca/structures/structures/small_molecule_drugs/'
 
-    smiles = dict() 
+    smiles = dict()
     for idx, dbId in enumerate(drugbankIdList):
         print 'parsing', dbId, 'idx=', str(idx+1), 'of', str(nDbId)
 
         s = 'not-available'
         url = baseURL+dbId+'.smiles'
-        try: 
+        try:
             s = urllib.urlopen(url)
         except urllib.HTTPError, e:
             print('HTTPError = ' + str(e.code))
@@ -300,7 +243,7 @@ def parseSmiles(drugbankIdList):
 # def parseDrugbankVocab():
 #     fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_vocabulary.csv'
 
-#     with open(fpath) as infile:      
+#     with open(fpath) as infile:
 #         first = True
 #         idx = 0
 #         for line in infile:

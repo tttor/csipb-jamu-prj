@@ -10,18 +10,7 @@ from urllib2 import urlopen
 from datetime import datetime
 
 def main():
-    #################
-    plantCompoundDict = None
-    # plantCompoundDict = parseKnapsack()
-    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003/knapsack_jsp_plant_vs_compound_2016-10-04_16:34:06.468234.pkl'  
-    with open(fpath, 'rb') as handle:
-        plantCompoundDict = pickle.load(handle)
-
-    # insertPlants(plantCompoundDict.keys())
-
-    ################
-    insertPlantVsCompound(plantCompoundDict)
-    db.close()
+    parseKnapsack()
 
 def parseKnapsack():
     # get the seed plant list
@@ -29,7 +18,7 @@ def parseKnapsack():
 
     seedPlantList = []
     for fp in seedPlantListFPaths:
-        with open(fp) as infile:        
+        with open(fp) as infile:
             idx = 0
             for line in infile:
                 idx += 1
@@ -75,7 +64,7 @@ def parseKnapsack():
                 comName = datum[2]
                 comFormula = datum[3]
                 plantName = datum[5]
-                
+
                 plantNameWords = plantName.split()
                 if len(plantNameWords)>1:
                     plantNameWords = plantNameWords[0:2]
@@ -98,69 +87,7 @@ def parseKnapsack():
 
     return plantCompoundDict
 
-def insertPlants(plantList):
-    nPlant = len(plantList)
-    for idx, p in enumerate(plantList):
-        plaId = str(idx+1)
-        plaId = plaId.zfill(8)
-        plaId = '"'+'PLA'+plaId+'"'
-        print 'inserting ', plaId, 'of', str(nPlant)
-
-        plaName = '"'+p+'"'
-
-        qf = 'INSERT INTO plant (pla_id,pla_name) VALUES ('
-        qm = plaId+','+plaName
-        qr = ')'
-        q = qf+qm+qr
-        util.mysqlCommit(q)
-
-def insertPlantVsCompound(plantCompoundDict):
-    pc = plantCompoundDict
-    src = 'knapsack.kanaya.naist.jp'
-    log = []; logFpath = outDir+'/insertPlantVsCompound.log'
-
-    n = len(pc); idx = 0; 
-    for p,v in pc.iteritems():
-        idx += 1
-
-        qf = 'SELECT pla_id FROM plant WHERE pla_name ='
-        qm = '"'+p+'"'
-        qr = ''
-        q = qf+qm+qr
-        plaIdR = util.mysqlCommit(db,cursor,q); 
-
-        comList = list( set([c[0] for c in v]) )
-        for c in comList:
-            msg = 'inserting '+ p+ ' vs '+ c+ ' idx= '+ str(idx)+ ' of '+ str(n)
-            print msg
-
-            qf = 'SELECT com_id FROM compound WHERE com_knapsack_id ='
-            qm = '"' + c + '"'
-            qr = ''
-            q = qf+qm+qr
-            comIdR = util.mysqlCommit(db,cursor,q); 
-
-            if plaIdR!=None and comIdR!=None:
-                plaId = plaIdR[0]
-                comId = comIdR[0]
-
-                insertVals = [plaId,comId,src]
-                insertVals = ['"'+i+'"' for i in insertVals]
-
-                qf = 'INSERT INTO plant_vs_compound (pla_id,com_id,source) VALUES ('
-                qm = ','.join(insertVals)
-                qr = ')'
-                q = qf+qm+qr
-                util.mysqlCommit(db,cursor,q)
-            else:
-                log.append('FAIL: '+msg)
-
-    with open(logFpath,'w') as f:
-        for i in log:
-            f.write(str(i)+'\n')
-
 if __name__ == '__main__':
     start_time = time.time()
     main()
     print("--- %s seconds ---" % (time.time() - start_time))
-    
