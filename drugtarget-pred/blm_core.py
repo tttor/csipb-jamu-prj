@@ -31,45 +31,12 @@ class BLM:
             self._loadInteraction(bindingFpath)
             self._loadSimMat(drugSimMatFpath, proteinSimMatFpath)
 
-    def predict(self, com, pro):
-        predictorList = [self.predictorA, self.predictorB, self.predictorC]
-
-        edgeList = []
-        srcList = []
-        for p in predictorList:
-            edge, src = p(com,pro)
-            edgeList.append(edge)
-            srcList.append(src)
-
-        weight = np.mean(edgeList)
-        srcs = '+'.join(srcList)
-
-        return (weight,srcs)
-
-    def predictorA(self,com,pro):
-        n = 1; p = 0.5; x = 1
-        pred = np.random.binomial(n, p, x)[0]
-        predName = 'predictorA'
-        return (pred, predName)
-
-    def predictorB(self,com,pro):
-        n = 1; p = 0.5; x = 1
-        pred = np.random.binomial(n, p, x)[0]
-        predName = 'predictorB'
-        return (pred, predName)
-
-    def predictorC(self,com,pro):
-        n = 1; p = 0.5; x = 1
-        pred = np.random.binomial(n, p, x)[0]
-        predName = 'predictorC'
-        return (pred, predName)
-
     def eval(self, type, outDir):
         nFolds = None
         kfList = None
         if type=='loocv':
             nFolds = self.nData
-            kfList = KFold(self.nData, n_folds=nFolds, shuffle=True) 
+            kfList = KFold(self.nData, n_folds=nFolds, shuffle=True)
         elif type=='kfcv':
             nFolds = 10
             kfList = StratifiedKFold(self.dataY, n_folds=nFolds, shuffle=True)
@@ -109,7 +76,7 @@ class BLM:
 
                 if yd!=None and yp!=None:
                     predResults['usingDrugAndProteinSet'].append( (max(yd,yp),y) )
-                
+
                 #
                 ynii = max(yd,yp,ydnii,ypnii); assert ynii!=None
                 predResults['usingDrugAndProteinSetNII'].append( (ynii,y) )
@@ -173,7 +140,7 @@ class BLM:
         plt.savefig(outDir+'/pr_curve.png', bbox_inches='tight')
 
     def _evalPerFold(self, xTest, yTest, xTr, yTr, drugList, proteinList):
-        yPredUsingDrugSet = self._predict('usingDrugSetAsTrainingData', xTest, xTr, yTr, 
+        yPredUsingDrugSet = self._predict('usingDrugSetAsTrainingData', xTest, xTr, yTr,
                                         drugList, proteinList)
         yPredUsingProteinSet = self._predict('usingProteinSetAsTrainingData', xTest, xTr, yTr,
                                            drugList, proteinList)
@@ -190,9 +157,9 @@ class BLM:
 
         refIdx = None # either drug(=0) or protein(=1) of a tuple xTest(drug,protein)
         if type=='usingProteinSetAsTrainingData':# =local model of a drug
-            refIdx = 0 
+            refIdx = 0
         elif type=='usingDrugSetAsTrainingData':# =local model of a protein
-            refIdx = 1 
+            refIdx = 1
         else:
             assert False
 
@@ -219,7 +186,7 @@ class BLM:
                     idx2 = metaT[refIdx].index( x[refIdx] )
                     simScore = simMatT[refIdx][idx1][idx2]
 
-                    nt = [None]*2 
+                    nt = [None]*2
                     nt[refIdx] = n
                     nt[not(refIdx)] = x[not(refIdx)]
 
@@ -229,7 +196,7 @@ class BLM:
 
                     ip += (interaction*simScore)
                 yTrLocalNII.append(ip)
-            
+
             #normalize such that each element of yTrLocalNII in [0,1]
             assert len(yTrLocalNII)==len(yTrLocal)
 
@@ -245,9 +212,9 @@ class BLM:
         xTrLocal = [i[int(not(refIdx))] for i in xTrLocal]
         xTestLocal = [i[int(not(refIdx))] for i in xTest]
 
-        gramTr = self._makeGram(xTrLocal, xTrLocal, 
+        gramTr = self._makeGram(xTrLocal, xTrLocal,
                                 simMatT[not(refIdx)], metaT[not(refIdx)])
-        gramTest = self._makeGram(xTestLocal,xTrLocal, 
+        gramTest = self._makeGram(xTestLocal,xTrLocal,
                                   simMatT[not(refIdx)], metaT[not(refIdx)])
 
         # Predict
@@ -263,7 +230,7 @@ class BLM:
 
             yPred = [None]*len(xTest)
             yPredNII = clf.predict(gramTest)
-            
+
         return (yPred, yPredNII)
 
     def _loadInteraction(self, fpath):
@@ -273,12 +240,12 @@ class BLM:
 
         self.drugList = [i.strip() for i in lines[0].split()]
         del lines[0]
-        
+
         nDrugs = len(self.drugList); nProteins = len(lines)
         self.adjMat = np.zeros( (nDrugs,nProteins) )
         for i,line in enumerate(lines):
             cols = [c.strip() for c in line.split()]
-            
+
             self.proteinList.append(cols[0])
             del cols[0]
 
@@ -292,7 +259,7 @@ class BLM:
             j = self.proteinList.index(x[1])
 
             self.dataY.append( self.adjMat[i][j])
-        
+
         assert(len(self.dataX)==len(self.dataY))
         self.nData = len(self.dataX)
 
@@ -302,7 +269,7 @@ class BLM:
 
         meta, self.drugSimMat = self._readSimMat(drugSimMatFpath)
         assert meta==self.drugList
-        
+
     def _readSimMat(self, fpath):
         with open(fpath) as f:
             content = f.readlines()
@@ -332,10 +299,10 @@ class BLM:
             for j, x2 in enumerate(X2):
                 x1 = x1.replace(':','')
                 x2 = x2.replace(':','')
-                
+
                 ii = meta.index(x1)
                 jj = meta.index(x2)
-                
+
                 gram[i][j] = simMat[ii][jj]
                 assert(gram[i][j] >= 0)
 
