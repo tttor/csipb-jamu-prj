@@ -1,5 +1,6 @@
 # insert_plant.py
 import os
+import sys
 import time
 import json
 import yaml
@@ -11,8 +12,9 @@ from bs4 import BeautifulSoup
 from urllib2 import urlopen
 from datetime import datetime
 
-def main():
-    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003/knapsack_jsp_plant_vs_compound_2016-10-04_16:34:06.468234.pkl'
+def main(argv):
+    assert len(argv)==1
+    fpath = argv[1] #e.g.: knapsack_jsp_plant_vs_compound.pkl'
     plantCompoundDict = None
     with open(fpath, 'rb') as handle:
         plantCompoundDict = pickle.load(handle)
@@ -36,4 +38,6 @@ def insertPlants(plantList):
         util.mysqlCommit(q)
 
 if __name__ == '__main__':
-    main()
+    start_time = time.time()
+    main(sys.argv)
+    print("--- %s seconds ---" % (time.time() - start_time))
