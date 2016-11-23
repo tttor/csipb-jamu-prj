@@ -1,5 +1,6 @@
 import time
 import json
+import sys
 import yaml
 import MySQLdb
 import pickle
@@ -9,13 +10,14 @@ from bs4 import BeautifulSoup
 from urllib2 import urlopen
 from datetime import datetime
 
-def main():
-    parseKnapsack()
+def main(argv):
+    assert len(argv)>=3
 
-def parseKnapsack():
-    # get the seed plant list
-    seedPlantListFPaths = ['/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003/ijah_jamu_plants.lst']
+    outDir = argv[1]
+    seedPlantListFPaths = argv[2:]
+    parseKnapsack(seedPlantListFPaths, outDir)
 
+def parseKnapsack(seedPlantListFPaths, outDir):
     seedPlantList = []
     for fp in seedPlantListFPaths:
         with open(fp) as infile:
@@ -89,5 +91,5 @@ def parseKnapsack():
 
 if __name__ == '__main__':
     start_time = time.time()
-    main()
+    main(sys.argv)
     print("--- %s seconds ---" % (time.time() - start_time))
