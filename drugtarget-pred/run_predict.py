@@ -2,6 +2,7 @@
 import MySQLdb
 import dbcrawler_util as util
 from blm_core import BLM
+from dummy_predictor import DummyPredictor
 
 db = MySQLdb.connect("localhost","root","123","ijah" )
 cursor = db.cursor()
@@ -17,7 +18,7 @@ def main():
     proList = ['PRO'+str(i).zfill(8) for i in proList]
 
     #
-    blm = BLM()
+    predictor = DummyPredictor()
 
     #
     nCom = len(comList)
@@ -44,7 +45,7 @@ def main():
                 print 'predicting ...'
                 # (re)predict
                 # weight here is the confidence level that the link exists
-                weight, srcs = blm.predict(c,p)
+                weight, srcs = predictor.predict(c,p)
 
                 # insert
                 if weight > 0.0:
@@ -52,7 +53,7 @@ def main():
                     insertVals = [c,p,str(weight),srcs]
                     insertVals = ['"'+j+'"' for j in insertVals]
                     qf = '''INSERT INTO compound_vs_protein (com_id,pro_id,
-                                                             weight,source) 
+                                                             weight,source)
                             VALUES ('''
                     qm = ','.join(insertVals)
                     qr = ')'
