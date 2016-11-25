@@ -11,6 +11,10 @@ from urllib2 import urlopen
 from datetime import datetime
 
 def main(argv):
+    '''
+    arg[1]: outDir
+    arg[2:]: seedPlantListFPaths, e.g. ijah_jamu_plants.lst
+    '''
     assert len(argv)>=3
 
     outDir = argv[1]
