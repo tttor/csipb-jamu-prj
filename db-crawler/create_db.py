@@ -10,53 +10,47 @@ def main(argv):
     host = argv[4]; port = argv[5]
     conn = psycopg2.connect(database=db, user=user, password=passwd,
                             host=host, port=port)
-    print "Opened database successfully"
-
     cur = conn.cursor()
 
     cur.execute('DROP TABLE IF EXISTS plant;')
     cur.execute('''CREATE TABLE plant (
-                pla_int_id serial NOT NULL,
                 pla_id varchar(12) NOT NULL,
                 pla_name varchar(256) NOT NULL,
-                PRIMARY KEY(pla_int_id)
+                PRIMARY KEY(pla_id)
                 );
                 ''')
 
     cur.execute('DROP TABLE IF EXISTS compound;')
     cur.execute('''CREATE TABLE compound (
-                com_int_id serial NOT NULL,
                 com_id varchar(12) NOT NULL,
-                com_cas_id varchar(128) NOT NULL,
-                com_drugbank_id varchar(128) NOT NULL,
-                com_inchikey varchar(1024) NOT NULL,
-                com_kegg_id varchar(128) NOT NULL,
-                com_knapsack_id varchar(128) NOT NULL,
-                com_pubchem_id varchar(128) NOT NULL,
-                com_simcomp varchar(128) NOT NULL,
-                com_smiles varchar(16384) NOT NULL,
-                PRIMARY KEY(com_int_id)
+                com_cas_id varchar(128),
+                com_drugbank_id varchar(128),
+                com_inchikey varchar(1024),
+                com_kegg_id varchar(128),
+                com_knapsack_id varchar(128),
+                com_pubchem_id varchar(128),
+                com_smiles varchar(16384),
+                com_simcomp varchar(128),
+                PRIMARY KEY(com_id)
                 );
                 ''')
 
     cur.execute('DROP TABLE IF EXISTS protein;')
     cur.execute('''CREATE TABLE protein (
-                pro_int_id serial NOT NULL,
                 pro_id varchar(12) NOT NULL,
                 pro_name varchar(300) NOT NULL,
-                pro_uniprot_id varchar(6) NOT NULL,
-                pro_uniprot_abbrv varchar(50) NOT NULL,
-                PRIMARY KEY(pro_int_id)
+                pro_uniprot_id varchar(6),
+                pro_uniprot_abbrv varchar(50),
+                PRIMARY KEY(pro_id)
                 );
                 ''')
 
     cur.execute('DROP TABLE IF EXISTS disease;')
     cur.execute('''CREATE TABLE disease (
-                dis_int_id serial NOT NULL,
                 dis_id varchar(12) NOT NULL,
                 dis_omim_id varchar(6) NOT NULL,
                 dis_uniprot_abbrv varchar(30) NOT NULL,
-                PRIMARY KEY(dis_int_id)
+                PRIMARY KEY(dis_id)
                 );
                 ''')
 
