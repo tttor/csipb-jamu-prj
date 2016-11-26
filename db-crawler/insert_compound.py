@@ -71,6 +71,9 @@ def insertComFromDrugbank(csr,fpath):
                 elif ii=='InChI Key':
                     insertKeys.append('com_inchikey')
                     insertVals.append(vv)
+                elif ii=='CAS number':
+                    insertKeys.append('com_cas_id')
+                    insertVals.append(vv)
         insertVals = ["'"+i+"'" for i in insertVals]
 
         qf = 'INSERT INTO compound ('+','.join(insertKeys)+') VALUES ('
@@ -101,29 +104,30 @@ def insertComFromKnapsack(csr,outDir,fpath):
     idx = 0
     for k,cas in compoundDict.iteritems():
         idx += 1
-        print 'insert/updating', k, 'idx=',str(idx), 'of', nCom
+        print 'insert/updating', k, 'idx=',str(idx), 'of', nCom,'(at most)'
 
-        if pg.doesExist(csr,'compound','com_cas_id',cas):
-            # print 'match'
-            matchList.append(cas)
+        if cas!='' and cas!='not-available':
+            if pg.doesExist(csr,'compound','com_cas_id',cas):
+                # print 'match'
+                matchList.append(cas)
 
-            qf = 'UPDATE compound SET com_knapsack_id='
-            qm = "'"+k+"'"
-            qr = 'WHERE com_cas_id='+"'"+cas+"'"
-            q = qf+qm+qr
-            csr.execute(q)
-        else:# insert
-            comIdx += 1
-            comIdStr = 'COM'+str(comIdx).zfill(8)
+                qf = 'UPDATE compound SET com_knapsack_id='
+                qm = "'"+k+"'"
+                qr = 'WHERE com_cas_id='+"'"+cas+"'"
+                q = qf+qm+qr
+                csr.execute(q)
+            else:
+                comIdx += 1
+                comIdStr = 'COM'+str(comIdx).zfill(8)
 
-            insertVals = [comIdStr,cas,k]
-            insertVals = ["'"+i+"'" for i in insertVals]
+                insertVals = [comIdStr,cas,k]
+                insertVals = ["'"+i+"'" for i in insertVals]
 
-            qf = 'INSERT INTO compound (com_id,com_cas_id,com_knapsack_id) VALUES ('
-            qm =','.join(insertVals)
-            qr = ')'
-            q = qf+qm+qr
-            csr.execute(q)
+                qf = 'INSERT INTO compound (com_id,com_cas_id,com_knapsack_id) VALUES ('
+                qm =','.join(insertVals)
+                qr = ')'
+                q = qf+qm+qr
+                csr.execute(q)
 
     fpath = outDir+'/compound_match_knapsack_vs_drugbank.lst'
     with open(fpath,'w') as f:
