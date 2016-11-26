@@ -186,11 +186,20 @@ def insertComFromKegg(csr,outDir,comDataDpath,drugDataFpath):
         drugData = pickle.load(handle)
 
     # Update or Insert
+    comIdx = 0
+    currComId = pg.getMax(csr,'com_id','compound')
+    if currComId!=None:
+        comIdx = int(currComId.strip('COM'))
+
     insertList = []
     n = len(comData); idx = 0
+    duplicateList = ['C00031','C10906','C00334','C00116','C00475']# TODO fix this
     for keggId,d in comData.iteritems():
         idx += 1
         print 'insert/update keggId=', keggId, 'idx=', idx, 'of', n
+
+        if keggId in duplicateList:
+            continue
 
         knapsackId = ''
         if 'knapsackId' in d.keys():
@@ -206,65 +215,51 @@ def insertComFromKegg(csr,outDir,comDataDpath,drugDataFpath):
         if 'casId' in d.keys():
             casId = d['casId']
 
-        mustInsert = False
+        knapsackIdFound = False
+        drugbankIdFound = False
         if knapsackId!='':
-            # check if exist
             if pg.doesExist(csr,'compound','com_knapsack_id',knapsackId):
-                # update based on knapsackID
-                qf = 'UPDATE compound '
-                qm = 'SET '+ 'com_kegg_id=' + "'"+keggId+"'"
-                if casId!='':
-                    qm = qm + ',' + ' com_cas_id=' + "'"+casId+"'"
-                if drugbankId!='':
-                    qm = qm + ',' + ' com_drugbank_id=' + "'"+drugbankId+"'"
-                qr = ' WHERE com_knapsack_id='+ "'" + knapsackId + "'"
-                q = qf+qm+qr
-                csr.execute(q)
-            else:
-                mustInsert = True
+                knapsackIdFound = True
 
         if drugbankId!='':
             if pg.doesExist(csr,'compound','com_drugbank_id',drugbankId):
-                # update based on drugbankId
-                qf = 'UPDATE  compound '
-                qm = 'SET '+ 'com_kegg_id=' + "'"+keggId+"'"
-                if casId!='':
-                    qm = qm + ','+ ' com_cas_id=' + "'"+casId+"'"
-                if knapsackId!='':
-                    qm = qm + ','+ ' com_knapsack_id=' + "'"+knapsackId+"'"
-                qr = ' WHERE com_drugbank_id='+ "'" + drugbankId + "'"
-                q = qf+qm+qr
-                csr.execute(q)
-            else:
-                mustInsert = True
+                drugbankIdFound = True
 
-        comIdx = 0
-        currComId = pg.getMax(csr,'com_id','compound')
-        if currComId!=None:
-            comIdx = int(currComId.strip('COM'))
+        knapsackId = "'"+knapsackId+"'"
+        drugbankId = "'"+drugbankId+"'"
+        keggId = "'"+keggId+"'"
 
-        if mustInsert:
+        if drugbankIdFound or knapsackIdFound:
+            # update based on knapsackID
+            qf = 'UPDATE compound '
+            qm = 'SET '+ 'com_kegg_id='+keggId
+            # if drugbankId!="''":
+            #     qm = qm + ',' + ' com_drugbank_id=' + drugbankId
+            # if knapsackId!="''":
+            #     qm = qm + ','+ ' com_knapsack_id=' + knapsackId
+            qr = ' WHERE com_knapsack_id='+knapsackId+' OR com_drugbank_id='+drugbankId
+            q = qf+qm+qr
+            print q
+            csr.execute(q)
+        else:
             comIdx += 1
             comIdStr = 'COM'+ str(comIdx).zfill(8)
+            comIdStr = "'"+comIdStr+"'"
 
             insertKeys = ['com_id','com_kegg_id']
             insertVals = [comIdStr,keggId]
 
-            if casId!='':
-                insertKeys.append('com_cas_id')
-                insertVals.append(casId)
-            if drugbankId!='':
+            if drugbankId!="''":
                 insertKeys.append('com_drugbank_id')
                 insertVals.append(drugbankId)
-            if knapsackId!='':
+            if knapsackId!="''":
                 insertKeys.append('com_knapsack_id')
                 insertVals.append(knapsackId)
-
-            insertVals = ["'"+i+"'" for i in insertVals]
 
             qf = 'INSERT INTO compound ('+','.join(insertKeys)+')'
             qr = ' VALUES (' + ','.join(insertVals) + ')'
             q = qf + qr
+            print q
             csr.execute(q)
 
             insertList.append(q)
