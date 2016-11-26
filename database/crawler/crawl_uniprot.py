@@ -1,13 +1,12 @@
 import time
 import json
-import MySQLdb
-import dbcrawler_util as util
+import pickle
 from collections import defaultdict
 
 dirPath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/uniprot/uniprot_human_dat_20160928'
 
 def main():
-    proteinDiseaseDict, proteinList, diseaseList = parseUniprotData()
+    parseUniprotData()
 
 def parseUniprotData():
     path = dirPath+'/uniprot_sprot_human.dat'
@@ -83,10 +82,20 @@ def parseUniprotData():
     diseaseList = list(set(diseaseList))
     assert(len(proteinList)==len(data2))
 
+    with open(dirPath+'/uniprot_sprot_human.pkl', 'wb') as f:
+        pickle.dump(data2, f)
     with open(dirPath+'/uniprot_sprot_human.json', 'w') as fp:
         json.dump(data2, fp, indent=2, sort_keys=True)
 
-    return (data2, proteinList, diseaseList)
+    with open(dirPath+'/uniprot_sprot_human_protein.pkl', 'wb') as f:
+        pickle.dump(proteinList, f)
+    with open(dirPath+'/uniprot_sprot_human_protein.lst', 'w') as fp:
+        for p in proteinList: fp.write(str(p)+'\n')
+
+    with open(dirPath+'/uniprot_sprot_human_disease.pkl', 'wb') as f:
+        pickle.dump(diseaseList, f)
+    with open(dirPath+'/uniprot_sprot_human_disease.lst', 'w') as fp:
+        for d in diseaseList: fp.write(str(d)+'\n')
 
 if __name__ == '__main__':
     start_time = time.time()
