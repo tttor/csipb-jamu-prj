@@ -23,11 +23,11 @@ def main(argv):
     cur.execute('''CREATE TABLE compound (
                 com_id varchar(12) PRIMARY KEY,
                 com_drugbank_id varchar(128) UNIQUE,
-                com_inchikey varchar(1024) UNIQUE,
-                com_kegg_id varchar(128) UNIQUE,
                 com_knapsack_id varchar(128) UNIQUE,
+                com_kegg_id varchar(128) UNIQUE,
                 com_pubchem_id varchar(128) UNIQUE,
                 com_cas_id varchar(128) UNIQUE,
+                com_inchikey varchar(1024) UNIQUE,
                 com_smiles varchar(16384) UNIQUE,
                 com_simcomp varchar(128)
                 );
