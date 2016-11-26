@@ -14,23 +14,23 @@ from urllib2 import urlopen
 from datetime import datetime
 
 def main(argv):
-    assert len(argv)==8
+    assert len(argv)==9
 
     db = argv[1]
     user = argv[2]; passwd = argv[3]
     host = argv[4]; port = argv[5]
     mode = argv[6]
     fpath = argv[7] #e.g.: knapsack_jsp_plant_vs_compound.pkl'
+    outDir = argv[8]
 
     conn = psycopg2.connect(database=db, user=user, password=passwd,
                             host=host, port=port)
     csr = conn.cursor()
 
     if mode=='insertComFromDrugbank':
-        insertComFromDrugbank(fpath,csr)
-    # elif mode=='insertComFromKnapsack':
-    #     idx = int(util.mysqlGetMax(db,cursor,table='compound',col='com_id').strip('COM'))
-    #     idx = insertComFromKnapsack(idx)
+        insertComFromDrugbank(csr,fpath)
+    elif mode=='insertComFromKnapsack':
+        insertComFromKnapsack(csr,fpath,outDir)
     # elif mode=='insertComFromKegg':
     #     idx = int(util.mysqlGetMax(db,cursor,table='compound',col='com_id').strip('COM'))
     #     idx = insertComFromKegg(idx)
@@ -42,7 +42,7 @@ def main(argv):
     conn.commit()
     conn.close()
 
-def insertComFromDrugbank(fpath,csr):
+def insertComFromDrugbank(csr,fpath):
     drugData = None
     with open(fpath, 'rb') as handle:
         drugData = pickle.load(handle)
@@ -51,6 +51,7 @@ def insertComFromDrugbank(fpath,csr):
     currComId = pg.getMax(csr,'com_id','compound')
     if currComId!=None:
         comIdx = int(currComId.strip('COM'))
+    assert comIdx==0,'insertComFromDrugbank _must_ be carried our first as the baseline!'
 
     for i,v in drugData.iteritems():
         if len(v['uniprotTargets'])==0:
@@ -79,9 +80,8 @@ def insertComFromDrugbank(fpath,csr):
 
     return comIdx
 
-def insertComFromKnapsack(comIdx):
+def insertComFromKnapsack(csr,fpath,outDir):
     plantCompoundDict = None
-    fpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003/knapsack_jsp_plant_vs_compound_2016-10-04_16:34:06.468234.pkl'
     with open(fpath, 'rb') as handle:
         plantCompoundDict = pickle.load(handle)
 
@@ -90,37 +90,41 @@ def insertComFromKnapsack(comIdx):
         for kId,cas,name,form in comList:
             compoundDict[kId] = cas
 
-    idx = 0
+    comIdx = 0
+    currComId = pg.getMax(csr,'com_id','compound')
+    if currComId!=None:
+        comIdx = int(currComId.strip('COM'))
+
     nCom = len(compoundDict)
     matchList = []
+    idx = 0
     for k,cas in compoundDict.iteritems():
         idx += 1
         print 'insert/updating', k, 'idx=',str(idx), 'of', nCom
 
-        if util.mysqlExist(db, cursor,
-                           table='compound', where='com_cas_id='+'"'+cas+'"'):
+        if pg.doesExist(csr,'compound','com_cas_id',cas):
             # print 'match'
             matchList.append(cas)
 
             qf = 'UPDATE compound SET com_knapsack_id='
-            qm = '"'+k+'"'
-            qr = 'WHERE com_cas_id='+'"'+cas+'"'
+            qm = "'"+k+"'"
+            qr = 'WHERE com_cas_id='+"'"+cas+"'"
             q = qf+qm+qr
-            util.mysqlCommit(db,cursor,q)
-        else:
+            csr.execute(q)
+        else:# insert
             comIdx += 1
             comIdStr = 'COM'+str(comIdx).zfill(8)
 
             insertVals = [comIdStr,cas,k]
-            insertVals = ['"'+i+'"' for i in insertVals]
+            insertVals = ["'"+i+"'" for i in insertVals]
 
             qf = 'INSERT INTO compound (com_id,com_cas_id,com_knapsack_id) VALUES ('
             qm =','.join(insertVals)
             qr = ')'
             q = qf+qm+qr
-            util.mysqlCommit(db,cursor,q)
+            csr.execute(q)
 
-    fpath = outDir+'/knapsack_compound_match_with_drugbank.lst'
+    fpath = outDir+'/compound_match_knapsack_vs_drugbank.lst'
     with open(fpath,'w') as f:
         for m in matchList:
             f.write(str(m)+'\n')
