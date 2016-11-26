@@ -51,8 +51,21 @@ def insertComFromDrugbank(csr,fpath):
         comIdx = int(currComId.strip('COM'))
     assert comIdx==0,'insertComFromDrugbank _must_ be carried our first as the baseline!'
 
+    supercededLists = []
+    supercededLists.append('DB02630')# by DB02053
+    supercededLists.append('DB03357')# by DB02280
+    supercededLists.append('DB02539')# by DB02234
+    supercededLists.append('DB01786')# by DB00160
+    supercededLists.append('DB00994')# by DB00452
+    supercededLists.append('DB02174')# by DB00130
+    supercededLists.append('DB02351')# by DB00006
+    supercededLists.append('DB03225')# by DB00150
+
     for i,v in drugData.iteritems():
         if len(v['uniprotTargets'])==0:
+            continue
+
+        if i in supercededLists:
             continue
 
         comIdx += 1
@@ -63,17 +76,24 @@ def insertComFromDrugbank(csr,fpath):
 
         insertKeys = ['com_id','com_drugbank_id']
         insertVals = [comId,comDrugbankId]
-        for ii,vv in v.iteritems():
-            if vv!='not-available' and vv!='':
-                if ii=='SMILES':
-                    insertKeys.append('com_smiles')
-                    insertVals.append(vv)
-                elif ii=='InChI Key':
-                    insertKeys.append('com_inchikey')
-                    insertVals.append(vv)
-                elif ii=='CAS number':
-                    insertKeys.append('com_cas_id')
-                    insertVals.append(vv)
+
+        cas = v['CAS number']
+        smiles = v['SMILES']
+        if cas!='not-available' and cas!='' and smiles!='not-available' and smiles!='':
+            insertKeys.append('com_cas_id')
+            insertVals.append(cas)
+
+            insertKeys.append('com_smiles')
+            insertVals.append(smiles)
+
+            for ii,vv in v.iteritems():
+                if vv!='not-available' and vv!='':
+                    if ii=='InChI Key':
+                        insertKeys.append('com_inchikey')
+                        insertVals.append(vv)
+                    elif ii=='pubchemCid':
+                        insertKeys.append('com_pubchem_id')
+                        insertVals.append(vv)
         insertVals = ["'"+i+"'" for i in insertVals]
 
         qf = 'INSERT INTO compound ('+','.join(insertKeys)+') VALUES ('
