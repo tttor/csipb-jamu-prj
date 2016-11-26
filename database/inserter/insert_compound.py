@@ -233,13 +233,12 @@ def insertComFromKegg(csr,outDir,comDataDpath,drugDataFpath):
             # update based on knapsackID
             qf = 'UPDATE compound '
             qm = 'SET '+ 'com_kegg_id='+keggId
-            # if drugbankId!="''":
-            #     qm = qm + ',' + ' com_drugbank_id=' + drugbankId
-            # if knapsackId!="''":
-            #     qm = qm + ','+ ' com_knapsack_id=' + knapsackId
+            if drugbankId!="''":
+                qm = qm + ',' + ' com_drugbank_id=' + drugbankId
+            if knapsackId!="''":
+                qm = qm + ','+ ' com_knapsack_id=' + knapsackId
             qr = ' WHERE com_knapsack_id='+knapsackId+' OR com_drugbank_id='+drugbankId
             q = qf+qm+qr
-            print q
             csr.execute(q)
         else:
             comIdx += 1
@@ -259,7 +258,6 @@ def insertComFromKegg(csr,outDir,comDataDpath,drugDataFpath):
             qf = 'INSERT INTO compound ('+','.join(insertKeys)+')'
             qr = ' VALUES (' + ','.join(insertVals) + ')'
             q = qf + qr
-            print q
             csr.execute(q)
 
             insertList.append(q)
