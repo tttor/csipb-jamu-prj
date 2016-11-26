@@ -51,8 +51,27 @@ def insertComFromDrugbank(csr,fpath):
         comIdx = int(currComId.strip('COM'))
     assert comIdx==0,'insertComFromDrugbank _must_ be carried our first as the baseline!'
 
+    supercededList = []
+    supercededList.append('DB02630')# by DB02053
+    supercededList.append('DB03357')# by DB02280
+    supercededList.append('DB02539')# by DB02234
+    supercededList.append('DB01786')# by DB00160
+    supercededList.append('DB00994')# by DB00452
+    supercededList.append('DB02174')# by DB00130
+    supercededList.append('DB02351')# by DB00006
+    supercededList.append('DB03225')# by DB00150
+
+    casIdConflictList = []
+    casIdConflictList.append('DB03655')# by DB06614 **
+    casIdConflictList.append('DB02031')# by DB00116 **
+    casIdConflictList.append('DB02975')# by DB02514 **
+    casIdConflictList.append('DB02201')# by DB02175 **
+
     for i,v in drugData.iteritems():
         if len(v['uniprotTargets'])==0:
+            continue
+
+        if (i in supercededList) or (i in casIdConflictList):
             continue
 
         comIdx += 1
@@ -63,17 +82,24 @@ def insertComFromDrugbank(csr,fpath):
 
         insertKeys = ['com_id','com_drugbank_id']
         insertVals = [comId,comDrugbankId]
-        for ii,vv in v.iteritems():
-            if vv!='not-available' and vv!='':
-                if ii=='SMILES':
-                    insertKeys.append('com_smiles')
-                    insertVals.append(vv)
-                elif ii=='InChI Key':
-                    insertKeys.append('com_inchikey')
-                    insertVals.append(vv)
-                elif ii=='CAS number':
-                    insertKeys.append('com_cas_id')
-                    insertVals.append(vv)
+
+        cas = v['CAS number']
+        smiles = v['SMILES']
+        if cas!='not-available' and cas!='' and smiles!='not-available' and smiles!='':
+            insertKeys.append('com_cas_id')
+            insertVals.append(cas)
+
+            insertKeys.append('com_smiles')
+            insertVals.append(smiles)
+
+            for ii,vv in v.iteritems():
+                if vv!='not-available' and vv!='':
+                    if ii=='InChI Key':
+                        insertKeys.append('com_inchikey')
+                        insertVals.append(vv)
+                    elif ii=='pubchemCid':
+                        insertKeys.append('com_pubchem_id')
+                        insertVals.append(vv)
         insertVals = ["'"+i+"'" for i in insertVals]
 
         qf = 'INSERT INTO compound ('+','.join(insertKeys)+') VALUES ('
@@ -105,6 +131,9 @@ def insertComFromKnapsack(csr,outDir,fpath):
     for k,cas in compoundDict.iteritems():
         idx += 1
         print 'insert/updating', k, 'idx=',str(idx), 'of', nCom,'(at most)'
+
+        if k=='C00001193': #TODO why this breaks unique constraint in knapsackId
+            continue
 
         if cas!='' and cas!='not-available':
             if pg.doesExist(csr,'compound','com_cas_id',cas):
@@ -163,11 +192,20 @@ def insertComFromKegg(csr,outDir,comDataDpath,drugDataFpath):
         drugData = pickle.load(handle)
 
     # Update or Insert
+    comIdx = 0
+    currComId = pg.getMax(csr,'com_id','compound')
+    if currComId!=None:
+        comIdx = int(currComId.strip('COM'))
+
     insertList = []
     n = len(comData); idx = 0
+    duplicateList = ['C00031','C10906','C00334','C00116','C00475']# TODO fix this
     for keggId,d in comData.iteritems():
         idx += 1
         print 'insert/update keggId=', keggId, 'idx=', idx, 'of', n
+
+        if keggId in duplicateList:
+            continue
 
         knapsackId = ''
         if 'knapsackId' in d.keys():
@@ -183,61 +221,45 @@ def insertComFromKegg(csr,outDir,comDataDpath,drugDataFpath):
         if 'casId' in d.keys():
             casId = d['casId']
 
-        mustInsert = False
+        knapsackIdFound = False
+        drugbankIdFound = False
         if knapsackId!='':
-            # check if exist
             if pg.doesExist(csr,'compound','com_knapsack_id',knapsackId):
-                # update based on knapsackID
-                qf = 'UPDATE compound '
-                qm = 'SET '+ 'com_kegg_id=' + "'"+keggId+"'"
-                if casId!='':
-                    qm = qm + ',' + ' com_cas_id=' + "'"+casId+"'"
-                if drugbankId!='':
-                    qm = qm + ',' + ' com_drugbank_id=' + "'"+drugbankId+"'"
-                qr = ' WHERE com_knapsack_id='+ "'" + knapsackId + "'"
-                q = qf+qm+qr
-                csr.execute(q)
-            else:
-                mustInsert = True
+                knapsackIdFound = True
 
         if drugbankId!='':
             if pg.doesExist(csr,'compound','com_drugbank_id',drugbankId):
-                # update based on drugbankId
-                qf = 'UPDATE  compound '
-                qm = 'SET '+ 'com_kegg_id=' + "'"+keggId+"'"
-                if casId!='':
-                    qm = qm + ','+ ' com_cas_id=' + "'"+casId+"'"
-                if knapsackId!='':
-                    qm = qm + ','+ ' com_knapsack_id=' + "'"+knapsackId+"'"
-                qr = ' WHERE com_drugbank_id='+ "'" + drugbankId + "'"
-                q = qf+qm+qr
-                csr.execute(q)
-            else:
-                mustInsert = True
+                drugbankIdFound = True
 
-        comIdx = 0
-        currComId = pg.getMax(csr,'com_id','compound')
-        if currComId!=None:
-            comIdx = int(currComId.strip('COM'))
+        knapsackId = "'"+knapsackId+"'"
+        drugbankId = "'"+drugbankId+"'"
+        keggId = "'"+keggId+"'"
 
-        if mustInsert:
+        if drugbankIdFound or knapsackIdFound:
+            # update based on knapsackID
+            qf = 'UPDATE compound '
+            qm = 'SET '+ 'com_kegg_id='+keggId
+            if drugbankId!="''":
+                qm = qm + ',' + ' com_drugbank_id=' + drugbankId
+            if knapsackId!="''":
+                qm = qm + ','+ ' com_knapsack_id=' + knapsackId
+            qr = ' WHERE com_knapsack_id='+knapsackId+' OR com_drugbank_id='+drugbankId
+            q = qf+qm+qr
+            csr.execute(q)
+        else:
             comIdx += 1
             comIdStr = 'COM'+ str(comIdx).zfill(8)
+            comIdStr = "'"+comIdStr+"'"
 
             insertKeys = ['com_id','com_kegg_id']
             insertVals = [comIdStr,keggId]
 
-            if casId!='':
-                insertKeys.append('com_cas_id')
-                insertVals.append(casId)
-            if drugbankId!='':
+            if drugbankId!="''":
                 insertKeys.append('com_drugbank_id')
                 insertVals.append(drugbankId)
-            if knapsackId!='':
+            if knapsackId!="''":
                 insertKeys.append('com_knapsack_id')
                 insertVals.append(knapsackId)
-
-            insertVals = ["'"+i+"'" for i in insertVals]
 
             qf = 'INSERT INTO compound ('+','.join(insertKeys)+')'
             qr = ' VALUES (' + ','.join(insertVals) + ')'

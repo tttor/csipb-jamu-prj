@@ -14,43 +14,40 @@ def main(argv):
 
     cur.execute('DROP TABLE IF EXISTS plant;')
     cur.execute('''CREATE TABLE plant (
-                pla_id varchar(12) NOT NULL,
-                pla_name varchar(256) NOT NULL,
-                PRIMARY KEY(pla_id)
+                pla_id varchar(12) PRIMARY KEY,
+                pla_name varchar(256) NOT NULL UNIQUE
                 );
                 ''')
 
     cur.execute('DROP TABLE IF EXISTS compound;')
     cur.execute('''CREATE TABLE compound (
-                com_id varchar(12) NOT NULL,
-                com_cas_id varchar(128),
-                com_drugbank_id varchar(128),
-                com_inchikey varchar(1024),
-                com_kegg_id varchar(128),
-                com_knapsack_id varchar(128),
-                com_pubchem_id varchar(128),
-                com_smiles varchar(16384),
-                com_simcomp varchar(128),
-                PRIMARY KEY(com_id)
+                com_id varchar(12) PRIMARY KEY,
+                com_drugbank_id varchar(128) UNIQUE,
+                com_inchikey varchar(1024) UNIQUE,
+                com_kegg_id varchar(128) UNIQUE,
+                com_knapsack_id varchar(128) UNIQUE,
+                com_pubchem_id varchar(128) UNIQUE,
+                com_cas_id varchar(128) UNIQUE,
+                com_smiles varchar(16384) UNIQUE,
+                com_simcomp varchar(128)
                 );
                 ''')
 
     cur.execute('DROP TABLE IF EXISTS protein;')
     cur.execute('''CREATE TABLE protein (
-                pro_id varchar(12) NOT NULL,
-                pro_name varchar(300) NOT NULL,
-                pro_uniprot_id varchar(6),
-                pro_uniprot_abbrv varchar(50),
-                PRIMARY KEY(pro_id)
+                pro_id varchar(12) PRIMARY KEY,
+                pro_name varchar(512) NOT NULL UNIQUE,
+                pro_uniprot_id varchar(8) NOT NULL UNIQUE,
+                pro_uniprot_abbrv varchar(64) NOT NULL UNIQUE
                 );
                 ''')
 
     cur.execute('DROP TABLE IF EXISTS disease;')
     cur.execute('''CREATE TABLE disease (
-                dis_id varchar(12) NOT NULL,
-                dis_omim_id varchar(6) NOT NULL,
-                dis_uniprot_abbrv varchar(30) NOT NULL,
-                PRIMARY KEY(dis_id)
+                dis_id varchar(12) PRIMARY KEY,
+                dis_omim_id varchar(8) NOT NULL UNIQUE,
+                dis_name varchar(16384) NOT NULL UNIQUE,
+                dis_uniprot_abbrv varchar(256) NOT NULL
                 );
                 ''')
 
@@ -58,9 +55,9 @@ def main(argv):
     cur.execute('''CREATE TABLE plant_vs_compound (
                 pla_id varchar(12) NOT NULL,
                 com_id varchar(12) NOT NULL,
-                weight float(3) NOT NULL,
                 source varchar(128) NOT NULL,
-                time_stamp timestamp  NOT NULL
+                weight float(16) DEFAULT 1.00000,
+                time_stamp timestamp DEFAULT now()
                 );
                 ''')
 
@@ -68,9 +65,9 @@ def main(argv):
     cur.execute('''CREATE TABLE compound_vs_protein (
                 com_id varchar(12) NOT NULL,
                 pro_id varchar(12) NOT NULL,
-                weight float(3) NOT NULL,
                 source varchar(256) NOT NULL,
-                time_stamp timestamp  NOT NULL
+                weight float(16) DEFAULT 1.00000,
+                time_stamp timestamp DEFAULT now()
                 );
                 ''')
 
@@ -78,9 +75,9 @@ def main(argv):
     cur.execute('''CREATE TABLE protein_vs_disease (
                 pro_id varchar(12) NOT NULL,
                 dis_id varchar(12) NOT NULL,
-                weight float(3) NOT NULL,
                 source varchar(256) NOT NULL,
-                time_stamp timestamp  NOT NULL
+                weight float(16) DEFAULT 1.00000,
+                time_stamp timestamp DEFAULT now()
                 );
                 ''')
 

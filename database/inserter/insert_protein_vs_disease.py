@@ -1,51 +1,78 @@
 # insert_protein_vs_disease.py
+import os
+import sys
+import time
+import json
+import yaml
+import MySQLdb
+import pickle
+import psycopg2
+import postgresql_util as pg
+from collections import defaultdict
+from bs4 import BeautifulSoup
+from urllib2 import urlopen
+from datetime import datetime
 
-def main():
-    insertProteinVsDisease(proteinDiseaseDict)
+def main(argv):
+    assert len(argv)>=8
 
-def insertProteinVsDisease(proteinDiseaseDict):
+    db = argv[1]
+    user = argv[2]; passwd = argv[3]
+    host = argv[4]; port = argv[5]
+    outDir = argv[6]
+    paths = argv[7:]
+
+    conn = psycopg2.connect(database=db, user=user, password=passwd,
+                            host=host, port=port)
+    csr = conn.cursor()
+
+    insertProteinVsDiseaseUniprot(csr,paths[0])
+
+    conn.commit()
+    conn.close()
+
+def insertProteinVsDiseaseUniprot(csr,fpath):
+    proteinDiseaseDict = None
+    with open(fpath, 'rb') as handle:
+        proteinDiseaseDict = pickle.load(handle)
+
     src = 'uniprot.org'
-    n = len(proteinDiseaseDict)
-    log = []; logFpath = dirPath+'/insertProteinVsDisease.log'
-    idx = 0
+    idx = 0; log = []; n = len(proteinDiseaseDict)
     for p,v in proteinDiseaseDict.iteritems():
         idx += 1
 
         qf = 'SELECT pro_id FROM protein WHERE pro_uniprot_abbrv ='
-        qm = '"' + p + '"'
+        qm = "'" + p + "'"
         qr = ''
         q = qf+qm+qr
-        proIdR = util.mysqlCommit(db,cursor,q)
+        csr.execute(q)
+        proIdR = csr.fetchall(); assert len(proIdR)==1
 
         for d in v['disease']:
-            msg = 'inserting '+ p+ ' vs '+ d[1]+ 'idx= '+ str(idx)+ ' of '+ str(n)
+            omimId = d[2]
+            msg = 'inserting '+p+' vs '+omimId+' idx= '+str(idx)+' of '+str(n)
             print msg
 
             qf = 'SELECT dis_id FROM disease WHERE dis_omim_id ='
-            qm = '"' + d[2] + '"'
+            qm = "'" + omimId + "'"
             qr = ''
             q = qf+qm+qr
-            disIdR = util.mysqlCommit(db,cursor,q)
+            csr.execute(q)
+            disIdR = csr.fetchall(); assert len(disIdR)==1
 
-            if proIdR!=None and disIdR!=None:
-                proId = proIdR[0]
-                disId = disIdR[0]
+            proId = proIdR[0][0]
+            disId = disIdR[0][0]
 
-                insertVals = [proId, disId, src]
-                insertVals = ['"'+i+'"' for i in insertVals]
+            insertVals = [proId, disId, src]
+            insertVals = ["'"+i+"'" for i in insertVals]
 
-                qf = 'INSERT INTO protein_vs_disease (pro_id,dis_id,pro_vs_dis_source) VALUES ('
-                qm = ','.join(insertVals)
-                qr = ')'
-                q = qf+qm+qr
-
-                util.mysqlCommit(db,cursor,q)
-            else:
-                log.append('FAIL: '+msg)
-
-    with open(logFpath,'w') as f:
-        for i in log:
-            f.write(str(i)+'\n')
+            qf = 'INSERT INTO protein_vs_disease (pro_id,dis_id,source) VALUES ('
+            qm = ','.join(insertVals)
+            qr = ')'
+            q = qf+qm+qr
+            csr.execute(q)
 
 if __name__ == '__main__':
-    main()
+    start_time = time.time()
+    main(sys.argv)
+    print("--- %s seconds ---" % (time.time() - start_time))
