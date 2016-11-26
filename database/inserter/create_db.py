@@ -55,8 +55,8 @@ def main(argv):
     cur.execute('''CREATE TABLE plant_vs_compound (
                 pla_id varchar(12) NOT NULL,
                 com_id varchar(12) NOT NULL,
-                weight float(16) NOT NULL,
                 source varchar(128) NOT NULL,
+                weight float(16) DEFAULT 1.00000,
                 time_stamp timestamp DEFAULT now()
                 );
                 ''')
