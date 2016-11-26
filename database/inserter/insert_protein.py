@@ -1,11 +1,39 @@
 # insert_protein.py
+import os
+import sys
+import time
+import json
+import yaml
+import MySQLdb
+import pickle
+import psycopg2
+import postgresql_util as pg
+from collections import defaultdict
+from bs4 import BeautifulSoup
+from urllib2 import urlopen
+from datetime import datetime
 
-def main():
-    insertProtein(proteinList)
+def main(argv):
+    assert len(argv)>=7
 
-def insertProtein(proteinList):
-    db = MySQLdb.connect("localhost","root","123","ijah" )
-    cursor = db.cursor()
+    db = argv[1]
+    user = argv[2]; passwd = argv[3]
+    host = argv[4]; port = argv[5]
+    paths = argv[6:]
+
+    conn = psycopg2.connect(database=db, user=user, password=passwd,
+                            host=host, port=port)
+    csr = conn.cursor()
+
+    insertProteinUniprot(csr,paths[0])
+
+    conn.commit()
+    conn.close()
+
+def insertProteinUniprot(csr,fpath):
+    proteinList = None
+    with open(fpath, 'rb') as handle:
+        proteinList = pickle.load(handle)
 
     for i,p in enumerate(proteinList):
         proId = str(i+1)
@@ -14,24 +42,18 @@ def insertProtein(proteinList):
         print 'inserting ', proId, 'of', str(len(proteinList))
 
         proName, proUniprotId, proUniprotAbbrv = p
+        proName = proName.replace("'","''")
         pro = [proId, proName, proUniprotId, proUniprotAbbrv]
-        pro = ['"'+i+'"' for i in pro]
+        pro = ["'"+i+"'" for i in pro]
 
         # Prepare SQL query to INSERT a record into the database.
         qf = 'INSERT INTO protein (pro_id,pro_name,pro_uniprot_id,pro_uniprot_abbrv) VALUES ('
-        qm = pro[0]+','+pro[1]+','+pro[2]+','+pro[3]
+        qm = ','.join(pro)
         qr = ')'
         sql = qf+qm+qr
-        # print sql
-
-        try:
-            cursor.execute(sql)
-            db.commit()
-        except:
-            assert False, 'dbErr'
-            db.rollback()
-
-    db.close()
+        csr.execute(sql)
 
 if __name__ == '__main__':
-    main()
+    start_time = time.time()
+    main(sys.argv)
+    print("--- %s seconds ---" % (time.time() - start_time))
