@@ -51,21 +51,27 @@ def insertComFromDrugbank(csr,fpath):
         comIdx = int(currComId.strip('COM'))
     assert comIdx==0,'insertComFromDrugbank _must_ be carried our first as the baseline!'
 
-    supercededLists = []
-    supercededLists.append('DB02630')# by DB02053
-    supercededLists.append('DB03357')# by DB02280
-    supercededLists.append('DB02539')# by DB02234
-    supercededLists.append('DB01786')# by DB00160
-    supercededLists.append('DB00994')# by DB00452
-    supercededLists.append('DB02174')# by DB00130
-    supercededLists.append('DB02351')# by DB00006
-    supercededLists.append('DB03225')# by DB00150
+    supercededList = []
+    supercededList.append('DB02630')# by DB02053
+    supercededList.append('DB03357')# by DB02280
+    supercededList.append('DB02539')# by DB02234
+    supercededList.append('DB01786')# by DB00160
+    supercededList.append('DB00994')# by DB00452
+    supercededList.append('DB02174')# by DB00130
+    supercededList.append('DB02351')# by DB00006
+    supercededList.append('DB03225')# by DB00150
+
+    casIdConflictList = []
+    casIdConflictList.append('DB03655')# by DB06614 **
+    casIdConflictList.append('DB02031')# by DB00116 **
+    casIdConflictList.append('DB02975')# by DB02514 **
+    casIdConflictList.append('DB02201')# by DB02175 **
 
     for i,v in drugData.iteritems():
         if len(v['uniprotTargets'])==0:
             continue
 
-        if i in supercededLists:
+        if (i in supercededList) or (i in casIdConflictList):
             continue
 
         comIdx += 1
