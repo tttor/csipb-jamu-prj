@@ -56,24 +56,27 @@ def insertComFromDrugbank(csr,fpath):
             continue
 
         comIdx += 1
-        print 'inserting', i, 'comIdx=',str(comIdx),'of at most', str(len(drugData))
+        print 'inserting', i, 'comIdx=',str(comIdx),'of', str(len(drugData))
 
         comId = str(comIdx); comId = comId.zfill(8); comId = 'COM'+comId
         comDrugbankId = i
 
-        insertKeys = ['com_id','com_drugbank_id','SMILES','InChI Key']
+        insertKeys = ['com_id','com_drugbank_id']
         insertVals = [comId,comDrugbankId]
         for ii,vv in v.iteritems():
-            if vv!='not-available' and vv!='' and ii in insertKeys:
-                insertVals.append(vv)
+            if vv!='not-available' and vv!='':
+                if ii=='SMILES':
+                    insertKeys.append('com_smiles')
+                    insertVals.append(vv)
+                elif ii=='InChI Key':
+                    insertKeys.append('com_inchikey')
+                    insertVals.append(vv)
         insertVals = ["'"+i+"'" for i in insertVals]
 
         qf = 'INSERT INTO compound ('+','.join(insertKeys)+') VALUES ('
         qm = ','.join(insertVals)
         qr = ')'
         sql = qf+qm+qr
-        sql = sql.replace('SMILES','com_smiles').replace('InChI Key','com_inchikey')
-        print sql
         csr.execute(sql)
 
     return comIdx
