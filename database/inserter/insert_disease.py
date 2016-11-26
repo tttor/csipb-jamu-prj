@@ -45,17 +45,6 @@ def insertDiseaseUniprot(csr,fpath):
         else:
             omimDict[omimId] = {'name':[name],'abbrv':[abbrv]}
 
-    # for k,v in omimDict.iteritems():
-    #     if len(v['name'])>1 or len(v['abbrv'])>1:
-    #         print k,v
-    # print len(omimDict)
-    # return
-
-    # representedList = []
-    # # by "Epilepsy, idiopathic generalized 11"
-    # representedList.append("Juvenile myoclonic epilepsy 8")
-    # representedList.append("Juvenile absence epilepsy 2")
-
     idx = 0; n = len(omimDict)
     for omimId,v in omimDict.iteritems():
         idx += 1
