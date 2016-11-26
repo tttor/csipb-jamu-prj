@@ -53,9 +53,9 @@ def insertDiseaseUniprot(csr,fpath):
         idStr = 'DIS'+idStr
         print 'inserting ', idx, 'of', n
 
-        name = '|'.join(v['name']);
+        name = ':'.join(v['name']);
         name = name.replace("'","''")
-        abbrv = '|'.join(v['abbrv'])
+        abbrv = ':'.join(v['abbrv'])
 
         dis = [idStr,omimId,name,abbrv]
         dis = ["'"+i+"'" for i in dis]
