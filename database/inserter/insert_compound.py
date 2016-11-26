@@ -126,6 +126,9 @@ def insertComFromKnapsack(csr,outDir,fpath):
         idx += 1
         print 'insert/updating', k, 'idx=',str(idx), 'of', nCom,'(at most)'
 
+        if k=='C00001193': #TODO why this breaks unique constraint in knapsackId
+            continue
+
         if cas!='' and cas!='not-available':
             if pg.doesExist(csr,'compound','com_cas_id',cas):
                 # print 'match'
