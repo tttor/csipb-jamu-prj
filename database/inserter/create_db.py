@@ -36,17 +36,18 @@ def main(argv):
     cur.execute('DROP TABLE IF EXISTS protein;')
     cur.execute('''CREATE TABLE protein (
                 pro_id varchar(12) PRIMARY KEY,
-                pro_name varchar(300) NOT NULL,
-                pro_uniprot_id varchar(6),
-                pro_uniprot_abbrv varchar(50)
+                pro_name varchar(512) NOT NULL UNIQUE,
+                pro_uniprot_id varchar(8) NOT NULL UNIQUE,
+                pro_uniprot_abbrv varchar(64) NOT NULL UNIQUE
                 );
                 ''')
 
     cur.execute('DROP TABLE IF EXISTS disease;')
     cur.execute('''CREATE TABLE disease (
                 dis_id varchar(12) PRIMARY KEY,
-                dis_omim_id varchar(6) NOT NULL,
-                dis_uniprot_abbrv varchar(30) NOT NULL
+                dis_omim_id varchar(8) NOT NULL UNIQUE,
+                dis_name varchar(16384) NOT NULL UNIQUE,
+                dis_uniprot_abbrv varchar(256) NOT NULL
                 );
                 ''')
 
