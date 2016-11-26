@@ -75,7 +75,7 @@ def insertComFromDrugbank(csr,fpath):
             continue
 
         comIdx += 1
-        print 'inserting', i, 'comIdx=',str(comIdx),'of', str(len(drugData))
+        print 'inserting',i,'comIdx=',str(comIdx),'of',str(len(drugData)),'(at most)'
 
         comId = str(comIdx); comId = comId.zfill(8); comId = 'COM'+comId
         comDrugbankId = i
@@ -85,7 +85,7 @@ def insertComFromDrugbank(csr,fpath):
 
         cas = v['CAS number']
         smiles = v['SMILES']
-        if cas!='not-available' and cas!='' and smiles!='not-available' and smiles!='':
+        if (cas!='not-available' and cas!='') and (smiles!='not-available' and smiles!=''):
             insertKeys.append('com_cas_id')
             insertVals.append(cas)
 
@@ -100,13 +100,13 @@ def insertComFromDrugbank(csr,fpath):
                     elif ii=='pubchemCid':
                         insertKeys.append('com_pubchem_id')
                         insertVals.append(vv)
-        insertVals = ["'"+i+"'" for i in insertVals]
+            insertVals = ["'"+i+"'" for i in insertVals]
 
-        qf = 'INSERT INTO compound ('+','.join(insertKeys)+') VALUES ('
-        qm = ','.join(insertVals)
-        qr = ')'
-        sql = qf+qm+qr
-        csr.execute(sql)
+            qf = 'INSERT INTO compound ('+','.join(insertKeys)+') VALUES ('
+            qm = ','.join(insertVals)
+            qr = ')'
+            sql = qf+qm+qr
+            csr.execute(sql)
 
     return comIdx
 
