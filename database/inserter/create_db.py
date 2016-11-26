@@ -55,7 +55,7 @@ def main(argv):
     cur.execute('''CREATE TABLE plant_vs_compound (
                 pla_id varchar(12) NOT NULL,
                 com_id varchar(12) NOT NULL,
-                weight float(3) NOT NULL,
+                weight float(16) NOT NULL,
                 source varchar(128) NOT NULL,
                 time_stamp timestamp DEFAULT now()
                 );
@@ -65,7 +65,7 @@ def main(argv):
     cur.execute('''CREATE TABLE compound_vs_protein (
                 com_id varchar(12) NOT NULL,
                 pro_id varchar(12) NOT NULL,
-                weight float(3) NOT NULL,
+                weight float(16) NOT NULL,
                 source varchar(256) NOT NULL,
                 time_stamp timestamp DEFAULT now()
                 );
@@ -75,8 +75,8 @@ def main(argv):
     cur.execute('''CREATE TABLE protein_vs_disease (
                 pro_id varchar(12) NOT NULL,
                 dis_id varchar(12) NOT NULL,
-                weight float(3) NOT NULL,
                 source varchar(256) NOT NULL,
+                weight float(16) DEFAULT 1.00000,
                 time_stamp timestamp DEFAULT now()
                 );
                 ''')
