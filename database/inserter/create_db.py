@@ -65,8 +65,8 @@ def main(argv):
     cur.execute('''CREATE TABLE compound_vs_protein (
                 com_id varchar(12) NOT NULL,
                 pro_id varchar(12) NOT NULL,
-                weight float(16) NOT NULL,
                 source varchar(256) NOT NULL,
+                weight float(16) DEFAULT 1.00000,
                 time_stamp timestamp DEFAULT now()
                 );
                 ''')
