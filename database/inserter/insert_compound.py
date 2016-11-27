@@ -30,8 +30,8 @@ def main(argv):
         insertComFromDrugbank(csr,paths[0])
     elif mode=='insertComFromKnapsack':
         insertComFromKnapsack(csr,outDir,paths[0])
-    elif mode=='insertComFromKegg':
-        insertComFromKegg(csr,outDir,paths[0],paths[1])
+    elif mode=='updateComBasedOnKegg':
+        updateComBasedOnKegg(csr,outDir,paths[0],paths[1])
     # elif mode=='updateForSimcomp':
     #     updateForSimcomp()
     else:
@@ -129,11 +129,11 @@ def insertComFromKnapsack(csr,outDir,fpath):
     matchList = []
     idx = 0
     for k,cas in compoundDict.iteritems():
-        idx += 1
-        print 'insert/updating', k, 'idx=',str(idx), 'of', nCom,'(at most)'
-
         if k=='C00001193': #TODO why this breaks unique constraint in knapsackId
             continue
+
+        idx += 1
+        print 'insert/updating', k, 'idx=',str(idx), 'of', nCom,'(at most)'
 
         if cas!='' and cas!='not-available':
             if pg.doesExist(csr,'compound','com_cas_id',cas):
@@ -165,7 +165,7 @@ def insertComFromKnapsack(csr,outDir,fpath):
 
     return comIdx
 
-def insertComFromKegg(csr,outDir,comDataDpath,drugDataFpath):
+def updateComBasedOnKegg(csr,outDir,comDataDpath,drugDataFpath):
     # Load Kegg compound data
     comData = {}
     for filename in os.listdir(comDataDpath):
@@ -201,11 +201,11 @@ def insertComFromKegg(csr,outDir,comDataDpath,drugDataFpath):
     n = len(comData); idx = 0
     duplicateList = ['C00031','C10906','C00334','C00116','C00475']# TODO fix this
     for keggId,d in comData.iteritems():
-        idx += 1
-        print 'insert/update keggId=', keggId, 'idx=', idx, 'of', n
-
         if keggId in duplicateList:
             continue
+
+        idx += 1
+        print 'insert/update keggId=', keggId, 'idx=', idx, 'of', n
 
         knapsackId = ''
         if 'knapsackId' in d.keys():
@@ -217,16 +217,12 @@ def insertComFromKegg(csr,outDir,comDataDpath,drugDataFpath):
             if len(_)!=0:
                 drugbankId = _
 
-        casId = ''
-        if 'casId' in d.keys():
-            casId = d['casId']
-
-        knapsackIdFound = False
-        drugbankIdFound = False
+        knapsackIdFound = False # knapsackId should always represent(have) casId
         if knapsackId!='':
             if pg.doesExist(csr,'compound','com_knapsack_id',knapsackId):
                 knapsackIdFound = True
 
+        drugbankIdFound = False
         if drugbankId!='':
             if pg.doesExist(csr,'compound','com_drugbank_id',drugbankId):
                 drugbankIdFound = True
@@ -236,7 +232,6 @@ def insertComFromKegg(csr,outDir,comDataDpath,drugDataFpath):
         keggId = "'"+keggId+"'"
 
         if drugbankIdFound or knapsackIdFound:
-            # update based on knapsackID
             qf = 'UPDATE compound '
             qm = 'SET '+ 'com_kegg_id='+keggId
             if drugbankId!="''":
@@ -246,32 +241,6 @@ def insertComFromKegg(csr,outDir,comDataDpath,drugDataFpath):
             qr = ' WHERE com_knapsack_id='+knapsackId+' OR com_drugbank_id='+drugbankId
             q = qf+qm+qr
             csr.execute(q)
-        else:
-            comIdx += 1
-            comIdStr = 'COM'+ str(comIdx).zfill(8)
-            comIdStr = "'"+comIdStr+"'"
-
-            insertKeys = ['com_id','com_kegg_id']
-            insertVals = [comIdStr,keggId]
-
-            if drugbankId!="''":
-                insertKeys.append('com_drugbank_id')
-                insertVals.append(drugbankId)
-            if knapsackId!="''":
-                insertKeys.append('com_knapsack_id')
-                insertVals.append(knapsackId)
-
-            qf = 'INSERT INTO compound ('+','.join(insertKeys)+')'
-            qr = ' VALUES (' + ','.join(insertVals) + ')'
-            q = qf + qr
-            csr.execute(q)
-
-            insertList.append(q)
-
-    insertListFpath = outDir + '/compound_insertion_from_keggComData_and_keggDrugData.lst'
-    with open(insertListFpath,'w') as f:
-        for l in insertList:
-            f.write(str(l)+'\n')
 
     return comIdx
 
