@@ -26,10 +26,48 @@ def main(argv):
     csr = conn.cursor()
 
     insertPlantVsCompoundKnapsack(csr,outDir,paths[0])
+    deletePlantsHavingNoCompound(csr)
+    deleteCompoundsHavingNoPlant(csr)
 
     conn.commit()
     conn.close()
 
+def deletePlantsHavingNoCompound(csr):
+    print 'deletePlantsHavingNoCompound...'
+    q = '''
+        DELETE FROM plant where pla_id IN (
+        SELECT
+        distinct plant.pla_id
+        FROM
+        plant
+        LEFT JOIN
+        plant_vs_compound
+        ON
+        plant.pla_id = plant_vs_compound.pla_id
+        WHERE
+        plant_vs_compound.pla_id IS NULL
+        );
+        '''
+    csr.execute(q)
+
+def deleteCompoundsHavingNoPlant(csr):
+    print 'deleteCompoundsHavingNoPlant...'
+    q = '''
+        DELETE FROM compound where com_id IN (
+        SELECT
+        distinct compound.com_id
+        FROM
+        compound
+        LEFT JOIN
+        plant_vs_compound
+        ON
+        compound.com_id = plant_vs_compound.com_id
+        WHERE
+        plant_vs_compound.com_id IS NULL
+        );
+        '''
+    csr.execute(q)
+    
 def insertPlantVsCompoundKnapsack(csr,outDir,fpath):
     pc = None # as plantCompoundDict
     with open(fpath, 'rb') as handle:
