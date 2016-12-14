@@ -27,6 +27,7 @@ def main(argv):
     csr = conn.cursor()
 
     insertProteinVsDiseaseUniprot(csr,paths[0])
+    deleteDiseasesHavingNoProtein(csr)
 
     conn.commit()
     conn.close()
@@ -71,6 +72,24 @@ def insertProteinVsDiseaseUniprot(csr,fpath):
             qr = ')'
             q = qf+qm+qr
             csr.execute(q)
+
+def deleteDiseasesHavingNoProtein(csr):
+    print 'deleteDiseasesHavingNoProtein...'
+    q = '''
+        DELETE FROM disease where dis_id IN (
+        SELECT
+        distinct disease.dis_id
+        FROM
+        disease
+        LEFT JOIN
+        protein_vs_disease
+        ON
+        disease.dis_id = protein_vs_disease.dis_id
+        WHERE
+        protein_vs_disease.dis_id IS NULL
+        );
+        '''
+    csr.execute(q)
 
 if __name__ == '__main__':
     start_time = time.time()
