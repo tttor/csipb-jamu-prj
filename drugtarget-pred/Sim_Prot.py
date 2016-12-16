@@ -1,6 +1,7 @@
 import numpy as np
 import time
 import math
+import csv
 from Bio import SeqIO
 from Bio import pairwise2
 from Bio.SubsMat.MatrixInfo import blosum62
@@ -15,28 +16,30 @@ if __name__ == '__main__':
     fastaFileDir = "Fasta/";
     listDir = "protein.csv"
     uniprotId = []
-    nProt = len(uniprotId)
+    nProt = 0
     seqProtein = []
     metaProtein = []
-    simMatProt = np.zeros((len(uniprotId),len(uniprotId)), dtype=float)
-    simMatProtNorm = np.zeros((len(uniprotId),len(uniprotId)), dtype=float)
     it = 0
     ###Parse uniprot ID from csv###
     with open(listDir,'r') as f:
         csvContent = csv.reader(f,  delimiter=',', quotechar='\"')
         for row in csvContent:
             if (it > 0):
-                uniProtId.append(row[2])
+                uniprotId.append(row[2])
             else:
                 it = 1
+    nProt = len(uniprotId)
+    simMatProtNorm = np.zeros((len(uniprotId),len(uniprotId)), dtype=float)
+    simMatProt = np.zeros((len(uniprotId),len(uniprotId)), dtype=float)
     ###############################
 
     ###Read file and parse (with library)###
-    for i in range(nProt):
-        fastaDir = fastaFileDir + uniprotId[i] + ".fasta"
+    for i in uniprotId:
+        fastaDir = fastaFileDir + i + ".fasta"
         recTemp = SeqIO.read(fastaDir, "fasta")
         seqProtein.append((recTemp.seq))
         metaProtein.append(recTemp.id)
+    print seqProtein[0]
 
     ###Baca an parse (own function) later###
 
@@ -46,6 +49,7 @@ if __name__ == '__main__':
     #Align all string using waterman with affine gap penalty -1 and extend gap penalty -1
     for i in xrange(nProt):
         for j in xrange(i,nProt):
+            print i, j
             simMatProt[i][j] = pairwise2.align.localds(seqProtein[i],seqProtein[j], blosum62, -1,-1,force_generic = 0, score_only = 1)
 
     #Normalisasi
