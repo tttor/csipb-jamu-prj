@@ -45,9 +45,9 @@ if __name__ == '__main__':
     ########################################
     ###Cleanning sequance###
     for i in range(len(uniprotId)):
-        for j in range(len(seqProtein[203])):
-            if(seqProtein[203][j]=='U'):
-                seqProtein[203][j]='C'
+        for j in range(len(seqProtein[i])):
+            if(seqProtein[i][j]=='U'):
+                seqProtein[i][j]='C'
         seqProtein[i] = "".join(seqProtein[i])
 
     ### Calculation ###
