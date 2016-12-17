@@ -37,16 +37,22 @@ if __name__ == '__main__':
     for i in uniprotId:
         fastaDir = fastaFileDir + i + ".fasta"
         recTemp = SeqIO.read(fastaDir, "fasta")
-        seqProtein.append((recTemp.seq))
+        seqProtein.append(list(recTemp.seq))
         metaProtein.append(recTemp.id)
-    print seqProtein[0]
 
     ###Baca an parse (own function) later###
 
     ########################################
+    ###Cleanning sequance###
+    for i in range(len(uniprotId)):
+        for j in range(len(seqProtein[203])):
+            if(seqProtein[203][j]=='U'):
+                seqProtein[203][j]='C'
+        seqProtein[i] = "".join(seqProtein[i])
 
     ### Calculation ###
     #Align all string using waterman with affine gap penalty -1 and extend gap penalty -1
+
     for i in xrange(nProt):
         for j in xrange(i,nProt):
             print i, j
@@ -80,6 +86,13 @@ if __name__ == '__main__':
     #######################
 
     #############Debugging section#############
+    #print seqProtein[0]
+    #print seqProtein[203]
+    # mat = blosum62
+    # print blosum62
+    # print metaProtein[0]
+    # print metaProtein[203]
+    #simMatProt[0][203] = pairwise2.align.localds(seqProtein[0],seqProtein[203], blosum62, -1,-1,force_generic = 0, score_only = 1)
     # print metaProtein
     print time.time()-start
     ###########################################
