@@ -73,7 +73,7 @@ export class Home {
     this.protein = [{ 'index': this.countProtein, 'value' : ''}];
     this.disease = [{ 'index': this.countDisease, 'value' : ''}];
 
-    this.http.get('ijah/total.php')
+    this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/total.php')
       .map(res => res.json())
       .subscribe(data => {
         this.plant_total = data[0]['plant_total'];
@@ -83,7 +83,7 @@ export class Home {
 
       })
 
-    this.http.get('ijah/plant.php')
+    this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/plant.php')
       .map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
@@ -94,7 +94,7 @@ export class Home {
         this.tanamanSearch = data;
       })
 
-    this.http.get('ijah/compound.php')
+    this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/compound.php')
       .map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
@@ -125,7 +125,7 @@ export class Home {
         this.compoundSearch = data;
       })
 
-    this.http.get('ijah/protein.php')
+    this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/protein.php')
       .map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
@@ -136,7 +136,7 @@ export class Home {
         this.proteinSearch = data;
       })
 
-    this.http.get('ijah/disease.php')
+    this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/disease.php')
       .map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
@@ -277,7 +277,6 @@ export class Home {
 
   check(data, input1, input2) {
 
-
     for(var i = 0; i < data.length; i++) {
       if (data[i][0] == input1 && data[i][1] == input2) {
         return false;
@@ -287,19 +286,118 @@ export class Home {
     return true;
   }
 
+  checkJson(data, input1) {
+
+    for(var i = 0; i < data.length; i++) {
+      if (data[i] == input1) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  getMaxKeys(json) {
+    var m;
+    for (var i in json) {
+        if (json.hasOwnProperty(i)) {
+           m = (typeof m == 'undefined' || i > m) ? i : m;
+        }
+    }
+    return m;
+  }
+
   pTanaman = false;
+
+  jsonPlantCompound;
+  jsonCompoundProtein;
+  jsonProteinDisease;
+
   predictTanaman() {
 
     this.tanaman.pop();
     let tanam = JSON.stringify(this.plantSelect);
+    console.log(tanam);
 
-    this.http.post('ijah/zz-plant.php', tanam)
+    this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-plant.php', tanam)
       .map(res => res.json())
       .subscribe(data => {
 
         let plantCompound = data[0]['plant_compound'];
         let compoundProtein = data[1]['compound_protein'];
         let proteinDisease = data[2]['protein_disease'];
+
+        let pla_comp = {};
+        let comp_prot = {};
+        let prot_dis = {};
+
+        let count_pla_comp = 0;
+        let count_comp_prot = 0;
+        let count_prot_dis = 0;
+
+        for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
+          let temp = plantCompound[count_pla_comp][0];
+
+          if (pla_comp[temp]) {
+            let temp2 = pla_comp[temp];
+
+            if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
+              temp2.push(plantCompound[count_pla_comp][1]);
+
+              pla_comp[temp] = temp2;
+            }
+
+          }
+          else {
+            let a = [];
+            a.push(plantCompound[count_pla_comp][1]);
+            pla_comp[temp] = a;
+          }
+        }
+
+        for(count_comp_prot; count_comp_prot < compoundProtein.length; count_comp_prot++) {
+          let temp = compoundProtein[count_comp_prot][0];
+
+          if (comp_prot[temp]) {
+            let temp2 = comp_prot[temp];
+
+            if(this.checkJson(temp2, compoundProtein[count_comp_prot][1])) {
+              temp2.push(compoundProtein[count_comp_prot][1]);
+
+              comp_prot[temp] = temp2;
+            }
+
+          }
+          else {
+            let a = [];
+            a.push(compoundProtein[count_comp_prot][1]);
+            comp_prot[temp] = a;
+          }
+        }
+
+        for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
+          let temp = proteinDisease[count_prot_dis][0];
+
+          if (prot_dis[temp]) {
+            let temp2 = prot_dis[temp];
+
+            if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
+              temp2.push(proteinDisease[count_prot_dis][1]);
+
+              prot_dis[temp] = temp2;
+            }
+
+          }
+          else {
+            let a = [];
+            a.push(proteinDisease[count_prot_dis][1]);
+            prot_dis[temp] = a;
+          }
+        }
+
+        this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+        this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
+        this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
 
         if (compoundProtein.length != 0) {
 
@@ -351,9 +449,9 @@ export class Home {
 
         }
 
-        this.pTanaman = true;
-
         localStorage.setItem('data', JSON.stringify(this.dataLocal));
+
+        this.pTanaman = true;
         this.show = true;
         this.click = false;
 
@@ -367,7 +465,7 @@ export class Home {
     this.protein.pop();
     let prot = JSON.stringify(this.proteinSelect);
 
-    this.http.post('ijah/zz-protein.php', prot)
+    this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-protein.php', prot)
       .map(res => res.json())
       .subscribe(data => {
 
@@ -427,7 +525,7 @@ export class Home {
     this.compound.pop();
     let comp = JSON.stringify(this.compoundSelect);
 
-    this.http.post('ijah/zz-compound.php', comp)
+    this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-compound.php', comp)
       .map(res => res.json())
       .subscribe(data => {
 
@@ -491,7 +589,7 @@ export class Home {
     this.disease.pop();
     let dis = JSON.stringify(this.diseaseSelect);
 
-    this.http.post('ijah/zz-disease.php', dis)
+    this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-disease.php', dis)
       .map(res => res.json())
       .subscribe(data => {
 
@@ -563,14 +661,14 @@ export class Home {
     let plantCompound;
     let proteinDisease;
 
-    this.http.post('ijah/zz-plant.php', tanam)
+    this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-plant.php', tanam)
       .map(res => res.json())
       .subscribe(data => {
 
         plantCompound = data[0]['plant_compound'];
         compoundProtein1 = data[1]['compound_protein'];
 
-        this.http.post('ijah/zz-protein.php', prot)
+        this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-protein.php', prot)
           .map(res => res.json())
           .subscribe(data1 => {
 
@@ -629,14 +727,14 @@ export class Home {
     let plantCompound;
     let proteinDisease;
 
-    this.http.post('ijah/zz-compound.php', com)
+    this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-compound.php', com)
       .map(res => res.json())
       .subscribe(data => {
 
         plantCompound = data[0]['plant_compound'];
         compoundProtein1 = data[1]['compound_protein'];
 
-        this.http.post('ijah/zz-disease.php', dis)
+        this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-disease.php', dis)
           .map(res => res.json())
           .subscribe(data1 => {
 
@@ -688,14 +786,14 @@ export class Home {
     let plantCompound;
     let proteinDisease;
 
-    this.http.post('ijah/zz-plant.php', tanam)
+    this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-plant.php', tanam)
       .map(res => res.json())
       .subscribe(data => {
 
         plantCompound = data[0]['plant_compound'];
         compoundProtein1 = data[1]['compound_protein'];
 
-        this.http.post('ijah/zz-disease.php', dis)
+        this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-disease.php', dis)
           .map(res => res.json())
           .subscribe(data1 => {
 
@@ -755,14 +853,14 @@ export class Home {
       let plantCompound;
       let proteinDisease;
 
-      this.http.post('ijah/zz-compound.php', com)
+      this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-compound.php', com)
         .map(res => res.json())
         .subscribe(data => {
 
           plantCompound = data[0]['plant_compound'];
           compoundProtein1 = data[1]['compound_protein'];
 
-          this.http.post('ijah/zz-protein.php', prot)
+          this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-protein.php', prot)
             .map(res => res.json())
             .subscribe(data1 => {
 
