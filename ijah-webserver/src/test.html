@@ -3,11 +3,7 @@
     <link rel="stylesheet" href="css/bootstrap.min.css">
 </head>
 <body>
- <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
- <script type="text/javascript" src="assets/js/jquery.js"></script>
- <script type="text/javascript" src="assets/js/h2c/html2canvas.js"></script>
- <script type="text/javascript" src="assets/js/filesaver.js"></script>
- <script type="text/javascript" src="assets/js/jszip.min.js"></script>
+
 
 <div onload="render()">
   <div id="html-content-holder">
@@ -34,14 +30,15 @@
 <a id="btn-Convert-Html2Image" class="btn btn-primary col-md-4 col-md-offset-4 text-center">Download As PNG</a>
 
 <br />
-<div class="row">
 
-</div>
-
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="assets/js/jquery.js"></script>
+<script type="text/javascript" src="assets/js/h2c/html2canvas.js"></script>
+<script type="text/javascript" src="assets/js/filesaver.js"></script>
+<script type="text/javascript" src="assets/js/jszip.min.js"></script>
 <script>
 
-  (function () {
-
+  window.onload = function () {
     var element = $("#html-content-holder"); // global variable
     var getCanvas; // global variable
 
@@ -60,38 +57,7 @@
         $("#btn-Convert-Html2Image").attr("download", "graph_predict.png").attr("href", newData);
 
     });
-
-
-    var zip = new JSZip();
-    zip.file("Hello.txt", "Hello world\n");
-
-
-    // Blob
-    var blobLink = document.getElementById('blob');
-    if (JSZip.support.blob) {
-      function downloadWithBlob() {
-        zip.generateAsync({type:"blob"}).then(function (blob) {
-          saveAs(blob, "hello.zip");
-        }, function (err) {
-            blobLink.innerHTML += " " + err;
-        });
-        return false;
-      }
-    } else {
-      blobLink.innerHTML += " (not supported on this browser)";
-    }
-
-    // data URI
-    function downloadWithDataURI() {
-      zip.generateAsync({type:"base64"}).then(function (base64) {
-        window.location = "data:application/zip;base64," + base64;
-      }, function (err) {
-        // shouldn't happen with a base64...
-      });
-    }
-    var dataUriLink = document.getElementById('data_uri');
-
-  })();
+  }
 </script>
 
 <script

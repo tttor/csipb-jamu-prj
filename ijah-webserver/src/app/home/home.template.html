@@ -191,5 +191,28 @@
     </div>
   </div>
 
-  <iframe id="graph" class="text-center" *ngIf="show" src="test.html" height="720px" width="100%" frameBorder="0"></iframe>
+  <iframe id="graph" class="text-center" *ngIf="show" src="test.html" height="700px" width="100%" frameBorder="0"></iframe>
+
+  <!-- <div  -->
+
+  <div class="row" *ngIf="show">
+    <div class="col-md-4">
+      Plant - Compound
+      <pre [innerHTML]="jsonPlantCompound">
+      </pre>
+    </div>
+    <div class="col-md-4">
+      Compound - Protein
+      <pre [innerHTML]="jsonCompoundProtein">
+      </pre>
+    </div>
+    <div class="col-md-4">
+      Protein - Disease
+      <pre [innerHTML]="jsonProteinDisease">
+      </pre>
+    </div>
+
+  </div>
+
+
 </div>

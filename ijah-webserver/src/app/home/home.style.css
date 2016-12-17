@@ -1,3 +1,7 @@
+pre {
+  height: 500px;
+}
+
 template .right-input {
   background-color: red;
 }
