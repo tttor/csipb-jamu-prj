@@ -33,6 +33,7 @@ if __name__ == '__main__':
     fastaFileDir = "Fasta/"
     listDir = "protein.csv"
     outDir = "hasil/"
+
     uniprotId = []
     colSeqProtein = []
     colMetaProtein = []
@@ -54,7 +55,7 @@ if __name__ == '__main__':
             else:
                 it = 1
     ###############################
-
+    
     ###Read file and parse (with library)###
     for i in xrange(rowStart,rowEnd):
         fastaDir = fastaFileDir + uniprotId[i] + ".fasta"
@@ -69,13 +70,13 @@ if __name__ == '__main__':
         colMetaProtein.append(recTemp.id)
 
     ###Cleanning sequance###
-    for i in xrange(rowStart,rowEnd):
+    for i in range(nProtRow):
         for j in range(len(rowSeqProtein[i])):
             if(rowSeqProtein[i][j]=='U'):
                 rowSeqProtein[i][j]='C'
         rowSeqProtein[i] = "".join(rowSeqProtein[i])
 
-    for i in xrange(colStart,colEnd):
+    for i in range(nProtCol):
         for j in range(len(colSeqProtein[i])):
             if(colSeqProtein[i][j]=='U'):
                 colSeqProtein[i][j]='C'
