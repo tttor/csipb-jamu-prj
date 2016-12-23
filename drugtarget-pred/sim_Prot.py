@@ -13,7 +13,9 @@ from scoop import futures
 #Parsing
 def alignprot(rowSeqProtein,colSeqProtein,i,j):
     alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
+    print str(i)+" "+str(j)
     return [alignres, i, j]
+
 
 if __name__ == '__main__':
     start = time.time()
@@ -28,11 +30,11 @@ if __name__ == '__main__':
 
     simMatProtNorm = np.zeros((nProtRow,nProtCol), dtype=float)
     simMatProt = np.zeros((nProtRow,nProtCol), dtype=float)
-    selfSimScoreCol = np.zeros((nProtCol), dtype=float)
-    selfSimScoreRow =  np.zeros((nProtRow), dtype=float)
+    # selfSimScoreCol = np.zeros((3334), dtype=float)
+    # selfSimScoreRow =  np.zeros((nProtRow), dtype=float)
     fastaFileDir = "Fasta/"
     listDir = "protein.csv"
-    outDir = "hasil/"
+
 
     uniprotId = []
     colSeqProtein = []
@@ -55,19 +57,23 @@ if __name__ == '__main__':
             else:
                 it = 1
     ###############################
-    
+
     ###Read file and parse (with library)###
     for i in xrange(rowStart,rowEnd):
         fastaDir = fastaFileDir + uniprotId[i] + ".fasta"
         recTemp = SeqIO.read(fastaDir, "fasta")
         rowSeqProtein.append(list(recTemp.seq))
-        rowMetaProtein.append(recTemp.id)
+        recTemp = str(recTemp.id)
+        recTemp = recTemp.split("|")
+        rowMetaProtein.append(recTemp[1])
 
     for i in xrange(colStart,colEnd):
         fastaDir = fastaFileDir + uniprotId[i] + ".fasta"
         recTemp = SeqIO.read(fastaDir, "fasta")
         colSeqProtein.append(list(recTemp.seq))
-        colMetaProtein.append(recTemp.id)
+        recTemp = str(recTemp.id)
+        recTemp = recTemp.split("|")
+        colMetaProtein.append(recTemp[1])
 
     ###Cleanning sequance###
     for i in range(nProtRow):
@@ -85,42 +91,42 @@ if __name__ == '__main__':
     ###Preparing data for parallel mapping###
     #sequance
     for i in range(nProtRow):
-        for j in xrange(nProtCol):
+        for j in xrange(rowStart+i,nProtCol):
             rowProtein.append(rowSeqProtein[i])
 
     for i in range(nProtRow):
-        for j in xrange(nProtCol):
+        for j in xrange(rowStart+i,nProtCol):
             colProtein.append(colSeqProtein[j])
 
     #index
     for i in range(nProtRow):
-        for j in xrange(nProtCol):
+        for j in xrange(rowStart+i,nProtCol):
             rowIndex.append(i)
 
     for i in range(nProtRow):
-        for j in xrange(nProtCol):
+        for j in xrange(rowStart+i,nProtCol):
             colIndex.append(j)
 
     ########################################
     ### Calculation ###
     #Align all string using waterman with affine gap penalty -1 and extend gap penalty -1
-    selfSimRow = list(futures.map(alignprot, rowSeqProtein, rowSeqProtein, [i for i in range(nProtRow)], [i for i in range(nProtRow)]))
-    selfSimCol = list(futures.map(alignprot, colSeqProtein, colSeqProtein, [i for i in range(nProtCol)], [i for i in range(nProtCol)]))
+    # selfSimRow = list(futures.map(alignprot, rowSeqProtein, rowSeqProtein, [i for i in range(nProtRow)], [i for i in range(nProtRow)]))
+    # selfSimCol = list(futures.map(alignprot, colSeqProtein, colSeqProtein, [i for i in range(nProtCol)], [i for i in range(nProtCol)]))
     listScore = list(futures.map(alignprot, rowProtein, colProtein, rowIndex, colIndex))
 
-    for i in range(nProtRow):
-        selfSimScoreRow[selfSimRow[i][1]] = selfSimRow[i][0]
-
-    for i in range(nProtCol):
-        selfSimScoreCol[selfSimCol[i][1]] = selfSimCol[i][0]
+    # for i in range(nProtRow):
+    #     selfSimScoreRow[selfSimRow[i][1]] = selfSimRow[i][0]
+    #
+    # for i in range(nProtCol):
+    #     selfSimScoreCol[selfSimCol[i][1]] = selfSimCol[i][0]
 
     for i in range(len(listScore)):
         simMatProt[listScore[i][1]][listScore[i][2]] = listScore[i][0]
 
     #Normalisasi
-    for i in range(nProtRow):
-        for j in range(nProtCol):
-            simMatProtNorm[i][j] = simMatProt[i][j]/(math.sqrt(selfSimScoreRow[i])*math.sqrt(selfSimScoreCol[j]))
+    # for i in range(nProtRow):
+    #     for j in range(nProtCol):
+    #         simMatProtNorm[i][j] = simMatProt[i][j]/(math.sqrt(selfSimScoreRow[i])*math.sqrt(selfSimScoreCol[j]))
 
     #Mirror Result
     # for i in xrange(nProtrow):
@@ -129,17 +135,17 @@ if __name__ == '__main__':
     ##################
 
     ###write as txt file###
-    outMatDir = outDir+"NormProtKernel.txt"
-    with open(outMatDir,'w') as f:
-        for i in range(nProtRow):
-            for j in range(nProtCol):
-                if j>0:
-                    f.write(",")
-                f.write(str(simMatProtNorm[i][j]))
-            f.write("\n")
-    f.close()
+    # outMatDir = outDir+"NormProtKernel.txt"
+    # with open(outMatDir,'w') as f:
+    #     for i in range(nProtRow):
+    #         for j in range(nProtCol):
+    #             if j>0:
+    #                 f.write(",")
+    #             f.write(str(simMatProtNorm[i][j]))
+    #         f.write("\n")
+    # f.close()
 
-    outMatDir = outDir+"RealProtKernel.txt"
+    outMatDir = "RealProtKernel.txt"
     with open(outMatDir,'w') as f:
         for i in range(nProtRow):
             for j in range(nProtCol):
@@ -149,7 +155,7 @@ if __name__ == '__main__':
             f.write("\n")
     f.close()
 
-    outMetaDir = outDir+"MetaProtKernel.txt"
+    outMetaDir = "MetaProtKernel.txt"
     with open(outMetaDir,'w') as f:
         f.write("\t")
         for i in range(nProtCol):
