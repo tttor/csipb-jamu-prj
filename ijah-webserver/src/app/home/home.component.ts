@@ -899,111 +899,111 @@ export class Home {
 
     }
 
-  example1() {
-    this.reset();
-    this.tanaman = [{ 'index': 1, 'value' : 'Datura stramonium'}, { 'index': 2, 'value' : 'Trifolium pratense'}, { 'index': 3, 'value' : 'Acacia senegal'}, { 'index': 4, 'value' : ''}];
-    this.plantSelect = [{"index":1,"value":"PLA00002565"},{"index":2,"value":"PLA00001090"},{"index":3,"value":"PLA00000325"}];
+    example1() {
+      this.reset();
+      this.tanaman = [{ 'index': 1, 'value' : 'Datura stramonium'}, { 'index': 2, 'value' : 'Trifolium pratense'}, { 'index': 3, 'value' : 'Acacia senegal'}, { 'index': 4, 'value' : ''}];
+      this.plantSelect = [{"index":1,"value":"PLA00002565"},{"index":2,"value":"PLA00001090"},{"index":3,"value":"PLA00000325"}];
 
-    this.countTanaman = 4;
-    this.activeCompound = false;
-    this.activeProtein = false;
-    this.activeDisease = false;
-  }
+      this.countTanaman = 4;
+      this.activeCompound = false;
+      this.activeProtein = false;
+      this.activeDisease = false;
+    }
 
-  example2() {
-    this.reset();
-    this.compound = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 4, 'value' : ''}];
-    this.compoundSelect = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000058'}];
+    example2() {
+      this.reset();
+      this.compound = [{ 'index': 1, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 4, 'value' : ''}];
+      this.compoundSelect = [{ 'index': 1, 'value' : 'COM00000058'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000039'}];
 
-    this.countCompound = 2;
-    this.activeDisease = false;
-    this.activeTanaman = false;
-    this.activeProtein = false;
-  }
+      this.countCompound = 2;
+      this.activeDisease = false;
+      this.activeTanaman = false;
+      this.activeProtein = false;
+    }
 
-  example3() {
-    this.reset();
-    this.protein = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
-    this.proteinSelect = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
+    example3() {
+      this.reset();
+      this.protein = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
+      this.proteinSelect = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
 
-    this.countProtein = 3;
-    this.activeDisease = false;
-    this.activeTanaman = false;
-    this.activeCompound = false;
-  }
+      this.countProtein = 3;
+      this.activeDisease = false;
+      this.activeTanaman = false;
+      this.activeCompound = false;
+    }
 
-  example4() {
-    this.reset();
-    this.disease = [{ 'index': 1, 'value' : '616669 | Immunodeficiency 45'}, { 'index': 2, 'value' : '256000 | Leigh syndrome'}, { 'index': 3, 'value' : '608516 | Major depressive disorder'}, { 'index': 4, 'value' : ''}];
-    this.diseaseSelect = [{ 'index': 1, 'value' : 'DIS00004042'}, { 'index': 2, 'value' : 'DIS00000371'}, { 'index': 3, 'value' : 'DIS00000849'}];
+    example4() {
+      this.reset();
+      this.disease = [{ 'index': 1, 'value' : '156610 | Skin creases, congenital symmetric circumferential, 1'}, { 'index': 2, 'value' : '614373 | Amyotrophic lateral sclerosis 16, juvenile'}, { 'index': 3, 'value' : '612244 | Inflammatory bowel disease 13'}, { 'index': 4, 'value' : ''}];
+      this.diseaseSelect = [{ 'index': 1, 'value' : 'DIS00001455'}, { 'index': 2, 'value' : 'DIS00000803'}, { 'index': 3, 'value' : 'DIS00003796'}];
 
-    this.countDisease = 4;
-    this.activeProtein = false;
-    this.activeTanaman = false;
-    this.activeCompound = false;
-  }
+      this.countDisease = 4;
+      this.activeProtein = false;
+      this.activeTanaman = false;
+      this.activeCompound = false;
+    }
 
-  example5() {
-    this.reset();
-    this.tanaman = [{ 'index': 1, 'value' : 'Datura stramonium'}, { 'index': 2, 'value' : 'Trifolium pratense'}, { 'index': 3, 'value' : 'Acacia senegal'}, { 'index': 4, 'value' : ''}];
-    this.plantSelect = [{"index":1,"value":"PLA00002565"},{"index":2,"value":"PLA00001090"},{"index":3,"value":"PLA00000325"}];
-    this.countTanaman = 4;
+    example5() {
+      this.reset();
+      this.tanaman = [{ 'index': 1, 'value' : 'Catharanthus roseus'}, { 'index': 2, 'value' : 'Nigella sativa'}, { 'index': 3, 'value' : 'Cocos nucifera'}, { 'index': 4, 'value' : ''}];
+      this.plantSelect = [{"index":1,"value":"PLA00001025"},{"index":2,"value":"PLA00003511"},{"index":3,"value":"PLA00001600"}];
+      this.countTanaman = 4;
 
-    this.protein = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
-    this.proteinSelect = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
+      this.protein = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
+      this.proteinSelect = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
 
-    this.countProtein = 3;
+      this.countProtein = 3;
 
-    this.activeDisease = false;
-    this.activeCompound = false;
-  }
+      this.activeDisease = false;
+      this.activeCompound = false;
+    }
 
-  example6() {
-    this.reset();
-    this.compound = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 4, 'value' : ''}];
-    this.compoundSelect = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000058'}];
+    example6() {
+      this.reset();
+      this.compound = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '51-34-3 | DB00747 | C00002292 | C01851'}, { 'index': 3, 'value' : '53-86-1 | DB00328 | C00030512 | C01926'}, { 'index': 4, 'value' : ''}];
+      this.compoundSelect = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00001628'}, { 'index': 3, 'value' : 'COM00005599'}];
 
-    this.countCompound = 2;
+      this.countCompound = 2;
 
-    this.disease = [{ 'index': 1, 'value' : '616669 | Immunodeficiency 45'}, { 'index': 2, 'value' : '256000 | Leigh syndrome'}, { 'index': 3, 'value' : '608516 | Major depressive disorder'}, { 'index': 4, 'value' : ''}];
-    this.diseaseSelect = [{ 'index': 1, 'value' : 'DIS00004042'}, { 'index': 2, 'value' : 'DIS00000371'}, { 'index': 3, 'value' : 'DIS00000849'}];
+      this.disease = [{ 'index': 1, 'value' : '608516 | Major depressive disorder'}, { 'index': 2, 'value' : '100100 | Prune belly syndrome'}, { 'index': 3, 'value' : '614473 | Arterial calcification of infancy, generalized, 2'}, { 'index': 4, 'value' : ''}];
+      this.diseaseSelect = [{ 'index': 1, 'value' : 'DIS00000849'}, { 'index': 2, 'value' : 'DIS00003796'}, { 'index': 3, 'value' : 'DIS00000853'}];
 
-    this.countDisease = 4;
+      this.countDisease = 4;
 
-    this.activeTanaman = false;
-    this.activeProtein = false;
-  }
+      this.activeTanaman = false;
+      this.activeProtein = false;
+    }
 
-  example7() {
-    this.reset();
-    this.tanaman = [{ 'index': 1, 'value' : 'Datura stramonium'}, { 'index': 2, 'value' : 'Trifolium pratense'}, { 'index': 3, 'value' : 'Acacia senegal'}, { 'index': 4, 'value' : ''}];
-    this.plantSelect = [{"index":1,"value":"PLA00002565"},{"index":2,"value":"PLA00001090"},{"index":3,"value":"PLA00000325"}];
-    this.countDisease = 4;
+    example7() {
+      this.reset();
+      this.tanaman = [{ 'index': 1, 'value' : 'Aloe vera'}, { 'index': 2, 'value' : 'Cocos nucifera'}, { 'index': 3, 'value' : 'Panax ginseng'}, { 'index': 4, 'value' : ''}];
+      this.plantSelect = [{"index":1,"value":"PLA00001504"},{"index":2,"value":"PLA00001600"},{"index":3,"value":"PLA00003447"}];
+      this.countDisease = 4;
 
-    this.disease = [{ 'index': 1, 'value' : '156610 | Skin creases, congenital symmetric circumferential, 1'}, { 'index': 2, 'value' : '615999 | Hyperthyroxinemia, familial dysalbuminemic'}, { 'index': 3, 'value' : ''}];
-    this.diseaseSelect = [{ 'index': 1, 'value' : 'DIS00003623'}, { 'index': 2, 'value' : 'DIS00003675'}];
+      this.disease = [{ 'index': 1, 'value' : '61600 | Analbuminemia'}, { 'index': 2, 'value' : '615999 | Hyperthyroxinemia, familial dysalbuminemic'}, { 'index': 3, 'value' : ''}];
+      this.diseaseSelect = [{ 'index': 1, 'value' : 'DIS00003787'}, { 'index': 2, 'value' : 'DIS00003675'}];
 
-    this.countDisease = 3;
+      this.countDisease = 3;
 
-    this.activeCompound = false;
-    this.activeProtein = false;
-  }
+      this.activeCompound = false;
+      this.activeProtein = false;
+    }
 
-  example8() {
-    this.reset();
-    this.compound = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 4, 'value' : ''}];
-    this.compoundSelect = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000058'}];
+    example8() {
+      this.reset();
+      this.compound = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 4, 'value' : ''}];
+      this.compoundSelect = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000058'}];
 
-    this.countCompound = 2;
+      this.countCompound = 2;
 
-    this.protein = [{ 'index': 1, 'value' : 'Q9Y617 | Phosphoserine aminotransferase'}, { 'index': 2, 'value' : 'P20309 | Muscarinic acetylcholine receptor M3'}, { 'index': 3, 'value' : 'Q96LT7 | Protein C9orf72'}, { 'index': 4, 'value' : ''}];
-    this.proteinSelect = [{ 'index': 1, 'value' : 'PRO00000001'}, { 'index': 2, 'value' : 'PRO00000452'}, { 'index': 3, 'value' : 'PRO00000006'}];
+      this.protein = [{ 'index': 1, 'value' : 'P53985 | Monocarboxylate transporter 1'}, { 'index': 2, 'value' : 'P20309 | Muscarinic acetylcholine receptor M3'}, { 'index': 3, 'value' : 'Q99720 | Sigma non-opioid intracellular receptor 1'}, { 'index': 4, 'value' : ''}];
+      this.proteinSelect = [{ 'index': 1, 'value' : 'PRO00000040'}, { 'index': 2, 'value' : 'PRO00000452'}, { 'index': 3, 'value' : 'PRO00000377'}];
 
-    this.countProtein = 4;
+      this.countProtein = 4;
 
-    this.activeTanaman = false;
-    this.activeDisease = false;
-  }
+      this.activeTanaman = false;
+      this.activeDisease = false;
+    }
 
   click = false;
   predict() {
