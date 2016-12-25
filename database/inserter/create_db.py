@@ -29,7 +29,7 @@ def main(argv):
                 com_cas_id varchar(128) UNIQUE,
                 com_inchikey varchar(1024) UNIQUE,
                 com_smiles varchar(16384) UNIQUE,
-                com_simcomp varchar(128)
+                com_similarity_simcomp text
                 );
                 ''')
 
@@ -38,7 +38,8 @@ def main(argv):
                 pro_id varchar(12) PRIMARY KEY,
                 pro_name varchar(512) NOT NULL UNIQUE,
                 pro_uniprot_id varchar(8) NOT NULL UNIQUE,
-                pro_uniprot_abbrv varchar(64) NOT NULL UNIQUE
+                pro_uniprot_abbrv varchar(64) NOT NULL UNIQUE,
+                pro_similarity_smithwaterman text
                 );
                 ''')
 

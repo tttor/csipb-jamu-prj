@@ -32,8 +32,8 @@ def main(argv):
         insertComFromKnapsack(csr,outDir,paths[0])
     elif mode=='updateComBasedOnKegg':
         updateComBasedOnKegg(csr,outDir,paths[0],paths[1])
-    # elif mode=='updateForSimcomp':
-    #     updateForSimcomp()
+    elif mode=='updateComSimcomp':
+        updateComSimcomp(csr,outDir,paths[0])
     else:
         assert False,'Unknown Mode!'
 
@@ -244,26 +244,22 @@ def updateComBasedOnKegg(csr,outDir,comDataDpath,drugDataFpath):
 
     return comIdx
 
-def updateForSimcomp():
-    dirpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010/simcomp'
-
+def updateComSimcomp(csr,outDir,path):
     # SELECT com_id FROM `compound` where com_kegg_id!=''
-    q = 'SELECT com_id,com_kegg_id FROM `compound` where com_kegg_id!=""'
-    resp = util.mysqlCommit(db,cursor,q, True)
+    q = "SELECT com_kegg_id,com_id FROM compound where com_kegg_id!=''"
+    csr.execute(q)
+    resp = csr.fetchall(); assert len(resp)>0
 
-    kegg2ComIdMap = {}
-
-    for i in resp:
-        kegg2ComIdMap[i[1]] = i[0]
+    kegg2ComIdMap = {kegg:comId for kegg,comId in resp}
 
     #
-    for filename in os.listdir(dirpath):
+    for filename in os.listdir(path):
         if filename.endswith(".sim"):
             keggId = filename.split('_')[1].strip('.sim').strip()
-            fpath = os.path.join(dirpath, filename)
+            fpath = os.path.join(path, filename)
 
             simcomp = []
-            with open(fpath) as infile:
+            with open(fpath,'r') as infile:
                 for line in infile:
                     words = line.split('=')
                     words = [i.strip() for i in words]
@@ -275,11 +271,11 @@ def updateForSimcomp():
 
             if len(simcomp)!=0:
                 simcompStr = '\n'.join(simcomp)
-                simcompStr = '"'+simcompStr+'"'
-                qf = 'UPDATE compound SET com_simcomp='+simcompStr
-                qr = ' WHERE com_kegg_id='+'"'+keggId+'"'
+                simcompStr = "'"+simcompStr+"'"
+                qf = "UPDATE compound SET com_similarity_simcomp="+simcompStr
+                qr = " WHERE com_kegg_id="+"'"+keggId+"'"
                 q = qf+qr
-                util.mysqlCommit(db,cursor,q)
+                # csr.execute(q)
 
 if __name__ == '__main__':
     start_time = time.time()

@@ -11,6 +11,9 @@ contains UniprotID
 SUPERTARGET + MATADOR
 http://insilico.charite.de/supertarget/
 http://insilico.charite.de/supertarget/index.php?site=drug_target&id=4594-CP2D6_HUMAN
+http://insilico.charite.de/supertarget/index.php?site=drug_target&id=5103-SERC_HUMAN
+http://insilico.charite.de/supertarget/index.php?site=drug_target&id=5103-S5A2_HUMAN
+http://insilico.charite.de/supertarget/index.php?site=drug_target&id=5103-AUTS2_HUMAN
 
 TRANSFORMER
 http://bioinformatics.charite.de/transformer/
