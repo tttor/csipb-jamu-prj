@@ -30,7 +30,7 @@ elif [ "$1" == "uckg" ]; then
 elif [ "$1" == "ucsc" ]; then
   ### update compound_simcomp from kegg
   mode=updateComSimcomp
-  path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010/simcomp
+  path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161014/simcomp
   exe=insert_compound.py
   python $exe $db $user $passwd $host $port $mode $outDir $path
 elif [ "$1" == "ipu" ]; then

@@ -244,38 +244,48 @@ def updateComBasedOnKegg(csr,outDir,comDataDpath,drugDataFpath):
 
     return comIdx
 
-def updateComSimcomp(csr,outDir,path):
+def updateComSimcomp(csr,outDir,dpath):
     # SELECT com_id FROM `compound` where com_kegg_id!=''
     q = "SELECT com_kegg_id,com_id FROM compound where com_kegg_id!=''"
     csr.execute(q)
     resp = csr.fetchall(); assert len(resp)>0
-
     kegg2ComIdMap = {kegg:comId for kegg,comId in resp}
 
     #
-    for filename in os.listdir(path):
-        if filename.endswith(".sim"):
-            keggId = filename.split('_')[1].strip('.sim').strip()
-            fpath = os.path.join(path, filename)
+    idx = 0
+    log = []
+    for keggId,comId in kegg2ComIdMap.iteritems():
+        idx += 1
+        s = 'updating simcomp '+keggId+':'+comId+ ' idx= '+str(idx)+' of '+str(len(resp))
+        print s
 
+        fname = 'simcomp_'+keggId
+        fpath = os.path.join(dpath,fname)
+
+        if os.path.exists(fpath):
             simcomp = []
             with open(fpath,'r') as infile:
-                for line in infile:
-                    words = line.split('=')
-                    words = [i.strip() for i in words]
-                    keggId2 = words[0]
-                    if keggId2 in kegg2ComIdMap.keys():
-                        comId = kegg2ComIdMap[keggId2]
-                        score = words[1]
-                        simcomp.append( comId+':'+keggId2+'='+score)
-
+                    for line in infile:
+                        words = line.split('=')
+                        words = [i.strip() for i in words]
+                        keggId2 = words[0]
+                        if keggId2 in kegg2ComIdMap.keys():
+                            comId = kegg2ComIdMap[keggId2]
+                            score = words[1]
+                            simcomp.append( comId+':'+keggId2+'='+score)
             if len(simcomp)!=0:
                 simcompStr = '\n'.join(simcomp)
                 simcompStr = "'"+simcompStr+"'"
                 qf = "UPDATE compound SET com_similarity_simcomp="+simcompStr
                 qr = " WHERE com_kegg_id="+"'"+keggId+"'"
                 q = qf+qr
-                # csr.execute(q)
+                csr.execute(q)
+        else:
+            s = 'NOT-FOUND: '+ s
+            log.append(s)
+
+    with open(os.path.join(outDir,'updateComSimcomp.log'),'w') as f:
+        for l in log: f.write(l+'\n')
 
 if __name__ == '__main__':
     start_time = time.time()
