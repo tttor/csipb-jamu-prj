@@ -1,4 +1,4 @@
-TODO ###########################################################################
+# TODO
 
 > calc compound similarity
 >>tanimoto, convert smiley to fingerprint
@@ -7,8 +7,7 @@ use api with curl with smiles, or MOL
 use api with keggC-ID vs knapsack DB
 
 > calc protein similarity
+Supertarget:
+As of November 10th 2011, we changed the way how target similarities are calculated. SuperTarget comprises pre-calculated target sequence similarities and sequence identities. Pairwise global alignments were calculated between all sequences of target proteins using the Needleman-Wunsch implementation Needle which is part of the package EMBOSS. For further information refer to: EMBOSS alignment formats and 'EMBOSS: The European Molecular Biology Open Software Suite (2000) Rice,P. Longden,I. and Bleasby,A. Trends in Genetics 16, (6) pp276--277'
 
 > run prediction using blm-nii framework
-
-DONE ###########################################################################
---> run dummy predictor
