@@ -8,33 +8,28 @@ from Bio import SeqIO
 from Bio import pairwise2
 from Bio.SubsMat.MatrixInfo import blosum62
 from scoop import futures
-#S-W Alignment
 
-#Parsing
 def alignprot(rowSeqProtein,colSeqProtein,i,j):
     alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
     print str(i)+" "+str(j)
-    return [alignres, i, j]
-
+    return [alignres, j]
 
 if __name__ == '__main__':
     start = time.time()
 
     rowStart = int(sys.argv[1])-1
     rowEnd = int(sys.argv[2])
-    colStart = int(sys.argv[3])-1
-    colEnd = int(sys.argv[4])
+    colStart = 0
+    colEnd = 3334
 
     nProtCol = colEnd-colStart
     nProtRow = rowEnd-rowStart
 
-    simMatProtNorm = np.zeros((nProtRow,nProtCol), dtype=float)
-    simMatProt = np.zeros((nProtRow,nProtCol), dtype=float)
-    # selfSimScoreCol = np.zeros((3334), dtype=float)
-    # selfSimScoreRow =  np.zeros((nProtRow), dtype=float)
+    simMatProtNorm = np.zeros(nProtCol, dtype=float)
+    simMatProt = np.zeros(nProtCol, dtype=float)
     fastaFileDir = "Fasta/"
     listDir = "protein.csv"
-
+    OutDir = ""
 
     uniprotId = []
     colSeqProtein = []
@@ -87,85 +82,47 @@ if __name__ == '__main__':
             if(colSeqProtein[i][j]=='U'):
                 colSeqProtein[i][j]='C'
         colSeqProtein[i] = "".join(colSeqProtein[i])
-
-    ###Preparing data for parallel mapping###
-    #sequance
-    for i in range(nProtRow):
-        for j in xrange(rowStart+i,nProtCol):
-            rowProtein.append(rowSeqProtein[i])
-
-    for i in range(nProtRow):
-        for j in xrange(rowStart+i,nProtCol):
-            colProtein.append(colSeqProtein[j])
-
-    #index
-    for i in range(nProtRow):
-        for j in xrange(rowStart+i,nProtCol):
-            rowIndex.append(i)
-
-    for i in range(nProtRow):
-        for j in xrange(rowStart+i,nProtCol):
-            colIndex.append(j)
-
     ########################################
-    ### Calculation ###
-    #Align all string using waterman with affine gap penalty -1 and extend gap penalty -1
-    # selfSimRow = list(futures.map(alignprot, rowSeqProtein, rowSeqProtein, [i for i in range(nProtRow)], [i for i in range(nProtRow)]))
-    # selfSimCol = list(futures.map(alignprot, colSeqProtein, colSeqProtein, [i for i in range(nProtCol)], [i for i in range(nProtCol)]))
-    listScore = list(futures.map(alignprot, rowProtein, colProtein, rowIndex, colIndex))
-
-    # for i in range(nProtRow):
-    #     selfSimScoreRow[selfSimRow[i][1]] = selfSimRow[i][0]
-    #
-    # for i in range(nProtCol):
-    #     selfSimScoreCol[selfSimCol[i][1]] = selfSimCol[i][0]
-
-    for i in range(len(listScore)):
-        simMatProt[listScore[i][1]][listScore[i][2]] = listScore[i][0]
-
-    #Normalisasi
-    # for i in range(nProtRow):
-    #     for j in range(nProtCol):
-    #         simMatProtNorm[i][j] = simMatProt[i][j]/(math.sqrt(selfSimScoreRow[i])*math.sqrt(selfSimScoreCol[j]))
-
-    #Mirror Result
-    # for i in xrange(nProtrow):
-    #     for j in xrange(i+1,nProtCol):
-    #         simMatProtNorm[j][i] = simMatProtNorm[i][j]
-    ##################
-
-    ###write as txt file###
-    # outMatDir = outDir+"NormProtKernel.txt"
-    # with open(outMatDir,'w') as f:
-    #     for i in range(nProtRow):
-    #         for j in range(nProtCol):
-    #             if j>0:
-    #                 f.write(",")
-    #             f.write(str(simMatProtNorm[i][j]))
-    #         f.write("\n")
-    # f.close()
-
-    outMatDir = "RealProtKernel.txt"
-    with open(outMatDir,'w') as f:
+    #sequance
+    outMatDir = OutDir+"RealProtKernel"+str(rowStart+1)+"_"+str(rowEnd)+".txt"
+    outMetaDir = OutDir+"MetaProtKernel"+str(rowStart+1)+"_"+str(rowEnd)+".txt"
+    listScore = []
+    with open(outMatDir, 'w') as matF, open(outMetaDir, 'w') as metaF:
+        metaF.write("\t")
+        for i in range(nProtCol):
+            metaF.write(colMetaProtein[i]+" ")
         for i in range(nProtRow):
+            ###Preparing data for parallel mapping###
+            for j in xrange(rowStart+i,nProtCol):
+                rowProtein.append(rowSeqProtein[i])
+                colProtein.append(colSeqProtein[j])
+                rowIndex.append(i)
+                colIndex.append(j)
+            ### Calculation ###
+            listScore = list(futures.map(alignprot, rowProtein, colProtein, rowIndex, colIndex))
+            ###Put into row
+            for j in range(len(listScore)):
+                simMatProt[listScore[j][1]] = listScore[j][0]
+
+            ###Print Row
             for j in range(nProtCol):
                 if j>0:
-                    f.write(",")
-                f.write(str(simMatProt[i][j]))
-            f.write("\n")
-    f.close()
+                    matF.write(",")
+                matF.write(str(simMatProt[j]))
+            matF.write("\n")
+            for j in range(nProtRow):
+                metaF.write(rowMetaProtein[j]+"\n")
+            #Reset value
+            colIndex = []
+            rowIndex = []
+            rowProtein = []
+            colProtein = []
+            listScore = []
+            simMatProt = [0.0 for i in range(nProtCol)]
 
-    outMetaDir = "MetaProtKernel.txt"
-    with open(outMetaDir,'w') as f:
-        f.write("\t")
-        for i in range(nProtCol):
-            f.write(colMetaProtein[i]+" ")
-        f.write("\n")
-        for i in range(nProtRow):
-            f.write(rowMetaProtein[i]+"\n")
-
-    f.close()
-    #######################
+    matF.close()
+    metaF.close()
+    ##################
 
     #############Debugging section#############
     print "Runtime :"+ str(time.time()-start)
