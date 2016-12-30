@@ -5,9 +5,9 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 
-
-
 import { Http } from '@angular/http';
+
+declare var saveAs: any;
 
 @Component({
   selector: 'home',
@@ -46,6 +46,8 @@ export class Home {
 
   dataLocal = [];
 
+  FileSaver: any;
+
   // typeahead
   public stateCtrl:FormControl = new FormControl();
 
@@ -82,7 +84,6 @@ export class Home {
         this.compound_total = data[0]['compound_total'];
         this.protein_total = data[0]['protein_total'];
         this.disease_total = data[0]['disease_total'];
-
       })
 
     this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/plant.php')
@@ -1535,6 +1536,12 @@ export class Home {
 
       this.activeTanaman = false;
       this.activeDisease = false;
+    }
+
+    downloadButton(){
+          var json = localStorage.getItem("jsonPlaComp");
+          var blob = new Blob([json], {type: "text/plain;charset=utf-8"});
+          saveAs(blob, "ijah_plantCompound.json");
     }
 
   click = false;
