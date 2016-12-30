@@ -88,9 +88,6 @@ if __name__ == '__main__':
     outMetaDir = OutDir+"MetaProtKernel"+str(rowStart+1)+"_"+str(rowEnd)+".txt"
     listScore = []
     with open(outMatDir, 'w') as matF, open(outMetaDir, 'w') as metaF:
-        metaF.write("\t")
-        for i in range(nProtCol):
-            metaF.write(colMetaProtein[i]+" ")
         for i in range(nProtRow):
             ###Preparing data for parallel mapping###
             for j in xrange(rowStart+i,nProtCol):
@@ -110,8 +107,7 @@ if __name__ == '__main__':
                     matF.write(",")
                 matF.write(str(simMatProt[j]))
             matF.write("\n")
-            for j in range(nProtRow):
-                metaF.write(rowMetaProtein[j]+"\n")
+            metaF.write(rowMetaProtein[j]+"\n")
             #Reset value
             colIndex = []
             rowIndex = []
