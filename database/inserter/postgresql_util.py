@@ -29,7 +29,15 @@ def main(argv):
     # print getMax(csr,'pla_id','plant')
 
     ###
-    print doesExist(csr,'compound','com_drugbank_id','DB08427')
+    # print doesExist(csr,'compound','com_drugbank_id','DB08427')
+
+    ###
+    q = "select com_similarity_simcomp from compound where com_kegg_id='C07619';"
+    q = "select pro_similarity_smithwaterman from protein where pro_uniprot_id='Q53R12'"
+    csr.execute(q)
+    resp = csr.fetchall()
+    print len(resp)
+    print resp[0]
 
 if __name__ == '__main__':
     main(sys.argv)

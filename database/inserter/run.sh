@@ -60,6 +60,8 @@ elif [ "$1" == "icp" ]; then
   ### insert_compound_vs_protein
   path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl
   python insert_compound_vs_protein.py $db $user $passwd $host $port $outDir $path
+elif [ "$1" == "test" ]; then
+  python postgresql_util.py $db $user $passwd $host $port
 else
   echo "ERROR: Unknown mode"
   exit 1
