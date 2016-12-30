@@ -29,7 +29,7 @@
     $rowCari = pg_fetch_assoc($cari);
     $value = $rowCari['dis_name'];
 
-    $query = pg_query($link, "SELECT p.pro_id, p.pro_name FROM `protein_vs_disease` as pd, protein as p where pd.pro_id = p.pro_id and pd.dis_id = '$index'");
+    $query = pg_query($link, "SELECT p.pro_id, p.pro_name FROM protein_vs_disease as pd, protein as p where pd.pro_id = p.pro_id and pd.dis_id = '$index'");
 
     while($row = pg_fetch_assoc($query)){
       $indexProtein = $row['pro_id'];
@@ -82,7 +82,7 @@
             $arrayProtein[] = array($namaCompound, $namaProtein);
           // }
 
-          $queryDisease = pg_query($link, "SELECT p.pla_name FROM `plant_vs_compound` as pc, plant as p where pc.pla_id = p.pla_id and pc.com_id = '$indexCompound'");
+          $queryDisease = pg_query($link, "SELECT p.pla_name FROM plant_vs_compound as pc, plant as p where pc.pla_id = p.pla_id and pc.com_id = '$indexCompound'");
 
           while($rowDisease = pg_fetch_assoc($queryDisease)) {
             $namaPlant = $rowDisease['pla_name'];

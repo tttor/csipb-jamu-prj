@@ -2,6 +2,16 @@
 
   include 'config.php';
 
+  function check($a, $var1, $var2) {
+    foreach ($a as $arr) {
+      if ($arr[0] == $var1 && $arr[1] == $var2){
+        // echo 'sama <br />';
+        return false;
+      }
+    }
+    return true;
+  }
+
   // get JSON input from HTTP POST
   $postdata = file_get_contents("php://input");
 
