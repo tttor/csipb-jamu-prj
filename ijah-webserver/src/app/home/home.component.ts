@@ -5,6 +5,8 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 
+
+
 import { Http } from '@angular/http';
 
 @Component({
@@ -450,6 +452,9 @@ export class Home {
         }
 
         localStorage.setItem('data', JSON.stringify(this.dataLocal));
+        localStorage.setItem('jsonPlaComp', JSON.stringify(pla_comp, undefined, 2));
+        localStorage.setItem('jsonCompProt', JSON.stringify(comp_prot, undefined, 2));
+        localStorage.setItem('jsonProtDis', JSON.stringify(prot_dis, undefined, 2));
 
         this.pTanaman = true;
         this.show = true;
@@ -464,6 +469,7 @@ export class Home {
 
     this.protein.pop();
     let prot = JSON.stringify(this.proteinSelect);
+    console.log(prot);
 
     this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-protein.php', prot)
       .map(res => res.json())
@@ -472,6 +478,78 @@ export class Home {
         let plantCompound = data[0]['plant_compound'];
         let compoundProtein = data[1]['compound_protein'];
         let proteinDisease = data[2]['protein_disease'];
+
+        let pla_comp = {};
+        let comp_prot = {};
+        let prot_dis = {};
+
+        let count_pla_comp = 0;
+        let count_comp_prot = 0;
+        let count_prot_dis = 0;
+
+        for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
+          let temp = plantCompound[count_pla_comp][0];
+
+          if (pla_comp[temp]) {
+            let temp2 = pla_comp[temp];
+
+            if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
+              temp2.push(plantCompound[count_pla_comp][1]);
+
+              pla_comp[temp] = temp2;
+            }
+
+          }
+          else {
+            let a = [];
+            a.push(plantCompound[count_pla_comp][1]);
+            pla_comp[temp] = a;
+          }
+        }
+
+        for(count_comp_prot; count_comp_prot < compoundProtein.length; count_comp_prot++) {
+          let temp = compoundProtein[count_comp_prot][0];
+
+          if (comp_prot[temp]) {
+            let temp2 = comp_prot[temp];
+
+            if(this.checkJson(temp2, compoundProtein[count_comp_prot][1])) {
+              temp2.push(compoundProtein[count_comp_prot][1]);
+
+              comp_prot[temp] = temp2;
+            }
+
+          }
+          else {
+            let a = [];
+            a.push(compoundProtein[count_comp_prot][1]);
+            comp_prot[temp] = a;
+          }
+        }
+
+        for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
+          let temp = proteinDisease[count_prot_dis][0];
+
+          if (prot_dis[temp]) {
+            let temp2 = prot_dis[temp];
+
+            if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
+              temp2.push(proteinDisease[count_prot_dis][1]);
+
+              prot_dis[temp] = temp2;
+            }
+
+          }
+          else {
+            let a = [];
+            a.push(proteinDisease[count_prot_dis][1]);
+            prot_dis[temp] = a;
+          }
+        }
+
+        this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+        this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
+        this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
 
         if (plantCompound.length != 0) {
 
@@ -524,6 +602,7 @@ export class Home {
 
     this.compound.pop();
     let comp = JSON.stringify(this.compoundSelect);
+    console.log(comp);
 
     this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-compound.php', comp)
       .map(res => res.json())
@@ -533,6 +612,77 @@ export class Home {
         let compoundProtein = data[1]['compound_protein'];
         let proteinDisease = data[2]['protein_disease'];
 
+        let pla_comp = {};
+        let comp_prot = {};
+        let prot_dis = {};
+
+        let count_pla_comp = 0;
+        let count_comp_prot = 0;
+        let count_prot_dis = 0;
+
+        for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
+          let temp = plantCompound[count_pla_comp][0];
+
+          if (pla_comp[temp]) {
+            let temp2 = pla_comp[temp];
+
+            if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
+              temp2.push(plantCompound[count_pla_comp][1]);
+
+              pla_comp[temp] = temp2;
+            }
+
+          }
+          else {
+            let a = [];
+            a.push(plantCompound[count_pla_comp][1]);
+            pla_comp[temp] = a;
+          }
+        }
+
+        for(count_comp_prot; count_comp_prot < compoundProtein.length; count_comp_prot++) {
+          let temp = compoundProtein[count_comp_prot][0];
+
+          if (comp_prot[temp]) {
+            let temp2 = comp_prot[temp];
+
+            if(this.checkJson(temp2, compoundProtein[count_comp_prot][1])) {
+              temp2.push(compoundProtein[count_comp_prot][1]);
+
+              comp_prot[temp] = temp2;
+            }
+
+          }
+          else {
+            let a = [];
+            a.push(compoundProtein[count_comp_prot][1]);
+            comp_prot[temp] = a;
+          }
+        }
+
+        for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
+          let temp = proteinDisease[count_prot_dis][0];
+
+          if (prot_dis[temp]) {
+            let temp2 = prot_dis[temp];
+
+            if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
+              temp2.push(proteinDisease[count_prot_dis][1]);
+
+              prot_dis[temp] = temp2;
+            }
+
+          }
+          else {
+            let a = [];
+            a.push(proteinDisease[count_prot_dis][1]);
+            prot_dis[temp] = a;
+          }
+        }
+
+        this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+        this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
+        this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
 
         if (proteinDisease.length != 0 && compoundProtein.length != 0) {
 
@@ -588,6 +738,7 @@ export class Home {
 
     this.disease.pop();
     let dis = JSON.stringify(this.diseaseSelect);
+    console.log(dis);
 
     this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-disease.php', dis)
       .map(res => res.json())
@@ -597,6 +748,77 @@ export class Home {
         let compoundProtein = data[1]['compound_protein'];
         let proteinDisease = data[2]['protein_disease'];
 
+        let pla_comp = {};
+        let comp_prot = {};
+        let prot_dis = {};
+
+        let count_pla_comp = 0;
+        let count_comp_prot = 0;
+        let count_prot_dis = 0;
+
+        for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
+          let temp = plantCompound[count_pla_comp][0];
+
+          if (pla_comp[temp]) {
+            let temp2 = pla_comp[temp];
+
+            if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
+              temp2.push(plantCompound[count_pla_comp][1]);
+
+              pla_comp[temp] = temp2;
+            }
+
+          }
+          else {
+            let a = [];
+            a.push(plantCompound[count_pla_comp][1]);
+            pla_comp[temp] = a;
+          }
+        }
+
+        for(count_comp_prot; count_comp_prot < compoundProtein.length; count_comp_prot++) {
+          let temp = compoundProtein[count_comp_prot][0];
+
+          if (comp_prot[temp]) {
+            let temp2 = comp_prot[temp];
+
+            if(this.checkJson(temp2, compoundProtein[count_comp_prot][1])) {
+              temp2.push(compoundProtein[count_comp_prot][1]);
+
+              comp_prot[temp] = temp2;
+            }
+
+          }
+          else {
+            let a = [];
+            a.push(compoundProtein[count_comp_prot][1]);
+            comp_prot[temp] = a;
+          }
+        }
+
+        for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
+          let temp = proteinDisease[count_prot_dis][0];
+
+          if (prot_dis[temp]) {
+            let temp2 = prot_dis[temp];
+
+            if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
+              temp2.push(proteinDisease[count_prot_dis][1]);
+
+              prot_dis[temp] = temp2;
+            }
+
+          }
+          else {
+            let a = [];
+            a.push(proteinDisease[count_prot_dis][1]);
+            prot_dis[temp] = a;
+          }
+        }
+
+        this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+        this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
+        this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
 
         if (plantCompound.length != 0) {
 
@@ -675,6 +897,78 @@ export class Home {
             proteinDisease = data1[2]['protein_disease'];
             compoundProtein2 = data1[1]['compound_protein'];
 
+            let pla_comp = {};
+            let comp_prot = {};
+            let prot_dis = {};
+
+            let count_pla_comp = 0;
+            let count_comp_prot = 0;
+            let count_prot_dis = 0;
+
+            for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
+              let temp = plantCompound[count_pla_comp][0];
+
+              if (pla_comp[temp]) {
+                let temp2 = pla_comp[temp];
+
+                if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
+                  temp2.push(plantCompound[count_pla_comp][1]);
+
+                  pla_comp[temp] = temp2;
+                }
+
+              }
+              else {
+                let a = [];
+                a.push(plantCompound[count_pla_comp][1]);
+                pla_comp[temp] = a;
+              }
+            }
+
+            for(count_comp_prot; count_comp_prot < compoundProtein2.length; count_comp_prot++) {
+              let temp = compoundProtein2[count_comp_prot][0];
+
+              if (comp_prot[temp]) {
+                let temp2 = comp_prot[temp];
+
+                if(this.checkJson(temp2, compoundProtein2[count_comp_prot][1])) {
+                  temp2.push(compoundProtein2[count_comp_prot][1]);
+
+                  comp_prot[temp] = temp2;
+                }
+
+              }
+              else {
+                let a = [];
+                a.push(compoundProtein2[count_comp_prot][1]);
+                comp_prot[temp] = a;
+              }
+            }
+
+            for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
+              let temp = proteinDisease[count_prot_dis][0];
+
+              if (prot_dis[temp]) {
+                let temp2 = prot_dis[temp];
+
+                if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
+                  temp2.push(proteinDisease[count_prot_dis][1]);
+
+                  prot_dis[temp] = temp2;
+                }
+
+              }
+              else {
+                let a = [];
+                a.push(proteinDisease[count_prot_dis][1]);
+                prot_dis[temp] = a;
+              }
+            }
+
+            this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+            this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
+            this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
+
             for (let i = 0; i < compoundProtein1.length; i++) {
 
               for (let j = 0; j < proteinDisease.length; j++) {
@@ -706,6 +1000,9 @@ export class Home {
             }
 
             localStorage.setItem('data', JSON.stringify(this.dataLocal));
+            localStorage.setItem('jsonPlaComp', JSON.stringify(pla_comp, undefined, 2));
+            localStorage.setItem('jsonCompProt', JSON.stringify(comp_prot, undefined, 2));
+            localStorage.setItem('jsonProtDis', JSON.stringify(prot_dis, undefined, 2));
             this.show = true;
 
         })
@@ -741,6 +1038,78 @@ export class Home {
             proteinDisease = data1[2]['protein_disease'];
             compoundProtein2 = data1[1]['compound_protein'];
 
+            let pla_comp = {};
+            let comp_prot = {};
+            let prot_dis = {};
+
+            let count_pla_comp = 0;
+            let count_comp_prot = 0;
+            let count_prot_dis = 0;
+
+            for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
+              let temp = plantCompound[count_pla_comp][0];
+
+              if (pla_comp[temp]) {
+                let temp2 = pla_comp[temp];
+
+                if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
+                  temp2.push(plantCompound[count_pla_comp][1]);
+
+                  pla_comp[temp] = temp2;
+                }
+
+              }
+              else {
+                let a = [];
+                a.push(plantCompound[count_pla_comp][1]);
+                pla_comp[temp] = a;
+              }
+            }
+
+            for(count_comp_prot; count_comp_prot < compoundProtein2.length; count_comp_prot++) {
+              let temp = compoundProtein2[count_comp_prot][0];
+
+              if (comp_prot[temp]) {
+                let temp2 = comp_prot[temp];
+
+                if(this.checkJson(temp2, compoundProtein2[count_comp_prot][1])) {
+                  temp2.push(compoundProtein2[count_comp_prot][1]);
+
+                  comp_prot[temp] = temp2;
+                }
+
+              }
+              else {
+                let a = [];
+                a.push(compoundProtein2[count_comp_prot][1]);
+                comp_prot[temp] = a;
+              }
+            }
+
+            for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
+              let temp = proteinDisease[count_prot_dis][0];
+
+              if (prot_dis[temp]) {
+                let temp2 = prot_dis[temp];
+
+                if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
+                  temp2.push(proteinDisease[count_prot_dis][1]);
+
+                  prot_dis[temp] = temp2;
+                }
+
+              }
+              else {
+                let a = [];
+                a.push(proteinDisease[count_prot_dis][1]);
+                prot_dis[temp] = a;
+              }
+            }
+
+            this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+            this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
+            this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
+
             for (let z = 0; z < 20; z++) {
               if (this.check(this.dataLocal, plantCompound[z][0], plantCompound[z][1])) {
                 let push = [plantCompound[z][0], plantCompound[z][1], 1];
@@ -765,6 +1134,9 @@ export class Home {
             }
 
             localStorage.setItem('data', JSON.stringify(this.dataLocal));
+            localStorage.setItem('jsonPlaComp', JSON.stringify(pla_comp, undefined, 2));
+            localStorage.setItem('jsonCompProt', JSON.stringify(comp_prot, undefined, 2));
+            localStorage.setItem('jsonProtDis', JSON.stringify(prot_dis, undefined, 2));
             this.show = true;
 
         })
@@ -800,6 +1172,78 @@ export class Home {
             proteinDisease = data1[2]['protein_disease'];
             compoundProtein2 = data1[1]['compound_protein'];
 
+            let pla_comp = {};
+            let comp_prot = {};
+            let prot_dis = {};
+
+            let count_pla_comp = 0;
+            let count_comp_prot = 0;
+            let count_prot_dis = 0;
+
+            for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
+              let temp = plantCompound[count_pla_comp][0];
+
+              if (pla_comp[temp]) {
+                let temp2 = pla_comp[temp];
+
+                if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
+                  temp2.push(plantCompound[count_pla_comp][1]);
+
+                  pla_comp[temp] = temp2;
+                }
+
+              }
+              else {
+                let a = [];
+                a.push(plantCompound[count_pla_comp][1]);
+                pla_comp[temp] = a;
+              }
+            }
+
+            for(count_comp_prot; count_comp_prot < compoundProtein2.length; count_comp_prot++) {
+              let temp = compoundProtein2[count_comp_prot][0];
+
+              if (comp_prot[temp]) {
+                let temp2 = comp_prot[temp];
+
+                if(this.checkJson(temp2, compoundProtein2[count_comp_prot][1])) {
+                  temp2.push(compoundProtein2[count_comp_prot][1]);
+
+                  comp_prot[temp] = temp2;
+                }
+
+              }
+              else {
+                let a = [];
+                a.push(compoundProtein2[count_comp_prot][1]);
+                comp_prot[temp] = a;
+              }
+            }
+
+            for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
+              let temp = proteinDisease[count_prot_dis][0];
+
+              if (prot_dis[temp]) {
+                let temp2 = prot_dis[temp];
+
+                if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
+                  temp2.push(proteinDisease[count_prot_dis][1]);
+
+                  prot_dis[temp] = temp2;
+                }
+
+              }
+              else {
+                let a = [];
+                a.push(proteinDisease[count_prot_dis][1]);
+                prot_dis[temp] = a;
+              }
+            }
+
+            this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+            this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
+            this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
+
             for (let i = 0; i < compoundProtein1.length; i++) {
 
               for (let j = 0; j < proteinDisease.length; j++) {
@@ -831,6 +1275,9 @@ export class Home {
             }
 
             localStorage.setItem('data', JSON.stringify(this.dataLocal));
+            localStorage.setItem('jsonPlaComp', JSON.stringify(pla_comp, undefined, 2));
+            localStorage.setItem('jsonCompProt', JSON.stringify(comp_prot, undefined, 2));
+            localStorage.setItem('jsonProtDis', JSON.stringify(prot_dis, undefined, 2));
             this.show = true;
 
         })
@@ -867,6 +1314,78 @@ export class Home {
               proteinDisease = data1[2]['protein_disease'];
               compoundProtein2 = data1[1]['compound_protein'];
 
+              let pla_comp = {};
+              let comp_prot = {};
+              let prot_dis = {};
+
+              let count_pla_comp = 0;
+              let count_comp_prot = 0;
+              let count_prot_dis = 0;
+
+              for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
+                let temp = plantCompound[count_pla_comp][0];
+
+                if (pla_comp[temp]) {
+                  let temp2 = pla_comp[temp];
+
+                  if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
+                    temp2.push(plantCompound[count_pla_comp][1]);
+
+                    pla_comp[temp] = temp2;
+                  }
+
+                }
+                else {
+                  let a = [];
+                  a.push(plantCompound[count_pla_comp][1]);
+                  pla_comp[temp] = a;
+                }
+              }
+
+              for(count_comp_prot; count_comp_prot < compoundProtein2.length; count_comp_prot++) {
+                let temp = compoundProtein2[count_comp_prot][0];
+
+                if (comp_prot[temp]) {
+                  let temp2 = comp_prot[temp];
+
+                  if(this.checkJson(temp2, compoundProtein2[count_comp_prot][1])) {
+                    temp2.push(compoundProtein2[count_comp_prot][1]);
+
+                    comp_prot[temp] = temp2;
+                  }
+
+                }
+                else {
+                  let a = [];
+                  a.push(compoundProtein2[count_comp_prot][1]);
+                  comp_prot[temp] = a;
+                }
+              }
+
+              for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
+                let temp = proteinDisease[count_prot_dis][0];
+
+                if (prot_dis[temp]) {
+                  let temp2 = prot_dis[temp];
+
+                  if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
+                    temp2.push(proteinDisease[count_prot_dis][1]);
+
+                    prot_dis[temp] = temp2;
+                  }
+
+                }
+                else {
+                  let a = [];
+                  a.push(proteinDisease[count_prot_dis][1]);
+                  prot_dis[temp] = a;
+                }
+              }
+
+              this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+              this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
+              this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
+
               for (let z = 0; z < 20; z++) {
                 if (this.check(this.dataLocal, plantCompound[z][0], plantCompound[z][1])) {
                   let push = [plantCompound[z][0], plantCompound[z][1], 1];
@@ -891,6 +1410,9 @@ export class Home {
               }
 
               localStorage.setItem('data', JSON.stringify(this.dataLocal));
+              localStorage.setItem('jsonPlaComp', JSON.stringify(pla_comp, undefined, 2));
+              localStorage.setItem('jsonCompProt', JSON.stringify(comp_prot, undefined, 2));
+              localStorage.setItem('jsonProtDis', JSON.stringify(prot_dis, undefined, 2));
               this.show = true;
 
           })
@@ -898,6 +1420,16 @@ export class Home {
       })
 
     }
+
+    // downloadJSON(){
+    //   //console.log("file open")
+    //
+    //
+    //   console.log("file close");
+    //
+    //   //
+    //   // console.log(file);
+    // }
 
     example1() {
       this.reset();

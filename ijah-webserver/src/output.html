@@ -27,13 +27,9 @@
 </div>
 
 <br />
-<a id="btn-Convert-Html2Image" class="btn btn-primary col-md-4 col-md-offset-4 text-center">Download As PNG</a>
+<a id="btn-convert" class="btn btn-primary col-md-4 col-md-offset-4 text-center">Download As PNG</a>
 
 <br />
-
-<div class="text-center">
-  <b><br />*NOTE: Not all data shown on graph. The complete data is shown below:</b>
-</div>
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript" src="assets/js/jquery.js"></script>
@@ -42,11 +38,12 @@
 <script type="text/javascript" src="assets/js/jszip.min.js"></script>
 <script>
 
-  window.onload = function () {
     var element = $("#html-content-holder"); // global variable
     var getCanvas; // global variable
 
-      $("#btn-Convert-Html2Image").on('click', function () {
+      $("#btn-convert").on('click', function () {
+
+        console.log('png test');
 
         html2canvas(element, {
         onrendered: function (canvas) {
@@ -58,10 +55,25 @@
         var imgageData = getCanvas.toDataURL("image/png");
         // Now browser starts downloading it instead of just showing it
         var newData = imgageData.replace(/^data:image\/png/, "data:application/octet-stream");
-        $("#btn-Convert-Html2Image").attr("download", "graph_predict.png").attr("href", newData);
+        $("#btn-convert").attr("download", "graph_predict.png").attr("href", newData);
 
     });
-  }
+    // var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem("jsonPlaComp"));
+    // //var dataStr2 = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem('jsonCompProt'));
+    // //var dataStr3 = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem('jsonProtDis'));
+    //
+    // var dlAnchorElem = document.getElementById("downloadAnchorElem");
+    // dlAnchorElem.setAttribute("href",     dataStr     );
+    // dlAnchorElem.setAttribute("download", "plantCompound.json");
+    // dlAnchorElem.click();
+
+    // var data1 = localStorage.getItem("jsonPlaComp");
+    // var data2 = localStorage.getItem("jsonCompProt");
+    // var data3 = localStorage.getItem("jsonProtDis");
+    // var jsonPC = new Blob([data1], {type: "application/json"});
+    // var jsonCP = new Blob([data2], {type: "application/json"});
+    // var jsonPD = new Blob([data3], {type: "application/json"});
+
 </script>
 
 <script
