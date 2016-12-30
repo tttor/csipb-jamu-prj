@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
   selector: 'help',
   styles: [`
   `],
-  templateUrl: './help.html'
+  templateUrl: './help.template.html'
 })
 export class Help {
   localState;
@@ -15,8 +15,8 @@ export class Help {
 
   ngOnInit() {
 
-
   }
+
   asyncDataWithWebpack() {
 
   }
