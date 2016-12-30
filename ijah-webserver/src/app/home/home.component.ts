@@ -1538,10 +1538,10 @@ export class Home {
       this.activeDisease = false;
     }
 
-    downloadButton(){
-          var json = localStorage.getItem("jsonPlaComp");
-          var blob = new Blob([json], {type: "text/plain;charset=utf-8"});
-          saveAs(blob, "ijah_plantCompound.json");
+    downloadJSON(idata,ifname){
+      var json = localStorage.getItem(idata);
+      var blob = new Blob([json], {type: "text/plain;charset=utf-8"});
+      saveAs(blob, ifname);
     }
 
   click = false;
