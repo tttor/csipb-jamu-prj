@@ -53,28 +53,28 @@
         $knapsack = $rowProtein['com_knapsack_id'];
         $kegg = $rowProtein['com_kegg_id'];
 
-        if ($cas != 'not-available') {
+        if ($cas != '') {
           $namaCompound = $namaCompound.'('.$cas.')';
         }
         else {
           $namaCompound = $namaCompound.'()';
         }
 
-        if ($db != 'not-available') {
+        if ($db != '') {
           $namaCompound = $namaCompound.'('.$db.')';
         }
         else {
           $namaCompound = $namaCompound.'()';
         }
 
-        if ($knapsack != 'not-available') {
+        if ($knapsack != '') {
           $namaCompound = $namaCompound.'('.$knapsack.')';
         }
         else {
           $namaCompound = $namaCompound.'()';
         }
 
-        if ($kegg != 'not-available') {
+        if ($kegg != '') {
           $namaCompound = $namaCompound.'('.$kegg.')';
         }
         else {
@@ -93,11 +93,8 @@
           // if(check($arrayPlant, $namaPlant, $namaCompound)) {
             $arrayPlant[] = array($namaPlant, $namaCompound);
           // }
-
         }
-
     }
-
   }
 
   // mysqli_commit($link);
@@ -110,6 +107,4 @@
   $final[] = array('protein_disease'=> $arrayDisease);
 
   echo json_encode($final);
-
-
 ?>

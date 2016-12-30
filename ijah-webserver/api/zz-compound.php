@@ -35,28 +35,28 @@
     $knapsack = $rowCari['com_knapsack_id'];
     $kegg = $rowCari['com_kegg_id'];
 
-    if ($cas != 'not-available') {
+    if ($cas != '') {
       $value = $value.'('.$cas.')';
     }
     else {
       $value = $value.'()';
     }
 
-    if ($db != 'not-available') {
+    if ($db != '') {
       $value = $value.'('.$db.')';
     }
     else {
       $value = $value.'()';
     }
 
-    if ($knapsack != 'not-available') {
+    if ($knapsack != '') {
       $value = $value.'('.$knapsack.')';
     }
     else {
       $value = $value.'()';
     }
 
-    if ($kegg != 'not-available') {
+    if ($kegg != '') {
       $value = $value.'('.$kegg.')';
     }
     else {
@@ -69,7 +69,6 @@
       $namaPlant = $row['pla_name'];
 
         $arrayPlant[] = array($namaPlant, $value);
-
     }
 
     $queryProtein = pg_query($link, "SELECT p.pro_id, p.pro_name FROM compound_vs_protein as cp, protein as p where cp.pro_id = p.pro_id and cp.com_id = '$index'");
@@ -85,11 +84,8 @@
         while($rowDisease = pg_fetch_assoc($queryDisease)) {
 
             $arrayDisease[] = array($namaProtein, $rowDisease['dis_name']);
-
         }
-
     }
-
   }
 
   header('Content-type: application/json');
@@ -101,6 +97,4 @@
   $final[] = array('protein_disease'=> $arrayDisease);
 
   echo json_encode($final);
-
-
 ?>
