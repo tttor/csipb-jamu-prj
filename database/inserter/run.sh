@@ -35,8 +35,15 @@ elif [ "$1" == "ucsc" ]; then
   python $exe $db $user $passwd $host $port $mode $outDir $path
 elif [ "$1" == "ipu" ]; then
   ### insert_protein
+  mode=insertProteinUniprot
   path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/uniprot/uniprot_human_dat_20160928/uniprot_sprot_human_protein.pkl
-  python insert_protein.py $db $user $passwd $host $port $path
+  python insert_protein.py $db $user $passwd $host $port $mode $outDir $path
+elif [ "$1" == "upsw" ]; then
+  ### update protein sim based on smith-waterman
+  mode=updateProteinSmithWaterman
+  simFpath=/home/tor/robotics/prj/csipb-jamu-prj/dataset/smithwaterman/20161230/normCombProtKernel2500_3334.csv
+  metaFpath=/home/tor/robotics/prj/csipb-jamu-prj/dataset/smithwaterman/20161230/metaCombProtKernel2500_3334.txt
+  python insert_protein.py $db $user $passwd $host $port $mode $outDir $simFpath $metaFpath
 elif [ "$1" == "idu" ]; then
   ### insert_disease
   path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/uniprot/uniprot_human_dat_20160928/uniprot_sprot_human_disease.pkl
@@ -53,6 +60,8 @@ elif [ "$1" == "icp" ]; then
   ### insert_compound_vs_protein
   path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/drugbank/drugbank_20161002/drugbank_drug_data_2016-10-05_10:16:42.860649.pkl
   python insert_compound_vs_protein.py $db $user $passwd $host $port $outDir $path
+elif [ "$1" == "test" ]; then
+  python postgresql_util.py $db $user $passwd $host $port
 else
   echo "ERROR: Unknown mode"
   exit 1
