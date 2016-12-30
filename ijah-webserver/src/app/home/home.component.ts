@@ -101,23 +101,23 @@ export class Home {
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
           let temp = '';
-          if (data[i]['com_cas_id'] !== 'not-available') {
+          if (data[i]['com_cas_id'] !== '') {
             temp = temp+data[i]['com_cas_id']+' | ';
           }
 
-          if (data[i]['com_drugbank_id'] !== 'not-available') {
+          if (data[i]['com_drugbank_id'] !== '') {
             temp = temp+data[i]['com_drugbank_id']+' | ';
           }
 
-          if (data[i]['com_knapsack_id'] !== 'not-available') {
+          if (data[i]['com_knapsack_id'] !== '') {
             temp = temp+data[i]['com_knapsack_id']+' | ';
           }
 
-          if (data[i]['com_kegg_id'] !== 'not-available') {
+          if (data[i]['com_kegg_id'] !== '') {
             temp = temp+data[i]['com_kegg_id']+' | ';
           }
 
-          if (data[i]['com_pubchem_id'] !== 'not-available') {
+          if (data[i]['com_pubchem_id'] !== '') {
             temp = temp+data[i]['com_pubchem_id'];
           }
 
