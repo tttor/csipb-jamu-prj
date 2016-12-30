@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
   selector: 'download',
   styles: [`
   `],
-  templateUrl: './download.html'
+  templateUrl: './download.template.html'
 })
 export class Download {
   localState;
