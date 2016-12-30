@@ -76,7 +76,7 @@
                    (typeaheadOnSelect)="selectCompound($event, c.index)"
                    (typeaheadNoResults)="changeTypeaheadNoResults($event, 2)"
                    class="form-control verticalLine2"
-                   placeholder="CAS | DrugBank ID | KnapSack ID | KEGG ID"
+                   placeholder="CAS | DrugBank ID | KnapSack ID"
                    (focus)="focusCompound(c.index)">
              <div *ngIf="noResultCompound===true" class="" style="">
                <span style="color:red; font-size:13px">Sorry, Unavailable</span>
@@ -113,7 +113,7 @@
                    (typeaheadOnSelect)="selectProtein($event, p.index)"
                    (typeaheadNoResults)="changeTypeaheadNoResults($event, 3)"
                    class="form-control verticalLine3"
-                   placeholder="Uniprot ID | Protein Name"
+                   placeholder="Uniprot ID | Uniprot Name"
                    (focus)="focusProtein(p.index)">
              <div *ngIf="noResultProtein===true" class="" style="">
                <span style="color:red; font-size:13px">Sorry, Unavailable</span>
@@ -139,7 +139,7 @@
                    (typeaheadOnSelect)="selectDisease($event, d.index)"
                    (typeaheadNoResults)="changeTypeaheadNoResults($event, 4)"
                    class="form-control verticalLine4"
-                   placeholder="Omim ID | Disease Name"
+                   placeholder="OMIM ID | OMIM Name"
                    (focus)="focusDisease(d.index)">
              <div *ngIf="noResultDisease===true" class="" style="">
                <span style="color:red; font-size:13px">Sorry, Unavailable</span>
