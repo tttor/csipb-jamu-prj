@@ -16,14 +16,14 @@
 
   <div class="row" *ngIf="!show">
     <p class="contoh col-md-12 text-center">
-      <button class="btn btn-success"(click)="example1()">Example #1</button>
-      <button class="btn btn-success"(click)="example2()">Example #2</button>
-      <button class="btn btn-success"(click)="example3()">Example #3</button>
-      <button class="btn btn-success"(click)="example4()">Example #4</button>
-      <button class="btn btn-success"(click)="example5()">Example #5</button>
-      <button class="btn btn-success"(click)="example6()">Example #6</button>
-      <button class="btn btn-success"(click)="example7()">Example #7</button>
-      <button class="btn btn-success"(click)="example8()">Example #8</button>
+      <button class="btn btn-success"(click)="example5()">Example #1a</button>
+      <button class="btn btn-success"(click)="example7()">Example #1b</button>
+      <button class="btn btn-success"(click)="example8()">Example #1c</button>
+      <button class="btn btn-success"(click)="example6()">Example #1d</button>
+      <button class="btn btn-success"(click)="example1()">Example #2a</button>
+      <button class="btn btn-success"(click)="example2()">Example #2b</button>
+      <button class="btn btn-success"(click)="example3()">Example #3a</button>
+      <button class="btn btn-success"(click)="example4()">Example #3b</button>
     </p>
     <div class="col-md-6">
       <div class="row text-center">
@@ -76,7 +76,7 @@
                    (typeaheadOnSelect)="selectCompound($event, c.index)"
                    (typeaheadNoResults)="changeTypeaheadNoResults($event, 2)"
                    class="form-control verticalLine2"
-                   placeholder="CAS | DrugBank ID | KnapSack ID | KEGG ID"
+                   placeholder="CAS | DrugBank ID | KnapSack ID"
                    (focus)="focusCompound(c.index)">
              <div *ngIf="noResultCompound===true" class="" style="">
                <span style="color:red; font-size:13px">Sorry, Unavailable</span>
@@ -113,7 +113,7 @@
                    (typeaheadOnSelect)="selectProtein($event, p.index)"
                    (typeaheadNoResults)="changeTypeaheadNoResults($event, 3)"
                    class="form-control verticalLine3"
-                   placeholder="Uniprot ID | Protein Name"
+                   placeholder="Uniprot ID | Uniprot Name"
                    (focus)="focusProtein(p.index)">
              <div *ngIf="noResultProtein===true" class="" style="">
                <span style="color:red; font-size:13px">Sorry, Unavailable</span>
@@ -139,7 +139,7 @@
                    (typeaheadOnSelect)="selectDisease($event, d.index)"
                    (typeaheadNoResults)="changeTypeaheadNoResults($event, 4)"
                    class="form-control verticalLine4"
-                   placeholder="Omim ID | Disease Name"
+                   placeholder="OMIM ID | OMIM Name"
                    (focus)="focusDisease(d.index)">
              <div *ngIf="noResultDisease===true" class="" style="">
                <span style="color:red; font-size:13px">Sorry, Unavailable</span>
@@ -176,18 +176,19 @@
   </div>
   <br />
 
+  <!-- Labels above the multipartite graph -->
   <div class="row" *ngIf="show">
     <div class="text-left col-md-3">
-      <b>Plants</b>
+      <b>Plants (Latin Name)</b>
     </div>
     <div class="text-center col-md-3">
-      <b>Compounds</b>
+      <b>Compounds (CAS)(DrugbankID)</b>
     </div>
     <div class="text-center col-md-3">
-      <b>Proteins</b>
+      <b>Proteins (Uniprot Name)</b>
     </div>
     <div class="col-md-3 text-right">
-      <b>Diseases</b>
+      <b>Diseases (OMIM Name)</b>
     </div>
   </div>
 
