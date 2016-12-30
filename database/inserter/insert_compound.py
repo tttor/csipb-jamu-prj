@@ -274,7 +274,7 @@ def updateComSimcomp(csr,outDir,dpath):
                             score = words[1]
                             simcomp.append( comId+':'+keggId2+'='+score)
             if len(simcomp)!=0:
-                simcompStr = '\n'.join(simcomp)
+                simcompStr = ','.join(simcomp)
                 simcompStr = "'"+simcompStr+"'"
                 qf = "UPDATE compound SET com_similarity_simcomp="+simcompStr
                 qr = " WHERE com_kegg_id="+"'"+keggId+"'"
