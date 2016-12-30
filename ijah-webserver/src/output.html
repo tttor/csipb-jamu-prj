@@ -42,9 +42,6 @@
     var getCanvas; // global variable
 
       $("#btn-convert").on('click', function () {
-
-        console.log('png test');
-
         html2canvas(element, {
         onrendered: function (canvas) {
                $("#previewImage").append(canvas);
@@ -53,9 +50,18 @@
         });
 
         var imgageData = getCanvas.toDataURL("image/png");
-        // Now browser starts downloading it instead of just showing it
+
+        // var currentdate = new Date();
+        // var pngName = "ijah_multipartite_graph_"
+        // var pngName = pngName.concat(currentdate.toString());
+        // var pngName2 = pngName.concat(".png");
+        // console.log(pngName2);
+
+        var pngFname = "ijah_multipartite_graph.png"
+        console.log(pngFname)
+
         var newData = imgageData.replace(/^data:image\/png/, "data:application/octet-stream");
-        $("#btn-convert").attr("download", "graph_predict.png").attr("href", newData);
+        $("#btn-convert").attr("download", pngFname).attr("href", newData);
 
     });
     // var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem("jsonPlaComp"));
