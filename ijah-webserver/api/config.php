@@ -18,11 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit(0);
 }
 
-// $link = mysqli_connect('localhost', 'admin_ijah', 'admin_ijah', 'admin_ijah');
-// $link = mysqli_connect('localhost', 'root', 'root', 'ijah');
-//$link = pg_connect("host=localhost dbname=ijah user=postgres password=nsr500sp");
-$link = pg_connect("host=apps.cs.ipb.ac.id dbname=ijah user=ijah password=JamuHerbal1337");
-//return $link;
-// $link = mysqli_connect('localhost', 'ijah', 'jamu~herbal', 'ijah');
+$link = pg_pconnect("host=localhost dbname=ijah user=ijah password=JamuHerbal1337");
 
 ?>

@@ -2,7 +2,6 @@
 
   include 'config.php';
 
-
   function check($a, $var1, $var2) {
     foreach ($a as $arr) {
       if ($arr[0] == $var1 && $arr[1] == $var2){
@@ -12,7 +11,6 @@
     }
     return true;
   }
-
 
   // get JSON input from HTTP POST
   $postdata = file_get_contents("php://input");
@@ -33,7 +31,7 @@
     $rowCari = pg_fetch_assoc($cari);
     $value = $rowCari['pla_name'];
 
-    $query = pg_query($link, "SELECT c.com_id, c.com_cas_id, c.com_knapsack_id, c.com_kegg_id, c.com_drugbank_id FROM `plant_vs_compound` as pc, compound as c where pc.com_id = c.com_id and pc.pla_id = '$index'");
+    $query = pg_query($link, "SELECT c.com_id, c.com_cas_id, c.com_knapsack_id, c.com_kegg_id, c.com_drugbank_id FROM plant_vs_compound as pc, compound as c where pc.com_id = c.com_id and pc.pla_id = '$index'");
 
     while($row = pg_fetch_assoc($query)){
       $compound = $row['com_id'];
