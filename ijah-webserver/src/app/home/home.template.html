@@ -212,10 +212,18 @@
       <pre [innerHTML]="jsonProteinDisease">
       </pre>
     </div>
+    <br />
+    <div class="col-md-4">
+      <button class="btn btn-primary col-md-8 col-md-offset-2 text-center" (click)="downloadButton()">Download Plant-Compound Data</button>
+    </div>
+    <div class="col-md-4">
+      <button class="btn btn-primary col-md-8 col-md-offset-2 text-center" (click)="downloadJSON()">Download Compound-Protein Data</button>
+    </div>
+    <div class="col-md-4">
+      <button class="btn btn-primary col-md-8 col-md-offset-2 text-center" (click)="downloadJSON()">Download Protein-Disease Data</button>
+    </div>
   </div>
 
-<!--<div>
-  <button (click)="downloadJSON()">Download as JSON</button>
-</div>-->
+
 
 </div>
