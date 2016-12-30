@@ -198,29 +198,29 @@
 
   <div class="row" *ngIf="show">
     <div class="col-md-4">
-      Plant - Compound
+      Plant - Compound Interaction
       <pre [innerHTML]="jsonPlantCompound">
       </pre>
     </div>
     <div class="col-md-4">
-      Compound - Protein
+      Compound - Protein Interaction
       <pre [innerHTML]="jsonCompoundProtein">
       </pre>
     </div>
     <div class="col-md-4">
-      Protein - Disease
+      Protein - Disease Interaction
       <pre [innerHTML]="jsonProteinDisease">
       </pre>
     </div>
     <br />
     <div class="col-md-4">
-      <button class="btn btn-primary col-md-8 col-md-offset-2 text-center" (click)="downloadJSON('jsonPlaComp', 'ijah_plant-compound-interaction.json')">Download Plant-Compound Data</button>
+      <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadJSON('jsonPlaComp', 'ijah_plant-compound-interaction.json')">Download Plant-Compound Interaction</button>
     </div>
     <div class="col-md-4">
-      <button class="btn btn-primary col-md-8 col-md-offset-2 text-center" (click)="downloadJSON('jsonCompProt', 'ijah_compound-protein-interaction.json')">Download Compound-Protein Data</button>
+      <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadJSON('jsonCompProt', 'ijah_compound-protein-interaction.json')">Download Compound-Protein Interaction</button>
     </div>
     <div class="col-md-4">
-      <button class="btn btn-primary col-md-8 col-md-offset-2 text-center" (click)="downloadJSON('jsonProtDis', 'ijah_protein-disease-interaction.json')">Download Protein-Disease Data</button>
+      <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadJSON('jsonProtDis', 'ijah_protein-disease-interaction.json')">Download Protein-Disease Interaction</button>
     </div>
   </div>
 
