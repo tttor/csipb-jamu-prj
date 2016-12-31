@@ -5,7 +5,6 @@ import { Disclaimer } from './disclaimer';
 import { Download } from './download';
 import { Help } from './help';
 import { V1 } from './v1';
-import { NoContent } from './no-content';
 
 import { DataResolver } from './app.resolver';
 
@@ -21,5 +20,4 @@ export const ROUTES: Routes = [
   {
     path: 'manual', loadChildren: () => System.import('./+detail')
   },
-  { path: '**',    component: NoContent },
 ];
