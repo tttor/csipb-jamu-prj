@@ -312,9 +312,30 @@ export class Home {
 
   pTanaman = false;
 
+  // This 3 vars are used in text output
   jsonPlantCompound;
   jsonCompoundProtein;
   jsonProteinDisease;
+
+  getHyperlinkStr(type,seed) {
+    let baseUrl: string = '';
+    if (type=='knapsack'){
+      baseUrl = 'http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=';
+    }
+    if (type=='drugbank'){
+      baseUrl = 'https://www.drugbank.ca/drugs/';
+    }
+    if (type=='kegg'){
+      baseUrl = 'http://www.genome.jp/dbget-bin/www_bget?cpd:';
+    }
+
+    let urlStr:string = '';
+    if (seed!='') {
+      let url: string = baseUrl + seed;
+      urlStr = '<a href="'+url+'" target="_blank">'+seed+'</a>';
+    }
+    return urlStr;
+  }
 
   predictTanaman() {
 
@@ -329,6 +350,42 @@ export class Home {
         let plantCompound = data[0]['plant_compound'];
         let compoundProtein = data[1]['compound_protein'];
         let proteinDisease = data[2]['protein_disease'];
+
+        ////////////////////////////////////////////////////////////////////////
+        let plaComStr: string = '';
+        let comProStr: string = '';
+        let proDisStr: string = '';
+
+        let i: number = 0;
+        let ii: number = 0;// # of unique plants
+        let prevPlaName = '';
+        for(i;i<plantCompound.length;i++) {
+          let plaName: string = plantCompound[i][0]
+          let comName: string = plantCompound[i][1]
+          let srcName: string = plantCompound[i][2]
+
+          if (prevPlaName!=plaName) {
+            ii = ii + 1;
+            plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
+            plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
+
+            prevPlaName = plaName;
+          }
+
+          let comNameComps = comName.split(')');
+          let comCasId = comNameComps[0].replace('(','');
+          let comDrugbankId = comNameComps[1].replace('(','');
+          let comKnapsackId = comNameComps[2].replace('(','');
+          let comKeggId = comNameComps[3].replace('(','');
+
+          plaComStr = plaComStr+'  '+comCasId+','
+                                    +this.getHyperlinkStr('drugbank',comDrugbankId)+','
+                                    +this.getHyperlinkStr('knapsack',comKnapsackId)+','
+                                    +this.getHyperlinkStr('kegg',comKeggId)+','
+                                    +srcName
+                                    +'\n';
+        }
+        ////////////////////////////////////////////////////////////////////////
 
         let pla_comp = {};
         let comp_prot = {};
@@ -398,9 +455,11 @@ export class Home {
           }
         }
 
-        this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+        ////////////////////////////////////////////////////////////////////////
+        this.jsonPlantCompound = plaComStr;
         this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
         this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
+        ////////////////////////////////////////////////////////////////////////
 
         if (compoundProtein.length != 0) {
 
@@ -462,7 +521,6 @@ export class Home {
         this.click = false;
 
       })
-
   }
 
   pProtein = false;
