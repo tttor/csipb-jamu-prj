@@ -1422,16 +1422,6 @@ export class Home {
 
     }
 
-    // downloadJSON(){
-    //   //console.log("file open")
-    //
-    //
-    //   console.log("file close");
-    //
-    //   //
-    //   // console.log(file);
-    // }
-
     example1() {
       this.reset();
       this.tanaman = [{ 'index': 1, 'value' : 'Datura stramonium'}, { 'index': 2, 'value' : 'Trifolium pratense'}, { 'index': 3, 'value' : 'Acacia senegal'}, { 'index': 4, 'value' : ''}];
