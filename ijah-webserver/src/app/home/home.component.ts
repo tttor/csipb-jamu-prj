@@ -385,6 +385,34 @@ export class Home {
                                     +srcName
                                     +'\n';
         }
+
+        // let prevComName = '';
+        // for(i;i<compoundProtein.length;i++) {
+        //   let comName: string = compoundProtein[i][0]
+        //   let proName: string = compoundProtein[i][1]
+        //   let srcName: string = compoundProtein[i][2]
+        //
+        //   if (prevComName!=comName) {
+        //     ii = ii + 1;
+        //     comProStr = comProStr + '#'+ii.toString()+' '+comName+':\n';
+        //     comProStr = comProStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
+        //
+        //     prevComName = comName;
+        //   }
+        //
+        //   let comNameComps = comName.split(')');
+        //   let comCasId = comNameComps[0].replace('(','');
+        //   let comDrugbankId = comNameComps[1].replace('(','');
+        //   let comKnapsackId = comNameComps[2].replace('(','');
+        //   let comKeggId = comNameComps[3].replace('(','');
+        //
+        //   comProStr = comProStr+'  '+comCasId+','
+        //                             +this.getHyperlinkStr('drugbank',comDrugbankId)+','
+        //                             +this.getHyperlinkStr('knapsack',comKnapsackId)+','
+        //                             +this.getHyperlinkStr('kegg',comKeggId)+','
+        //                             +srcName
+        //                             +'\n';
+        // }
         ////////////////////////////////////////////////////////////////////////
 
         let pla_comp = {};
@@ -542,6 +570,43 @@ export class Home {
         let comp_prot = {};
         let prot_dis = {};
 
+        ////////////////////////////////////////////////////////////////////////
+        let plaComStr: string = '';
+        let comProStr: string = '';
+        let proDisStr: string = '';
+
+        let i: number = 0;
+        let ii: number = 0;// # of unique plants
+        let prevPlaName = '';
+        for(i;i<plantCompound.length;i++) {
+          let plaName: string = plantCompound[i][0]
+          let comName: string = plantCompound[i][1]
+          let srcName: string = plantCompound[i][2]
+
+          if (prevPlaName!=plaName) {
+            ii = ii + 1;
+            plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
+            plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
+
+            prevPlaName = plaName;
+          }
+
+          let comNameComps = comName.split(')');
+          let comCasId = comNameComps[0].replace('(','');
+          let comDrugbankId = comNameComps[1].replace('(','');
+          let comKnapsackId = comNameComps[2].replace('(','');
+          let comKeggId = comNameComps[3].replace('(','');
+
+          plaComStr = plaComStr+'  '+comCasId+','
+                                    +this.getHyperlinkStr('drugbank',comDrugbankId)+','
+                                    +this.getHyperlinkStr('knapsack',comKnapsackId)+','
+                                    +this.getHyperlinkStr('kegg',comKeggId)+','
+                                    +srcName
+                                    +'\n';
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+
         let count_pla_comp = 0;
         let count_comp_prot = 0;
         let count_prot_dis = 0;
@@ -606,7 +671,7 @@ export class Home {
           }
         }
 
-        this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+        this.jsonPlantCompound = plaComStr;
         this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
         this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
 
@@ -675,6 +740,42 @@ export class Home {
         let comp_prot = {};
         let prot_dis = {};
 
+        ////////////////////////////////////////////////////////////////////////
+        let plaComStr: string = '';
+        let comProStr: string = '';
+        let proDisStr: string = '';
+
+        let i: number = 0;
+        let ii: number = 0;// # of unique plants
+        let prevPlaName = '';
+        for(i;i<plantCompound.length;i++) {
+          let plaName: string = plantCompound[i][0]
+          let comName: string = plantCompound[i][1]
+          let srcName: string = plantCompound[i][2]
+
+          if (prevPlaName!=plaName) {
+            ii = ii + 1;
+            plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
+            plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
+
+            prevPlaName = plaName;
+          }
+
+          let comNameComps = comName.split(')');
+          let comCasId = comNameComps[0].replace('(','');
+          let comDrugbankId = comNameComps[1].replace('(','');
+          let comKnapsackId = comNameComps[2].replace('(','');
+          let comKeggId = comNameComps[3].replace('(','');
+
+          plaComStr = plaComStr+'  '+comCasId+','
+                                    +this.getHyperlinkStr('drugbank',comDrugbankId)+','
+                                    +this.getHyperlinkStr('knapsack',comKnapsackId)+','
+                                    +this.getHyperlinkStr('kegg',comKeggId)+','
+                                    +srcName
+                                    +'\n';
+        }
+        ////////////////////////////////////////////////////////////////////////
+
         let count_pla_comp = 0;
         let count_comp_prot = 0;
         let count_prot_dis = 0;
@@ -739,7 +840,7 @@ export class Home {
           }
         }
 
-        this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+        this.jsonPlantCompound = plaComStr;
         this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
         this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
 
@@ -811,6 +912,42 @@ export class Home {
         let comp_prot = {};
         let prot_dis = {};
 
+        ////////////////////////////////////////////////////////////////////////
+        let plaComStr: string = '';
+        let comProStr: string = '';
+        let proDisStr: string = '';
+
+        let i: number = 0;
+        let ii: number = 0;// # of unique plants
+        let prevPlaName = '';
+        for(i;i<plantCompound.length;i++) {
+          let plaName: string = plantCompound[i][0]
+          let comName: string = plantCompound[i][1]
+          let srcName: string = plantCompound[i][2]
+
+          if (prevPlaName!=plaName) {
+            ii = ii + 1;
+            plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
+            plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
+
+            prevPlaName = plaName;
+          }
+
+          let comNameComps = comName.split(')');
+          let comCasId = comNameComps[0].replace('(','');
+          let comDrugbankId = comNameComps[1].replace('(','');
+          let comKnapsackId = comNameComps[2].replace('(','');
+          let comKeggId = comNameComps[3].replace('(','');
+
+          plaComStr = plaComStr+'  '+comCasId+','
+                                    +this.getHyperlinkStr('drugbank',comDrugbankId)+','
+                                    +this.getHyperlinkStr('knapsack',comKnapsackId)+','
+                                    +this.getHyperlinkStr('kegg',comKeggId)+','
+                                    +srcName
+                                    +'\n';
+        }
+        ////////////////////////////////////////////////////////////////////////
+
         let count_pla_comp = 0;
         let count_comp_prot = 0;
         let count_prot_dis = 0;
@@ -875,7 +1012,7 @@ export class Home {
           }
         }
 
-        this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+        this.jsonPlantCompound = plaComStr;
         this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
         this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
 
@@ -960,6 +1097,42 @@ export class Home {
             let comp_prot = {};
             let prot_dis = {};
 
+            ////////////////////////////////////////////////////////////////////////
+            let plaComStr: string = '';
+            let comProStr: string = '';
+            let proDisStr: string = '';
+
+            let i: number = 0;
+            let ii: number = 0;// # of unique plants
+            let prevPlaName = '';
+            for(i;i<plantCompound.length;i++) {
+              let plaName: string = plantCompound[i][0]
+              let comName: string = plantCompound[i][1]
+              let srcName: string = plantCompound[i][2]
+
+              if (prevPlaName!=plaName) {
+                ii = ii + 1;
+                plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
+                plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
+
+                prevPlaName = plaName;
+              }
+
+              let comNameComps = comName.split(')');
+              let comCasId = comNameComps[0].replace('(','');
+              let comDrugbankId = comNameComps[1].replace('(','');
+              let comKnapsackId = comNameComps[2].replace('(','');
+              let comKeggId = comNameComps[3].replace('(','');
+
+              plaComStr = plaComStr+'  '+comCasId+','
+                                        +this.getHyperlinkStr('drugbank',comDrugbankId)+','
+                                        +this.getHyperlinkStr('knapsack',comKnapsackId)+','
+                                        +this.getHyperlinkStr('kegg',comKeggId)+','
+                                        +srcName
+                                        +'\n';
+            }
+            ////////////////////////////////////////////////////////////////////////
+
             let count_pla_comp = 0;
             let count_comp_prot = 0;
             let count_prot_dis = 0;
@@ -1024,7 +1197,7 @@ export class Home {
               }
             }
 
-            this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+            this.jsonPlantCompound = plaComStr;
             this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
             this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
 
@@ -1101,6 +1274,42 @@ export class Home {
             let comp_prot = {};
             let prot_dis = {};
 
+            ////////////////////////////////////////////////////////////////////////
+            let plaComStr: string = '';
+            let comProStr: string = '';
+            let proDisStr: string = '';
+
+            let i: number = 0;
+            let ii: number = 0;// # of unique plants
+            let prevPlaName = '';
+            for(i;i<plantCompound.length;i++) {
+              let plaName: string = plantCompound[i][0]
+              let comName: string = plantCompound[i][1]
+              let srcName: string = plantCompound[i][2]
+
+              if (prevPlaName!=plaName) {
+                ii = ii + 1;
+                plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
+                plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
+
+                prevPlaName = plaName;
+              }
+
+              let comNameComps = comName.split(')');
+              let comCasId = comNameComps[0].replace('(','');
+              let comDrugbankId = comNameComps[1].replace('(','');
+              let comKnapsackId = comNameComps[2].replace('(','');
+              let comKeggId = comNameComps[3].replace('(','');
+
+              plaComStr = plaComStr+'  '+comCasId+','
+                                        +this.getHyperlinkStr('drugbank',comDrugbankId)+','
+                                        +this.getHyperlinkStr('knapsack',comKnapsackId)+','
+                                        +this.getHyperlinkStr('kegg',comKeggId)+','
+                                        +srcName
+                                        +'\n';
+            }
+            ////////////////////////////////////////////////////////////////////////
+
             let count_pla_comp = 0;
             let count_comp_prot = 0;
             let count_prot_dis = 0;
@@ -1165,7 +1374,7 @@ export class Home {
               }
             }
 
-            this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+            this.jsonPlantCompound = plaComStr;
             this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
             this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
 
@@ -1235,6 +1444,42 @@ export class Home {
             let comp_prot = {};
             let prot_dis = {};
 
+            ////////////////////////////////////////////////////////////////////////
+            let plaComStr: string = '';
+            let comProStr: string = '';
+            let proDisStr: string = '';
+
+            let i: number = 0;
+            let ii: number = 0;// # of unique plants
+            let prevPlaName = '';
+            for(i;i<plantCompound.length;i++) {
+              let plaName: string = plantCompound[i][0]
+              let comName: string = plantCompound[i][1]
+              let srcName: string = plantCompound[i][2]
+
+              if (prevPlaName!=plaName) {
+                ii = ii + 1;
+                plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
+                plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
+
+                prevPlaName = plaName;
+              }
+
+              let comNameComps = comName.split(')');
+              let comCasId = comNameComps[0].replace('(','');
+              let comDrugbankId = comNameComps[1].replace('(','');
+              let comKnapsackId = comNameComps[2].replace('(','');
+              let comKeggId = comNameComps[3].replace('(','');
+
+              plaComStr = plaComStr+'  '+comCasId+','
+                                        +this.getHyperlinkStr('drugbank',comDrugbankId)+','
+                                        +this.getHyperlinkStr('knapsack',comKnapsackId)+','
+                                        +this.getHyperlinkStr('kegg',comKeggId)+','
+                                        +srcName
+                                        +'\n';
+            }
+            ////////////////////////////////////////////////////////////////////////
+
             let count_pla_comp = 0;
             let count_comp_prot = 0;
             let count_prot_dis = 0;
@@ -1299,7 +1544,7 @@ export class Home {
               }
             }
 
-            this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+            this.jsonPlantCompound = plaComStr;
             this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
             this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
 
@@ -1377,6 +1622,42 @@ export class Home {
               let comp_prot = {};
               let prot_dis = {};
 
+              ////////////////////////////////////////////////////////////////////////
+              let plaComStr: string = '';
+              let comProStr: string = '';
+              let proDisStr: string = '';
+
+              let i: number = 0;
+              let ii: number = 0;// # of unique plants
+              let prevPlaName = '';
+              for(i;i<plantCompound.length;i++) {
+                let plaName: string = plantCompound[i][0]
+                let comName: string = plantCompound[i][1]
+                let srcName: string = plantCompound[i][2]
+
+                if (prevPlaName!=plaName) {
+                  ii = ii + 1;
+                  plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
+                  plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
+
+                  prevPlaName = plaName;
+                }
+
+                let comNameComps = comName.split(')');
+                let comCasId = comNameComps[0].replace('(','');
+                let comDrugbankId = comNameComps[1].replace('(','');
+                let comKnapsackId = comNameComps[2].replace('(','');
+                let comKeggId = comNameComps[3].replace('(','');
+
+                plaComStr = plaComStr+'  '+comCasId+','
+                                          +this.getHyperlinkStr('drugbank',comDrugbankId)+','
+                                          +this.getHyperlinkStr('knapsack',comKnapsackId)+','
+                                          +this.getHyperlinkStr('kegg',comKeggId)+','
+                                          +srcName
+                                          +'\n';
+              }
+              ////////////////////////////////////////////////////////////////////////
+
               let count_pla_comp = 0;
               let count_comp_prot = 0;
               let count_prot_dis = 0;
@@ -1441,7 +1722,7 @@ export class Home {
                 }
               }
 
-              this.jsonPlantCompound = JSON.stringify(pla_comp, undefined, 2);
+              this.jsonPlantCompound = plaComStr;
               this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
               this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
 
