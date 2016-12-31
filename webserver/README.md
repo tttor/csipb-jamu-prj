@@ -1,4 +1,4 @@
-Sistem informasi Indonesia Jamu-Herbs (SI-IJAH) v2
+Ijah Werbserver
 
 // install install nodejs
 curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -

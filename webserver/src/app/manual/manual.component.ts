@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'detail',
-  templateUrl: './detail.template.html'
+  selector: 'manual',
+  templateUrl: './manual.template.html'
 })
-export class Detail {
+export class Manual {
 
   data = [];
 
