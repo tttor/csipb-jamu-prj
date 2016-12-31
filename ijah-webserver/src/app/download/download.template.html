@@ -3,13 +3,55 @@
 Here, we provide .txt file downloads of several major entities in our database. Enjoy.<br />
 To download, click any .txt listed below.<br /><br />
 
-<div class="col-md-4">
+<div class="col-md-4 text-left">
 
 <button
 style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
-(click)="downloadList()"
+(click)="downloadList(1, 'ijah_plant_list.txt')"
 >
 plant_list.txt
+</button> <br />
+
+<button
+style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
+(click)="downloadList(2, 'ijah_compound_list.txt')"
+>
+compound_list.txt
+</button> <br />
+
+<button
+style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
+(click)="downloadList(3, 'ijah_protein_list.txt')"
+>
+protein_list.txt
+</button> <br />
+
+<button
+style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
+(click)="downloadList(4, 'ijah_disease_list.txt')"
+>
+disease_list.txt
+</button> <br />
+
+<button
+style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
+(click)="downloadList(5, 'ijah_plant_vs_compound_list.txt')"
+>
+plant_vs_compound_list.txt
+</button> <br />
+
+<button
+style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
+(click)="downloadList(6, 'ijah_compound_vs_protein_list.txt')"
+>
+compound_vs_protein_list.txt
+</button> <br />
+
+<button
+style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
+(click)="downloadList(7, 'ijah_protein_vs_disease_list.txt')"
+>
+protein_vs_disease_list.txt
 </button> <br />
 
 <!-- <button

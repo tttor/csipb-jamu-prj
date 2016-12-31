@@ -1,6 +1,6 @@
 <?php
   include 'config.php';
-  $query = pg_query($link, "SELECT * FROM compound_vs_protein");
+  $query = pg_query($link, "SELECT * FROM plant_vs_compound");
 
   $array = array();
   while($row = pg_fetch_assoc($query)){
