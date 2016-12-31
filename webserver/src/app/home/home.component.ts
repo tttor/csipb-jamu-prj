@@ -48,13 +48,6 @@ export class Home {
 
   FileSaver: any;
 
-  // typeahead
-  public stateCtrl:FormControl = new FormControl();
-
-  public myForm:FormGroup = new FormGroup({
-    state: this.stateCtrl
-  });
-
   // DATA search
   tanamanSearch: Array<string>;
   compoundSearch: Array<string>;
@@ -66,8 +59,56 @@ export class Home {
   protein_total;
   disease_total;
 
+  plantSelect = [];
+  compoundSelect = [];
+  proteinSelect = [];
+  diseaseSelect = [];
+  typeaheadNoResults:boolean = false;
+
+  noResultPlant = false;
+  noResultCompound = false;
+  noResultProtein = false;
+  noResultDisease = false;
+
+  pTanaman = false;
+
+  // This 3 vars are used in text output
+  jsonPlantCompound;
+  jsonCompoundProtein;
+  jsonProteinDisease;
+
   ngOnInit() {
 
+  }
+
+  public stateCtrl:FormControl = new FormControl();
+
+  public myForm:FormGroup = new FormGroup({
+    state: this.stateCtrl
+  });
+
+  public typeaheadOnSelect(e:any):void {
+
+  }
+
+  public changeTypeaheadNoResults(e:boolean, id):void {
+    this.typeaheadNoResults = e;
+
+    if (id == 1) {
+      this.noResultPlant = e;
+    }
+
+    else if (id == 2) {
+      this.noResultCompound = e;
+    }
+
+    else if (id == 3) {
+      this.noResultProtein = e;
+    }
+
+    else if (id == 4) {
+      this.noResultDisease = e;
+    }
   }
 
   constructor(public appState: AppState, private http: Http) {
@@ -149,43 +190,6 @@ export class Home {
 
         this.diseaseSearch = data;
       })
-
-  }
-
-  public typeaheadOnSelect(e:any):void {
-
-  }
-
-  plantSelect = [];
-  compoundSelect = [];
-  proteinSelect = [];
-  diseaseSelect = [];
-  typeaheadNoResults:boolean = false;
-
-  noResultPlant = false;
-  noResultCompound = false;
-  noResultProtein = false;
-  noResultDisease = false;
-
-  public changeTypeaheadNoResults(e:boolean, id):void {
-    this.typeaheadNoResults = e;
-
-    if (id == 1) {
-      this.noResultPlant = e;
-    }
-
-    else if (id == 2) {
-      this.noResultCompound = e;
-    }
-
-    else if (id == 3) {
-      this.noResultProtein = e;
-    }
-
-    else if (id == 4) {
-      this.noResultDisease = e;
-    }
-
 
   }
 
@@ -309,13 +313,6 @@ export class Home {
     }
     return m;
   }
-
-  pTanaman = false;
-
-  // This 3 vars are used in text output
-  jsonPlantCompound;
-  jsonCompoundProtein;
-  jsonProteinDisease;
 
   getHyperlinkStr(type,seed) {
     let baseUrl: string = '';
@@ -1955,12 +1952,8 @@ export class Home {
           clearInterval(inter);
         }
       }
-
-
       if (this.show) this.click = false;
-
     }, 100);
-
-  }
+  }// predict()
 
 }
