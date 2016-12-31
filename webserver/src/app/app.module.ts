@@ -12,12 +12,14 @@ import { ROUTES } from './app.routes';
 import { App } from './app.component';
 import { APP_RESOLVER_PROVIDERS } from './app.resolver';
 import { AppState } from './app.service';
+
 import { Home } from './home';
-import { About } from './about';
+import { Manual } from './manual';
+import { Download } from './download';
 import { Help } from './help';
 import { Disclaimer } from './disclaimer';
-import { Download } from './download';
 import { V1 } from './v1';
+import { About } from './about';
 
 // Application wide providers
 const APP_PROVIDERS = [
@@ -32,12 +34,14 @@ const APP_PROVIDERS = [
   bootstrap: [ App ],
   declarations: [
     App,
-    About,
+
     Home,
+    Manual,
     Help,
-    Disclaimer,
     Download,
+    Disclaimer,
     V1,
+    About,
   ],
   imports: [ // import Angular's modules
     BrowserModule,
