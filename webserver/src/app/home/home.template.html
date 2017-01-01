@@ -37,12 +37,12 @@
           <h4>
             Plants (of {{plant_total}})
           </h4>
-          <div *ngFor="let t of tanaman">
+          <div *ngFor="let t of plant">
             <template #customTanaman let-model="item" let-index="index">
               <h5>{{model.pla_name}}</h5>
             </template>
             <input [(ngModel)]="t.value"
-                   [typeahead]="tanamanSearch"
+                   [typeahead]="plantSearch"
                    [typeaheadItemTemplate]="customTanaman"
                    [typeaheadOptionField]="'pla_name'"
                    [typeaheadOptionsLimit]="7"
