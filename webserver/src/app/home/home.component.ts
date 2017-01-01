@@ -257,7 +257,7 @@ export class Home {
   }
 
   // SEARCH+PREDICT METHODS ////////////////////////////////////////////////////
-  predict() {
+  searchAndPredictButtonCallback() {
     this.click = true;
 
     let showPlant = false;
@@ -340,7 +340,7 @@ export class Home {
       }
       if (this.show) this.click = false;
     }, 100);
-  }// predict()
+  }
 
   predictPlant() {
 
