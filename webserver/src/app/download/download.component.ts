@@ -83,7 +83,7 @@ export class Download {
               })
           } else{
               if(type == 5){
-              this.http.get('http://localhost/ijah/query_pla_com.php')
+              this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/query_pla_com.php')
                 .map(res => res.json())
                 .subscribe(data => {
                   let list: string[] = [];
@@ -97,7 +97,7 @@ export class Download {
                 })
             } else{
                 if(type == 6){
-                this.http.get('http://localhost/ijah/query_com_pro.php')
+                this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/query_com_pro.php')
                   .map(res => res.json())
                   .subscribe(data => {
                     let list: string[] = [];
@@ -111,7 +111,7 @@ export class Download {
                   })
               } else{
                   if(type == 7){
-                  this.http.get('http://localhost/ijah/query_pro_dis.php')
+                  this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/query_pro_dis.php')
                     .map(res => res.json())
                     .subscribe(data => {
                       let list: string[] = [];
