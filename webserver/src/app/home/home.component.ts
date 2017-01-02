@@ -24,7 +24,7 @@ export class Home {
   data: any;
   chartType: any;
 
-  tanaman : any;
+  plant: any;
   compound: any;
   protein: any;
   disease: any;
@@ -49,7 +49,7 @@ export class Home {
   FileSaver: any;
 
   // DATA search
-  tanamanSearch: Array<string>;
+  plantSearch: Array<string>;
   compoundSearch: Array<string>;
   proteinSearch: Array<string>;
   diseaseSearch: Array<string>;
@@ -59,10 +59,11 @@ export class Home {
   protein_total;
   disease_total;
 
-  plantSelect = [];
-  compoundSelect = [];
-  proteinSelect = [];
-  diseaseSelect = [];
+  selectedPlants = [];
+  selectedCompounds = [];
+  selectedProteins = [];
+  selectedDiseases = [];
+
   typeaheadNoResults:boolean = false;
 
   noResultPlant = false;
@@ -80,6 +81,9 @@ export class Home {
   jsonCompoundProtein;
   jsonProteinDisease;
 
+  click = false;
+
+  //////////////////////////////////////////////////////////////////////////////
   ngOnInit() {
 
   }
@@ -116,7 +120,7 @@ export class Home {
 
   constructor(public appState: AppState, private http: Http) {
 
-    this.tanaman = [{ 'index': this.countTanaman, 'value' : ''}];
+    this.plant = [{ 'index': this.countTanaman, 'value' : ''}];
     this.compound = [{ 'index': this.countCompound, 'value' : ''}];
     this.protein = [{ 'index': this.countProtein, 'value' : ''}];
     this.disease = [{ 'index': this.countDisease, 'value' : ''}];
@@ -138,7 +142,7 @@ export class Home {
           data[i]['search'] = temp;
         }
 
-        this.tanamanSearch = data;
+        this.plantSearch = data;
       })
 
     this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/compound.php')
@@ -198,25 +202,25 @@ export class Home {
   // INPUT HANDLING METHODS ////////////////////////////////////////////////////
   selectPlant(e:any, index):void {
     if (index != this.countTanaman) {
-      this.plantSelect.push({ 'index': this.countTanaman, 'value' : e.item.pla_id});
+      this.selectedPlants.push({ 'index': this.countTanaman, 'value' : e.item.pla_id});
     }
   }
 
   selectCompound(e:any, index):void {
     if (index != this.countCompound) {
-      this.compoundSelect.push({ 'index': this.countCompound, 'value' : e.item.com_id});
+      this.selectedCompounds.push({ 'index': this.countCompound, 'value' : e.item.com_id});
     }
   }
 
   selectProtein(e:any, index):void {
     if (index != this.countProtein) {
-      this.proteinSelect.push({ 'index': this.countProtein, 'value' : e.item.pro_id});
+      this.selectedProteins.push({ 'index': this.countProtein, 'value' : e.item.pro_id});
     }
   }
 
   selectDisease(e:any, index):void {
     if (index != this.countDisease) {
-      this.diseaseSelect.push({ 'index': this.countDisease, 'value' : e.item.dis_id});
+      this.selectedDiseases.push({ 'index': this.countDisease, 'value' : e.item.dis_id});
     }
   }
 
@@ -224,7 +228,7 @@ export class Home {
     this.activeCompound = false;
     if (index == this.countTanaman) {
       this.countTanaman++;
-      this.tanaman.push({ 'index': this.countTanaman, 'value' : ''});
+      this.plant.push({ 'index': this.countTanaman, 'value' : ''});
     }
   }
 
@@ -253,10 +257,111 @@ export class Home {
   }
 
   // SEARCH+PREDICT METHODS ////////////////////////////////////////////////////
-  predictTanaman() {
+  searchAndPredictButtonCallback() {
+    this.click = true;
 
-    this.tanaman.pop();
-    let tanam = JSON.stringify(this.plantSelect);
+    let showPlant = false;
+    let showCompound = false;
+    let showProtein = false;
+    let showDisease = false;
+
+    if (this.plant.length > 1 && this.disease.length <= 1 && this.protein.length <= 1) {
+        this.predictPlant();
+        showPlant = true;
+    }
+
+    else if (this.compound.length > 1 && this.protein.length <= 1 && this.disease.length <= 1) {
+        this.predictCompound();
+        showCompound = true;
+    }
+
+    else if (this.protein.length > 1 && this.plant.length <= 1 && this.compound.length <= 1) {
+        this.predictProtein();
+        showProtein = true;
+    }
+
+    else if (this.disease.length > 1 && this.plant.length <= 1 && this.compound.length <= 1) {
+        this.predictDisease();
+        showDisease = true;
+    }
+
+    else if (this.plant.length > 1 && this.protein.length > 1) {
+        this.predictPlantProtein();
+    }
+
+    else if (this.compound.length > 1 && this.disease.length > 1) {
+        this.predictCompoundDisease();
+    }
+
+    if (this.plant.length > 1 && this.disease.length > 1) {
+        this.predictPlantDisease();
+    }
+
+    if (this.compound.length > 1 && this.protein.length > 1) {
+        this.predictCompoundProtein();
+    }
+
+    var inter = setInterval(() => {
+
+      if (showPlant && !showProtein && !showDisease) {
+        if (this.pTanaman) {
+          localStorage.setItem('data', JSON.stringify(this.dataLocal));
+          this.show = true;
+          this.click = false;
+          clearInterval(inter);
+        }
+      }
+
+      else if (showCompound && !showProtein && !showDisease) {
+        if(this.pCompound) {
+          localStorage.setItem('data', JSON.stringify(this.dataLocal));
+          this.show = true;
+          this.click = false;
+          clearInterval(inter);
+        }
+      }
+
+      else if (showProtein && !showPlant && !showCompound) {
+        if (this.pProtein) {
+          localStorage.setItem('data', JSON.stringify(this.dataLocal));
+          this.show = true;
+          this.click = false;
+          clearInterval(inter);
+        }
+      }
+
+      else if (showDisease && !showPlant && !showCompound) {
+        if (this.pDisease) {
+          localStorage.setItem('data', JSON.stringify(this.dataLocal));
+          this.show = true;
+          this.click = false;
+          clearInterval(inter);
+        }
+      }
+      if (this.show) this.click = false;
+    }, 100);
+  }
+
+  // searchAndPredict(drugSideInput,targetSideInput) {
+  //   let dsi = drugSideInput;
+  //   let tsi = targetSideInput;
+
+  //   // let tanam =
+  //   // let dsiStr = JSON.stringify(this.selectedPlants);
+
+  //   // let api =
+
+  //   this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-plant.php', tanam)
+  //     .map(res => res.json())
+  //     .subscribe(data => {
+
+  //     });
+  // }
+
+  predictPlant() {
+
+    this.plant.pop();
+    let tanam = JSON.stringify(this.selectedPlants);
     console.log(tanam);
 
     this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-plant.php', tanam)
@@ -470,7 +575,7 @@ export class Home {
   predictProtein() {
 
     this.protein.pop();
-    let prot = JSON.stringify(this.proteinSelect);
+    let prot = JSON.stringify(this.selectedProteins);
     console.log(prot);
 
     this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-protein.php', prot)
@@ -639,7 +744,7 @@ export class Home {
   predictCompound() {
 
     this.compound.pop();
-    let comp = JSON.stringify(this.compoundSelect);
+    let comp = JSON.stringify(this.selectedCompounds);
     console.log(comp);
 
     this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-compound.php', comp)
@@ -810,7 +915,7 @@ export class Home {
   predictDisease() {
 
     this.disease.pop();
-    let dis = JSON.stringify(this.diseaseSelect);
+    let dis = JSON.stringify(this.selectedDiseases);
     console.log(dis);
 
     this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-disease.php', dis)
@@ -981,10 +1086,10 @@ export class Home {
 
   predictPlantProtein() {
 
-    this.tanaman.pop();
+    this.plant.pop();
     this.protein.pop();
-    let tanam = JSON.stringify(this.plantSelect);
-    let prot = JSON.stringify(this.proteinSelect);
+    let tanam = JSON.stringify(this.selectedPlants);
+    let prot = JSON.stringify(this.selectedProteins);
 
     let compoundProtein1;
     let compoundProtein2;
@@ -1160,8 +1265,8 @@ export class Home {
 
     this.compound.pop();
     this.disease.pop();
-    let com = JSON.stringify(this.compoundSelect);
-    let dis = JSON.stringify(this.diseaseSelect);
+    let com = JSON.stringify(this.selectedCompounds);
+    let dis = JSON.stringify(this.selectedDiseases);
 
     let compoundProtein1;
     let compoundProtein2;
@@ -1328,10 +1433,10 @@ export class Home {
 
   predictPlantDisease() {
 
-    this.tanaman.pop();
+    this.plant.pop();
     this.protein.pop();
-    let tanam = JSON.stringify(this.plantSelect);
-    let dis = JSON.stringify(this.diseaseSelect);
+    let tanam = JSON.stringify(this.selectedPlants);
+    let dis = JSON.stringify(this.selectedDiseases);
 
     let compoundProtein1;
     let compoundProtein2;
@@ -1507,8 +1612,8 @@ export class Home {
 
     this.compound.pop();
     this.disease.pop();
-    let com = JSON.stringify(this.compoundSelect);
-    let prot = JSON.stringify(this.proteinSelect);
+    let com = JSON.stringify(this.selectedCompounds);
+    let prot = JSON.stringify(this.selectedProteins);
 
     let compoundProtein1;
     let compoundProtein2;
@@ -1670,92 +1775,6 @@ export class Home {
     })
   }
 
-  click = false;
-  predict() {
-    this.click = true;
-
-    let showTanaman = false;
-    let showCompound = false;
-    let showProtein = false;
-    let showDisease = false;
-
-    if (this.tanaman.length > 1 && this.disease.length <= 1 && this.protein.length <= 1) {
-        this.predictTanaman();
-        showTanaman = true;
-    }
-
-    else if (this.compound.length > 1 && this.protein.length <= 1 && this.disease.length <= 1) {
-        this.predictCompound();
-        showCompound = true;
-    }
-
-    else if (this.protein.length > 1 && this.tanaman.length <= 1 && this.compound.length <= 1) {
-        this.predictProtein();
-        showProtein = true;
-    }
-
-    else if (this.disease.length > 1 && this.tanaman.length <= 1 && this.compound.length <= 1) {
-        this.predictDisease();
-        showDisease = true;
-    }
-
-    else if (this.tanaman.length > 1 && this.protein.length > 1) {
-        this.predictPlantProtein();
-    }
-
-    else if (this.compound.length > 1 && this.disease.length > 1) {
-        this.predictCompoundDisease();
-    }
-
-    if (this.tanaman.length > 1 && this.disease.length > 1) {
-        this.predictPlantDisease();
-    }
-
-    if (this.compound.length > 1 && this.protein.length > 1) {
-        this.predictCompoundProtein();
-    }
-
-    var inter = setInterval(() => {
-
-      if (showTanaman && !showProtein && !showDisease) {
-        if (this.pTanaman) {
-          localStorage.setItem('data', JSON.stringify(this.dataLocal));
-          this.show = true;
-          this.click = false;
-          clearInterval(inter);
-        }
-      }
-
-      else if (showCompound && !showProtein && !showDisease) {
-        if(this.pCompound) {
-          localStorage.setItem('data', JSON.stringify(this.dataLocal));
-          this.show = true;
-          this.click = false;
-          clearInterval(inter);
-        }
-      }
-
-      else if (showProtein && !showTanaman && !showCompound) {
-        if (this.pProtein) {
-          localStorage.setItem('data', JSON.stringify(this.dataLocal));
-          this.show = true;
-          this.click = false;
-          clearInterval(inter);
-        }
-      }
-
-      else if (showDisease && !showTanaman && !showCompound) {
-        if (this.pDisease) {
-          localStorage.setItem('data', JSON.stringify(this.dataLocal));
-          this.show = true;
-          this.click = false;
-          clearInterval(inter);
-        }
-      }
-      if (this.show) this.click = false;
-    }, 100);
-  }// predict()
-
   // UTILITY METHODS ///////////////////////////////////////////////////////////
   downloadJSON(idata,ifname){
     var json = localStorage.getItem(idata);
@@ -1826,15 +1845,15 @@ export class Home {
     this.pProtein = false;
     this.pDisease = false;
 
-    this.tanaman = [{ 'index': this.countTanaman, 'value' : ''}];
+    this.plant = [{ 'index': this.countTanaman, 'value' : ''}];
     this.compound = [{ 'index': this.countCompound, 'value' : ''}];
     this.protein = [{ 'index': this.countProtein, 'value' : ''}];
     this.disease = [{ 'index': this.countDisease, 'value' : ''}];
 
-    this.plantSelect = [];
-    this.compoundSelect = [];
-    this.proteinSelect = [];
-    this.diseaseSelect = [];
+    this.selectedPlants = [];
+    this.selectedCompounds = [];
+    this.selectedProteins = [];
+    this.selectedDiseases = [];
 
     this.show = false;
     localStorage.clear();
@@ -1851,8 +1870,8 @@ export class Home {
   // EXAMPLE-BUTTON METHODS ////////////////////////////////////////////////////
   example1() {
   this.reset();
-  this.tanaman = [{ 'index': 1, 'value' : 'Datura stramonium'}, { 'index': 2, 'value' : 'Trifolium pratense'}, { 'index': 3, 'value' : 'Acacia senegal'}, { 'index': 4, 'value' : ''}];
-  this.plantSelect = [{"index":1,"value":"PLA00002565"},{"index":2,"value":"PLA00001090"},{"index":3,"value":"PLA00000325"}];
+  this.plant = [{ 'index': 1, 'value' : 'Datura stramonium'}, { 'index': 2, 'value' : 'Trifolium pratense'}, { 'index': 3, 'value' : 'Acacia senegal'}, { 'index': 4, 'value' : ''}];
+  this.selectedPlants = [{"index":1,"value":"PLA00002565"},{"index":2,"value":"PLA00001090"},{"index":3,"value":"PLA00000325"}];
 
   this.countTanaman = 4;
   this.activeCompound = false;
@@ -1863,7 +1882,7 @@ export class Home {
   example2() {
   this.reset();
   this.compound = [{ 'index': 1, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 4, 'value' : ''}];
-  this.compoundSelect = [{ 'index': 1, 'value' : 'COM00000058'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000039'}];
+  this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000058'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000039'}];
 
   this.countCompound = 2;
   this.activeDisease = false;
@@ -1874,7 +1893,7 @@ export class Home {
   example3() {
   this.reset();
   this.protein = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
-  this.proteinSelect = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
+  this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
 
   this.countProtein = 3;
   this.activeDisease = false;
@@ -1885,7 +1904,7 @@ export class Home {
   example4() {
   this.reset();
   this.disease = [{ 'index': 1, 'value' : '156610 | Skin creases, congenital symmetric circumferential, 1'}, { 'index': 2, 'value' : '614373 | Amyotrophic lateral sclerosis 16, juvenile'}, { 'index': 3, 'value' : '612244 | Inflammatory bowel disease 13'}, { 'index': 4, 'value' : ''}];
-  this.diseaseSelect = [{ 'index': 1, 'value' : 'DIS00001455'}, { 'index': 2, 'value' : 'DIS00000803'}, { 'index': 3, 'value' : 'DIS00003796'}];
+  this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00001455'}, { 'index': 2, 'value' : 'DIS00000803'}, { 'index': 3, 'value' : 'DIS00003796'}];
 
   this.countDisease = 4;
   this.activeProtein = false;
@@ -1895,12 +1914,12 @@ export class Home {
 
   example5() {
   this.reset();
-  this.tanaman = [{ 'index': 1, 'value' : 'Catharanthus roseus'}, { 'index': 2, 'value' : 'Nigella sativa'}, { 'index': 3, 'value' : 'Cocos nucifera'}, { 'index': 4, 'value' : ''}];
-  this.plantSelect = [{"index":1,"value":"PLA00001025"},{"index":2,"value":"PLA00003511"},{"index":3,"value":"PLA00001600"}];
+  this.plant = [{ 'index': 1, 'value' : 'Catharanthus roseus'}, { 'index': 2, 'value' : 'Nigella sativa'}, { 'index': 3, 'value' : 'Cocos nucifera'}, { 'index': 4, 'value' : ''}];
+  this.selectedPlants = [{"index":1,"value":"PLA00001025"},{"index":2,"value":"PLA00003511"},{"index":3,"value":"PLA00001600"}];
   this.countTanaman = 4;
 
   this.protein = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
-  this.proteinSelect = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
+  this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
 
   this.countProtein = 3;
 
@@ -1911,12 +1930,12 @@ export class Home {
   example6() {
   this.reset();
   this.compound = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '51-34-3 | DB00747 | C00002292 | C01851'}, { 'index': 3, 'value' : '53-86-1 | DB00328 | C00030512 | C01926'}, { 'index': 4, 'value' : ''}];
-  this.compoundSelect = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00001628'}, { 'index': 3, 'value' : 'COM00005599'}];
+  this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00001628'}, { 'index': 3, 'value' : 'COM00005599'}];
 
   this.countCompound = 2;
 
   this.disease = [{ 'index': 1, 'value' : '608516 | Major depressive disorder'}, { 'index': 2, 'value' : '100100 | Prune belly syndrome'}, { 'index': 3, 'value' : '614473 | Arterial calcification of infancy, generalized, 2'}, { 'index': 4, 'value' : ''}];
-  this.diseaseSelect = [{ 'index': 1, 'value' : 'DIS00000849'}, { 'index': 2, 'value' : 'DIS00003796'}, { 'index': 3, 'value' : 'DIS00000853'}];
+  this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000849'}, { 'index': 2, 'value' : 'DIS00003796'}, { 'index': 3, 'value' : 'DIS00000853'}];
 
   this.countDisease = 4;
 
@@ -1926,12 +1945,12 @@ export class Home {
 
   example7() {
   this.reset();
-  this.tanaman = [{ 'index': 1, 'value' : 'Aloe vera'}, { 'index': 2, 'value' : 'Cocos nucifera'}, { 'index': 3, 'value' : 'Panax ginseng'}, { 'index': 4, 'value' : ''}];
-  this.plantSelect = [{"index":1,"value":"PLA00001504"},{"index":2,"value":"PLA00001600"},{"index":3,"value":"PLA00003447"}];
+  this.plant = [{ 'index': 1, 'value' : 'Aloe vera'}, { 'index': 2, 'value' : 'Cocos nucifera'}, { 'index': 3, 'value' : 'Panax ginseng'}, { 'index': 4, 'value' : ''}];
+  this.selectedPlants = [{"index":1,"value":"PLA00001504"},{"index":2,"value":"PLA00001600"},{"index":3,"value":"PLA00003447"}];
   this.countDisease = 4;
 
   this.disease = [{ 'index': 1, 'value' : '61600 | Analbuminemia'}, { 'index': 2, 'value' : '615999 | Hyperthyroxinemia, familial dysalbuminemic'}, { 'index': 3, 'value' : ''}];
-  this.diseaseSelect = [{ 'index': 1, 'value' : 'DIS00003787'}, { 'index': 2, 'value' : 'DIS00003675'}];
+  this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00003787'}, { 'index': 2, 'value' : 'DIS00003675'}];
 
   this.countDisease = 3;
 
@@ -1942,12 +1961,12 @@ export class Home {
   example8() {
   this.reset();
   this.compound = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 4, 'value' : ''}];
-  this.compoundSelect = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000058'}];
+  this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000058'}];
 
   this.countCompound = 2;
 
   this.protein = [{ 'index': 1, 'value' : 'P53985 | Monocarboxylate transporter 1'}, { 'index': 2, 'value' : 'P20309 | Muscarinic acetylcholine receptor M3'}, { 'index': 3, 'value' : 'Q99720 | Sigma non-opioid intracellular receptor 1'}, { 'index': 4, 'value' : ''}];
-  this.proteinSelect = [{ 'index': 1, 'value' : 'PRO00000040'}, { 'index': 2, 'value' : 'PRO00000452'}, { 'index': 3, 'value' : 'PRO00000377'}];
+  this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00000040'}, { 'index': 2, 'value' : 'PRO00000452'}, { 'index': 3, 'value' : 'PRO00000377'}];
 
   this.countProtein = 4;
 
