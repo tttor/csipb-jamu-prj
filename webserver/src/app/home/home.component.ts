@@ -342,6 +342,22 @@ export class Home {
     }, 100);
   }
 
+  // searchAndPredict(drugSideInput,targetSideInput) {
+  //   let dsi = drugSideInput;
+  //   let tsi = targetSideInput;
+
+  //   // let tanam =
+  //   // let dsiStr = JSON.stringify(this.selectedPlants);
+
+  //   // let api =
+
+  //   this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-plant.php', tanam)
+  //     .map(res => res.json())
+  //     .subscribe(data => {
+
+  //     });
+  // }
+
   predictPlant() {
 
     this.plant.pop();
