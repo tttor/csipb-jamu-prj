@@ -1,7 +1,7 @@
 *~*
 *.pyc
 *_DS_Store*
+*.log
 
 catkin_ws
 .idea
-webserver/node_modules
