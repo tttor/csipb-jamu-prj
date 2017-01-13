@@ -1,134 +1,113 @@
+#!/usr/bin/python
+
 import psycopg2
 import random
 import numpy as np
 import sys
 import time
-from blm import predictBLMNII
+import os
+import socket
+
 
 conn = psycopg2.connect(database="ijah", user="ijah", password="ijahdb", host= "127.0.0.1", port = "5432")
 cur = conn.cursor()
 
-def MakeKernel(dataList,mode):
-    dataList = list(set(dataList))
-    dataDict = {e:i for i,e in enumerate(dataList)}#for Index
-    simMat = np.zeros((len(dataList),len(dataList)), dtype=float)
-    if mode=="com":
-        qParam = ["com_id","com_similarity_simcomp","compound"]
-    elif mode=="pro":
-        qParam = ["pro_id","pro_similarity_smithwaterman","protein"]
-
-    query = "SELECT " + qParam[0] +", " + qParam[1]+ " FROM " + qParam[2]
-    queryC = " WHERE "
-
-    for i,d in enumerate(dataList):
-        if i>0:
-            queryC += " OR "
-        queryC += (qParam[0] + " = " + "'" + d + "'")
-    query += queryC
-    cur.execute(query)
-    dataRows = cur.fetchall()
-    for i,row in enumerate(dataRows):
-        if row[1] != None:
-            temp = row[1].split(',')
-            temp = [i.split('=') for i in temp]
-            for j in temp:
-                if j[0].split(':')[0] in dataDict:
-                    simMat[dataDict[row[0]]][dataDict[j[0].split(':')[0] ]]=float(j[1])
-
-    return dataDict, simMat
-
-
 if __name__ == "__main__":
+
     #init Variables
+
     start = time.time()
-    print "Initialization..."
+
+    sys.stderr.write("Initialization...\n")
     #Catch Argument sent from php...
     compList = [c for c in sys.argv[1].split(',')]
     protList = [p for p in sys.argv[2].split(',')]
     assert len(compList) == len(protList)
 
     ############# Build to be predicted data as Pair #############
-    print "Preparing to be predicted data..."
+    sys.stderr.write ("Preparing to be predicted data...\n")
     pairIdList = [[compList[i], protList[i]] for i in range(len(compList))]
-    maxIter = len(pairIdList)
-    nPair = len(pairIdList)
-    # pairSet = set(pairIdList)
 
-    ############# Generate random ID #############
-    print "Generating addtional random data..."
-    temp1 = None
-    tempC = None
-    tempP = None
-    idP = None
-    idC = None
+    ############## Prepare Query Data ##############
+    queryString = ""
+    for i,pair in enumerate(pairIdList):
+        if i >0:
+            queryString += ","
+        queryString += pair[0]+":"+pair[1]
 
-    while nPair < 1000:
-        temp1 = np.random.randint(1,3334*17277)
-        if temp1%3334 == 0:
-            idP = 3334
-            idC = temp1/3334
-        else:
-            idP = temp1%3334
-            idC = (temp1/3334)+1
-        tempC = "COM"+str(idC).zfill(8)
+    ##### Send Data to server
+    addr = ('localhost',5556)
+    data = ""
+    dataTemp = ""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect(addr)
+    sys.stderr.write("Connecting to server...\n")
+    try:
+        sock.sendall(queryString+"|end")
+        sys.stderr.write("Sending Data...\n")
+        sys.stderr.write(str(queryString)+"...\n")
+        lenDataRecv = 0
+        lenDataExpected = len(queryString)+(4*len(pairIdList))
 
-        tempP = "PRO"+str(idP).zfill(8)
-        # if ([temp1,temp2] in pairSet):
-        #     continue
-        # pairSet |= [temp1, temp2]
-        pairIdList.append([tempC, tempP])
-        nPair += 1
+        while lenDataRecv < lenDataExpected:
+            dataTemp = sock.recv(1024)
+            lenDataRecv += len(dataTemp)
+            data += dataTemp
+    finally:
+        sys.stderr.write("Closing connection...\n")
+        sock.close()
 
-    ############# Make simMat and dict #############
-    print "Making kernel...."
-    compList = [i[0] for i in pairIdList]
-    compMeta, compSimMat = MakeKernel(compList,"com")
+    metaPred = [[pair.split(":")[0], pair.split(":")[1].split("=")[0]] for pair in data.split(",")]
+    resPred = [ 0.65*float(res.split(":")[1].split("=")[1]) for res in data.split(",")]
 
-    protList = [i[1] for i in pairIdList]
-    protMeta, protSimMat = MakeKernel(protList,"pro")
-
-    ############# Make adjacency list #############
-    print "Building connectivity data"
-    adjMat = np.zeros((len(compMeta), len(protMeta)), dtype=int)
-
-    query = "SELECT com_id, pro_id, weight FROM compound_vs_protein"
-    queryC = " WHERE ("
-    for i,j in enumerate(compMeta):
+    jsonOut = '{"comp":['
+    for i,pair in enumerate(metaPred):
         if i>0:
-            queryC += " OR "
-        queryC += " com_id = " + "'"+j+"'"
-    queryC += ")"
-    queryP = " AND ("
-    for i,j in enumerate(protMeta):
+            jsonOut += ', '
+        jsonOut += '"'+pair[0]+'"'
+    jsonOut += '], '
+
+    jsonOut += ' "prot":['
+    for i,pair in enumerate(metaPred):
         if i>0:
-            queryP += " OR "
-        queryP += " pro_id = " + "'"+j+"'"
-    queryP += ")"
+            jsonOut += ', '
+        jsonOut += '"'+pair[1]+'"'
+    jsonOut += '], '
 
-    query += queryC + queryP
-    cur.execute(query)
-
-    rows = cur.fetchall()
-    for row in rows:
-        adjMat[compMeta[row[0]]][protMeta[row[1]]]=(row[2])
-
-    ############## Predict ##############
-    print "Predicting..."
-    #Transform from PairId to PairIndex
-    pairIndexList = [[compMeta[i[0]],protMeta[i[1]]] for i in pairIdList]
-    resPred = np.zeros((len(pairIndexList)),dtype=float)
-    for i,pair in enumerate(pairIndexList):
-        if i == maxIter:
-            break
-        #PredictEveryPair
-        resPred[i] = predictBLMNII(adjMat,compSimMat,protSimMat,pair[0],pair[1])
-
+    jsonOut += '"weight": ['
+    for i,res in enumerate(resPred):
+        if i>0:
+            jsonOut += ', '
+        jsonOut += str(res)
+    jsonOut += ']}'
+    print jsonOut
     ############## Update database ##############
-    print "Push data to DB"
+    query = ""
+    query1 = ""
+    query2 = ""
+    query3 = ""
+    queryCheck = ""
+
+    sys.stderr.write ("Push data to DB...\n")
     for i in range(maxIter):
-        query1 = "INSERT INTO compound_vs_protein (com_id, pro_id, source, weight) "
-        query2 = "VALUES ( "+ "'" + pairIdList[i][0] + "', "+ "'" + pairIdList[i][1]
-        query3 = "', " + "'blm-nii-svm', "+ str(resPred[i]*0.65)+" )"
+        ## Check row in the table ##
+        queryCheck = "SELECT * FROM compound_vs_protein WHERE "
+        queryChect += "com_id='"+pairIdList[i][0]+"', pro_id='"+pairIdList[i][1]+"' "
+        queryCheck += "source = 'blm-nii-svm'"
+        cur.execute(queryCheck)
+        dataRows = cur.fetchall()
+        ## Update row if data is already exsist on table ##
+        if len(dataRows)>0:
+            query1 = "UPDATE compound_vs_protein "
+            query2 = "SET source='blm-nii-svm', weight="+ str(max(dataRows[0][4],resPred[i]))+" "
+            query3 = "WHERE com_id='" + pairIdList[i][0] + "', pro_id='" + pairIdList[i][1]+"'"
+
+        ## Insert if no record found ##
+        else:
+            #May use INSERT INTO .. VALUE ... ON DUPLICATE KEY UPDATE
+            query1 = "INSERT INTO compound_vs_protein (com_id, pro_id, source, weight) "
+            query2 = "VALUES ( "+ "'" + pairIdList[i][0] + "', "+ "'" + pairIdList[i][1]+" "
+            query3 = "', " + "'blm-nii-svm', "+ str(resPred[i])+" )"
 
         query = query1 + query2 + query3
         cur.execute(query)
@@ -136,9 +115,8 @@ if __name__ == "__main__":
     conn.commit()
 
     conn.close()
-    print "Done..."
+    sys.stderr.write ("Done...\n")
 
-    
     #############Debugging section#############
-    print "Runtime :"+ str(time.time()-start)
+    sys.stderr.write ("Runtime :"+ str(time.time()-start)+"\n")
     ###########################################

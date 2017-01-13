@@ -9,10 +9,14 @@ from Bio import pairwise2
 from Bio.SubsMat.MatrixInfo import blosum62
 from scoop import futures
 
+
+#Parsing
+
 def alignprot(rowSeqProtein,colSeqProtein,i,j):
     alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
     print str(i)+" "+str(j)
     return [alignres, j]
+
 
 if __name__ == '__main__':
     start = time.time()
@@ -107,7 +111,7 @@ if __name__ == '__main__':
                     matF.write(",")
                 matF.write(str(simMatProt[j]))
             matF.write("\n")
-            metaF.write(rowMetaProtein[j]+"\n")
+            metaF.write(rowMetaProtein[i]+"\n")
             #Reset value
             colIndex = []
             rowIndex = []
