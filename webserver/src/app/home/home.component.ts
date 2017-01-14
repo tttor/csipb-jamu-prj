@@ -408,16 +408,12 @@ export class Home {
           let comMetaPost = this.getMetaPostStr(comSet);
           let proMetaPost = this.getMetaPostStr(proSet);
           let disMetaPost = this.getMetaPostStr(disSet);
-          console.log(plaMetaPost);
-          console.log(metaQueryAPI);
 
-          console.log('getting meta ...');
+          // console.log('getting meta ...');
           this.http.post(metaQueryAPI,plaMetaPost).map(resp4 => resp4.json())
           .subscribe(plaMeta => {
-            console.log('got plaMeta');
             this.http.post(metaQueryAPI,comMetaPost).map(resp5=>resp5.json())
             .subscribe(comMeta => {
-              console.log('got comMeta');
               this.http.post(metaQueryAPI,proMetaPost).map(resp6=>resp6.json())
               .subscribe(proMeta => {
                 this.http.post(metaQueryAPI,disMetaPost).map(resp7=>resp7.json())
@@ -1892,32 +1888,145 @@ export class Home {
     return postStr;
   }
 
-  makeTextOutput(interaction,metaSrc,metaDest,srcType,destType) {
+  getPropKeys(type) {
+    let keys: string[] = [];
+    if (type==='pla') {
+      keys.push('pla_name');
+    }
+    if (type==='com') {
+      keys.push('com_cas_id');
+      keys.push('com_drugbank_id');
+      keys.push('com_kegg_id');
+      keys.push('com_knapsack_id');
+    }
+    if (type==='pro') {
+      keys.push('pro_uniprot_id');
+      keys.push('pro_uniprot_abbrv');
+      keys.push('pro_name');
+    }
+    if (type==='dis') {
+      keys.push('dis_omim_id');
+      keys.push('dis_name');
+    }
+    return keys;
+  }
+
+  getHyperlinkStr(type,seed) {
+    let baseUrl: string = 'null';
+
+    if (type==='com_knapsack_id') {
+      baseUrl = 'http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=';
+    }
+    if (type==='com_drugbank_id') {
+      baseUrl = 'https://www.drugbank.ca/drugs/';
+    }
+    if (type==='com_kegg_id') {
+      baseUrl = 'http://www.genome.jp/dbget-bin/www_bget?cpd:';
+    }
+
+    if (type==='pro_uniprot_id') {
+      baseUrl = 'http://www.uniprot.org/uniprot/';
+    }
+
+    if (type==='dis_omim_id') {
+      baseUrl = 'https://www.omim.org/entry/';
+    }
+
+    let urlStr:string = seed;
+    if (seed!=='' && seed!=='null') {
+      let url: string = baseUrl + seed;
+      urlStr = '<a href="'+url+'" target="_blank">'+seed+'</a>';
+    }
+    if (urlStr.indexOf('null') !==-1 ) {
+      urlStr = seed;
+    }
+    return urlStr;
+  }
+
+  getProps(id,keys,meta) {
+    let prefix = id.substr(0,3);
+    prefix = prefix.toLowerCase() + '_id';
+
+    let i=0;
+    for (i;i<meta.length;i++) {
+      if (id===meta[i][prefix]) {
+        break;
+      }
+    }
+
+    let props = []
+    let j=0;
+    for(j;j<keys.length;j++) {
+      props.push(meta[i][keys[j]]);
+    }
+
+    return props;
+  }
+
+  getHeader(type) {
+    let header = 'DEFAULT_HEADER';
+    if (type === 'com') {
+      header = 'CAS,DrugbankID,KnapsackID,KeggID,weight,source';
+    }
+    if (type === 'pro') {
+      header = 'UniprotID,UniprotAbbrv,UniprotName,weight,source';
+    }
+    if (type === 'dis') {
+      header = 'OmimID,OmimName,weight,source';
+    }
+    return header;
+  }
+
+  makeTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
     let text: string = '';
 
-    // let id = '';
-    // if (srcType === 'pla') {
-    //   id = 'p'
-    // }
+    let srcProp = [];
+    let destProp = [];
+
+    let srcPropKeys = this.getPropKeys(srcType);
+    let destPropKeys = this.getPropKeys(destType);
 
     let i: number = 0;
     let ii: number = 0;// # of unique plants
-    let prev = '';
+    let prevSrc = '';
     for(i;i<interaction.length;i++) {
       let srcKey = srcType+'_id';
       let destKey = destType+'_id'
-      let src: string = interaction[i][srcKey];
-      let dest: string = interaction[i][destKey];
+      let src = interaction[i][srcKey];
+      let dest = interaction[i][destKey];
+      let source = interaction[i]['source'];
+      let weight = interaction[i]['weight'];
 
-      if (prev!=src) {
+      if (prevSrc!=src) {
         ii = ii + 1;
-        text = text + '#'+ii.toString()+' '+src+':\n';
-        text = text + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
+        text = text+'#'+ii.toString()+' ';
 
-        prev = src;
+        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
+
+        let j=0;
+        for (j;j<srcProps.length;j++) {
+          text = text+this.getHyperlinkStr( srcPropKeys[j],srcProps[j] );
+          if (j<srcProps.length-1) {
+            text = text + ',';
+          }
+        }
+        text = text+':\n';
+        text = text+'  '+this.getHeader(destType)+'\n';
+
+        prevSrc = src;
       }
 
-      text = text+'  '+dest+','+'\n';
+      let destProps = this.getProps(dest,destPropKeys,destMeta);
+      let jj=0;
+      text = text+'  ';
+      for (jj;jj<destProps.length;jj++) {
+        text = text+this.getHyperlinkStr( destPropKeys[jj],destProps[jj] );
+        if (jj<destProps.length-1) {
+          text = text + ',';
+        }
+      }
+      text = text+','+weight+','+source;
+      text = text+'\n';
     }
 
     return text;
@@ -1959,26 +2068,6 @@ export class Home {
         }
     }
     return m;
-  }
-
-  getHyperlinkStr(type,seed) {
-    let baseUrl: string = '';
-    if (type=='knapsack'){
-      baseUrl = 'http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=';
-    }
-    if (type=='drugbank'){
-      baseUrl = 'https://www.drugbank.ca/drugs/';
-    }
-    if (type=='kegg'){
-      baseUrl = 'http://www.genome.jp/dbget-bin/www_bget?cpd:';
-    }
-
-    let urlStr:string = '';
-    if (seed!='') {
-      let url: string = baseUrl + seed;
-      urlStr = '<a href="'+url+'" target="_blank">'+seed+'</a>';
-    }
-    return urlStr;
   }
 
   reset() {
