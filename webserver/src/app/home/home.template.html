@@ -169,26 +169,6 @@
   </div>
   <br />
 
-  <!-- Labels above the multipartite graph -->
-<!--   <div class="row" *ngIf="show">
-    <div class="text-left col-md-3">
-      <b>Plants (Latin Name)</b>
-    </div>
-    <div class="text-center col-md-3">
-      <b>Compounds (CAS)(DrugbankID)</b>
-    </div>
-    <div class="text-center col-md-3">
-      <b>Proteins (Uniprot Name)</b>
-    </div>
-    <div class="col-md-3 text-right">
-      <b>Diseases (OMIM Name)</b>
-    </div>
-  </div> -->
-
-  <!-- The multi-partite graph rendering -->
-  <iframe id="graph" class="text-center" *ngIf="show" src="app_home_graph_output.html" height="750px" width="99%" frameBorder="0"></iframe>
-
-
   <!-- Text Output -->
   <div class="row" *ngIf="show">
     <div class="col-md-4">
@@ -225,5 +205,26 @@
       <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
     </div>
   </div>
+  <br />
+  <br />
+
+  <!-- Labels above the multipartite graph -->
+<!--   <div class="row" *ngIf="show">
+    <div class="text-left col-md-3">
+      <b>Plants (Latin Name)</b>
+    </div>
+    <div class="text-center col-md-3">
+      <b>Compounds (CAS)(DrugbankID)</b>
+    </div>
+    <div class="text-center col-md-3">
+      <b>Proteins (Uniprot Name)</b>
+    </div>
+    <div class="col-md-3 text-right">
+      <b>Diseases (OMIM Name)</b>
+    </div>
+  </div> -->
+
+  <!-- The multi-partite graph rendering -->
+  <iframe id="graph" class="text-center" *ngIf="show" src="app_home_graph_output.html" height="750px" width="99%" frameBorder="0"></iframe>
 
 </div>
