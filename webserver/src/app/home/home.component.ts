@@ -422,8 +422,8 @@ export class Home {
                                                                plaMeta,comMeta,
                                                                'pla','com');
                   this.jsonCompoundProtein = this.makeTextOutput(comVSpro,
-                                                               comMeta,proMeta,
-                                                               'com','pro');
+                                                                 comMeta,proMeta,
+                                                                 'com','pro');
                   this.jsonProteinDisease = this.makeTextOutput(proVSdis,
                                                                proMeta,disMeta,
                                                                'pro','dis');
@@ -438,23 +438,42 @@ export class Home {
                   let disForGraph = this.getItemForGraph(disSet,nNodeMax);
 
                   let graphDataArr = [this.getGraphData(plaVScom,
-                                                        plaForGraph,comForGraph,
-                                                        plaMeta,comMeta),
+                                                        plaMeta,comMeta,
+                                                        'pla','com'),
                                       this.getGraphData(comVSpro,
-                                                        comForGraph,proForGraph,
-                                                        comMeta,proMeta),
+                                                        comMeta,proMeta,
+                                                        'com','pro'),
                                       this.getGraphData(proVSdis,
-                                                        proForGraph,disForGraph,
-                                                        proMeta,disMeta)];
+                                                        proMeta,disMeta,
+                                                         'pro','dis')];
+                  // let graphDataArr = [
+                  //   this.getGraphData(proVSdis,
+                  //                     proMeta,disMeta,
+                  //                     'pro','dis')];
+
+                  // let graphDataArr = [
+                  //                                       this.getGraphData(comVSpro,
+                  //                                       comMeta,proMeta,
+                  //                                       'com','pro'),
+                  //   this.getGraphData(proVSdis,
+                  //                     proMeta,disMeta,
+                  //                     'pro','dis')];
+
+
+                  // let graphDataArr = [this.getGraphData(plaVScom,
+                  //                                       plaMeta,comMeta,
+                  //                                       'pla','com'),
+                  //                     this.getGraphData(comVSpro,
+                  //                                       comMeta,proMeta,
+                  //                                       'com','pro')
+                  //                    ];
 
                   let ii=0;
                   for (ii;ii<graphDataArr.length;ii++) {
                     let jj=0;
-                    let nNode=0;
                     for(jj;jj<graphDataArr[ii].length;jj++) {
                         let datum = graphDataArr[ii][jj];
                         graphData.push(datum);
-                        nNode++;
                     }
                   }
 
@@ -1724,51 +1743,6 @@ export class Home {
     return itemForGraph;
   }
 
-  getGraphData(interaction,itemArr1,itemArr2,meta1,meta2) {
-    let key1 = itemArr1[0].substr(0,3).toLowerCase();
-    let key2 = itemArr2[0].substr(0,3).toLowerCase();
-    let key11 = key1+'_id';
-    let key22 = key2+'_id';
-
-    let data = [];
-
-    let i=0;
-    for (i;i<itemArr1.length;i++) {
-      let j=0;
-      for (j;j<itemArr2.length;j++) {
-        let k=0;
-        for (k;k<interaction.length;k++) {
-          let id1 = interaction[k][key11];
-          let id2 = interaction[k][key22];
-          if (id1===itemArr1[i] && id2===itemArr2[j]) {
-            let datum = [];
-
-            let propKeys1 = this.getPropKeys(key1);
-            let propKeys2 = this.getPropKeys(key2);
-            // console.log(propKeys1.length);
-            // console.log(propKeys2.length);
-
-            let w = parseFloat(interaction[k]['weight']);
-            // let props1 = this.getProps(key1,propKeys1,meta1);
-            // let props2 = this.getProps(key2,propKeys2,meta2);
-            // console.log(props1.length);
-            // console.log(props2.length);
-
-            // datum.push(props1[0]);
-            // datum.push(props2[0]);
-            datum.push(id1);
-            datum.push(id2);
-            datum.push(w);
-
-            data.push(datum);
-            break;
-          }
-        }
-      }
-    }
-    return data;
-  }
-
   getSet(interaction,id) {
     let set = [];
 
@@ -1865,17 +1839,6 @@ export class Home {
         break;
       }
     }
-    // console.log('wwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
-    // console.log(prefix);
-    // if (prefix=='pla_id') {
-    //   console.log(JSON.stringify(meta));
-
-    //   let meta2 = [{"pla_id":"PLA00001504","pla_name":"Aloe vera"},{"pla_id":"PLA00001600","pla_name":"Cocos nucifera"},{"pla_id":"PLA00003447","pla_name":"Panax ginseng"}];
-
-    //   console.log(meta2[i]["pla_id"]);
-    //   console.log(meta2[0]['pla_name']);
-    //   console.log(meta2[i]['pla_name']);
-    // }
 
     let props = []
     let j=0;
@@ -1898,6 +1861,63 @@ export class Home {
       header = 'OmimID,OmimName,weight,source';
     }
     return header;
+  }
+
+  getGraphData(interaction,srcMeta,destMeta,srcType,destType) {
+    let srcProp = [];
+    let destProp = [];
+
+    let srcPropKeys = this.getPropKeys(srcType);
+    let destPropKeys = this.getPropKeys(destType);
+
+    let data = [];
+
+    let i=0;
+    for(i;i<interaction.length;i++) {
+      let datum = [];
+
+      let srcKey = srcType+'_id';
+      let destKey = destType+'_id';
+
+      let src = interaction[i][srcKey];
+      let dest = interaction[i][destKey];
+      let source = interaction[i]['source'];
+      let weight = parseFloat( interaction[i]['weight'] );
+
+      let srcProps = this.getProps(src,srcPropKeys,srcMeta);
+      let destProps = this.getProps(dest,destPropKeys,destMeta);
+
+      let j=0;
+      let srcText = '';
+      for (j;j<srcProps.length;j++) {
+        srcText = srcText+srcProps[j];
+        if (j<srcProps.length-1) {
+          srcText = srcText + ',';
+        }
+        break;
+      }
+
+      j=0;
+      let destText = '';
+      for (j;j<srcProps.length;j++) {
+        destText = destText+destProps[j];
+        if (j<srcProps.length-1) {
+          destText = destText + ',';
+        }
+        break;
+      }
+
+      // TODO: fix this: should NOT overwrite!
+      srcText = src;
+      destText = dest;
+
+      datum.push(srcText);
+      datum.push(destText);
+      datum.push(weight);
+
+      data.push(datum);
+    }
+    return data;
   }
 
   makeTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
