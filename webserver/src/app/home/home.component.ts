@@ -430,22 +430,25 @@ export class Home {
 
                   // graph output data prep ////////////////////////////////////
                   let graphData = [];
-                  let nNodeMax = 5;
+                  let nNodeMax = 10;
 
-                  let graphDataArr = [this.getGraphData(plaVScom,'pla','com'),
-                                      this.getGraphData(comVSpro,'com','pro'),
-                                      this.getGraphData(proVSdis,'pro','dis')];
+                  let plaForGraph = this.getItemForGraph(plaSet,nNodeMax);
+                  let comForGraph = this.getItemForGraph(comSet,nNodeMax);
+                  let proForGraph = this.getItemForGraph(proSet,nNodeMax);
+                  let disForGraph = this.getItemForGraph(disSet,nNodeMax);
+
+                  let graphDataArr = [this.getGraphData(plaVScom,plaForGraph,comForGraph),
+                                      this.getGraphData(comVSpro,comForGraph,proForGraph),
+                                      this.getGraphData(proVSdis,proForGraph,disForGraph)];
 
                   let ii=0;
                   for (ii;ii<graphDataArr.length;ii++) {
                     let jj=0;
                     let nNode=0;
                     for(jj;jj<graphDataArr[ii].length;jj++) {
-                      // if (nNode < nNodeMax) {
                         let datum = graphDataArr[ii][jj];
                         graphData.push(datum);
                         nNode++;
-                      // }
                     }
                   }
 
@@ -1701,23 +1704,45 @@ export class Home {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
-  getGraphData(interaction,key1,key2) {
+  getItemForGraph(set,max) {
+    let itemForGraph = [];
+    let kk = 0;
+    for (kk;kk<set.length;kk++) {
+      if (kk < max) {
+        itemForGraph.push(set[kk]);
+      }
+      else {
+        break;
+      }
+    }
+    return itemForGraph;
+  }
+
+  getGraphData(interaction,itemArr1,itemArr2) {
+    let key1 = itemArr1[0].substr(0,3).toLowerCase()+'_id';
+    let key2 = itemArr2[0].substr(0,3).toLowerCase()+'_id';
+
     let data = [];
-    let ii=0;
-    for (ii;ii<interaction.length;ii++) {
-      let datum = [];
-      let keyStr1 = key1+'_id';
-      let keyStr2 = key2+'_id';
 
-      let id1 = interaction[ii][keyStr1];
-      let id2 = interaction[ii][keyStr2];
-      let w = parseFloat(interaction[ii]['weight']);
-
-      datum.push(id1);
-      datum.push(id2);
-      datum.push(w);
-
-      data.push(datum);
+    let i=0;
+    for (i;i<itemArr1.length;i++) {
+      let j=0;
+      for (j;j<itemArr2.length;j++) {
+        let k=0;
+        for (k;k<interaction.length;k++) {
+          let id1 = interaction[k][key1];
+          let id2 = interaction[k][key2];
+          if (id1===itemArr1[i] && id2===itemArr2[j]) {
+            let datum = [];
+            let w = parseFloat(interaction[k]['weight']);
+            datum.push(id1);
+            datum.push(id2);
+            datum.push(w);
+            data.push(datum);
+            break;
+          }
+        }
+      }
     }
     return data;
   }
