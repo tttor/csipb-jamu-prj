@@ -418,7 +418,7 @@ export class Home {
               .subscribe(proMeta => {
                 this.http.post(metaQueryAPI,disMetaPost).map(resp7=>resp7.json())
                 .subscribe(disMeta => {
-                  // Make text output with detail metadata
+                  // text output with detail metadata //////////////////////////
                   this.jsonPlantCompound = this.makeTextOutput(plaVScom,
                                                                plaMeta,comMeta,
                                                                'pla','com');
@@ -428,6 +428,29 @@ export class Home {
                   this.jsonProteinDisease = this.makeTextOutput(proVSdis,
                                                                proMeta,disMeta,
                                                                'pro','dis');
+
+                  // graph output data prep ////////////////////////////////////
+                  let graphData = [];
+                  let nNodeMax = 5;
+
+                  let graphDataArr = [this.getGraphData(plaVScom,'pla','com'),
+                                      this.getGraphData(comVSpro,'com','pro'),
+                                      this.getGraphData(proVSdis,'pro','dis')];
+
+                  let ii=0;
+                  for (ii;ii<graphDataArr.length;ii++) {
+                    let jj=0;
+                    let nNode=0;
+                    for(jj;jj<graphDataArr[ii].length;jj++) {
+                      // if (nNode < nNodeMax) {
+                        let datum = graphDataArr[ii][jj];
+                        graphData.push(datum);
+                        nNode++;
+                      // }
+                    }
+                  }
+
+                  localStorage.setItem('data', JSON.stringify(graphData));
                   this.show = true;
                 })//disMeta
               })//proMeta
@@ -436,6 +459,27 @@ export class Home {
         })
       })
     })
+  }
+
+  getGraphData(interaction,key1,key2) {
+    let data = [];
+    let ii=0;
+    for (ii;ii<interaction.length;ii++) {
+      let datum = [];
+      let keyStr1 = key1+'_id';
+      let keyStr2 = key2+'_id';
+
+      let id1 = interaction[ii][keyStr1];
+      let id2 = interaction[ii][keyStr2];
+      let w = parseFloat(interaction[ii]['weight']);
+
+      datum.push(id1);
+      datum.push(id2);
+      datum.push(w);
+
+      data.push(datum);
+    }
+    return data;
   }
 
   predictPlantDisease() {
