@@ -1849,9 +1849,12 @@ export class Home {
     let str = '';
     let j=0;
     for (j;j<props.length;j++) {
-      str = str+props[j];
-      if (j<props.length-1) {
-        str = str + ',';
+      let prop = props[j];
+      if (prop) {
+        str = str+prop;
+        if (j<props.length-1) {
+          str = str + ',';
+        }
       }
     }
     return str;
