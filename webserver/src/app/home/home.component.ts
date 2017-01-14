@@ -348,10 +348,6 @@ export class Home {
 
     let dsi = JSON.stringify(drugSideInput);
     let tsi = JSON.stringify(targetSideInput);
-    // let headerDSI = '[{"header": "plaVScom"},'
-    // if (dsi.indexOf('PLA') >=0) {
-    // }
-    // dsi = '[{"header": "plaVScom"},'+dsi.slice(1);
     // console.log(dsi);
     // console.log(tsi);
 
@@ -359,17 +355,48 @@ export class Home {
     let interactionQueryAPI = baseAPI+'query_interaction.php'
     let metadataQueryAPI = baseAPI+'query_metadata.php'
 
-    console.log(interactionQueryAPI);
-
     this.http.post(interactionQueryAPI,dsi).map(resp => resp.json())
       .subscribe(plaVScom => {
-        let xx = plaVScom[0]['pla_id'];
-        console.log(xx);
-
         this.http.post(interactionQueryAPI,tsi).map(resp2 => resp2.json())
           .subscribe(proVSdis => {
-            console.log(proVSdis[0]['pro_id']);
+            let comVSproList = [];
 
+            let i = 0;
+            for (i;i<plaVScom.length;i++) {
+              let j = 0;
+              for (j;j<proVSdis.length;j++) {
+                let comId = '"'+plaVScom[i]['com_id']+'"';
+                let proId = '"'+proVSdis[j]['pro_id']+'"';
+                let comVSpro = '{'+'"comId":'+comId+','+'"proId":'+proId+'}';
+                comVSproList.push(comVSpro);
+              }
+            }
+
+            // make unique
+            comVSproList = comVSproList.filter((v, i, a) => a.indexOf(v) === i);
+
+            // make it JSON-format
+            let comVSproStr = '';
+            let k = 0;
+            for (k;k<comVSproList.length;k++) {
+              comVSproStr = comVSproStr+comVSproList[k];
+              if (k<comVSproList.length-1) {
+                comVSproStr = comVSproStr + ',';
+              }
+            }
+            comVSproStr = '['+comVSproStr+']';
+            // console.log(comVSproStr);
+
+            this.http.post(interactionQueryAPI,comVSproStr).map(resp3 => resp3.json())
+              .subscribe(comVSpro => {
+                console.log(comVSpro.length);
+
+                this.jsonPlantCompound = this.makeTextOutput(plaVScom);
+                this.jsonCompoundProtein = this.jsonPlantCompound;
+                this.jsonProteinDisease = this.jsonPlantCompound;
+
+                this.show = true;
+              })
           })
       })
   }
@@ -1793,6 +1820,30 @@ export class Home {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
+  makeTextOutput(interaction) {
+    let text: string = '';
+
+    let i: number = 0;
+    let ii: number = 0;// # of unique plants
+    let prev = '';
+    for(i;i<interaction.length;i++) {
+      let name: string = interaction[i]['pla_id'];
+      let name2: string = interaction[i]['com_id'];
+
+      if (prev!=name) {
+        ii = ii + 1;
+        text = text + '#'+ii.toString()+' '+name+':\n';
+        text = text + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
+
+        prev = name;
+      }
+
+      text = text+'  '+name2+','+'\n';
+    }
+
+    return text;
+  }
+
   downloadJSON(idata,ifname){
     var json = localStorage.getItem(idata);
     var blob = new Blob([json], {type: "text/plain;charset=utf-8"});
