@@ -430,7 +430,7 @@ export class Home {
 
                   // graph output data prep ////////////////////////////////////
                   let graphData = [];
-                  let nNodeMax = 10;
+                  let nNodeMax = 20;
 
                   let plaForGraph = this.getItemForGraph(plaSet,nNodeMax);
                   let comForGraph = this.getItemForGraph(comSet,nNodeMax);
@@ -439,34 +439,16 @@ export class Home {
 
                   let graphDataArr = [this.getGraphData(plaVScom,
                                                         plaMeta,comMeta,
-                                                        'pla','com'),
+                                                        'pla','com',
+                                                        plaForGraph,comForGraph),
                                       this.getGraphData(comVSpro,
                                                         comMeta,proMeta,
-                                                        'com','pro'),
+                                                        'com','pro',
+                                                        comForGraph,proForGraph),
                                       this.getGraphData(proVSdis,
                                                         proMeta,disMeta,
-                                                         'pro','dis')];
-                  // let graphDataArr = [
-                  //   this.getGraphData(proVSdis,
-                  //                     proMeta,disMeta,
-                  //                     'pro','dis')];
-
-                  // let graphDataArr = [
-                  //                                       this.getGraphData(comVSpro,
-                  //                                       comMeta,proMeta,
-                  //                                       'com','pro'),
-                  //   this.getGraphData(proVSdis,
-                  //                     proMeta,disMeta,
-                  //                     'pro','dis')];
-
-
-                  // let graphDataArr = [this.getGraphData(plaVScom,
-                  //                                       plaMeta,comMeta,
-                  //                                       'pla','com'),
-                  //                     this.getGraphData(comVSpro,
-                  //                                       comMeta,proMeta,
-                  //                                       'com','pro')
-                  //                    ];
+                                                         'pro','dis',
+                                                         proForGraph,disForGraph)];
 
                   let ii=0;
                   for (ii;ii<graphDataArr.length;ii++) {
@@ -1863,7 +1845,19 @@ export class Home {
     return header;
   }
 
-  getGraphData(interaction,srcMeta,destMeta,srcType,destType) {
+  concatProps(props) {
+    let str = '';
+    let j=0;
+    for (j;j<props.length;j++) {
+      str = str+props[j];
+      if (j<props.length-1) {
+        str = str + ',';
+      }
+    }
+    return str;
+  }
+
+  getGraphData(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
     let srcProp = [];
     let destProp = [];
 
@@ -1881,41 +1875,22 @@ export class Home {
 
       let src = interaction[i][srcKey];
       let dest = interaction[i][destKey];
-      let source = interaction[i]['source'];
-      let weight = parseFloat( interaction[i]['weight'] );
 
-      let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-      let destProps = this.getProps(dest,destPropKeys,destMeta);
+      if ((srcItems.indexOf(src)!==-1)&&(destItems.indexOf(dest)!==-1)) {
+        let source = interaction[i]['source'];
+        let weight = parseFloat( interaction[i]['weight'] );
 
-      let j=0;
-      let srcText = '';
-      for (j;j<srcProps.length;j++) {
-        srcText = srcText+srcProps[j];
-        if (j<srcProps.length-1) {
-          srcText = srcText + ',';
-        }
-        break;
+        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
+        let destProps = this.getProps(dest,destPropKeys,destMeta);
+        let srcText = this.concatProps(srcProps);
+        let destText = this.concatProps(destProps);
+
+        datum.push(srcText);
+        datum.push(destText);
+        datum.push(weight);
+
+        data.push(datum);
       }
-
-      j=0;
-      let destText = '';
-      for (j;j<srcProps.length;j++) {
-        destText = destText+destProps[j];
-        if (j<srcProps.length-1) {
-          destText = destText + ',';
-        }
-        break;
-      }
-
-      // TODO: fix this: should NOT overwrite!
-      srcText = src;
-      destText = dest;
-
-      datum.push(srcText);
-      datum.push(destText);
-      datum.push(weight);
-
-      data.push(datum);
     }
     return data;
   }
