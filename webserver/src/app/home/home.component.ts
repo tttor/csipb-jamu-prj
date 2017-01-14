@@ -82,6 +82,7 @@ export class Home {
   jsonProteinDisease;
 
   click = false;
+  baseAPI;
 
   //////////////////////////////////////////////////////////////////////////////
   ngOnInit() {
@@ -197,6 +198,8 @@ export class Home {
 
         this.diseaseSearch = data;
       })
+
+      this.baseAPI ='http://localhost/';
   }
 
   // INPUT HANDLING METHODS ////////////////////////////////////////////////////
@@ -351,54 +354,92 @@ export class Home {
     // console.log(dsi);
     // console.log(tsi);
 
-    let baseAPI = 'http://localhost/';
-    let interactionQueryAPI = baseAPI+'query_interaction.php'
-    let metadataQueryAPI = baseAPI+'query_metadata.php'
+    let interactionQueryAPI = this.baseAPI+'query_interaction.php';
+    let metaQueryAPI = this.baseAPI+'query_metadata.php'
 
     this.http.post(interactionQueryAPI,dsi).map(resp => resp.json())
-      .subscribe(plaVScom => {
-        this.http.post(interactionQueryAPI,tsi).map(resp2 => resp2.json())
-          .subscribe(proVSdis => {
-            let comVSproList = [];
+    .subscribe(plaVScom => {
+      this.http.post(interactionQueryAPI,tsi).map(resp2 => resp2.json())
+      .subscribe(proVSdis => {
+        let comVSproList = [];
 
-            let i = 0;
-            for (i;i<plaVScom.length;i++) {
-              let j = 0;
-              for (j;j<proVSdis.length;j++) {
-                let comId = '"'+plaVScom[i]['com_id']+'"';
-                let proId = '"'+proVSdis[j]['pro_id']+'"';
-                let comVSpro = '{'+'"comId":'+comId+','+'"proId":'+proId+'}';
-                comVSproList.push(comVSpro);
-              }
-            }
+        let i = 0;
+        for (i;i<plaVScom.length;i++) {
+          let j = 0;
+          for (j;j<proVSdis.length;j++) {
+            let comId = '"'+plaVScom[i]['com_id']+'"';
+            let proId = '"'+proVSdis[j]['pro_id']+'"';
+            let comVSpro = '{'+'"comId":'+comId+','+'"proId":'+proId+'}';
+            comVSproList.push(comVSpro);
+          }
+        }
 
-            // make unique
-            comVSproList = comVSproList.filter((v, i, a) => a.indexOf(v) === i);
+        // make unique
+        comVSproList = comVSproList.filter((v, i, a) => a.indexOf(v) === i);
 
-            // make it JSON-format
-            let comVSproStr = '';
-            let k = 0;
-            for (k;k<comVSproList.length;k++) {
-              comVSproStr = comVSproStr+comVSproList[k];
-              if (k<comVSproList.length-1) {
-                comVSproStr = comVSproStr + ',';
-              }
-            }
-            comVSproStr = '['+comVSproStr+']';
-            // console.log(comVSproStr);
+        // make it JSON-format
+        let comVSproStr = '';
+        let k = 0;
+        for (k;k<comVSproList.length;k++) {
+          comVSproStr = comVSproStr+comVSproList[k];
+          if (k<comVSproList.length-1) {
+            comVSproStr = comVSproStr + ',';
+          }
+        }
+        comVSproStr = '['+comVSproStr+']';
+        // console.log(comVSproStr);
 
-            this.http.post(interactionQueryAPI,comVSproStr).map(resp3 => resp3.json())
-              .subscribe(comVSpro => {
-                console.log(comVSpro.length);
+        this.http.post(interactionQueryAPI,comVSproStr).map(resp3 => resp3.json())
+        .subscribe(comVSpro => {
+          // Get unique items
+          let plaSet = this.getSet(plaVScom,'pla_id');
+          let comSet = this.getSet(plaVScom,'com_id');
+          // let comSet2 = this.getSet(comVSpro,'com_id');
+          // let proSet2 = this.getSet(comVSpro,'pro_id');
+          let proSet = this.getSet(proVSdis,'pro_id');
+          let disSet = this.getSet(proVSdis,'dis_id');
+          // console.log(plaSet.length);
+          // console.log(comSet.length);
+          // console.log(proSet.length);
+          // console.log(disSet.length);
 
-                this.jsonPlantCompound = this.makeTextOutput(plaVScom);
-                this.jsonCompoundProtein = this.jsonPlantCompound;
-                this.jsonProteinDisease = this.jsonPlantCompound;
+          // Get metadata of each unique item
+          let plaMetaPost = this.getMetaPostStr(plaSet);
+          let comMetaPost = this.getMetaPostStr(comSet);
+          let proMetaPost = this.getMetaPostStr(proSet);
+          let disMetaPost = this.getMetaPostStr(disSet);
+          console.log(plaMetaPost);
+          console.log(metaQueryAPI);
 
-                this.show = true;
-              })
-          })
+          console.log('getting meta ...');
+          this.http.post(metaQueryAPI,plaMetaPost).map(resp4 => resp4.json())
+          .subscribe(plaMeta => {
+            console.log('got plaMeta');
+            this.http.post(metaQueryAPI,comMetaPost).map(resp5=>resp5.json())
+            .subscribe(comMeta => {
+              console.log('got comMeta');
+              this.http.post(metaQueryAPI,proMetaPost).map(resp6=>resp6.json())
+              .subscribe(proMeta => {
+                this.http.post(metaQueryAPI,disMetaPost).map(resp7=>resp7.json())
+                .subscribe(disMeta => {
+                  // Make text output with detail metadata
+                  this.jsonPlantCompound = this.makeTextOutput(plaVScom,
+                                                               plaMeta,comMeta,
+                                                               'pla','com');
+                  this.jsonCompoundProtein = this.makeTextOutput(comVSpro,
+                                                               comMeta,proMeta,
+                                                               'com','pro');
+                  this.jsonProteinDisease = this.makeTextOutput(proVSdis,
+                                                               proMeta,disMeta,
+                                                               'pro','dis');
+                  this.show = true;
+                })//disMeta
+              })//proMeta
+            })//comMeta
+          })//plaMeta
+        })
       })
+    })
   }
 
   predictPlantDisease() {
@@ -1820,25 +1861,63 @@ export class Home {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
-  makeTextOutput(interaction) {
+  getSet(interaction,id) {
+    let set = [];
+
+    let i=0;
+    for (i;i<interaction.length;i++) {
+      let item = interaction[i][id];
+      if (set.indexOf(item) < 0) {
+        set.push(item);
+      }
+    }
+
+    return set;
+  }
+
+  getMetaPostStr(set) {
+    let postStr = '';
+
+    let i=0;
+    for (i;i<set.length;i++) {
+      let item = '"'+set[i]+'"';
+      postStr = postStr+'{'+'"id":'+item+'}';
+      if (i<set.length-1) {
+        postStr = postStr+',';
+      }
+    }
+    postStr = '['+postStr+']';
+    // console.log(postStr);
+
+    return postStr;
+  }
+
+  makeTextOutput(interaction,metaSrc,metaDest,srcType,destType) {
     let text: string = '';
+
+    // let id = '';
+    // if (srcType === 'pla') {
+    //   id = 'p'
+    // }
 
     let i: number = 0;
     let ii: number = 0;// # of unique plants
     let prev = '';
     for(i;i<interaction.length;i++) {
-      let name: string = interaction[i]['pla_id'];
-      let name2: string = interaction[i]['com_id'];
+      let srcKey = srcType+'_id';
+      let destKey = destType+'_id'
+      let src: string = interaction[i][srcKey];
+      let dest: string = interaction[i][destKey];
 
-      if (prev!=name) {
+      if (prev!=src) {
         ii = ii + 1;
-        text = text + '#'+ii.toString()+' '+name+':\n';
+        text = text + '#'+ii.toString()+' '+src+':\n';
         text = text + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
 
-        prev = name;
+        prev = src;
       }
 
-      text = text+'  '+name2+','+'\n';
+      text = text+'  '+dest+','+'\n';
     }
 
     return text;
