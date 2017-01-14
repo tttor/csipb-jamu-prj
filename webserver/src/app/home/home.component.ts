@@ -437,9 +437,15 @@ export class Home {
                   let proForGraph = this.getItemForGraph(proSet,nNodeMax);
                   let disForGraph = this.getItemForGraph(disSet,nNodeMax);
 
-                  let graphDataArr = [this.getGraphData(plaVScom,plaForGraph,comForGraph),
-                                      this.getGraphData(comVSpro,comForGraph,proForGraph),
-                                      this.getGraphData(proVSdis,proForGraph,disForGraph)];
+                  let graphDataArr = [this.getGraphData(plaVScom,
+                                                        plaForGraph,comForGraph,
+                                                        plaMeta,comMeta),
+                                      this.getGraphData(comVSpro,
+                                                        comForGraph,proForGraph,
+                                                        comMeta,proMeta),
+                                      this.getGraphData(proVSdis,
+                                                        proForGraph,disForGraph,
+                                                        proMeta,disMeta)];
 
                   let ii=0;
                   for (ii;ii<graphDataArr.length;ii++) {
@@ -1718,9 +1724,11 @@ export class Home {
     return itemForGraph;
   }
 
-  getGraphData(interaction,itemArr1,itemArr2) {
-    let key1 = itemArr1[0].substr(0,3).toLowerCase()+'_id';
-    let key2 = itemArr2[0].substr(0,3).toLowerCase()+'_id';
+  getGraphData(interaction,itemArr1,itemArr2,meta1,meta2) {
+    let key1 = itemArr1[0].substr(0,3).toLowerCase();
+    let key2 = itemArr2[0].substr(0,3).toLowerCase();
+    let key11 = key1+'_id';
+    let key22 = key2+'_id';
 
     let data = [];
 
@@ -1730,14 +1738,28 @@ export class Home {
       for (j;j<itemArr2.length;j++) {
         let k=0;
         for (k;k<interaction.length;k++) {
-          let id1 = interaction[k][key1];
-          let id2 = interaction[k][key2];
+          let id1 = interaction[k][key11];
+          let id2 = interaction[k][key22];
           if (id1===itemArr1[i] && id2===itemArr2[j]) {
             let datum = [];
+
+            let propKeys1 = this.getPropKeys(key1);
+            let propKeys2 = this.getPropKeys(key2);
+            // console.log(propKeys1.length);
+            // console.log(propKeys2.length);
+
             let w = parseFloat(interaction[k]['weight']);
+            // let props1 = this.getProps(key1,propKeys1,meta1);
+            // let props2 = this.getProps(key2,propKeys2,meta2);
+            // console.log(props1.length);
+            // console.log(props2.length);
+
+            // datum.push(props1[0]);
+            // datum.push(props2[0]);
             datum.push(id1);
             datum.push(id2);
             datum.push(w);
+
             data.push(datum);
             break;
           }
@@ -1843,11 +1865,22 @@ export class Home {
         break;
       }
     }
+    // console.log('wwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
+    // console.log(prefix);
+    // if (prefix=='pla_id') {
+    //   console.log(JSON.stringify(meta));
+
+    //   let meta2 = [{"pla_id":"PLA00001504","pla_name":"Aloe vera"},{"pla_id":"PLA00001600","pla_name":"Cocos nucifera"},{"pla_id":"PLA00003447","pla_name":"Panax ginseng"}];
+
+    //   console.log(meta2[i]["pla_id"]);
+    //   console.log(meta2[0]['pla_name']);
+    //   console.log(meta2[i]['pla_name']);
+    // }
 
     let props = []
     let j=0;
     for(j;j<keys.length;j++) {
-      props.push(meta[i][keys[j]]);
+      props.push( meta[i][keys[j]] );
     }
 
     return props;
