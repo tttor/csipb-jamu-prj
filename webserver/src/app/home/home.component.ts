@@ -297,7 +297,6 @@ export class Home {
     }
 
     if (this.plant.length > 1 && this.disease.length > 1) {
-        // this.predictPlantDisease();
         this.searchAndPredict(this.selectedPlants,this.selectedDiseases)
     }
 
@@ -459,205 +458,6 @@ export class Home {
         })
       })
     })
-  }
-
-  getGraphData(interaction,key1,key2) {
-    let data = [];
-    let ii=0;
-    for (ii;ii<interaction.length;ii++) {
-      let datum = [];
-      let keyStr1 = key1+'_id';
-      let keyStr2 = key2+'_id';
-
-      let id1 = interaction[ii][keyStr1];
-      let id2 = interaction[ii][keyStr2];
-      let w = parseFloat(interaction[ii]['weight']);
-
-      datum.push(id1);
-      datum.push(id2);
-      datum.push(w);
-
-      data.push(datum);
-    }
-    return data;
-  }
-
-  predictPlantDisease() {
-    console.log('predictPlantDisesase');
-
-    this.plant.pop();
-    this.protein.pop();
-    let tanam = JSON.stringify(this.selectedPlants);
-    let dis = JSON.stringify(this.selectedDiseases);
-
-    let compoundProtein1;
-    let compoundProtein2;
-
-    let plantCompound;
-    let proteinDisease;
-
-    this.http.post('http://localhost/zz-plant.php', tanam)
-      .map(res => res.json())
-      .subscribe(data => {
-
-        plantCompound = data[0]['plant_compound'];
-        compoundProtein1 = data[1]['compound_protein'];
-
-        this.http.post('http://localhost/zz-disease.php', dis)
-          .map(res => res.json())
-          .subscribe(data1 => {
-
-            proteinDisease = data1[2]['protein_disease'];
-            compoundProtein2 = data1[1]['compound_protein'];
-
-            let pla_comp = {};
-            let comp_prot = {};
-            let prot_dis = {};
-
-            ////////////////////////////////////////////////////////////////////////
-            let plaComStr: string = '';
-            let comProStr: string = '';
-            let proDisStr: string = '';
-
-            let i: number = 0;
-            let ii: number = 0;// # of unique plants
-            let prevPlaName = '';
-            for(i;i<plantCompound.length;i++) {
-              let plaName: string = plantCompound[i][0]
-              let comName: string = plantCompound[i][1]
-              let srcName: string = plantCompound[i][2]
-
-              if (prevPlaName!=plaName) {
-                ii = ii + 1;
-                plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
-                plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
-
-                prevPlaName = plaName;
-              }
-
-              let comNameComps = comName.split(')');
-              let comCasId = comNameComps[0].replace('(','');
-              let comDrugbankId = comNameComps[1].replace('(','');
-              let comKnapsackId = comNameComps[2].replace('(','');
-              let comKeggId = comNameComps[3].replace('(','');
-
-              plaComStr = plaComStr+'  '+comCasId+','
-                                        +this.getHyperlinkStr('drugbank',comDrugbankId)+','
-                                        +this.getHyperlinkStr('knapsack',comKnapsackId)+','
-                                        +this.getHyperlinkStr('kegg',comKeggId)+','
-                                        +srcName
-                                        +'\n';
-            }
-            ////////////////////////////////////////////////////////////////////////
-
-            let count_pla_comp = 0;
-            let count_comp_prot = 0;
-            let count_prot_dis = 0;
-
-            for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
-              let temp = plantCompound[count_pla_comp][0];
-
-              if (pla_comp[temp]) {
-                let temp2 = pla_comp[temp];
-
-                if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
-                  temp2.push(plantCompound[count_pla_comp][1]);
-
-                  pla_comp[temp] = temp2;
-                }
-
-              }
-              else {
-                let a = [];
-                a.push(plantCompound[count_pla_comp][1]);
-                pla_comp[temp] = a;
-              }
-            }
-
-            for(count_comp_prot; count_comp_prot < compoundProtein2.length; count_comp_prot++) {
-              let temp = compoundProtein2[count_comp_prot][0];
-
-              if (comp_prot[temp]) {
-                let temp2 = comp_prot[temp];
-
-                if(this.checkJson(temp2, compoundProtein2[count_comp_prot][1])) {
-                  temp2.push(compoundProtein2[count_comp_prot][1]);
-
-                  comp_prot[temp] = temp2;
-                }
-
-              }
-              else {
-                let a = [];
-                a.push(compoundProtein2[count_comp_prot][1]);
-                comp_prot[temp] = a;
-              }
-            }
-
-            for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
-              let temp = proteinDisease[count_prot_dis][0];
-
-              if (prot_dis[temp]) {
-                let temp2 = prot_dis[temp];
-
-                if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
-                  temp2.push(proteinDisease[count_prot_dis][1]);
-
-                  prot_dis[temp] = temp2;
-                }
-
-              }
-              else {
-                let a = [];
-                a.push(proteinDisease[count_prot_dis][1]);
-                prot_dis[temp] = a;
-              }
-            }
-
-            this.jsonPlantCompound = plaComStr;
-            this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
-            this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
-
-            for (let i = 0; i < compoundProtein1.length; i++) {
-
-              for (let j = 0; j < proteinDisease.length; j++) {
-                if (compoundProtein1[i][1] == proteinDisease[j][0]) {
-                  let cp = compoundProtein1[i][0];
-                  if (this.check(this.dataLocal, compoundProtein1[i][0], proteinDisease[j][0])) {
-                    let push = [compoundProtein1[i][0], proteinDisease[j][0], 1];
-                    this.dataLocal.push(push);
-                  }
-
-                  for (let z = 0; z < plantCompound.length; z++) {
-                    if (plantCompound[z][1] == cp) {
-                      if (this.check(this.dataLocal, plantCompound[z][0], plantCompound[z][1])) {
-                        let push = [plantCompound[z][0], plantCompound[z][1], 1];
-                        this.dataLocal.push(push);
-                      }
-                    }
-                  }
-                }
-              }
-
-            }
-
-            for (let i = 0; i < proteinDisease.length; i++) {
-              if (this.check(this.dataLocal, proteinDisease[i][0], proteinDisease[i][1])) {
-                let push = [proteinDisease[i][0], proteinDisease[i][1], 1];
-                this.dataLocal.push(push);
-              }
-            }
-
-            localStorage.setItem('data', JSON.stringify(this.dataLocal));
-            localStorage.setItem('jsonPlaComp', JSON.stringify(pla_comp, undefined, 2));
-            localStorage.setItem('jsonCompProt', JSON.stringify(comp_prot, undefined, 2));
-            localStorage.setItem('jsonProtDis', JSON.stringify(prot_dis, undefined, 2));
-            this.show = true;
-
-        })
-
-    })
-
   }
 
   predictPlant() {
@@ -1901,6 +1701,27 @@ export class Home {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
+  getGraphData(interaction,key1,key2) {
+    let data = [];
+    let ii=0;
+    for (ii;ii<interaction.length;ii++) {
+      let datum = [];
+      let keyStr1 = key1+'_id';
+      let keyStr2 = key2+'_id';
+
+      let id1 = interaction[ii][keyStr1];
+      let id2 = interaction[ii][keyStr2];
+      let w = parseFloat(interaction[ii]['weight']);
+
+      datum.push(id1);
+      datum.push(id2);
+      datum.push(w);
+
+      data.push(datum);
+    }
+    return data;
+  }
+
   getSet(interaction,id) {
     let set = [];
 
