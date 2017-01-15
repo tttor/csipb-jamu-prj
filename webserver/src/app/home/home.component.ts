@@ -20,15 +20,6 @@ declare var saveAs: any;
   templateUrl: './home.template.html'
 })
 export class Home {
-  options: any;
-  data: any;
-  chartType: any;
-
-  plant: any;
-  compound: any;
-  protein: any;
-  disease: any;
-
   // count variable
   countTanaman = 0;
   countCompound = 0;
@@ -41,50 +32,52 @@ export class Home {
   activeProtein = true;
   activeDisease = true;
 
-  // show
-  show = false;
-
-  dataLocal = [];
-
-  FileSaver: any;
-
-  // DATA search
+  // Search data for auto completion, search while filling
   plantSearch: Array<string>;
   compoundSearch: Array<string>;
   proteinSearch: Array<string>;
   diseaseSearch: Array<string>;
 
+  // Total number of items in each set
   plant_total;
   compound_total;
   protein_total;
   disease_total;
 
+  // Items selected by users
   selectedPlants = [];
   selectedCompounds = [];
   selectedProteins = [];
   selectedDiseases = [];
-
-  typeaheadNoResults:boolean = false;
-
-  noResultPlant = false;
-  noResultCompound = false;
-  noResultProtein = false;
-  noResultDisease = false;
-
-  pTanaman = false;
-  pProtein = false;
-  pCompound = false;
-  pDisease = false;
 
   // This 3 vars are used in text output
   jsonPlantCompound;
   jsonCompoundProtein;
   jsonProteinDisease;
 
+  // Misc.
+  // TODO explain the usage
+  show = false;
+  dataLocal = [];
+  FileSaver: any;
   click = false;
   baseAPI;
   interactionQueryAPI;
   metaQueryAPI;
+  typeaheadNoResults:boolean = false;
+  noResultPlant = false;
+  noResultCompound = false;
+  noResultProtein = false;
+  noResultDisease = false;
+  pTanaman = false;
+  pProtein = false;
+  pCompound = false;
+  pDisease = false;
+  data: any;
+  plant: any;
+  compound: any;
+  protein: any;
+  disease: any;
 
   //////////////////////////////////////////////////////////////////////////////
   ngOnInit() {
