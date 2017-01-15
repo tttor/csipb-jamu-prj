@@ -409,10 +409,8 @@ export class Home {
       .subscribe(proVSdis => {
         let comVSproList = [];
 
-        let i = 0;
-        for (i;i<plaVScom.length;i++) {
-          let j = 0;
-          for (j;j<proVSdis.length;j++) {
+        for (let i=0;i<plaVScom.length;i++) {
+          for (let j=0;j<proVSdis.length;j++) {
             let comId = '"'+plaVScom[i]['com_id']+'"';
             let proId = '"'+proVSdis[j]['pro_id']+'"';
             let comVSpro = '{'+'"comId":'+comId+','+'"proId":'+proId+'}';
@@ -425,8 +423,7 @@ export class Home {
 
         // make it JSON-format
         let comVSproStr = '';
-        let k = 0;
-        for (k;k<comVSproList.length;k++) {
+        for (let k=0;k<comVSproList.length;k++) {
           comVSproStr = comVSproStr+comVSproList[k];
           if (k<comVSproList.length-1) {
             comVSproStr = comVSproStr + ',';
@@ -507,10 +504,8 @@ export class Home {
                                                    'pro','dis',
                                                    proForGraph,disForGraph)];
 
-            let ii=0;
-            for (ii;ii<graphDataArr.length;ii++) {
-              let jj=0;
-              for(jj;jj<graphDataArr[ii].length;jj++) {
+            for (let ii=0;ii<graphDataArr.length;ii++) {
+              for(let jj=0;jj<graphDataArr[ii].length;jj++) {
                   let datum = graphDataArr[ii][jj];
                   graphData.push(datum);
               }
@@ -526,8 +521,7 @@ export class Home {
 
   makeJSONFormat(arr,key) {
     let str = '';
-    let j=0;
-    for (j;j<arr.length;j++){
+    for (let j=0;j<arr.length;j++){
       str = str+'{'+'"'+key+'"'+':'+'"'+arr[j]+'"'+'}';
       if (j<arr.length-1) {
         str = str+','
@@ -547,8 +541,7 @@ export class Home {
 
   getItemForGraph(set,max) {
     let itemForGraph = [];
-    let kk = 0;
-    for (kk;kk<set.length;kk++) {
+    for (let kk=0;kk<set.length;kk++) {
       if (kk < max) {
         itemForGraph.push(set[kk]);
       }
@@ -561,8 +554,7 @@ export class Home {
 
   getSet(interaction,id) {
     let set = [];
-    let i=0;
-    for (i;i<interaction.length;i++) {
+    for (let i=0;i<interaction.length;i++) {
       let item = interaction[i][id];
       if (set.indexOf(item) === -1) {
         set.push(item);
@@ -630,17 +622,17 @@ export class Home {
     let prefix = id.substr(0,3);
     prefix = prefix.toLowerCase() + '_id';
 
-    let i=0;
-    for (i;i<meta.length;i++) {
+    let idx = -1;
+    for (let i=0;i<meta.length;i++) {
       if (id===meta[i][prefix]) {
+        idx = i;
         break;
       }
     }
 
     let props = []
-    let j=0;
-    for(j;j<keys.length;j++) {
-      props.push( meta[i][keys[j]] );
+    for(let j=0;j<keys.length;j++) {
+      props.push( meta[idx][keys[j]] );
     }
 
     return props;
@@ -662,8 +654,7 @@ export class Home {
 
   concatProps(props) {
     let str = '';
-    let j=0;
-    for (j;j<props.length;j++) {
+    for (let j=0;j<props.length;j++) {
       let prop = props[j];
       if (prop) {
         str = str+prop;
