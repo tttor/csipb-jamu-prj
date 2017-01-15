@@ -461,6 +461,11 @@ export class Home {
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
   makeOutput(plaSet,comSet,proSet,disSet,plaVScom,comVSpro,proVSdis) {
+    plaSet = this.handleIfEmptySet(plaSet,'pla');
+    comSet = this.handleIfEmptySet(comSet,'com');
+    proSet = this.handleIfEmptySet(proSet,'pro');
+    disSet = this.handleIfEmptySet(disSet,'dis');
+
     // Get metadata of each unique item
     let plaMetaPost = this.makeJSONFormat(plaSet,'id');
     let comMetaPost = this.makeJSONFormat(comSet,'id');
@@ -537,6 +542,14 @@ export class Home {
     }
     str = '['+str+']';
     return str;
+  }
+
+  handleIfEmptySet(set,type) {
+    if (set.length>0) {
+      return set;
+    }
+    let newSet = [type.toUpperCase()+'NONE_DUMMY'];
+    return newSet;
   }
 
   getItemForGraph(set,max) {
