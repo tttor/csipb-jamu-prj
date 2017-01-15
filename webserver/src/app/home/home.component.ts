@@ -462,10 +462,10 @@ export class Home {
   // UTILITY METHODS ///////////////////////////////////////////////////////////
   makeOutput(plaSet,comSet,proSet,disSet,plaVScom,comVSpro,proVSdis) {
     // Get metadata of each unique item
-    let plaMetaPost = this.getMetaPostStr(plaSet);
-    let comMetaPost = this.getMetaPostStr(comSet);
-    let proMetaPost = this.getMetaPostStr(proSet);
-    let disMetaPost = this.getMetaPostStr(disSet);
+    let plaMetaPost = this.makeJSONFormat(plaSet,'id');
+    let comMetaPost = this.makeJSONFormat(comSet,'id');
+    let proMetaPost = this.makeJSONFormat(proSet,'id');
+    let disMetaPost = this.makeJSONFormat(disSet,'id');
 
     // console.log('getting meta ...');
     this.http.post(this.metaQueryAPI,plaMetaPost).map(resp4 => resp4.json())
@@ -563,23 +563,6 @@ export class Home {
       }
     }
     return set;
-  }
-
-  getMetaPostStr(set) {
-    let postStr = '';
-
-    let i=0;
-    for (i;i<set.length;i++) {
-      let item = '"'+set[i]+'"';
-      postStr = postStr+'{'+'"id":'+item+'}';
-      if (i<set.length-1) {
-        postStr = postStr+',';
-      }
-    }
-    postStr = '['+postStr+']';
-    // console.log(postStr);
-
-    return postStr;
   }
 
   getPropKeys(type) {
