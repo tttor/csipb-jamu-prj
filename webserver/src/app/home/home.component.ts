@@ -755,38 +755,6 @@ export class Home {
     saveAs(blob, ifname);
   }
 
-  check(data, input1, input2) {
-
-    for(var i = 0; i < data.length; i++) {
-      if (data[i][0] == input1 && data[i][1] == input2) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  checkJson(data, input1) {
-
-    for(var i = 0; i < data.length; i++) {
-      if (data[i] == input1) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  getMaxKeys(json) {
-    var m;
-    for (var i in json) {
-        if (json.hasOwnProperty(i)) {
-           m = (typeof m == 'undefined' || i > m) ? i : m;
-        }
-    }
-    return m;
-  }
-
   reset() {
     this.activeTanaman = true;
     this.activeCompound = true;
