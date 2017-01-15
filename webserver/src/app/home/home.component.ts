@@ -136,8 +136,7 @@ export class Home {
         this.disease_total = data[0]['disease_total'];
       })
 
-    this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/plant.php')
-      .map(res => res.json())
+    this.http.get(this.baseAPI+'plant.php').map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
           let temp = data[i]['pla_name'];
@@ -147,8 +146,7 @@ export class Home {
         this.plantSearch = data;
       })
 
-    this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/compound.php')
-      .map(res => res.json())
+    this.http.get(this.baseAPI+'compound.php').map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
           let temp = '';
@@ -178,8 +176,7 @@ export class Home {
         this.compoundSearch = data;
       })
 
-    this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/protein.php')
-      .map(res => res.json())
+    this.http.get(this.baseAPI+'protein.php').map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
           let temp = data[i]['pro_uniprot_id']+' | '+data[i]['pro_name'];
@@ -189,8 +186,7 @@ export class Home {
         this.proteinSearch = data;
       })
 
-    this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/disease.php')
-      .map(res => res.json())
+    this.http.get(this.baseAPI+'disease.php').map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
           let temp = data[i]['dis_omim_id']+' | '+data[i]['dis_name'];
