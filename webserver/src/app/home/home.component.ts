@@ -772,6 +772,9 @@ export class Home {
       text = text+'\n';
     }
 
+    if (text==='') {
+      text = 'None';
+    }
     return text;
   }
 
