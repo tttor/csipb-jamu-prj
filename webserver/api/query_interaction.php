@@ -81,7 +81,7 @@
     $resp = pg_query($link, $query);
     $respLen = pg_num_rows($resp);
 
-    if ($respLen===0) {
+    if ($respLen===0 and $mode==='SEARCH_AND_PREDICT') {
       // TODO @Ajmal: run real predictors!
       $weight = '0.5';
       $source = 'predictor';
@@ -101,7 +101,6 @@
       break;
     }
   }
-
   header('Content-type: application/json');
   echo json_encode($respArr);
 ?>
