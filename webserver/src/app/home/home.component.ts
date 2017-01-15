@@ -264,13 +264,12 @@ export class Home {
     let showDisease = false;
 
     if (this.plant.length > 1 && this.disease.length <= 1 && this.protein.length <= 1) {
-        this.predictPlant();
-        showPlant = true;
+      this.searchFromDrugSide(this.selectedPlants);
+      showPlant = true;
     }
-
     else if (this.compound.length > 1 && this.protein.length <= 1 && this.disease.length <= 1) {
-        this.predictCompound();
-        showCompound = true;
+      this.searchFromDrugSide(this.selectedCompounds);
+      showCompound = true;
     }
 
     else if (this.protein.length > 1 && this.plant.length <= 1 && this.compound.length <= 1) {
@@ -334,6 +333,38 @@ export class Home {
     }, 100);
   }
 
+  searchFromDrugSide(drugSideInput) {
+    console.log('searchOnly: drugSideInput');
+
+    let dsi = JSON.stringify(drugSideInput);
+    console.log(dsi);
+
+    let interactionQueryAPI = this.baseAPI+'query_interaction.php';
+
+    this.http.post(interactionQueryAPI,dsi).map(resp => resp.json())
+    .subscribe(plaVScom => {
+      let comSet = this.getSet(plaVScom,'com_id');
+      let comSetJSON = this.makeJSONFormat(comSet,'comId');
+      // console.log(comSetJSON);
+
+      this.http.post(interactionQueryAPI,comSetJSON).map(resp2 => resp2.json())
+      .subscribe(comVSpro => {
+        let proSet = this.getSet(comVSpro,'pro_id');
+        let proSetJSON = this.makeJSONFormat(proSet,'value');
+        // console.log(proSetJSON);
+
+        this.http.post(interactionQueryAPI,proSetJSON).map(resp3 => resp3.json())
+        .subscribe(proVSdis => {
+          let plaSet = this.getSet(plaVScom,'pla_id');
+          let disSet = this.getSet(proVSdis,'dis_id');
+
+          this.makeOutput(plaSet,comSet,proSet,disSet,
+                          plaVScom,comVSpro,proVSdis);
+        })
+      })
+    })
+  }
+
   searchAndPredict(drugSideInput,targetSideInput) {
     console.log('searchAndPredict');
 
@@ -382,14 +413,10 @@ export class Home {
           // Get unique items
           let plaSet = this.getSet(plaVScom,'pla_id');
           let comSet = this.getSet(plaVScom,'com_id');
-          // let comSet2 = this.getSet(comVSpro,'com_id');
-          // let proSet2 = this.getSet(comVSpro,'pro_id');
           let proSet = this.getSet(proVSdis,'pro_id');
           let disSet = this.getSet(proVSdis,'dis_id');
-          // console.log(plaSet.length);
-          // console.log(comSet.length);
-          // console.log(proSet.length);
-          // console.log(disSet.length);
+          // let comSet2 = this.getSet(comVSpro,'com_id');
+          // let proSet2 = this.getSet(comVSpro,'pro_id');
 
           // Get metadata of each unique item
           let plaMetaPost = this.getMetaPostStr(plaSet);
@@ -1186,6 +1213,87 @@ export class Home {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
+  makeOutput(plaSet,comSet,proSet,disSet,plaVScom,comVSpro,proVSdis) {
+    let metaQueryAPI = this.baseAPI+'query_metadata.php';
+
+    // Get metadata of each unique item
+    let plaMetaPost = this.getMetaPostStr(plaSet);
+    let comMetaPost = this.getMetaPostStr(comSet);
+    let proMetaPost = this.getMetaPostStr(proSet);
+    let disMetaPost = this.getMetaPostStr(disSet);
+
+    // console.log('getting meta ...');
+    this.http.post(metaQueryAPI,plaMetaPost).map(resp4 => resp4.json())
+    .subscribe(plaMeta => {
+      this.http.post(metaQueryAPI,comMetaPost).map(resp5=>resp5.json())
+      .subscribe(comMeta => {
+        this.http.post(metaQueryAPI,proMetaPost).map(resp6=>resp6.json())
+        .subscribe(proMeta => {
+          this.http.post(metaQueryAPI,disMetaPost).map(resp7=>resp7.json())
+          .subscribe(disMeta => {
+            // text output with detail metadata //////////////////////////
+            this.jsonPlantCompound = this.makeTextOutput(plaVScom,
+                                                         plaMeta,comMeta,
+                                                         'pla','com');
+            this.jsonCompoundProtein = this.makeTextOutput(comVSpro,
+                                                           comMeta,proMeta,
+                                                           'com','pro');
+            this.jsonProteinDisease = this.makeTextOutput(proVSdis,
+                                                         proMeta,disMeta,
+                                                         'pro','dis');
+
+            // graph output data prep ////////////////////////////////////
+            let graphData = [];
+            let nNodeMax = 20;
+
+            let plaForGraph = this.getItemForGraph(plaSet,nNodeMax);
+            let comForGraph = this.getItemForGraph(comSet,nNodeMax);
+            let proForGraph = this.getItemForGraph(proSet,nNodeMax);
+            let disForGraph = this.getItemForGraph(disSet,nNodeMax);
+
+            let graphDataArr = [this.getGraphData(plaVScom,
+                                                  plaMeta,comMeta,
+                                                  'pla','com',
+                                                  plaForGraph,comForGraph),
+                                this.getGraphData(comVSpro,
+                                                  comMeta,proMeta,
+                                                  'com','pro',
+                                                  comForGraph,proForGraph),
+                                this.getGraphData(proVSdis,
+                                                  proMeta,disMeta,
+                                                   'pro','dis',
+                                                   proForGraph,disForGraph)];
+
+            let ii=0;
+            for (ii;ii<graphDataArr.length;ii++) {
+              let jj=0;
+              for(jj;jj<graphDataArr[ii].length;jj++) {
+                  let datum = graphDataArr[ii][jj];
+                  graphData.push(datum);
+              }
+            }
+
+            localStorage.setItem('data', JSON.stringify(graphData));
+            this.show = true;
+          })//disMeta
+        })//proMeta
+      })//comMeta
+    })//plaMeta
+  }
+
+  makeJSONFormat(arr,key) {
+    let str = '';
+    let j=0;
+    for (j;j<arr.length;j++){
+      str = str+'{'+'"'+key+'"'+':'+'"'+arr[j]+'"'+'}';
+      if (j<arr.length-1) {
+        str = str+','
+      }
+    }
+    str = '['+str+']';
+    return str;
+  }
+
   getItemForGraph(set,max) {
     let itemForGraph = [];
     let kk = 0;
@@ -1202,15 +1310,13 @@ export class Home {
 
   getSet(interaction,id) {
     let set = [];
-
     let i=0;
     for (i;i<interaction.length;i++) {
       let item = interaction[i][id];
-      if (set.indexOf(item) < 0) {
+      if (set.indexOf(item) === -1) {
         set.push(item);
       }
     }
-
     return set;
   }
 
