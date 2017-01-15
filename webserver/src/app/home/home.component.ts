@@ -141,14 +141,38 @@ export class Home {
         this.disease_total = data[0]['disease_total'];
       })
 
-    this.http.get(this.baseAPI+'plant.php').map(res => res.json())
+    // Query for metadata for _text_ _completion_ //////////////////////////////
+    let plaPostMsg = ['PLA_ALL'];
+    let plaPostMsgJSON = this.makeJSONFormat(plaPostMsg,'id');
+    this.http.post(this.metaQueryAPI,plaPostMsgJSON).map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
           let temp = data[i]['pla_name'];
           data[i]['search'] = temp;
         }
-
         this.plantSearch = data;
+      })
+
+    let proPostMsg = ['PRO_ALL'];
+    let proPostMsgJSON = this.makeJSONFormat(proPostMsg,'id');
+    this.http.post(this.metaQueryAPI,proPostMsgJSON).map(res => res.json())
+      .subscribe(data => {
+        for (let i = 0; i < data.length; i++) {
+          let temp = data[i]['pro_uniprot_id']+' | '+data[i]['pro_name'];
+          data[i]['search'] = temp;
+        }
+        this.proteinSearch = data;
+      })
+
+    let disPostMsg = ['DIS_ALL'];
+    let disPostMsgJSON = this.makeJSONFormat(disPostMsg,'id');
+    this.http.post(this.metaQueryAPI,disPostMsgJSON).map(res => res.json())
+      .subscribe(data => {
+        for (let i = 0; i < data.length; i++) {
+          let temp = data[i]['dis_omim_id']+' | '+data[i]['dis_name'];
+          data[i]['search'] = temp;
+        }
+        this.diseaseSearch = data;
       })
 
     this.http.get(this.baseAPI+'compound.php').map(res => res.json())
@@ -179,26 +203,6 @@ export class Home {
         }
 
         this.compoundSearch = data;
-      })
-
-    this.http.get(this.baseAPI+'protein.php').map(res => res.json())
-      .subscribe(data => {
-        for (let i = 0; i < data.length; i++) {
-          let temp = data[i]['pro_uniprot_id']+' | '+data[i]['pro_name'];
-          data[i]['search'] = temp;
-        }
-
-        this.proteinSearch = data;
-      })
-
-    this.http.get(this.baseAPI+'disease.php').map(res => res.json())
-      .subscribe(data => {
-        for (let i = 0; i < data.length; i++) {
-          let temp = data[i]['dis_omim_id']+' | '+data[i]['dis_name'];
-          data[i]['search'] = temp;
-        }
-
-        this.diseaseSearch = data;
       })
   }
 
