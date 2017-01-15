@@ -667,16 +667,11 @@ export class Home {
   }
 
   getGraphData(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
-    let srcProp = [];
-    let destProp = [];
-
     let srcPropKeys = this.getPropKeys(srcType);
     let destPropKeys = this.getPropKeys(destType);
-
     let data = [];
 
-    let i=0;
-    for(i;i<interaction.length;i++) {
+    for(let i=0;i<interaction.length;i++) {
       let datum = [];
 
       let srcKey = srcType+'_id';
@@ -706,17 +701,12 @@ export class Home {
 
   makeTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
     let text: string = '';
-
-    let srcProp = [];
-    let destProp = [];
-
     let srcPropKeys = this.getPropKeys(srcType);
     let destPropKeys = this.getPropKeys(destType);
 
-    let i: number = 0;
-    let ii: number = 0;// # of unique plants
+    let nUnique = 0;
     let prevSrc = '';
-    for(i;i<interaction.length;i++) {
+    for(let i=0;i<interaction.length;i++) {
       let srcKey = srcType+'_id';
       let destKey = destType+'_id'
       let src = interaction[i][srcKey];
@@ -725,13 +715,11 @@ export class Home {
       let weight = interaction[i]['weight'];
 
       if (prevSrc!=src) {
-        ii = ii + 1;
-        text = text+'#'+ii.toString()+' ';
+        nUnique = nUnique + 1;
+        text = text+'#'+nUnique.toString()+' ';
 
         let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-
-        let j=0;
-        for (j;j<srcProps.length;j++) {
+        for (let j=0;j<srcProps.length;j++) {
           text = text+this.getHyperlinkStr( srcPropKeys[j],srcProps[j] );
           if (j<srcProps.length-1) {
             text = text + ',';
@@ -744,9 +732,8 @@ export class Home {
       }
 
       let destProps = this.getProps(dest,destPropKeys,destMeta);
-      let jj=0;
       text = text+'  ';
-      for (jj;jj<destProps.length;jj++) {
+      for (let jj=0;jj<destProps.length;jj++) {
         text = text+this.getHyperlinkStr( destPropKeys[jj],destProps[jj] );
         if (jj<destProps.length-1) {
           text = text + ',';
