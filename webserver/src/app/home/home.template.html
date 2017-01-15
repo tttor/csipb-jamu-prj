@@ -13,7 +13,6 @@
 </div>
 
 <div *ngIf="!click">
-
   <div class="row" *ngIf="!show">
     <p class="contoh col-md-12 text-center">
       <button class="btn btn-success"(click)="example5()">Example #1a</button>
@@ -169,25 +168,10 @@
   </div>
   <br />
 
-  <!-- Labels above the multipartite graph ///////////////////////////////// -->
-<!--   <div class="row" *ngIf="show">
-    <div class="text-left col-md-3">
-      <b>Plants (Latin Name)</b>
-    </div>
-    <div class="text-center col-md-3">
-      <b>Compounds (CAS)(DrugbankID)</b>
-    </div>
-    <div class="text-center col-md-3">
-      <b>Proteins (Uniprot Name)</b>
-    </div>
-    <div class="col-md-3 text-right">
-      <b>Diseases (OMIM Name)</b>
-    </div>
+  <!-- The multi-partite graph output /////////////////////////////////// -->
+  <div class="row" *ngIf="baseAPI != 'http://localhost/'">
+    <iframe id="graph" class="text-center" *ngIf="show" src="app_home_graph_output.html" height="750px" width="100%" frameBorder="0"></iframe>
   </div>
- -->
-
-  <!-- The multi-partite graph rendering /////////////////////////////////// -->
-  <!-- <iframe id="graph" class="text-center" *ngIf="show" src="app_home_graph_output.html" height="750px" width="100%" frameBorder="0"></iframe> -->
 
   <!-- Text Output ///////////////////////////////////////////////////////// -->
   <div class="row" *ngIf="show">
@@ -208,7 +192,6 @@
     </div>
     <br />
 
-    <!-- Download buttons for text output ////////////////////////////////// -->
     <div class="col-md-4">
       <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadJSON('jsonPlaComp', 'ijah_plant-compound-interaction.json')">Download Plant-Compound Interaction</button>
     </div>
