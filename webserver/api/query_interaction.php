@@ -45,6 +45,16 @@
       $condArr[] = "(com_id='".$comId."'"." AND "."pro_id='".$proId."')";
       $table = 'compound_vs_protein';
     }
+    elseif ( isset($req['comId']) ) {
+      $mode = 'SEARCH_ONLY';
+      $table = 'compound_vs_protein';
+      $condArr[] = 'com_id='."'".$req['comId']."'";
+    }
+    elseif ( isset($req['proId']) ) {
+      $mode = 'SEARCH_ONLY';
+      $table = 'compound_vs_protein';
+      $condArr[] = 'pro_id='."'".$req['proId']."'";
+    }
   }
   $condArrLen = count($condArr);
 
