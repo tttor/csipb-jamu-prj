@@ -83,6 +83,8 @@ export class Home {
 
   click = false;
   baseAPI;
+  interactionQueryAPI;
+  metaQueryAPI;
 
   //////////////////////////////////////////////////////////////////////////////
   ngOnInit() {
@@ -122,6 +124,9 @@ export class Home {
   constructor(public appState: AppState, private http: Http) {
     this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/ijah/';
     this.baseAPI ='http://localhost/';// Comment this if you run online!
+
+    this.interactionQueryAPI = this.baseAPI+'query_interaction.php';
+    this.metaQueryAPI = this.baseAPI+'query_metadata.php';
 
     this.plant = [{ 'index': this.countTanaman, 'value' : ''}];
     this.compound = [{ 'index': this.countCompound, 'value' : ''}];
@@ -337,23 +342,21 @@ export class Home {
     console.log('searchOnly: drugSideInput');
 
     let dsi = JSON.stringify(drugSideInput);
-    console.log(dsi);
+    // console.log(dsi);
 
-    let interactionQueryAPI = this.baseAPI+'query_interaction.php';
-
-    this.http.post(interactionQueryAPI,dsi).map(resp => resp.json())
+    this.http.post(this.interactionQueryAPI,dsi).map(resp => resp.json())
     .subscribe(plaVScom => {
       let comSet = this.getSet(plaVScom,'com_id');
       let comSetJSON = this.makeJSONFormat(comSet,'comId');
       // console.log(comSetJSON);
 
-      this.http.post(interactionQueryAPI,comSetJSON).map(resp2 => resp2.json())
+      this.http.post(this.interactionQueryAPI,comSetJSON).map(resp2 => resp2.json())
       .subscribe(comVSpro => {
         let proSet = this.getSet(comVSpro,'pro_id');
         let proSetJSON = this.makeJSONFormat(proSet,'value');
         // console.log(proSetJSON);
 
-        this.http.post(interactionQueryAPI,proSetJSON).map(resp3 => resp3.json())
+        this.http.post(this.interactionQueryAPI,proSetJSON).map(resp3 => resp3.json())
         .subscribe(proVSdis => {
           let plaSet = this.getSet(plaVScom,'pla_id');
           let disSet = this.getSet(proVSdis,'dis_id');
@@ -373,12 +376,9 @@ export class Home {
     // console.log(dsi);
     // console.log(tsi);
 
-    let interactionQueryAPI = this.baseAPI+'query_interaction.php';
-    let metaQueryAPI = this.baseAPI+'query_metadata.php'
-
-    this.http.post(interactionQueryAPI,dsi).map(resp => resp.json())
+    this.http.post(this.interactionQueryAPI,dsi).map(resp => resp.json())
     .subscribe(plaVScom => {
-      this.http.post(interactionQueryAPI,tsi).map(resp2 => resp2.json())
+      this.http.post(this.interactionQueryAPI,tsi).map(resp2 => resp2.json())
       .subscribe(proVSdis => {
         let comVSproList = [];
 
@@ -408,7 +408,7 @@ export class Home {
         comVSproStr = '['+comVSproStr+']';
         // console.log(comVSproStr);
 
-        this.http.post(interactionQueryAPI,comVSproStr).map(resp3 => resp3.json())
+        this.http.post(this.interactionQueryAPI,comVSproStr).map(resp3 => resp3.json())
         .subscribe(comVSpro => {
           // Get unique items
           let plaSet = this.getSet(plaVScom,'pla_id');
@@ -418,69 +418,8 @@ export class Home {
           // let comSet2 = this.getSet(comVSpro,'com_id');
           // let proSet2 = this.getSet(comVSpro,'pro_id');
 
-          // Get metadata of each unique item
-          let plaMetaPost = this.getMetaPostStr(plaSet);
-          let comMetaPost = this.getMetaPostStr(comSet);
-          let proMetaPost = this.getMetaPostStr(proSet);
-          let disMetaPost = this.getMetaPostStr(disSet);
-
-          // console.log('getting meta ...');
-          this.http.post(metaQueryAPI,plaMetaPost).map(resp4 => resp4.json())
-          .subscribe(plaMeta => {
-            this.http.post(metaQueryAPI,comMetaPost).map(resp5=>resp5.json())
-            .subscribe(comMeta => {
-              this.http.post(metaQueryAPI,proMetaPost).map(resp6=>resp6.json())
-              .subscribe(proMeta => {
-                this.http.post(metaQueryAPI,disMetaPost).map(resp7=>resp7.json())
-                .subscribe(disMeta => {
-                  // text output with detail metadata //////////////////////////
-                  this.jsonPlantCompound = this.makeTextOutput(plaVScom,
-                                                               plaMeta,comMeta,
-                                                               'pla','com');
-                  this.jsonCompoundProtein = this.makeTextOutput(comVSpro,
-                                                                 comMeta,proMeta,
-                                                                 'com','pro');
-                  this.jsonProteinDisease = this.makeTextOutput(proVSdis,
-                                                               proMeta,disMeta,
-                                                               'pro','dis');
-
-                  // graph output data prep ////////////////////////////////////
-                  let graphData = [];
-                  let nNodeMax = 20;
-
-                  let plaForGraph = this.getItemForGraph(plaSet,nNodeMax);
-                  let comForGraph = this.getItemForGraph(comSet,nNodeMax);
-                  let proForGraph = this.getItemForGraph(proSet,nNodeMax);
-                  let disForGraph = this.getItemForGraph(disSet,nNodeMax);
-
-                  let graphDataArr = [this.getGraphData(plaVScom,
-                                                        plaMeta,comMeta,
-                                                        'pla','com',
-                                                        plaForGraph,comForGraph),
-                                      this.getGraphData(comVSpro,
-                                                        comMeta,proMeta,
-                                                        'com','pro',
-                                                        comForGraph,proForGraph),
-                                      this.getGraphData(proVSdis,
-                                                        proMeta,disMeta,
-                                                         'pro','dis',
-                                                         proForGraph,disForGraph)];
-
-                  let ii=0;
-                  for (ii;ii<graphDataArr.length;ii++) {
-                    let jj=0;
-                    for(jj;jj<graphDataArr[ii].length;jj++) {
-                        let datum = graphDataArr[ii][jj];
-                        graphData.push(datum);
-                    }
-                  }
-
-                  localStorage.setItem('data', JSON.stringify(graphData));
-                  this.show = true;
-                })//disMeta
-              })//proMeta
-            })//comMeta
-          })//plaMeta
+          this.makeOutput(plaSet,comSet,proSet,disSet,
+                          plaVScom,comVSpro,proVSdis);
         })
       })
     })
@@ -1214,8 +1153,6 @@ export class Home {
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
   makeOutput(plaSet,comSet,proSet,disSet,plaVScom,comVSpro,proVSdis) {
-    let metaQueryAPI = this.baseAPI+'query_metadata.php';
-
     // Get metadata of each unique item
     let plaMetaPost = this.getMetaPostStr(plaSet);
     let comMetaPost = this.getMetaPostStr(comSet);
@@ -1223,13 +1160,13 @@ export class Home {
     let disMetaPost = this.getMetaPostStr(disSet);
 
     // console.log('getting meta ...');
-    this.http.post(metaQueryAPI,plaMetaPost).map(resp4 => resp4.json())
+    this.http.post(this.metaQueryAPI,plaMetaPost).map(resp4 => resp4.json())
     .subscribe(plaMeta => {
-      this.http.post(metaQueryAPI,comMetaPost).map(resp5=>resp5.json())
+      this.http.post(this.metaQueryAPI,comMetaPost).map(resp5=>resp5.json())
       .subscribe(comMeta => {
-        this.http.post(metaQueryAPI,proMetaPost).map(resp6=>resp6.json())
+        this.http.post(this.metaQueryAPI,proMetaPost).map(resp6=>resp6.json())
         .subscribe(proMeta => {
-          this.http.post(metaQueryAPI,disMetaPost).map(resp7=>resp7.json())
+          this.http.post(this.metaQueryAPI,disMetaPost).map(resp7=>resp7.json())
           .subscribe(disMeta => {
             // text output with detail metadata //////////////////////////
             this.jsonPlantCompound = this.makeTextOutput(plaVScom,
