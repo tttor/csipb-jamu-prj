@@ -120,14 +120,15 @@ export class Home {
   }
 
   constructor(public appState: AppState, private http: Http) {
+    this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/ijah/';
+    this.baseAPI ='http://localhost/';// Comment this if you run online!
 
     this.plant = [{ 'index': this.countTanaman, 'value' : ''}];
     this.compound = [{ 'index': this.countCompound, 'value' : ''}];
     this.protein = [{ 'index': this.countProtein, 'value' : ''}];
     this.disease = [{ 'index': this.countDisease, 'value' : ''}];
 
-    this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/total.php')
-      .map(res => res.json())
+    this.http.get(this.baseAPI+'total.php').map(res => res.json())
       .subscribe(data => {
         this.plant_total = data[0]['plant_total'];
         this.compound_total = data[0]['compound_total'];
@@ -198,8 +199,6 @@ export class Home {
 
         this.diseaseSearch = data;
       })
-
-      this.baseAPI ='http://localhost/';
   }
 
   // INPUT HANDLING METHODS ////////////////////////////////////////////////////
@@ -305,7 +304,6 @@ export class Home {
     }
 
     var inter = setInterval(() => {
-
       if (showPlant && !showProtein && !showDisease) {
         if (this.pTanaman) {
           localStorage.setItem('data', JSON.stringify(this.dataLocal));
@@ -314,7 +312,6 @@ export class Home {
           clearInterval(inter);
         }
       }
-
       else if (showCompound && !showProtein && !showDisease) {
         if(this.pCompound) {
           localStorage.setItem('data', JSON.stringify(this.dataLocal));
@@ -323,7 +320,6 @@ export class Home {
           clearInterval(inter);
         }
       }
-
       else if (showProtein && !showPlant && !showCompound) {
         if (this.pProtein) {
           localStorage.setItem('data', JSON.stringify(this.dataLocal));
@@ -332,7 +328,6 @@ export class Home {
           clearInterval(inter);
         }
       }
-
       else if (showDisease && !showPlant && !showCompound) {
         if (this.pDisease) {
           localStorage.setItem('data', JSON.stringify(this.dataLocal));
