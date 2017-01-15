@@ -6,6 +6,8 @@
 
   $cond = '';
   $table = 'ERROR_UNKNOWN_TABLE_PLEASE_FIX';
+  $col = 'ERROR_UNKNOWN_COL_PLEASE_FIX';
+  $selectAll = false;
   foreach($requestList as $req) {
     if (isset($req['id'])) {
       $val = $req['id'];
@@ -14,28 +16,37 @@
       if (strpos($val, 'PLA') !== false) {
         $id = 'pla_id';
         $table = 'plant';
+        $col = 'pla_id,pla_name';
       }
       elseif (strpos($val, 'COM') !== false) {
         $id = 'com_id';
         $table = 'compound';
+        $col = 'com_id,com_cas_id,com_drugbank_id,com_knapsack_id,com_kegg_id,com_pubchem_id';
       }
       elseif (strpos($val, 'PRO') !== false) {
         $id = 'pro_id';
         $table = 'protein';
+        $col = 'pro_id,pro_name,pro_uniprot_id,pro_uniprot_abbrv';
       }
       elseif (strpos($val, 'DIS') !== false) {
         $id = 'dis_id';
         $table = 'disease';
+        $col = 'dis_id,dis_omim_id,dis_name,dis_uniprot_abbrv';
       }
 
-      $condArr[] = $id."='".$val."'";
-
+      if (strpos($val,'ALL')!==false) {
+        $selectAll = true;
+        break;
+      }
       $cond = $cond.$id."="."'".$val."'".' OR ';
     }
   }
 
   $cond = substr($cond,0,-4);// remove the last OR
-  $query = "SELECT * FROM ".$table." WHERE ".$cond;
+  $query = "SELECT ".$col." FROM ".$table;
+  if ($selectAll===false) {
+    $query = $query." WHERE ".$cond;
+  }
 
   $resp = pg_query($link, $query);
   $respArr = array();
