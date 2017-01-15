@@ -175,33 +175,34 @@ export class Home {
         this.diseaseSearch = data;
       })
 
-    this.http.get(this.baseAPI+'compound.php').map(res => res.json())
+    let comPostMsg = ['COM_ALL'];
+    let comPostMsgJSON = this.makeJSONFormat(comPostMsg,'id');
+    this.http.post(this.metaQueryAPI,comPostMsgJSON).map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
-          let temp = '';
-          if (data[i]['com_cas_id'] !== '') {
-            temp = temp+data[i]['com_cas_id']+' | ';
+          let valid = [];
+          if (data[i]['com_cas_id']) {
+            valid.push(data[i]['com_cas_id']);
+          }
+          if (data[i]['com_drugbank_id']) {
+            valid.push(data[i]['com_drugbank_id']);
+          }
+          if (data[i]['com_knapsack_id']) {
+            valid.push(data[i]['com_knapsack_id']);
+          }
+          if (data[i]['com_kegg_id']) {
+            valid.push(data[i]['com_kegg_id']);
           }
 
-          if (data[i]['com_drugbank_id'] !== '') {
-            temp = temp+data[i]['com_drugbank_id']+' | ';
+          let str = '';
+          for (let j=0;j<valid.length;j++) {
+            str = str + valid[j];
+            if (j<valid.length-1) {
+              str = str + ' | ';
+            }
           }
-
-          if (data[i]['com_knapsack_id'] !== '') {
-            temp = temp+data[i]['com_knapsack_id']+' | ';
-          }
-
-          if (data[i]['com_kegg_id'] !== '') {
-            temp = temp+data[i]['com_kegg_id']+' | ';
-          }
-
-          if (data[i]['com_pubchem_id'] !== '') {
-            temp = temp+data[i]['com_pubchem_id'];
-          }
-
-          data[i]['search'] = temp;
+          data[i]['search'] = str;
         }
-
         this.compoundSearch = data;
       })
   }
