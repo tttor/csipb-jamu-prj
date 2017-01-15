@@ -142,7 +142,7 @@ export class Home {
       })
 
     // Query for metadata for _text_ _completion_ //////////////////////////////
-    let plaPostMsg = ['PLA_ALL'];
+    let plaPostMsg = ['PLA_ALL_ROWS'];
     let plaPostMsgJSON = this.makeJSONFormat(plaPostMsg,'id');
     this.http.post(this.metaQueryAPI,plaPostMsgJSON).map(res => res.json())
       .subscribe(data => {
@@ -153,7 +153,7 @@ export class Home {
         this.plantSearch = data;
       })
 
-    let proPostMsg = ['PRO_ALL'];
+    let proPostMsg = ['PRO_ALL_ROWS'];
     let proPostMsgJSON = this.makeJSONFormat(proPostMsg,'id');
     this.http.post(this.metaQueryAPI,proPostMsgJSON).map(res => res.json())
       .subscribe(data => {
@@ -164,7 +164,7 @@ export class Home {
         this.proteinSearch = data;
       })
 
-    let disPostMsg = ['DIS_ALL'];
+    let disPostMsg = ['DIS_ALL_ROWS'];
     let disPostMsgJSON = this.makeJSONFormat(disPostMsg,'id');
     this.http.post(this.metaQueryAPI,disPostMsgJSON).map(res => res.json())
       .subscribe(data => {
@@ -175,7 +175,7 @@ export class Home {
         this.diseaseSearch = data;
       })
 
-    let comPostMsg = ['COM_ALL'];
+    let comPostMsg = ['COM_ALL_ROWS'];
     let comPostMsgJSON = this.makeJSONFormat(comPostMsg,'id');
     this.http.post(this.metaQueryAPI,comPostMsgJSON).map(res => res.json())
       .subscribe(data => {

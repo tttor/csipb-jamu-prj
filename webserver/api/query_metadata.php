@@ -34,7 +34,7 @@
         $col = 'dis_id,dis_omim_id,dis_name,dis_uniprot_abbrv';
       }
 
-      if (strpos($val,'ALL')!==false) {
+      if (strpos($val,'ALL_ROWS')!==false) {
         $selectAll = true;
         break;
       }
