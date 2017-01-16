@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#
+echo 'Have you set the API to apps.cs? (see home.component.ts)'
+read input
+echo 'Yeay, lets roll...'
+
 #build the src in production stage
 echo "building ..."
 npm run build:prod
