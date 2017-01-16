@@ -4,9 +4,9 @@
   $postdata = file_get_contents("php://input");
   $requestList = json_decode($postdata, true);
 
-  $condArr = [];
-  $comIdArr = [];
-  $proIdArr = [];
+  $condArr = array();
+  $comIdArr = array();
+  $proIdArr = array();
   $table = 'ERROR_UNKNOWN_TABLE_PLEASE_FIX';
   $mode = '';
   foreach($requestList as $req) {
@@ -58,7 +58,7 @@
   }
   $condArrLen = count($condArr);
 
-  $respArr = [];
+  $respArr = array();
   for($i = 0; $i < $condArrLen; $i++) {
     // Construct the query
     $condStr = '';
