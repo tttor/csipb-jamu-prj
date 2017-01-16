@@ -26,7 +26,7 @@ ssh tor@apps.cs.ipb.ac.id find /var/www/ijah/ -type f ! -name "backup*" -exec cp
 # upload
 echo "uploading files ..."
 scp -r dist/* tor@apps.cs.ipb.ac.id:/var/www/ijah/
-scp -r src/css tor@apps.cs.ipb.ac.id:/var/www/ijah/
-scp -r src/img tor@apps.cs.ipb.ac.id:/var/www/ijah/
+scp -r src/assets/css tor@apps.cs.ipb.ac.id:/var/www/ijah/
+scp -r src/assets/img tor@apps.cs.ipb.ac.id:/var/www/ijah/
 scp -r src/app_home_graph_output.html tor@apps.cs.ipb.ac.id:/var/www/ijah/
 scp -r api/* tor@apps.cs.ipb.ac.id:/var/www/ijah/ijah
