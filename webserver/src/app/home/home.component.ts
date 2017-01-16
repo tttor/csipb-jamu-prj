@@ -656,12 +656,15 @@ export class Home {
     let str = '';
     for (let j=0;j<props.length;j++) {
       let prop = props[j];
-      if (prop) {
+      if (prop && prop!=='') {
         str = str+prop;
         if (j<props.length-1) {
           str = str + ',';
         }
       }
+    }
+    if (str.charAt(str.length-1)===',') {
+      str = str.substr(0,str.length-1);
     }
     return str;
   }
