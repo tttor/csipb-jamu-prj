@@ -491,15 +491,15 @@ export class Home {
             let proForGraph = this.getItemForGraph(proSet,nNodeMax);
             let disForGraph = this.getItemForGraph(disSet,nNodeMax);
 
-            let graphDataArr = [this.getGraphData(plaVScom,
+            let graphDataArr = [this.makeGraphData(plaVScom,
                                                   plaMeta,comMeta,
                                                   'pla','com',
                                                   plaForGraph,comForGraph),
-                                this.getGraphData(comVSpro,
+                                this.makeGraphData(comVSpro,
                                                   comMeta,proMeta,
                                                   'com','pro',
                                                   comForGraph,proForGraph),
-                                this.getGraphData(proVSdis,
+                                this.makeGraphData(proVSdis,
                                                   proMeta,disMeta,
                                                    'pro','dis',
                                                    proForGraph,disForGraph)];
@@ -656,20 +656,32 @@ export class Home {
     let str = '';
     for (let j=0;j<props.length;j++) {
       let prop = props[j];
-      if (prop) {
+      if (prop && prop!=='') {
         str = str+prop;
         if (j<props.length-1) {
           str = str + ',';
         }
       }
     }
+    if (str.charAt(str.length-1)===',') {
+      str = str.substr(0,str.length-1);
+    }
     return str;
   }
 
-  getGraphData(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
+  makeGraphData(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
     let srcPropKeys = this.getPropKeys(srcType);
     let destPropKeys = this.getPropKeys(destType);
     let data = [];
+
+    let srcHasDestArr = [];
+    let destHasSrcArr = [];
+    for (let i=0;i<srcItems.length;i++) {
+      srcHasDestArr.push(false);
+    }
+    for (let i=0;i<destItems.length;i++) {
+      destHasSrcArr.push(false);
+    }
 
     for(let i=0;i<interaction.length;i++) {
       let datum = [];
@@ -680,7 +692,13 @@ export class Home {
       let src = interaction[i][srcKey];
       let dest = interaction[i][destKey];
 
-      if ((srcItems.indexOf(src)!==-1)&&(destItems.indexOf(dest)!==-1)) {
+      let srcIdx = srcItems.indexOf(src);
+      let destIdx = destItems.indexOf(dest);
+
+      if ((srcIdx!==-1)&&(destIdx!==-1)) {
+        srcHasDestArr[srcIdx] = true;
+        destHasSrcArr[destIdx] = true;
+
         let source = interaction[i]['source'];
         let weight = parseFloat( interaction[i]['weight'] );
 
@@ -696,6 +714,43 @@ export class Home {
         data.push(datum);
       }
     }
+
+    // Make _dummy_ interaction to beautify the graph rendering
+    let wDummy = 0.00001;// to become "invisible"
+    let prefix = 'z';
+    let srcDummyText = prefix+srcType.toUpperCase();
+    let destDummyText = prefix+destType.toUpperCase();
+    for (let i=0;i<srcHasDestArr.length;i++) {
+      if (srcHasDestArr[i] === false) {
+        let dummy = [];
+        let src = srcItems[i];
+        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
+        let srcText = this.concatProps(srcProps);
+        dummy.push(srcText);
+        dummy.push(destDummyText);
+        dummy.push(wDummy);
+        data.push(dummy);
+      }
+    }
+    for (let i=0;i<destHasSrcArr.length;i++) {
+      if (destHasSrcArr[i] === false) {
+        let dummy = [];
+        let dest = destItems[i];
+        let destProps = this.getProps(dest,destPropKeys,destMeta);
+        let destText = this.concatProps(destProps);
+        dummy.push(srcDummyText);
+        dummy.push(destText);
+        dummy.push(wDummy);
+        data.push(dummy);
+      }
+    }
+
+    let anchor = [];
+    anchor.push(srcDummyText);
+    anchor.push(destDummyText);
+    anchor.push(wDummy);
+    data.push(anchor);
+
     return data;
   }
 
