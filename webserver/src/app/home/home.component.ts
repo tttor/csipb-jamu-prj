@@ -20,15 +20,6 @@ declare var saveAs: any;
   templateUrl: './home.template.html'
 })
 export class Home {
-  options: any;
-  data: any;
-  chartType: any;
-
-  plant: any;
-  compound: any;
-  protein: any;
-  disease: any;
-
   // count variable
   countTanaman = 0;
   countCompound = 0;
@@ -41,47 +32,52 @@ export class Home {
   activeProtein = true;
   activeDisease = true;
 
-  // show
-  show = false;
-
-  dataLocal = [];
-
-  FileSaver: any;
-
-  // DATA search
+  // Search data for auto completion, search while filling
   plantSearch: Array<string>;
   compoundSearch: Array<string>;
   proteinSearch: Array<string>;
   diseaseSearch: Array<string>;
 
+  // Total number of items in each set
   plant_total;
   compound_total;
   protein_total;
   disease_total;
 
+  // Items selected by users
   selectedPlants = [];
   selectedCompounds = [];
   selectedProteins = [];
   selectedDiseases = [];
-
-  typeaheadNoResults:boolean = false;
-
-  noResultPlant = false;
-  noResultCompound = false;
-  noResultProtein = false;
-  noResultDisease = false;
-
-  pTanaman = false;
-  pProtein = false;
-  pCompound = false;
-  pDisease = false;
 
   // This 3 vars are used in text output
   jsonPlantCompound;
   jsonCompoundProtein;
   jsonProteinDisease;
 
+  // Misc.
+  // TODO explain the usage
+  show = false;
+  dataLocal = [];
+  FileSaver: any;
   click = false;
+  baseAPI;
+  interactionQueryAPI;
+  metaQueryAPI;
+  typeaheadNoResults:boolean = false;
+  noResultPlant = false;
+  noResultCompound = false;
+  noResultProtein = false;
+  noResultDisease = false;
+  pTanaman = false;
+  pProtein = false;
+  pCompound = false;
+  pDisease = false;
+  data: any;
+  plant: any;
+  compound: any;
+  protein: any;
+  disease: any;
 
   //////////////////////////////////////////////////////////////////////////////
   ngOnInit() {
@@ -119,14 +115,18 @@ export class Home {
   }
 
   constructor(public appState: AppState, private http: Http) {
+    this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/ijah/';
+    // this.baseAPI ='http://localhost/';// Comment this if you run online!
+
+    this.interactionQueryAPI = this.baseAPI+'query_interaction.php';
+    this.metaQueryAPI = this.baseAPI+'query_metadata.php';
 
     this.plant = [{ 'index': this.countTanaman, 'value' : ''}];
     this.compound = [{ 'index': this.countCompound, 'value' : ''}];
     this.protein = [{ 'index': this.countProtein, 'value' : ''}];
     this.disease = [{ 'index': this.countDisease, 'value' : ''}];
 
-    this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/total.php')
-      .map(res => res.json())
+    this.http.get(this.baseAPI+'total.php').map(res => res.json())
       .subscribe(data => {
         this.plant_total = data[0]['plant_total'];
         this.compound_total = data[0]['compound_total'];
@@ -134,68 +134,69 @@ export class Home {
         this.disease_total = data[0]['disease_total'];
       })
 
-    this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/plant.php')
-      .map(res => res.json())
+    // Query for metadata for _text_ _completion_ //////////////////////////////
+    let plaPostMsg = ['PLA_ALL_ROWS'];
+    let plaPostMsgJSON = this.makeJSONFormat(plaPostMsg,'id');
+    this.http.post(this.metaQueryAPI,plaPostMsgJSON).map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
           let temp = data[i]['pla_name'];
           data[i]['search'] = temp;
         }
-
         this.plantSearch = data;
       })
 
-    this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/compound.php')
-      .map(res => res.json())
-      .subscribe(data => {
-        for (let i = 0; i < data.length; i++) {
-          let temp = '';
-          if (data[i]['com_cas_id'] !== '') {
-            temp = temp+data[i]['com_cas_id']+' | ';
-          }
-
-          if (data[i]['com_drugbank_id'] !== '') {
-            temp = temp+data[i]['com_drugbank_id']+' | ';
-          }
-
-          if (data[i]['com_knapsack_id'] !== '') {
-            temp = temp+data[i]['com_knapsack_id']+' | ';
-          }
-
-          if (data[i]['com_kegg_id'] !== '') {
-            temp = temp+data[i]['com_kegg_id']+' | ';
-          }
-
-          if (data[i]['com_pubchem_id'] !== '') {
-            temp = temp+data[i]['com_pubchem_id'];
-          }
-
-          data[i]['search'] = temp;
-        }
-
-        this.compoundSearch = data;
-      })
-
-    this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/protein.php')
-      .map(res => res.json())
+    let proPostMsg = ['PRO_ALL_ROWS'];
+    let proPostMsgJSON = this.makeJSONFormat(proPostMsg,'id');
+    this.http.post(this.metaQueryAPI,proPostMsgJSON).map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
           let temp = data[i]['pro_uniprot_id']+' | '+data[i]['pro_name'];
           data[i]['search'] = temp;
         }
-
         this.proteinSearch = data;
       })
 
-    this.http.get('http://ijah.apps.cs.ipb.ac.id/ijah/disease.php')
-      .map(res => res.json())
+    let disPostMsg = ['DIS_ALL_ROWS'];
+    let disPostMsgJSON = this.makeJSONFormat(disPostMsg,'id');
+    this.http.post(this.metaQueryAPI,disPostMsgJSON).map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
           let temp = data[i]['dis_omim_id']+' | '+data[i]['dis_name'];
           data[i]['search'] = temp;
         }
-
         this.diseaseSearch = data;
+      })
+
+    let comPostMsg = ['COM_ALL_ROWS'];
+    let comPostMsgJSON = this.makeJSONFormat(comPostMsg,'id');
+    this.http.post(this.metaQueryAPI,comPostMsgJSON).map(res => res.json())
+      .subscribe(data => {
+        for (let i = 0; i < data.length; i++) {
+          let valid = [];
+          if (data[i]['com_cas_id']) {
+            valid.push(data[i]['com_cas_id']);
+          }
+          if (data[i]['com_drugbank_id']) {
+            valid.push(data[i]['com_drugbank_id']);
+          }
+          if (data[i]['com_knapsack_id']) {
+            valid.push(data[i]['com_knapsack_id']);
+          }
+          if (data[i]['com_kegg_id']) {
+            valid.push(data[i]['com_kegg_id']);
+          }
+
+          let str = '';
+          for (let j=0;j<valid.length;j++) {
+            str = str + valid[j];
+            if (j<valid.length-1) {
+              str = str + ' | ';
+            }
+          }
+          data[i]['search'] = str;
+        }
+        this.compoundSearch = data;
       })
   }
 
@@ -266,43 +267,38 @@ export class Home {
     let showDisease = false;
 
     if (this.plant.length > 1 && this.disease.length <= 1 && this.protein.length <= 1) {
-        this.predictPlant();
-        showPlant = true;
+      this.searchFromDrugSide(this.selectedPlants);
+      showPlant = true;
     }
-
     else if (this.compound.length > 1 && this.protein.length <= 1 && this.disease.length <= 1) {
-        this.predictCompound();
-        showCompound = true;
+      this.searchFromDrugSide(this.selectedCompounds);
+      showCompound = true;
     }
 
     else if (this.protein.length > 1 && this.plant.length <= 1 && this.compound.length <= 1) {
-        this.predictProtein();
-        showProtein = true;
+      this.searchFromTargetSide(this.selectedProteins);
+      showProtein = true;
     }
-
     else if (this.disease.length > 1 && this.plant.length <= 1 && this.compound.length <= 1) {
-        this.predictDisease();
-        showDisease = true;
+      this.searchFromTargetSide(this.selectedDiseases);
+      showDisease = true;
     }
-
+    // Use case 1: both sides are specified ////////////////////////////////////
     else if (this.plant.length > 1 && this.protein.length > 1) {
-        this.predictPlantProtein();
+        this.searchAndPredict(this.selectedPlants,this.selectedProteins);
     }
-
+    else if (this.plant.length > 1 && this.disease.length > 1) {
+        this.searchAndPredict(this.selectedPlants,this.selectedDiseases)
+    }
+    else if (this.compound.length > 1 && this.protein.length > 1) {
+        this.searchAndPredict(this.selectedCompounds,this.selectedProteins);
+    }
     else if (this.compound.length > 1 && this.disease.length > 1) {
-        this.predictCompoundDisease();
+        this.searchAndPredict(this.selectedCompounds,this.selectedDiseases);
     }
 
-    if (this.plant.length > 1 && this.disease.length > 1) {
-        this.predictPlantDisease();
-    }
-
-    if (this.compound.length > 1 && this.protein.length > 1) {
-        this.predictCompoundProtein();
-    }
-
+    ////////////////////////////////////////////////////////////////////////////
     var inter = setInterval(() => {
-
       if (showPlant && !showProtein && !showDisease) {
         if (this.pTanaman) {
           localStorage.setItem('data', JSON.stringify(this.dataLocal));
@@ -311,7 +307,6 @@ export class Home {
           clearInterval(inter);
         }
       }
-
       else if (showCompound && !showProtein && !showDisease) {
         if(this.pCompound) {
           localStorage.setItem('data', JSON.stringify(this.dataLocal));
@@ -320,7 +315,6 @@ export class Home {
           clearInterval(inter);
         }
       }
-
       else if (showProtein && !showPlant && !showCompound) {
         if (this.pProtein) {
           localStorage.setItem('data', JSON.stringify(this.dataLocal));
@@ -329,7 +323,6 @@ export class Home {
           clearInterval(inter);
         }
       }
-
       else if (showDisease && !showPlant && !showCompound) {
         if (this.pDisease) {
           localStorage.setItem('data', JSON.stringify(this.dataLocal));
@@ -342,1496 +335,424 @@ export class Home {
     }, 100);
   }
 
-  // searchAndPredict(drugSideInput,targetSideInput) {
-  //   let dsi = drugSideInput;
-  //   let tsi = targetSideInput;
-
-  //   // let tanam =
-  //   // let dsiStr = JSON.stringify(this.selectedPlants);
-
-  //   // let api =
-
-  //   this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-plant.php', tanam)
-  //     .map(res => res.json())
-  //     .subscribe(data => {
-
-  //     });
-  // }
-
-  predictPlant() {
-
-    this.plant.pop();
-    let tanam = JSON.stringify(this.selectedPlants);
-    console.log(tanam);
-
-    this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-plant.php', tanam)
-      .map(res => res.json())
-      .subscribe(data => {
-
-        let plantCompound = data[0]['plant_compound'];
-        let compoundProtein = data[1]['compound_protein'];
-        let proteinDisease = data[2]['protein_disease'];
-
-        ////////////////////////////////////////////////////////////////////////
-        let plaComStr: string = '';
-        let comProStr: string = '';
-        let proDisStr: string = '';
-
-        let i: number = 0;
-        let ii: number = 0;// # of unique plants
-        let prevPlaName = '';
-        for(i;i<plantCompound.length;i++) {
-          let plaName: string = plantCompound[i][0]
-          let comName: string = plantCompound[i][1]
-          let srcName: string = plantCompound[i][2]
-
-          if (prevPlaName!=plaName) {
-            ii = ii + 1;
-            plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
-            plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
-
-            prevPlaName = plaName;
-          }
-
-          let comNameComps = comName.split(')');
-          let comCasId = comNameComps[0].replace('(','');
-          let comDrugbankId = comNameComps[1].replace('(','');
-          let comKnapsackId = comNameComps[2].replace('(','');
-          let comKeggId = comNameComps[3].replace('(','');
-
-          plaComStr = plaComStr+'  '+comCasId+','
-                                    +this.getHyperlinkStr('drugbank',comDrugbankId)+','
-                                    +this.getHyperlinkStr('knapsack',comKnapsackId)+','
-                                    +this.getHyperlinkStr('kegg',comKeggId)+','
-                                    +srcName
-                                    +'\n';
-        }
-
-        // let prevComName = '';
-        // for(i;i<compoundProtein.length;i++) {
-        //   let comName: string = compoundProtein[i][0]
-        //   let proName: string = compoundProtein[i][1]
-        //   let srcName: string = compoundProtein[i][2]
-        //
-        //   if (prevComName!=comName) {
-        //     ii = ii + 1;
-        //     comProStr = comProStr + '#'+ii.toString()+' '+comName+':\n';
-        //     comProStr = comProStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
-        //
-        //     prevComName = comName;
-        //   }
-        //
-        //   let comNameComps = comName.split(')');
-        //   let comCasId = comNameComps[0].replace('(','');
-        //   let comDrugbankId = comNameComps[1].replace('(','');
-        //   let comKnapsackId = comNameComps[2].replace('(','');
-        //   let comKeggId = comNameComps[3].replace('(','');
-        //
-        //   comProStr = comProStr+'  '+comCasId+','
-        //                             +this.getHyperlinkStr('drugbank',comDrugbankId)+','
-        //                             +this.getHyperlinkStr('knapsack',comKnapsackId)+','
-        //                             +this.getHyperlinkStr('kegg',comKeggId)+','
-        //                             +srcName
-        //                             +'\n';
-        // }
-        ////////////////////////////////////////////////////////////////////////
-
-        let pla_comp = {};
-        let comp_prot = {};
-        let prot_dis = {};
-
-        let count_pla_comp = 0;
-        let count_comp_prot = 0;
-        let count_prot_dis = 0;
-
-        for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
-          let temp = plantCompound[count_pla_comp][0];
-
-          if (pla_comp[temp]) {
-            let temp2 = pla_comp[temp];
-
-            if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
-              temp2.push(plantCompound[count_pla_comp][1]);
-
-              pla_comp[temp] = temp2;
-            }
-
-          }
-          else {
-            let a = [];
-            a.push(plantCompound[count_pla_comp][1]);
-            pla_comp[temp] = a;
-          }
-        }
-
-        for(count_comp_prot; count_comp_prot < compoundProtein.length; count_comp_prot++) {
-          let temp = compoundProtein[count_comp_prot][0];
-
-          if (comp_prot[temp]) {
-            let temp2 = comp_prot[temp];
-
-            if(this.checkJson(temp2, compoundProtein[count_comp_prot][1])) {
-              temp2.push(compoundProtein[count_comp_prot][1]);
-
-              comp_prot[temp] = temp2;
-            }
-
-          }
-          else {
-            let a = [];
-            a.push(compoundProtein[count_comp_prot][1]);
-            comp_prot[temp] = a;
-          }
-        }
-
-        for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
-          let temp = proteinDisease[count_prot_dis][0];
-
-          if (prot_dis[temp]) {
-            let temp2 = prot_dis[temp];
-
-            if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
-              temp2.push(proteinDisease[count_prot_dis][1]);
-
-              prot_dis[temp] = temp2;
-            }
-
-          }
-          else {
-            let a = [];
-            a.push(proteinDisease[count_prot_dis][1]);
-            prot_dis[temp] = a;
-          }
-        }
-
-        ////////////////////////////////////////////////////////////////////////
-        this.jsonPlantCompound = plaComStr;
-        this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
-        this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
-        ////////////////////////////////////////////////////////////////////////
-
-        if (compoundProtein.length != 0) {
-
-          for (let i = 0; i < 20; i++) {
-            if (this.check(this.dataLocal, proteinDisease[i][0], proteinDisease[i][1])) {
-              let push = [proteinDisease[i][0], proteinDisease[i][1], 1];
-              this.dataLocal.push(push);
-
-            }
-          }
-
-          for(let i = 0; i < compoundProtein.length; i++) {
-            for (let j = 0; j < this.dataLocal.length; j++) {
-              if (compoundProtein[i][1] == this.dataLocal[j][0]) {
-                if (this.check(this.dataLocal, compoundProtein[i][0], compoundProtein[i][1])) {
-                  let push = [compoundProtein[i][0], compoundProtein[i][1], 1];
-                  this.dataLocal.push(push);
-                }
-              }
-            }
-          }
-
-          for(let i = 0; i < plantCompound.length; i++) {
-            for (let j = 0; j < this.dataLocal.length; j++) {
-              if (plantCompound[i][1] == this.dataLocal[j][0]) {
-                if (this.check(this.dataLocal, plantCompound[i][0], plantCompound[i][1])) {
-                  let push = [plantCompound[i][0], plantCompound[i][1], 1 ];
-                  this.dataLocal.push(push);
-                }
-              }
-            }
-          }
-
-        }
-
-        else {
-          for (let i = 0; i < plantCompound.length; i++) {
-            if (this.check(this.dataLocal, plantCompound[i][0], plantCompound[i][1])) {
-              let push = [plantCompound[i][0], plantCompound[i][1], 1];
-              this.dataLocal.push(push);
-            }
-          }
-          for (let i = 0; i < compoundProtein.length; i++) {
-            if (this.check(this.dataLocal, compoundProtein[i][0], compoundProtein[i][1])) {
-              let push = [compoundProtein[i][0], compoundProtein[i][1], 1];
-              this.dataLocal.push(push);
-            }
-          }
-
-        }
-
-        localStorage.setItem('data', JSON.stringify(this.dataLocal));
-        localStorage.setItem('jsonPlaComp', JSON.stringify(pla_comp, undefined, 2));
-        localStorage.setItem('jsonCompProt', JSON.stringify(comp_prot, undefined, 2));
-        localStorage.setItem('jsonProtDis', JSON.stringify(prot_dis, undefined, 2));
-
-        this.pTanaman = true;
-        this.show = true;
-        this.click = false;
-
-      })
-  }
-
-  predictProtein() {
-
-    this.protein.pop();
-    let prot = JSON.stringify(this.selectedProteins);
-    console.log(prot);
-
-    this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-protein.php', prot)
-      .map(res => res.json())
-      .subscribe(data => {
-
-        let plantCompound = data[0]['plant_compound'];
-        let compoundProtein = data[1]['compound_protein'];
-        let proteinDisease = data[2]['protein_disease'];
-
-        let pla_comp = {};
-        let comp_prot = {};
-        let prot_dis = {};
-
-        ////////////////////////////////////////////////////////////////////////
-        let plaComStr: string = '';
-        let comProStr: string = '';
-        let proDisStr: string = '';
-
-        let i: number = 0;
-        let ii: number = 0;// # of unique plants
-        let prevPlaName = '';
-        for(i;i<plantCompound.length;i++) {
-          let plaName: string = plantCompound[i][0]
-          let comName: string = plantCompound[i][1]
-          let srcName: string = plantCompound[i][2]
-
-          if (prevPlaName!=plaName) {
-            ii = ii + 1;
-            plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
-            plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
-
-            prevPlaName = plaName;
-          }
-
-          let comNameComps = comName.split(')');
-          let comCasId = comNameComps[0].replace('(','');
-          let comDrugbankId = comNameComps[1].replace('(','');
-          let comKnapsackId = comNameComps[2].replace('(','');
-          let comKeggId = comNameComps[3].replace('(','');
-
-          plaComStr = plaComStr+'  '+comCasId+','
-                                    +this.getHyperlinkStr('drugbank',comDrugbankId)+','
-                                    +this.getHyperlinkStr('knapsack',comKnapsackId)+','
-                                    +this.getHyperlinkStr('kegg',comKeggId)+','
-                                    +srcName
-                                    +'\n';
-        }
-
-        ////////////////////////////////////////////////////////////////////////
-
-        let count_pla_comp = 0;
-        let count_comp_prot = 0;
-        let count_prot_dis = 0;
-
-        for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
-          let temp = plantCompound[count_pla_comp][0];
-
-          if (pla_comp[temp]) {
-            let temp2 = pla_comp[temp];
-
-            if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
-              temp2.push(plantCompound[count_pla_comp][1]);
-
-              pla_comp[temp] = temp2;
-            }
-
-          }
-          else {
-            let a = [];
-            a.push(plantCompound[count_pla_comp][1]);
-            pla_comp[temp] = a;
-          }
-        }
-
-        for(count_comp_prot; count_comp_prot < compoundProtein.length; count_comp_prot++) {
-          let temp = compoundProtein[count_comp_prot][0];
-
-          if (comp_prot[temp]) {
-            let temp2 = comp_prot[temp];
-
-            if(this.checkJson(temp2, compoundProtein[count_comp_prot][1])) {
-              temp2.push(compoundProtein[count_comp_prot][1]);
-
-              comp_prot[temp] = temp2;
-            }
-
-          }
-          else {
-            let a = [];
-            a.push(compoundProtein[count_comp_prot][1]);
-            comp_prot[temp] = a;
-          }
-        }
-
-        for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
-          let temp = proteinDisease[count_prot_dis][0];
-
-          if (prot_dis[temp]) {
-            let temp2 = prot_dis[temp];
-
-            if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
-              temp2.push(proteinDisease[count_prot_dis][1]);
-
-              prot_dis[temp] = temp2;
-            }
-
-          }
-          else {
-            let a = [];
-            a.push(proteinDisease[count_prot_dis][1]);
-            prot_dis[temp] = a;
-          }
-        }
-
-        this.jsonPlantCompound = plaComStr;
-        this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
-        this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
-
-        if (plantCompound.length != 0) {
-
-          for (let i = 0; i < 20; i++) {
-            for (let j = 0; j < compoundProtein.length; j++) {
-
-              if (plantCompound[i][1] == compoundProtein[j][0]) {
-                if (this.check(this.dataLocal, plantCompound[i][0], plantCompound[i][1])) {
-                  let push = [plantCompound[i][0], plantCompound[i][1], 1];
-                  this.dataLocal.push(push);
-                }
-                if (this.check(this.dataLocal, compoundProtein[j][0], compoundProtein[j][1])) {
-                  let push = [compoundProtein[j][0], compoundProtein[j][1], 1];
-                  this.dataLocal.push(push);
-                }
-
-              }
-
-            }
-          }
-
-        }
-
-        else {
-          for (let i = 0; i < compoundProtein.length  / (this.protein.length * 10); i++) {
-            if (this.check(this.dataLocal, compoundProtein[i][0], compoundProtein[i][1])) {
-              let push = [compoundProtein[i][0], compoundProtein[i][1], 1];
-              this.dataLocal.push(push);
-            }
-          }
-
-        }
-
-        for (let i = 0; i < proteinDisease.length ; i++) {
-          if (this.check(this.dataLocal, proteinDisease[i][0], proteinDisease[i][1])) {
-            let push = [proteinDisease[i][0], proteinDisease[i][1], 1];
-            this.dataLocal.push(push);
-          }
-        }
-
-        this.pProtein = true;
-
-
-      })
-
-  }
-
-  predictCompound() {
-
-    this.compound.pop();
-    let comp = JSON.stringify(this.selectedCompounds);
-    console.log(comp);
-
-    this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-compound.php', comp)
-      .map(res => res.json())
-      .subscribe(data => {
-
-        let plantCompound = data[0]['plant_compound'];
-        let compoundProtein = data[1]['compound_protein'];
-        let proteinDisease = data[2]['protein_disease'];
-
-        let pla_comp = {};
-        let comp_prot = {};
-        let prot_dis = {};
-
-        ////////////////////////////////////////////////////////////////////////
-        let plaComStr: string = '';
-        let comProStr: string = '';
-        let proDisStr: string = '';
-
-        let i: number = 0;
-        let ii: number = 0;// # of unique plants
-        let prevPlaName = '';
-        for(i;i<plantCompound.length;i++) {
-          let plaName: string = plantCompound[i][0]
-          let comName: string = plantCompound[i][1]
-          let srcName: string = plantCompound[i][2]
-
-          if (prevPlaName!=plaName) {
-            ii = ii + 1;
-            plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
-            plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
-
-            prevPlaName = plaName;
-          }
-
-          let comNameComps = comName.split(')');
-          let comCasId = comNameComps[0].replace('(','');
-          let comDrugbankId = comNameComps[1].replace('(','');
-          let comKnapsackId = comNameComps[2].replace('(','');
-          let comKeggId = comNameComps[3].replace('(','');
-
-          plaComStr = plaComStr+'  '+comCasId+','
-                                    +this.getHyperlinkStr('drugbank',comDrugbankId)+','
-                                    +this.getHyperlinkStr('knapsack',comKnapsackId)+','
-                                    +this.getHyperlinkStr('kegg',comKeggId)+','
-                                    +srcName
-                                    +'\n';
-        }
-        ////////////////////////////////////////////////////////////////////////
-
-        let count_pla_comp = 0;
-        let count_comp_prot = 0;
-        let count_prot_dis = 0;
-
-        for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
-          let temp = plantCompound[count_pla_comp][0];
-
-          if (pla_comp[temp]) {
-            let temp2 = pla_comp[temp];
-
-            if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
-              temp2.push(plantCompound[count_pla_comp][1]);
-
-              pla_comp[temp] = temp2;
-            }
-
-          }
-          else {
-            let a = [];
-            a.push(plantCompound[count_pla_comp][1]);
-            pla_comp[temp] = a;
-          }
-        }
-
-        for(count_comp_prot; count_comp_prot < compoundProtein.length; count_comp_prot++) {
-          let temp = compoundProtein[count_comp_prot][0];
-
-          if (comp_prot[temp]) {
-            let temp2 = comp_prot[temp];
-
-            if(this.checkJson(temp2, compoundProtein[count_comp_prot][1])) {
-              temp2.push(compoundProtein[count_comp_prot][1]);
-
-              comp_prot[temp] = temp2;
-            }
-
-          }
-          else {
-            let a = [];
-            a.push(compoundProtein[count_comp_prot][1]);
-            comp_prot[temp] = a;
-          }
-        }
-
-        for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
-          let temp = proteinDisease[count_prot_dis][0];
-
-          if (prot_dis[temp]) {
-            let temp2 = prot_dis[temp];
-
-            if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
-              temp2.push(proteinDisease[count_prot_dis][1]);
-
-              prot_dis[temp] = temp2;
-            }
-
-          }
-          else {
-            let a = [];
-            a.push(proteinDisease[count_prot_dis][1]);
-            prot_dis[temp] = a;
-          }
-        }
-
-        this.jsonPlantCompound = plaComStr;
-        this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
-        this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
-
-        if (proteinDisease.length != 0 && compoundProtein.length != 0) {
-
-          for (let i = 0; i < 20; i++) {
-            for (let j = 0; j < compoundProtein.length; j++) {
-
-              if (proteinDisease[i][0] == compoundProtein[j][1]) {
-                if (this.check(this.dataLocal, proteinDisease[i][0], proteinDisease[i][1])) {
-                  let push = [proteinDisease[i][0], proteinDisease[i][1], 1];
-                  this.dataLocal.push(push);
-                }
-                if (this.check(this.dataLocal, compoundProtein[j][0], compoundProtein[j][1])) {
-                  let push = [compoundProtein[j][0], compoundProtein[j][1], 1];
-                  this.dataLocal.push(push);
-                }
-
-              }
-
-            }
-          }
-
-        }
-
-        else if (compoundProtein.length != 0){
-
-          for (let i = 0; i < 20; i++) {
-            if (this.check(this.dataLocal, compoundProtein[i][0], compoundProtein[i][1])) {
-              let push = [compoundProtein[i][0], compoundProtein[i][1], 1];
-              this.dataLocal.push(push);
-            }
-          }
-
-        }
-
-        let limit;
-        if (plantCompound.length > 20) limit = 20;
-        else limit = plantCompound.length;
-
-        for (let i = 0; i < limit; i++) {
-          if (this.check(this.dataLocal, plantCompound[i][0], plantCompound[i][1])) {
-            let push = [plantCompound[i][0], plantCompound[i][1], 1];
-            this.dataLocal.push(push);
-          }
-        }
-
-        this.pCompound = true;
-      })
-
-  }
-
-  predictDisease() {
-
-    this.disease.pop();
-    let dis = JSON.stringify(this.selectedDiseases);
-    console.log(dis);
-
-    this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-disease.php', dis)
-      .map(res => res.json())
-      .subscribe(data => {
-
-        let plantCompound = data[0]['plant_compound'];
-        let compoundProtein = data[1]['compound_protein'];
-        let proteinDisease = data[2]['protein_disease'];
-
-        let pla_comp = {};
-        let comp_prot = {};
-        let prot_dis = {};
-
-        ////////////////////////////////////////////////////////////////////////
-        let plaComStr: string = '';
-        let comProStr: string = '';
-        let proDisStr: string = '';
-
-        let i: number = 0;
-        let ii: number = 0;// # of unique plants
-        let prevPlaName = '';
-        for(i;i<plantCompound.length;i++) {
-          let plaName: string = plantCompound[i][0]
-          let comName: string = plantCompound[i][1]
-          let srcName: string = plantCompound[i][2]
-
-          if (prevPlaName!=plaName) {
-            ii = ii + 1;
-            plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
-            plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
-
-            prevPlaName = plaName;
-          }
-
-          let comNameComps = comName.split(')');
-          let comCasId = comNameComps[0].replace('(','');
-          let comDrugbankId = comNameComps[1].replace('(','');
-          let comKnapsackId = comNameComps[2].replace('(','');
-          let comKeggId = comNameComps[3].replace('(','');
-
-          plaComStr = plaComStr+'  '+comCasId+','
-                                    +this.getHyperlinkStr('drugbank',comDrugbankId)+','
-                                    +this.getHyperlinkStr('knapsack',comKnapsackId)+','
-                                    +this.getHyperlinkStr('kegg',comKeggId)+','
-                                    +srcName
-                                    +'\n';
-        }
-        ////////////////////////////////////////////////////////////////////////
-
-        let count_pla_comp = 0;
-        let count_comp_prot = 0;
-        let count_prot_dis = 0;
-
-        for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
-          let temp = plantCompound[count_pla_comp][0];
-
-          if (pla_comp[temp]) {
-            let temp2 = pla_comp[temp];
-
-            if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
-              temp2.push(plantCompound[count_pla_comp][1]);
-
-              pla_comp[temp] = temp2;
-            }
-
-          }
-          else {
-            let a = [];
-            a.push(plantCompound[count_pla_comp][1]);
-            pla_comp[temp] = a;
-          }
-        }
-
-        for(count_comp_prot; count_comp_prot < compoundProtein.length; count_comp_prot++) {
-          let temp = compoundProtein[count_comp_prot][0];
-
-          if (comp_prot[temp]) {
-            let temp2 = comp_prot[temp];
-
-            if(this.checkJson(temp2, compoundProtein[count_comp_prot][1])) {
-              temp2.push(compoundProtein[count_comp_prot][1]);
-
-              comp_prot[temp] = temp2;
-            }
-
-          }
-          else {
-            let a = [];
-            a.push(compoundProtein[count_comp_prot][1]);
-            comp_prot[temp] = a;
-          }
-        }
-
-        for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
-          let temp = proteinDisease[count_prot_dis][0];
-
-          if (prot_dis[temp]) {
-            let temp2 = prot_dis[temp];
-
-            if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
-              temp2.push(proteinDisease[count_prot_dis][1]);
-
-              prot_dis[temp] = temp2;
-            }
-
-          }
-          else {
-            let a = [];
-            a.push(proteinDisease[count_prot_dis][1]);
-            prot_dis[temp] = a;
-          }
-        }
-
-        this.jsonPlantCompound = plaComStr;
-        this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
-        this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
-
-        if (plantCompound.length != 0) {
-
-          for (let i = 0; i < 20; i++) {
-            for (let j = 0; j < compoundProtein.length; j++) {
-
-              if (plantCompound[i][1] == compoundProtein[j][0]) {
-                if (this.check(this.dataLocal, plantCompound[i][0], plantCompound[i][1])) {
-                  let push = [plantCompound[i][0], plantCompound[i][1], 1];
-                  this.dataLocal.push(push);
-                }
-                if (this.check(this.dataLocal, compoundProtein[j][0], compoundProtein[j][1])) {
-                  let push = [compoundProtein[j][0], compoundProtein[j][1], 1];
-                  this.dataLocal.push(push);
-                }
-
-              }
-
-            }
-          }
-
-        }
-
-        else {
-
-          for(let i = 0; i < 20; i++) {
-            for (let j = 0; j < this.dataLocal.length; j++) {
-              if (compoundProtein[i][1] == this.dataLocal[j][0]) {
-                if (this.check(this.dataLocal, compoundProtein[i][0], compoundProtein[i][1])) {
-                  let push = [compoundProtein[i][0], compoundProtein[i][1], 1];
-                  this.dataLocal.push(push);
-                }
-              }
-            }
-          }
-
-        }
-
-
-        for (let i = 0; i < proteinDisease.length; i++) {
-          if (this.check(this.dataLocal, proteinDisease[i][0], proteinDisease[i][1])) {
-            let push = [proteinDisease[i][0], proteinDisease[i][1], 1];
-            this.dataLocal.push(push);
-          }
-        }
-
-        this.pDisease = true;
-      })
-
-  }
-
-  predictPlantProtein() {
-
-    this.plant.pop();
-    this.protein.pop();
-    let tanam = JSON.stringify(this.selectedPlants);
-    let prot = JSON.stringify(this.selectedProteins);
-
-    let compoundProtein1;
-    let compoundProtein2;
-
-    let plantCompound;
-    let proteinDisease;
-
-    this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-plant.php', tanam)
-      .map(res => res.json())
-      .subscribe(data => {
-
-        plantCompound = data[0]['plant_compound'];
-        compoundProtein1 = data[1]['compound_protein'];
-
-        this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-protein.php', prot)
-          .map(res => res.json())
-          .subscribe(data1 => {
-
-            proteinDisease = data1[2]['protein_disease'];
-            compoundProtein2 = data1[1]['compound_protein'];
-
-            let pla_comp = {};
-            let comp_prot = {};
-            let prot_dis = {};
-
-            ////////////////////////////////////////////////////////////////////////
-            let plaComStr: string = '';
-            let comProStr: string = '';
-            let proDisStr: string = '';
-
-            let i: number = 0;
-            let ii: number = 0;// # of unique plants
-            let prevPlaName = '';
-            for(i;i<plantCompound.length;i++) {
-              let plaName: string = plantCompound[i][0]
-              let comName: string = plantCompound[i][1]
-              let srcName: string = plantCompound[i][2]
-
-              if (prevPlaName!=plaName) {
-                ii = ii + 1;
-                plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
-                plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
-
-                prevPlaName = plaName;
-              }
-
-              let comNameComps = comName.split(')');
-              let comCasId = comNameComps[0].replace('(','');
-              let comDrugbankId = comNameComps[1].replace('(','');
-              let comKnapsackId = comNameComps[2].replace('(','');
-              let comKeggId = comNameComps[3].replace('(','');
-
-              plaComStr = plaComStr+'  '+comCasId+','
-                                        +this.getHyperlinkStr('drugbank',comDrugbankId)+','
-                                        +this.getHyperlinkStr('knapsack',comKnapsackId)+','
-                                        +this.getHyperlinkStr('kegg',comKeggId)+','
-                                        +srcName
-                                        +'\n';
-            }
-            ////////////////////////////////////////////////////////////////////////
-
-            let count_pla_comp = 0;
-            let count_comp_prot = 0;
-            let count_prot_dis = 0;
-
-            for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
-              let temp = plantCompound[count_pla_comp][0];
-
-              if (pla_comp[temp]) {
-                let temp2 = pla_comp[temp];
-
-                if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
-                  temp2.push(plantCompound[count_pla_comp][1]);
-
-                  pla_comp[temp] = temp2;
-                }
-
-              }
-              else {
-                let a = [];
-                a.push(plantCompound[count_pla_comp][1]);
-                pla_comp[temp] = a;
-              }
-            }
-
-            for(count_comp_prot; count_comp_prot < compoundProtein2.length; count_comp_prot++) {
-              let temp = compoundProtein2[count_comp_prot][0];
-
-              if (comp_prot[temp]) {
-                let temp2 = comp_prot[temp];
-
-                if(this.checkJson(temp2, compoundProtein2[count_comp_prot][1])) {
-                  temp2.push(compoundProtein2[count_comp_prot][1]);
-
-                  comp_prot[temp] = temp2;
-                }
-
-              }
-              else {
-                let a = [];
-                a.push(compoundProtein2[count_comp_prot][1]);
-                comp_prot[temp] = a;
-              }
-            }
-
-            for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
-              let temp = proteinDisease[count_prot_dis][0];
-
-              if (prot_dis[temp]) {
-                let temp2 = prot_dis[temp];
-
-                if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
-                  temp2.push(proteinDisease[count_prot_dis][1]);
-
-                  prot_dis[temp] = temp2;
-                }
-
-              }
-              else {
-                let a = [];
-                a.push(proteinDisease[count_prot_dis][1]);
-                prot_dis[temp] = a;
-              }
-            }
-
-            this.jsonPlantCompound = plaComStr;
-            this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
-            this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
-
-            for (let i = 0; i < compoundProtein1.length; i++) {
-
-              for (let j = 0; j < proteinDisease.length; j++) {
-                if (compoundProtein1[i][1] == proteinDisease[j][0]) {
-                  let cp = compoundProtein1[i][0];
-                  if (this.check(this.dataLocal, compoundProtein1[i][0], proteinDisease[j][0])) {
-                    let push = [compoundProtein1[i][0], proteinDisease[j][0], 1];
-                    this.dataLocal.push(push);
-                  }
-
-                  for (let z = 0; z < plantCompound.length; z++) {
-                    if (plantCompound[z][1] == cp) {
-                      if (this.check(this.dataLocal, plantCompound[z][0], plantCompound[z][1])) {
-                        let push = [plantCompound[z][0], plantCompound[z][1], 1];
-                        this.dataLocal.push(push);
-                      }
-                    }
-                  }
-                }
-              }
-
-            }
-
-            for (let i = 0; i < proteinDisease.length; i++) {
-              if (this.check(this.dataLocal, proteinDisease[i][0], proteinDisease[i][1])) {
-                let push = [proteinDisease[i][0], proteinDisease[i][1], 1];
-                this.dataLocal.push(push);
-              }
-            }
-
-            localStorage.setItem('data', JSON.stringify(this.dataLocal));
-            localStorage.setItem('jsonPlaComp', JSON.stringify(pla_comp, undefined, 2));
-            localStorage.setItem('jsonCompProt', JSON.stringify(comp_prot, undefined, 2));
-            localStorage.setItem('jsonProtDis', JSON.stringify(prot_dis, undefined, 2));
-            this.show = true;
-
+  searchFromDrugSide(drugSideInput) {
+    console.log('searchOnly: drugSideInput');
+
+    let dsi = JSON.stringify(drugSideInput);
+    // console.log(dsi);
+
+    this.http.post(this.interactionQueryAPI,dsi).map(resp => resp.json())
+    .subscribe(plaVScom => {
+      let comSet = this.getSet(plaVScom,'com_id');
+      let comSetJSON = this.makeJSONFormat(comSet,'comId');
+      // console.log(comSetJSON);
+
+      this.http.post(this.interactionQueryAPI,comSetJSON).map(resp2 => resp2.json())
+      .subscribe(comVSpro => {
+        let proSet = this.getSet(comVSpro,'pro_id');
+        let proSetJSON = this.makeJSONFormat(proSet,'value');
+        // console.log(proSetJSON);
+
+        this.http.post(this.interactionQueryAPI,proSetJSON).map(resp3 => resp3.json())
+        .subscribe(proVSdis => {
+          let plaSet = this.getSet(plaVScom,'pla_id');
+          let disSet = this.getSet(proVSdis,'dis_id');
+
+          this.makeOutput(plaSet,comSet,proSet,disSet,
+                          plaVScom,comVSpro,proVSdis);
         })
-
+      })
     })
-
   }
 
-  predictCompoundDisease() {
+  searchFromTargetSide(targetSideInput) {
+    console.log('searchOnly: targetSideInput');
 
-    this.compound.pop();
-    this.disease.pop();
-    let com = JSON.stringify(this.selectedCompounds);
-    let dis = JSON.stringify(this.selectedDiseases);
+    let tsi = JSON.stringify(targetSideInput);
+    // console.log(tsi);
 
-    let compoundProtein1;
-    let compoundProtein2;
+    this.http.post(this.interactionQueryAPI,tsi).map(resp => resp.json())
+    .subscribe(proVSdis => {
+      let proSet = this.getSet(proVSdis,'pro_id');
+      let proSetJSON = this.makeJSONFormat(proSet,'proId');
+      // console.log(proSetJSON);
 
-    let plantCompound;
-    let proteinDisease;
+      this.http.post(this.interactionQueryAPI,proSetJSON).map(resp2 => resp2.json())
+      .subscribe(comVSpro => {
+        let comSet = this.getSet(comVSpro,'com_id');
+        let comSetJSON = this.makeJSONFormat(comSet,'value');
+        // console.log(comSetJSON);
 
-    this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-compound.php', com)
-      .map(res => res.json())
-      .subscribe(data => {
+        this.http.post(this.interactionQueryAPI,comSetJSON).map(resp3 => resp3.json())
+        .subscribe(plaVScom => {
+          let plaSet = this.getSet(plaVScom,'pla_id');
+          let disSet = this.getSet(proVSdis,'dis_id');
 
-        plantCompound = data[0]['plant_compound'];
-        compoundProtein1 = data[1]['compound_protein'];
-
-        this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-disease.php', dis)
-          .map(res => res.json())
-          .subscribe(data1 => {
-
-            proteinDisease = data1[2]['protein_disease'];
-            compoundProtein2 = data1[1]['compound_protein'];
-
-            let pla_comp = {};
-            let comp_prot = {};
-            let prot_dis = {};
-
-            ////////////////////////////////////////////////////////////////////////
-            let plaComStr: string = '';
-            let comProStr: string = '';
-            let proDisStr: string = '';
-
-            let i: number = 0;
-            let ii: number = 0;// # of unique plants
-            let prevPlaName = '';
-            for(i;i<plantCompound.length;i++) {
-              let plaName: string = plantCompound[i][0]
-              let comName: string = plantCompound[i][1]
-              let srcName: string = plantCompound[i][2]
-
-              if (prevPlaName!=plaName) {
-                ii = ii + 1;
-                plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
-                plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
-
-                prevPlaName = plaName;
-              }
-
-              let comNameComps = comName.split(')');
-              let comCasId = comNameComps[0].replace('(','');
-              let comDrugbankId = comNameComps[1].replace('(','');
-              let comKnapsackId = comNameComps[2].replace('(','');
-              let comKeggId = comNameComps[3].replace('(','');
-
-              plaComStr = plaComStr+'  '+comCasId+','
-                                        +this.getHyperlinkStr('drugbank',comDrugbankId)+','
-                                        +this.getHyperlinkStr('knapsack',comKnapsackId)+','
-                                        +this.getHyperlinkStr('kegg',comKeggId)+','
-                                        +srcName
-                                        +'\n';
-            }
-            ////////////////////////////////////////////////////////////////////////
-
-            let count_pla_comp = 0;
-            let count_comp_prot = 0;
-            let count_prot_dis = 0;
-
-            for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
-              let temp = plantCompound[count_pla_comp][0];
-
-              if (pla_comp[temp]) {
-                let temp2 = pla_comp[temp];
-
-                if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
-                  temp2.push(plantCompound[count_pla_comp][1]);
-
-                  pla_comp[temp] = temp2;
-                }
-
-              }
-              else {
-                let a = [];
-                a.push(plantCompound[count_pla_comp][1]);
-                pla_comp[temp] = a;
-              }
-            }
-
-            for(count_comp_prot; count_comp_prot < compoundProtein2.length; count_comp_prot++) {
-              let temp = compoundProtein2[count_comp_prot][0];
-
-              if (comp_prot[temp]) {
-                let temp2 = comp_prot[temp];
-
-                if(this.checkJson(temp2, compoundProtein2[count_comp_prot][1])) {
-                  temp2.push(compoundProtein2[count_comp_prot][1]);
-
-                  comp_prot[temp] = temp2;
-                }
-
-              }
-              else {
-                let a = [];
-                a.push(compoundProtein2[count_comp_prot][1]);
-                comp_prot[temp] = a;
-              }
-            }
-
-            for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
-              let temp = proteinDisease[count_prot_dis][0];
-
-              if (prot_dis[temp]) {
-                let temp2 = prot_dis[temp];
-
-                if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
-                  temp2.push(proteinDisease[count_prot_dis][1]);
-
-                  prot_dis[temp] = temp2;
-                }
-
-              }
-              else {
-                let a = [];
-                a.push(proteinDisease[count_prot_dis][1]);
-                prot_dis[temp] = a;
-              }
-            }
-
-            this.jsonPlantCompound = plaComStr;
-            this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
-            this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
-
-            for (let z = 0; z < 20; z++) {
-              if (this.check(this.dataLocal, plantCompound[z][0], plantCompound[z][1])) {
-                let push = [plantCompound[z][0], plantCompound[z][1], 1];
-                this.dataLocal.push(push);
-              }
-            }
-
-            for (let i = 0; i < compoundProtein1.length; i++) {
-              for (let j = 0; j < proteinDisease.length; j++) {
-                if (compoundProtein1[i][1] == proteinDisease[j][0]) {
-                  if (this.check(this.dataLocal, compoundProtein1[i][0], proteinDisease[j][0])) {
-                    let push = [compoundProtein1[i][0], proteinDisease[j][0], 1];
-                    this.dataLocal.push(push);
-                  }
-
-                  if (this.check(this.dataLocal, proteinDisease[j][0], proteinDisease[j][1])) {
-                    let push = [proteinDisease[j][0], proteinDisease[j][1], 1];
-                    this.dataLocal.push(push);
-                  }
-                }
-              }
-            }
-
-            localStorage.setItem('data', JSON.stringify(this.dataLocal));
-            localStorage.setItem('jsonPlaComp', JSON.stringify(pla_comp, undefined, 2));
-            localStorage.setItem('jsonCompProt', JSON.stringify(comp_prot, undefined, 2));
-            localStorage.setItem('jsonProtDis', JSON.stringify(prot_dis, undefined, 2));
-            this.show = true;
-
+          this.makeOutput(plaSet,comSet,proSet,disSet,
+                          plaVScom,comVSpro,proVSdis);
         })
-
+      })
     })
-
   }
 
-  predictPlantDisease() {
+  searchAndPredict(drugSideInput,targetSideInput) {
+    console.log('searchAndPredict');
 
-    this.plant.pop();
-    this.protein.pop();
-    let tanam = JSON.stringify(this.selectedPlants);
-    let dis = JSON.stringify(this.selectedDiseases);
+    let dsi = JSON.stringify(drugSideInput);
+    let tsi = JSON.stringify(targetSideInput);
+    // console.log(dsi);
+    // console.log(tsi);
 
-    let compoundProtein1;
-    let compoundProtein2;
+    this.http.post(this.interactionQueryAPI,dsi).map(resp => resp.json())
+    .subscribe(plaVScom => {
+      this.http.post(this.interactionQueryAPI,tsi).map(resp2 => resp2.json())
+      .subscribe(proVSdis => {
+        let comVSproList = [];
 
-    let plantCompound;
-    let proteinDisease;
+        for (let i=0;i<plaVScom.length;i++) {
+          for (let j=0;j<proVSdis.length;j++) {
+            let comId = '"'+plaVScom[i]['com_id']+'"';
+            let proId = '"'+proVSdis[j]['pro_id']+'"';
+            let comVSpro = '{'+'"comId":'+comId+','+'"proId":'+proId+'}';
+            comVSproList.push(comVSpro);
+          }
+        }
 
-    this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-plant.php', tanam)
-      .map(res => res.json())
-      .subscribe(data => {
+        // make unique
+        comVSproList = comVSproList.filter((v, i, a) => a.indexOf(v) === i);
 
-        plantCompound = data[0]['plant_compound'];
-        compoundProtein1 = data[1]['compound_protein'];
+        // make it JSON-format
+        let comVSproStr = '';
+        for (let k=0;k<comVSproList.length;k++) {
+          comVSproStr = comVSproStr+comVSproList[k];
+          if (k<comVSproList.length-1) {
+            comVSproStr = comVSproStr + ',';
+          }
+        }
+        comVSproStr = '['+comVSproStr+']';
+        // console.log(comVSproStr);
 
-        this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-disease.php', dis)
-          .map(res => res.json())
-          .subscribe(data1 => {
+        this.http.post(this.interactionQueryAPI,comVSproStr).map(resp3 => resp3.json())
+        .subscribe(comVSpro => {
+          // Get unique items
+          let plaSet = this.getSet(plaVScom,'pla_id');
+          let comSet = this.getSet(plaVScom,'com_id');
+          let proSet = this.getSet(proVSdis,'pro_id');
+          let disSet = this.getSet(proVSdis,'dis_id');
+          // let comSet2 = this.getSet(comVSpro,'com_id');
+          // let proSet2 = this.getSet(comVSpro,'pro_id');
 
-            proteinDisease = data1[2]['protein_disease'];
-            compoundProtein2 = data1[1]['compound_protein'];
-
-            let pla_comp = {};
-            let comp_prot = {};
-            let prot_dis = {};
-
-            ////////////////////////////////////////////////////////////////////////
-            let plaComStr: string = '';
-            let comProStr: string = '';
-            let proDisStr: string = '';
-
-            let i: number = 0;
-            let ii: number = 0;// # of unique plants
-            let prevPlaName = '';
-            for(i;i<plantCompound.length;i++) {
-              let plaName: string = plantCompound[i][0]
-              let comName: string = plantCompound[i][1]
-              let srcName: string = plantCompound[i][2]
-
-              if (prevPlaName!=plaName) {
-                ii = ii + 1;
-                plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
-                plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
-
-                prevPlaName = plaName;
-              }
-
-              let comNameComps = comName.split(')');
-              let comCasId = comNameComps[0].replace('(','');
-              let comDrugbankId = comNameComps[1].replace('(','');
-              let comKnapsackId = comNameComps[2].replace('(','');
-              let comKeggId = comNameComps[3].replace('(','');
-
-              plaComStr = plaComStr+'  '+comCasId+','
-                                        +this.getHyperlinkStr('drugbank',comDrugbankId)+','
-                                        +this.getHyperlinkStr('knapsack',comKnapsackId)+','
-                                        +this.getHyperlinkStr('kegg',comKeggId)+','
-                                        +srcName
-                                        +'\n';
-            }
-            ////////////////////////////////////////////////////////////////////////
-
-            let count_pla_comp = 0;
-            let count_comp_prot = 0;
-            let count_prot_dis = 0;
-
-            for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
-              let temp = plantCompound[count_pla_comp][0];
-
-              if (pla_comp[temp]) {
-                let temp2 = pla_comp[temp];
-
-                if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
-                  temp2.push(plantCompound[count_pla_comp][1]);
-
-                  pla_comp[temp] = temp2;
-                }
-
-              }
-              else {
-                let a = [];
-                a.push(plantCompound[count_pla_comp][1]);
-                pla_comp[temp] = a;
-              }
-            }
-
-            for(count_comp_prot; count_comp_prot < compoundProtein2.length; count_comp_prot++) {
-              let temp = compoundProtein2[count_comp_prot][0];
-
-              if (comp_prot[temp]) {
-                let temp2 = comp_prot[temp];
-
-                if(this.checkJson(temp2, compoundProtein2[count_comp_prot][1])) {
-                  temp2.push(compoundProtein2[count_comp_prot][1]);
-
-                  comp_prot[temp] = temp2;
-                }
-
-              }
-              else {
-                let a = [];
-                a.push(compoundProtein2[count_comp_prot][1]);
-                comp_prot[temp] = a;
-              }
-            }
-
-            for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
-              let temp = proteinDisease[count_prot_dis][0];
-
-              if (prot_dis[temp]) {
-                let temp2 = prot_dis[temp];
-
-                if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
-                  temp2.push(proteinDisease[count_prot_dis][1]);
-
-                  prot_dis[temp] = temp2;
-                }
-
-              }
-              else {
-                let a = [];
-                a.push(proteinDisease[count_prot_dis][1]);
-                prot_dis[temp] = a;
-              }
-            }
-
-            this.jsonPlantCompound = plaComStr;
-            this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
-            this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
-
-            for (let i = 0; i < compoundProtein1.length; i++) {
-
-              for (let j = 0; j < proteinDisease.length; j++) {
-                if (compoundProtein1[i][1] == proteinDisease[j][0]) {
-                  let cp = compoundProtein1[i][0];
-                  if (this.check(this.dataLocal, compoundProtein1[i][0], proteinDisease[j][0])) {
-                    let push = [compoundProtein1[i][0], proteinDisease[j][0], 1];
-                    this.dataLocal.push(push);
-                  }
-
-                  for (let z = 0; z < plantCompound.length; z++) {
-                    if (plantCompound[z][1] == cp) {
-                      if (this.check(this.dataLocal, plantCompound[z][0], plantCompound[z][1])) {
-                        let push = [plantCompound[z][0], plantCompound[z][1], 1];
-                        this.dataLocal.push(push);
-                      }
-                    }
-                  }
-                }
-              }
-
-            }
-
-            for (let i = 0; i < proteinDisease.length; i++) {
-              if (this.check(this.dataLocal, proteinDisease[i][0], proteinDisease[i][1])) {
-                let push = [proteinDisease[i][0], proteinDisease[i][1], 1];
-                this.dataLocal.push(push);
-              }
-            }
-
-            localStorage.setItem('data', JSON.stringify(this.dataLocal));
-            localStorage.setItem('jsonPlaComp', JSON.stringify(pla_comp, undefined, 2));
-            localStorage.setItem('jsonCompProt', JSON.stringify(comp_prot, undefined, 2));
-            localStorage.setItem('jsonProtDis', JSON.stringify(prot_dis, undefined, 2));
-            this.show = true;
-
+          this.makeOutput(plaSet,comSet,proSet,disSet,
+                          plaVScom,comVSpro,proVSdis);
         })
-
-    })
-
-  }
-
-  predictCompoundProtein() {
-
-    this.compound.pop();
-    this.disease.pop();
-    let com = JSON.stringify(this.selectedCompounds);
-    let prot = JSON.stringify(this.selectedProteins);
-
-    let compoundProtein1;
-    let compoundProtein2;
-
-    let plantCompound;
-    let proteinDisease;
-
-    this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-compound.php', com)
-      .map(res => res.json())
-      .subscribe(data => {
-
-        plantCompound = data[0]['plant_compound'];
-        compoundProtein1 = data[1]['compound_protein'];
-
-        this.http.post('http://ijah.apps.cs.ipb.ac.id/ijah/zz-protein.php', prot)
-          .map(res => res.json())
-          .subscribe(data1 => {
-
-            proteinDisease = data1[2]['protein_disease'];
-            compoundProtein2 = data1[1]['compound_protein'];
-
-            let pla_comp = {};
-            let comp_prot = {};
-            let prot_dis = {};
-
-            ////////////////////////////////////////////////////////////////////////
-            let plaComStr: string = '';
-            let comProStr: string = '';
-            let proDisStr: string = '';
-
-            let i: number = 0;
-            let ii: number = 0;// # of unique plants
-            let prevPlaName = '';
-            for(i;i<plantCompound.length;i++) {
-              let plaName: string = plantCompound[i][0]
-              let comName: string = plantCompound[i][1]
-              let srcName: string = plantCompound[i][2]
-
-              if (prevPlaName!=plaName) {
-                ii = ii + 1;
-                plaComStr = plaComStr + '#'+ii.toString()+' '+plaName+':\n';
-                plaComStr = plaComStr + '  CAS,DrugbankID,KnapsackID,KeggID,source\n';
-
-                prevPlaName = plaName;
-              }
-
-              let comNameComps = comName.split(')');
-              let comCasId = comNameComps[0].replace('(','');
-              let comDrugbankId = comNameComps[1].replace('(','');
-              let comKnapsackId = comNameComps[2].replace('(','');
-              let comKeggId = comNameComps[3].replace('(','');
-
-              plaComStr = plaComStr+'  '+comCasId+','
-                                        +this.getHyperlinkStr('drugbank',comDrugbankId)+','
-                                        +this.getHyperlinkStr('knapsack',comKnapsackId)+','
-                                        +this.getHyperlinkStr('kegg',comKeggId)+','
-                                        +srcName
-                                        +'\n';
-            }
-            ////////////////////////////////////////////////////////////////////////
-
-            let count_pla_comp = 0;
-            let count_comp_prot = 0;
-            let count_prot_dis = 0;
-
-            for(count_pla_comp; count_pla_comp < plantCompound.length; count_pla_comp++) {
-              let temp = plantCompound[count_pla_comp][0];
-
-              if (pla_comp[temp]) {
-                let temp2 = pla_comp[temp];
-
-                if (this.checkJson(temp2, plantCompound[count_pla_comp][1])) {
-                  temp2.push(plantCompound[count_pla_comp][1]);
-
-                  pla_comp[temp] = temp2;
-                }
-
-              }
-              else {
-                let a = [];
-                a.push(plantCompound[count_pla_comp][1]);
-                pla_comp[temp] = a;
-              }
-            }
-
-            for(count_comp_prot; count_comp_prot < compoundProtein2.length; count_comp_prot++) {
-              let temp = compoundProtein2[count_comp_prot][0];
-
-              if (comp_prot[temp]) {
-                let temp2 = comp_prot[temp];
-
-                if(this.checkJson(temp2, compoundProtein2[count_comp_prot][1])) {
-                  temp2.push(compoundProtein2[count_comp_prot][1]);
-
-                  comp_prot[temp] = temp2;
-                }
-
-              }
-              else {
-                let a = [];
-                a.push(compoundProtein2[count_comp_prot][1]);
-                comp_prot[temp] = a;
-              }
-            }
-
-            for(count_prot_dis = 0; count_prot_dis < proteinDisease.length; count_prot_dis++) {
-              let temp = proteinDisease[count_prot_dis][0];
-
-              if (prot_dis[temp]) {
-                let temp2 = prot_dis[temp];
-
-                if (this.checkJson(temp2, proteinDisease[count_prot_dis][1])) {
-                  temp2.push(proteinDisease[count_prot_dis][1]);
-
-                  prot_dis[temp] = temp2;
-                }
-
-              }
-              else {
-                let a = [];
-                a.push(proteinDisease[count_prot_dis][1]);
-                prot_dis[temp] = a;
-              }
-            }
-
-            this.jsonPlantCompound = plaComStr;
-            this.jsonCompoundProtein = JSON.stringify(comp_prot, undefined, 2);
-            this.jsonProteinDisease = JSON.stringify(prot_dis, undefined, 2);
-
-            for (let z = 0; z < 20; z++) {
-              if (this.check(this.dataLocal, plantCompound[z][0], plantCompound[z][1])) {
-                let push = [plantCompound[z][0], plantCompound[z][1], 1];
-                this.dataLocal.push(push);
-              }
-            }
-
-            for (let i = 0; i < compoundProtein1.length; i++) {
-              for (let j = 0; j < proteinDisease.length; j++) {
-                if (compoundProtein1[i][1] == proteinDisease[j][0]) {
-                  if (this.check(this.dataLocal, compoundProtein1[i][0], proteinDisease[j][0])) {
-                    let push = [compoundProtein1[i][0], proteinDisease[j][0], 1];
-                    this.dataLocal.push(push);
-                  }
-
-                  if (this.check(this.dataLocal, proteinDisease[j][0], proteinDisease[j][1])) {
-                    let push = [proteinDisease[j][0], proteinDisease[j][1], 1];
-                    this.dataLocal.push(push);
-                  }
-                }
-              }
-            }
-
-            localStorage.setItem('data', JSON.stringify(this.dataLocal));
-            localStorage.setItem('jsonPlaComp', JSON.stringify(pla_comp, undefined, 2));
-            localStorage.setItem('jsonCompProt', JSON.stringify(comp_prot, undefined, 2));
-            localStorage.setItem('jsonProtDis', JSON.stringify(prot_dis, undefined, 2));
-            this.show = true;
-        })
+      })
     })
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
+  makeOutput(plaSet,comSet,proSet,disSet,plaVScom,comVSpro,proVSdis) {
+    plaSet = this.handleIfEmptySet(plaSet,'pla');
+    comSet = this.handleIfEmptySet(comSet,'com');
+    proSet = this.handleIfEmptySet(proSet,'pro');
+    disSet = this.handleIfEmptySet(disSet,'dis');
+
+    // Get metadata of each unique item
+    let plaMetaPost = this.makeJSONFormat(plaSet,'id');
+    let comMetaPost = this.makeJSONFormat(comSet,'id');
+    let proMetaPost = this.makeJSONFormat(proSet,'id');
+    let disMetaPost = this.makeJSONFormat(disSet,'id');
+
+    // console.log('getting meta ...');
+    this.http.post(this.metaQueryAPI,plaMetaPost).map(resp4 => resp4.json())
+    .subscribe(plaMeta => {
+      this.http.post(this.metaQueryAPI,comMetaPost).map(resp5=>resp5.json())
+      .subscribe(comMeta => {
+        this.http.post(this.metaQueryAPI,proMetaPost).map(resp6=>resp6.json())
+        .subscribe(proMeta => {
+          this.http.post(this.metaQueryAPI,disMetaPost).map(resp7=>resp7.json())
+          .subscribe(disMeta => {
+            // text output with detail metadata //////////////////////////
+            this.jsonPlantCompound = this.makeTextOutput(plaVScom,
+                                                         plaMeta,comMeta,
+                                                         'pla','com');
+            this.jsonCompoundProtein = this.makeTextOutput(comVSpro,
+                                                           comMeta,proMeta,
+                                                           'com','pro');
+            this.jsonProteinDisease = this.makeTextOutput(proVSdis,
+                                                         proMeta,disMeta,
+                                                         'pro','dis');
+
+            // graph output data prep ////////////////////////////////////
+            let graphData = [];
+            let nNodeMax = 20;
+
+            let plaForGraph = this.getItemForGraph(plaSet,nNodeMax);
+            let comForGraph = this.getItemForGraph(comSet,nNodeMax);
+            let proForGraph = this.getItemForGraph(proSet,nNodeMax);
+            let disForGraph = this.getItemForGraph(disSet,nNodeMax);
+
+            let graphDataArr = [this.getGraphData(plaVScom,
+                                                  plaMeta,comMeta,
+                                                  'pla','com',
+                                                  plaForGraph,comForGraph),
+                                this.getGraphData(comVSpro,
+                                                  comMeta,proMeta,
+                                                  'com','pro',
+                                                  comForGraph,proForGraph),
+                                this.getGraphData(proVSdis,
+                                                  proMeta,disMeta,
+                                                   'pro','dis',
+                                                   proForGraph,disForGraph)];
+
+            for (let ii=0;ii<graphDataArr.length;ii++) {
+              for(let jj=0;jj<graphDataArr[ii].length;jj++) {
+                  let datum = graphDataArr[ii][jj];
+                  graphData.push(datum);
+              }
+            }
+
+            localStorage.setItem('data', JSON.stringify(graphData));
+            this.show = true;
+          })//disMeta
+        })//proMeta
+      })//comMeta
+    })//plaMeta
+  }
+
+  makeJSONFormat(arr,key) {
+    let str = '';
+    for (let j=0;j<arr.length;j++){
+      str = str+'{'+'"'+key+'"'+':'+'"'+arr[j]+'"'+'}';
+      if (j<arr.length-1) {
+        str = str+','
+      }
+    }
+    str = '['+str+']';
+    return str;
+  }
+
+  handleIfEmptySet(set,type) {
+    if (set.length>0) {
+      return set;
+    }
+    let newSet = [type.toUpperCase()+'NONE_DUMMY'];
+    return newSet;
+  }
+
+  getItemForGraph(set,max) {
+    let itemForGraph = [];
+    for (let kk=0;kk<set.length;kk++) {
+      if (kk < max) {
+        itemForGraph.push(set[kk]);
+      }
+      else {
+        break;
+      }
+    }
+    return itemForGraph;
+  }
+
+  getSet(interaction,id) {
+    let set = [];
+    for (let i=0;i<interaction.length;i++) {
+      let item = interaction[i][id];
+      if (set.indexOf(item) === -1) {
+        set.push(item);
+      }
+    }
+    return set;
+  }
+
+  getPropKeys(type) {
+    let keys: string[] = [];
+    if (type==='pla') {
+      keys.push('pla_name');
+    }
+    if (type==='com') {
+      keys.push('com_cas_id');
+      keys.push('com_drugbank_id');
+      keys.push('com_kegg_id');
+      keys.push('com_knapsack_id');
+    }
+    if (type==='pro') {
+      keys.push('pro_uniprot_id');
+      keys.push('pro_uniprot_abbrv');
+      keys.push('pro_name');
+    }
+    if (type==='dis') {
+      keys.push('dis_omim_id');
+      keys.push('dis_name');
+    }
+    return keys;
+  }
+
+  getHyperlinkStr(type,seed) {
+    let baseUrl: string = 'null';
+
+    if (type==='com_knapsack_id') {
+      baseUrl = 'http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=';
+    }
+    if (type==='com_drugbank_id') {
+      baseUrl = 'https://www.drugbank.ca/drugs/';
+    }
+    if (type==='com_kegg_id') {
+      baseUrl = 'http://www.genome.jp/dbget-bin/www_bget?cpd:';
+    }
+
+    if (type==='pro_uniprot_id') {
+      baseUrl = 'http://www.uniprot.org/uniprot/';
+    }
+
+    if (type==='dis_omim_id') {
+      baseUrl = 'https://www.omim.org/entry/';
+    }
+
+    let urlStr:string = seed;
+    if (seed!=='' && seed!=='null') {
+      let url: string = baseUrl + seed;
+      urlStr = '<a href="'+url+'" target="_blank">'+seed+'</a>';
+    }
+    if (urlStr.indexOf('null') !==-1 ) {
+      urlStr = seed;
+    }
+    return urlStr;
+  }
+
+  getProps(id,keys,meta) {
+    let prefix = id.substr(0,3);
+    prefix = prefix.toLowerCase() + '_id';
+
+    let idx = -1;
+    for (let i=0;i<meta.length;i++) {
+      if (id===meta[i][prefix]) {
+        idx = i;
+        break;
+      }
+    }
+
+    let props = []
+    for(let j=0;j<keys.length;j++) {
+      props.push( meta[idx][keys[j]] );
+    }
+
+    return props;
+  }
+
+  getHeader(type) {
+    let header = 'DEFAULT_HEADER';
+    if (type === 'com') {
+      header = 'CAS,DrugbankID,KnapsackID,KeggID,weight,source';
+    }
+    if (type === 'pro') {
+      header = 'UniprotID,UniprotAbbrv,UniprotName,weight,source';
+    }
+    if (type === 'dis') {
+      header = 'OmimID,OmimName,weight,source';
+    }
+    return header;
+  }
+
+  concatProps(props) {
+    let str = '';
+    for (let j=0;j<props.length;j++) {
+      let prop = props[j];
+      if (prop) {
+        str = str+prop;
+        if (j<props.length-1) {
+          str = str + ',';
+        }
+      }
+    }
+    return str;
+  }
+
+  getGraphData(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
+    let srcPropKeys = this.getPropKeys(srcType);
+    let destPropKeys = this.getPropKeys(destType);
+    let data = [];
+
+    for(let i=0;i<interaction.length;i++) {
+      let datum = [];
+
+      let srcKey = srcType+'_id';
+      let destKey = destType+'_id';
+
+      let src = interaction[i][srcKey];
+      let dest = interaction[i][destKey];
+
+      if ((srcItems.indexOf(src)!==-1)&&(destItems.indexOf(dest)!==-1)) {
+        let source = interaction[i]['source'];
+        let weight = parseFloat( interaction[i]['weight'] );
+
+        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
+        let destProps = this.getProps(dest,destPropKeys,destMeta);
+        let srcText = this.concatProps(srcProps);
+        let destText = this.concatProps(destProps);
+
+        datum.push(srcText);
+        datum.push(destText);
+        datum.push(weight);
+
+        data.push(datum);
+      }
+    }
+    return data;
+  }
+
+  makeTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
+    let text: string = '';
+    let srcPropKeys = this.getPropKeys(srcType);
+    let destPropKeys = this.getPropKeys(destType);
+
+    let nUnique = 0;
+    let prevSrc = '';
+    for(let i=0;i<interaction.length;i++) {
+      let srcKey = srcType+'_id';
+      let destKey = destType+'_id'
+      let src = interaction[i][srcKey];
+      let dest = interaction[i][destKey];
+      let source = interaction[i]['source'];
+      let weight = interaction[i]['weight'];
+
+      if (prevSrc!=src) {
+        nUnique = nUnique + 1;
+        text = text+'#'+nUnique.toString()+' ';
+
+        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
+        for (let j=0;j<srcProps.length;j++) {
+          text = text+this.getHyperlinkStr( srcPropKeys[j],srcProps[j] );
+          if (j<srcProps.length-1) {
+            text = text + ',';
+          }
+        }
+        text = text+':\n';
+        text = text+'  '+this.getHeader(destType)+'\n';
+
+        prevSrc = src;
+      }
+
+      let destProps = this.getProps(dest,destPropKeys,destMeta);
+      text = text+'  ';
+      for (let jj=0;jj<destProps.length;jj++) {
+        text = text+this.getHyperlinkStr( destPropKeys[jj],destProps[jj] );
+        if (jj<destProps.length-1) {
+          text = text + ',';
+        }
+      }
+      text = text+','+weight+','+source;
+      text = text+'\n';
+    }
+
+    if (text==='') {
+      text = 'None';
+    }
+    return text;
+  }
+
   downloadJSON(idata,ifname){
     var json = localStorage.getItem(idata);
     var blob = new Blob([json], {type: "text/plain;charset=utf-8"});
     saveAs(blob, ifname);
-  }
-
-  check(data, input1, input2) {
-
-    for(var i = 0; i < data.length; i++) {
-      if (data[i][0] == input1 && data[i][1] == input2) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  checkJson(data, input1) {
-
-    for(var i = 0; i < data.length; i++) {
-      if (data[i] == input1) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  getMaxKeys(json) {
-    var m;
-    for (var i in json) {
-        if (json.hasOwnProperty(i)) {
-           m = (typeof m == 'undefined' || i > m) ? i : m;
-        }
-    }
-    return m;
-  }
-
-  getHyperlinkStr(type,seed) {
-    let baseUrl: string = '';
-    if (type=='knapsack'){
-      baseUrl = 'http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=';
-    }
-    if (type=='drugbank'){
-      baseUrl = 'https://www.drugbank.ca/drugs/';
-    }
-    if (type=='kegg'){
-      baseUrl = 'http://www.genome.jp/dbget-bin/www_bget?cpd:';
-    }
-
-    let urlStr:string = '';
-    if (seed!='') {
-      let url: string = baseUrl + seed;
-      urlStr = '<a href="'+url+'" target="_blank">'+seed+'</a>';
-    }
-    return urlStr;
   }
 
   reset() {

@@ -7,3 +7,6 @@ img/_DS_Store
 
 ang2.note
 npm-debug.log
+
+*.js
+*.js.map
