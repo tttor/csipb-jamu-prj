@@ -1,8 +1,12 @@
 #!/bin/bash
 
 #
-echo 'Have you set the API to apps.cs? (see home.component.ts)'
+echo 'Have you set the API to apps.cs at(see home.component.ts?'
 read input
+
+echo 'Have you set the DB link to apps.cs at api/config.php(see home.component.ts?'
+read input2
+
 echo 'Yeay, lets roll...'
 
 #build the src in production stage
