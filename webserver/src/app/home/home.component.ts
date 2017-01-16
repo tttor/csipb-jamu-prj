@@ -116,7 +116,7 @@ export class Home {
 
   constructor(public appState: AppState, private http: Http) {
     this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/ijah/';
-    this.baseAPI ='http://localhost/';// Comment this if you run online!
+    // this.baseAPI ='http://localhost/';// Comment this if you run online!
 
     this.interactionQueryAPI = this.baseAPI+'query_interaction.php';
     this.metaQueryAPI = this.baseAPI+'query_metadata.php';
