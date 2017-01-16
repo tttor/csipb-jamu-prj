@@ -491,15 +491,15 @@ export class Home {
             let proForGraph = this.getItemForGraph(proSet,nNodeMax);
             let disForGraph = this.getItemForGraph(disSet,nNodeMax);
 
-            let graphDataArr = [this.getGraphData(plaVScom,
+            let graphDataArr = [this.makeGraphData(plaVScom,
                                                   plaMeta,comMeta,
                                                   'pla','com',
                                                   plaForGraph,comForGraph),
-                                this.getGraphData(comVSpro,
+                                this.makeGraphData(comVSpro,
                                                   comMeta,proMeta,
                                                   'com','pro',
                                                   comForGraph,proForGraph),
-                                this.getGraphData(proVSdis,
+                                this.makeGraphData(proVSdis,
                                                   proMeta,disMeta,
                                                    'pro','dis',
                                                    proForGraph,disForGraph)];
@@ -666,7 +666,7 @@ export class Home {
     return str;
   }
 
-  getGraphData(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
+  makeGraphData(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
     let srcPropKeys = this.getPropKeys(srcType);
     let destPropKeys = this.getPropKeys(destType);
     let data = [];
