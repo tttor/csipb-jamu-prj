@@ -76,11 +76,18 @@
 
       // Set chart options
       var options = {
-        width: 1175,
+        width: 1190,
         sankey: {
-          node: { label: {
-             color: '#34495e',
-             bold: true} } },
+          node: {
+            label: {
+              color: '#34495e',
+              bold: true
+            },
+            interactivity: true,
+            labelPadding: 0,
+            width: 5
+          }
+        },
       };
 
       // Instantiate and draw our chart, passing in some options.
