@@ -8,6 +8,12 @@ elif [ "$1" == "ipks" ]; then
   ### insert_plant
   path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003/knapsack_jsp_plant_vs_compound_2016-10-04_16:34:06.468234.pkl
   python insert_plant.py $db $user $passwd $host $port $path
+elif [ "$1" == "upidr" ]; then
+  ### update IDR plant name
+  mode=updatePlantIdrName
+  outDir=/home/tor/robotics/prj/csipb-jamu-prj/xprmt/insert-data-ijah
+  path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/plant-list/latin2idr_201701170815.json
+  python insert_plant.py $db $user $passwd $host $port $mode $outDir $path
 elif [ "$1" == "icdb" ]; then
   ### insert_compound (1)
   mode=insertComFromDrugbank
