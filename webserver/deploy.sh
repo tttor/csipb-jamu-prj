@@ -43,4 +43,4 @@ if [ $6 -ne 0 ]; then
   echo "deploying assets(css,img) ..."
   scp -r src/assets/css tor@apps.cs.ipb.ac.id:/var/www/ijah/
   scp -r src/assets/img tor@apps.cs.ipb.ac.id:/var/www/ijah/
-if
+fi
