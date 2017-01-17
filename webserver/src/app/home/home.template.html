@@ -51,7 +51,7 @@
                    placeholder="Latin Name | Indonesian Name"
                    (focus)="focusPlant(t.index)">
              <div *ngIf="noResultPlant===true" class="" style="">
-               <span style="color:red; font-size:13px">Sorry, Unavailable</span>
+               <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
              </div>
           </div>
         </div>
@@ -77,7 +77,7 @@
                    placeholder="CAS | DrugBank ID | KnapSack ID"
                    (focus)="focusCompound(c.index)">
              <div *ngIf="noResultCompound===true" class="" style="">
-               <span style="color:red; font-size:13px">Sorry, Unavailable</span>
+               <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
              </div>
           </div>
         </div>
@@ -111,7 +111,7 @@
                    placeholder="Uniprot ID | Uniprot Name"
                    (focus)="focusProtein(p.index)">
              <div *ngIf="noResultProtein===true" class="" style="">
-               <span style="color:red; font-size:13px">Sorry, Unavailable</span>
+               <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
              </div>
           </div>
         </div>
@@ -137,7 +137,7 @@
                    placeholder="OMIM ID | OMIM Name"
                    (focus)="focusDisease(d.index)">
              <div *ngIf="noResultDisease===true" class="" style="">
-               <span style="color:red; font-size:13px">Sorry, Unavailable</span>
+               <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
              </div>
           </div>
         </div>
