@@ -116,7 +116,7 @@ export class Home {
 
   constructor(public appState: AppState, private http: Http) {
     this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/ijah/';
-    // this.baseAPI ='http://localhost/';// Comment this if you run online!
+    this.baseAPI ='http://localhost/';// Comment this if you run online!
 
     this.interactionQueryAPI = this.baseAPI+'query_interaction.php';
     this.metaQueryAPI = this.baseAPI+'query_metadata.php';
@@ -535,7 +535,7 @@ export class Home {
     if (set.length>0) {
       return set;
     }
-    let newSet = [type.toUpperCase()+'NONE_DUMMY'];
+    let newSet = [type.toUpperCase()+'_NONE_DUMMY'];
     return newSet;
   }
 
@@ -631,8 +631,14 @@ export class Home {
     }
 
     let props = []
-    for(let j=0;j<keys.length;j++) {
-      props.push( meta[idx][keys[j]] );
+    if (idx !== -1) {
+      for(let j=0;j<keys.length;j++) {
+        let k = keys[j];
+        props.push( meta[idx][k] );
+      }
+    }
+    else {
+      // console.log('ERROR: NOT FOUND');
     }
 
     return props;
