@@ -486,10 +486,10 @@ export class Home {
             let graphData = [];
             let nNodeMax = 20;
 
-            let plaForGraph = this.getItemForGraph(plaSet,nNodeMax);
-            let comForGraph = this.getItemForGraph(comSet,nNodeMax);
-            let proForGraph = this.getItemForGraph(proSet,nNodeMax);
-            let disForGraph = this.getItemForGraph(disSet,nNodeMax);
+            let plaForGraph = plaSet.slice(0,nNodeMax);
+            let comForGraph = comSet.slice(0,nNodeMax);
+            let proForGraph = proSet.slice(0,nNodeMax);
+            let disForGraph = disSet.slice(0,nNodeMax);
 
             let graphDataArr = [this.makeGraphData(plaVScom,
                                                   plaMeta,comMeta,
@@ -537,19 +537,6 @@ export class Home {
     }
     let newSet = [type.toUpperCase()+'_NONE_DUMMY'];
     return newSet;
-  }
-
-  getItemForGraph(set,max) {
-    let itemForGraph = [];
-    for (let kk=0;kk<set.length;kk++) {
-      if (kk < max) {
-        itemForGraph.push(set[kk]);
-      }
-      else {
-        break;
-      }
-    }
-    return itemForGraph;
   }
 
   getSet(interaction,id) {
