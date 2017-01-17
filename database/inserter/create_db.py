@@ -83,6 +83,14 @@ def main(argv):
                 );
                 ''')
 
+    cur.execute('DROP VIEW IF EXISTS total_view;')
+    curr.execute('''create view total_view as select 
+                (select count (*) from plant) as plant_total, 
+                (select count (*) from compound) as compound_total, 
+                (select count (*) from protein) as protein_total, 
+                (select count (*) from disease) as disease_total;
+                ''')
+
     conn.commit()
     print "Tables have created successfully"
 
