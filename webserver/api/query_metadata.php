@@ -16,7 +16,7 @@
       if (strpos($val, 'PLA') !== false) {
         $id = 'pla_id';
         $table = 'plant';
-        $col = 'pla_id,pla_name';
+        $col = 'pla_id,pla_name,pla_idr_name';
       }
       elseif (strpos($val, 'COM') !== false) {
         $id = 'com_id';
