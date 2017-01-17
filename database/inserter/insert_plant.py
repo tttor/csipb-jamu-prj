@@ -13,20 +13,51 @@ from urllib2 import urlopen
 from datetime import datetime
 
 def main(argv):
-    assert len(argv)==7
+    assert len(argv)>=8
 
     db = argv[1]
     user = argv[2]; passwd = argv[3]
     host = argv[4]; port = argv[5]
-    fpath = argv[6] #e.g.: knapsack_jsp_plant_vs_compound.pkl'
+    mode = argv[6]; outDir = argv[7]
+    paths = argv[8:]
 
-    plantCompoundDict = None
-    with open(fpath, 'rb') as handle:
-        plantCompoundDict = pickle.load(handle)
+    conn = psycopg2.connect(database=db, user=user, password=passwd,
+                            host=host, port=port)
+    csr = conn.cursor()
 
-    insertPlants(plantCompoundDict.keys(),db,user,passwd,host,port)
+    if mode=='insertPlantsFromKnapsack':
+        assert False,'fix insertPlantsFromKnapsack()'
+    elif mode=='updatePlantIdrName':
+        updatePlantIdrName(csr,outDir,paths[0])
 
-def insertPlants(plantList,db,user,passwd,host,port):
+    conn.commit()
+    conn.close()
+
+def updatePlantIdrName(csr,outDir,fpath):
+    latin2idr = {}
+    with open(fpath,'r') as f:
+        latin2idr = yaml.load(f)
+
+    idx = 0
+    log = []
+    for latin,idr in latin2idr.iteritems():
+        idx += 1
+        s = 'updating '+latin+': '+idr+ ' idx= '+str(idx)+' of '+str(len(latin2idr))
+        print s
+
+        qf = "UPDATE plant SET pla_idr_name="+"'"+idr+"'"
+        qr = " WHERE pla_name="+"'"+latin+"'"
+        q = qf+qr
+        csr.execute(q)
+        affectedRows = csr.rowcount;
+
+        if affectedRows==0:
+            log.append('NOT FOUND:'+s)
+
+    with open(outDir+'/updatePlantIdrName.log','w') as f:
+        for i in log: f.write(i+'\n');
+
+def insertPlantsFromKnapsack(plantList,db,user,passwd,host,port):
     conn = psycopg2.connect(database=db, user=user, password=passwd,
                             host=host, port=port)
     cur = conn.cursor()

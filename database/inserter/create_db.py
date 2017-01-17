@@ -15,7 +15,8 @@ def main(argv):
     cur.execute('DROP TABLE IF EXISTS plant;')
     cur.execute('''CREATE TABLE plant (
                 pla_id varchar(12) PRIMARY KEY,
-                pla_name varchar(256) NOT NULL UNIQUE
+                pla_name varchar(256) NOT NULL UNIQUE,
+                pla_idr_name varchar(256)
                 );
                 ''')
 
