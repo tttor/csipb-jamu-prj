@@ -140,7 +140,7 @@ export class Home {
     this.http.post(this.metaQueryAPI,plaPostMsgJSON).map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
-          let temp = data[i]['pla_name'];
+          let temp = data[i]['pla_name']+' | '+data[i]['pla_idr_name'];
           data[i]['search'] = temp;
         }
         this.plantSearch = data;
@@ -554,6 +554,7 @@ export class Home {
     let keys: string[] = [];
     if (type==='pla') {
       keys.push('pla_name');
+      keys.push('pla_idr_name')
     }
     if (type==='com') {
       keys.push('com_cas_id');

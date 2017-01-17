@@ -38,17 +38,17 @@
           </h4>
           <div *ngFor="let t of plant">
             <template #customTanaman let-model="item" let-index="index">
-              <h5>{{model.pla_name}}</h5>
+              <h5>{{model.pla_name}} | {{model.pla_idr_name}}</h5>
             </template>
             <input [(ngModel)]="t.value"
                    [typeahead]="plantSearch"
                    [typeaheadItemTemplate]="customTanaman"
-                   [typeaheadOptionField]="'pla_name'"
+                   [typeaheadOptionField]="'search'"
                    [typeaheadOptionsLimit]="7"
-                   (typeaheadNoResults)="changeTypeaheadNoResults($event, 1)"
                    (typeaheadOnSelect)="selectPlant($event, t.index)"
+                   (typeaheadNoResults)="changeTypeaheadNoResults($event, 1)"
                    class="form-control verticalLine1"
-                   placeholder="Latin Name"
+                   placeholder="Latin Name | Indonesian Name"
                    (focus)="focusPlant(t.index)">
              <div *ngIf="noResultPlant===true" class="" style="">
                <span style="color:red; font-size:13px">Sorry, Unavailable</span>
