@@ -11,6 +11,7 @@ def main():
 def parsePlaList(dirpath):
     latin2idr = {}
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    idrSeparator = '/'
 
     fpathList = glob.glob(dirpath+"/*.list")
     for fpath in fpathList:
@@ -40,7 +41,7 @@ def parsePlaList(dirpath):
                 idrComps = idr.split(',')
                 idrComps = [i.strip().capitalize() for i in idrComps if ',' not in i]
                 idrComps = [c for c in idrComps if (len(c)!=0)]
-                idr = '/'.join(idrComps)
+                idr = idrSeparator.join(idrComps)
 
                 if (len(idr))==0:
                     continue
@@ -56,25 +57,15 @@ def parsePlaList(dirpath):
                 if (len(latin)<2):
                     continue;
 
-                #
+                # Put in the dict
                 if (latin in latin2idr):
-                    if latin2idr[latin] not in idr:
-                        latin2idr[latin] += (','+idr)
+                    if idr not in latin2idr[latin]:
+                        latin2idr[latin] += (idrSeparator+idr)
                 else:
                     latin2idr[latin] = idr
 
-                # because there are so many writing variance in the original list
-                # we need to do yet another conditioning here
-                latin2idr2 = {}
-                for k,i in latin2idr.iteritems():
-
-                    comps = i.split(',')
-                    comps = list( set(comps) )
-                    latin2idr2[k] = '/'.join(comps)
-
-    print(len(latin2idr2))
     with open(dirpath+'/latin2idr_'+timestamp+'.json', 'w') as fp:
-        json.dump(latin2idr2, fp, indent=2, sort_keys=True)
+        json.dump(latin2idr, fp, indent=2, sort_keys=True)
 
 if __name__ == '__main__':
     start_time = time.time()
