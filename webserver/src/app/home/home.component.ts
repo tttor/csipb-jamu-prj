@@ -591,6 +591,9 @@ export class Home {
   getHyperlinkStr(type,seed) {
     let baseUrl: string = 'null';
 
+    if (type==='pla_name') {
+      baseUrl = 'https://en.wikipedia.org/wiki/';
+    }
     if (type==='com_knapsack_id') {
       baseUrl = 'http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=';
     }
