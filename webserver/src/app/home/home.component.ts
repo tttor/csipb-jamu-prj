@@ -140,8 +140,22 @@ export class Home {
     this.http.post(this.metaQueryAPI,plaPostMsgJSON).map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
-          let temp = data[i]['pla_name']+' | '+data[i]['pla_idr_name'];
-          data[i]['search'] = temp;
+          let valid = [];
+          if (data[i]['pla_name']) {
+            valid.push(data[i]['pla_name']);
+          }
+          if (data[i]['pla_idr_name']) {
+            valid.push(data[i]['pla_idr_name']);
+          }
+
+          let str = '';
+          for (let j=0;j<valid.length;j++) {
+            str = str + valid[j];
+            if (j<valid.length-1) {
+              str = str + ' | ';
+            }
+          }
+          data[i]['search'] = str;
         }
         this.plantSearch = data;
       })
