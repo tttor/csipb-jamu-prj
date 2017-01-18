@@ -38,13 +38,13 @@
           </h4>
           <div *ngFor="let t of plant">
             <template #customTanaman let-model="item" let-index="index">
-              <h5>{{model.pla_name}} | {{model.pla_idr_name}}</h5>
+              <h5>{{model.pla_name}} <span *ngIf="model.pla_idr_name">|</span> {{model.pla_idr_name}}</h5>
             </template>
             <input [(ngModel)]="t.value"
                    [typeahead]="plantSearch"
                    [typeaheadItemTemplate]="customTanaman"
                    [typeaheadOptionField]="'search'"
-                   [typeaheadOptionsLimit]="7"
+                   [typeaheadOptionsLimit]="10"
                    (typeaheadOnSelect)="selectPlant($event, t.index)"
                    (typeaheadNoResults)="changeTypeaheadNoResults($event, 1)"
                    class="form-control verticalLine1"
@@ -64,17 +64,17 @@
           </h4>
           <div *ngFor="let c of compound">
             <template #customCompound let-model="item" let-index="index">
-              <h5>{{model.com_cas_id}} | {{model.com_knapsack_id}} | {{model.com_drugbank_id}} | {{model.com_kegg_id}} | {{model.com_pubchem_id}}</h5>
+              <h5>{{model.com_cas_id}} <span *ngIf="model.com_knapsack_id">|</span> {{model.com_knapsack_id}} <span *ngIf="model.com_drugbank_id">|</span> {{model.com_drugbank_id}}</h5>
             </template>
             <input [(ngModel)]="c.value"
                    [typeahead]="compoundSearch"
                    [typeaheadItemTemplate]="customCompound"
                    [typeaheadOptionField]="'search'"
-                   [typeaheadOptionsLimit]="7"
+                   [typeaheadOptionsLimit]="10"
                    (typeaheadOnSelect)="selectCompound($event, c.index)"
                    (typeaheadNoResults)="changeTypeaheadNoResults($event, 2)"
                    class="form-control verticalLine2"
-                   placeholder="CAS | DrugBank ID | KnapSack ID"
+                   placeholder="CAS | KnapSack ID | DrugBank ID"
                    (focus)="focusCompound(c.index)">
              <div *ngIf="noResultCompound===true" class="" style="">
                <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
@@ -104,7 +104,7 @@
                    [typeahead]="proteinSearch"
                    [typeaheadItemTemplate]="customProtein"
                    [typeaheadOptionField]="'search'"
-                   [typeaheadOptionsLimit]="7"
+                   [typeaheadOptionsLimit]="10"
                    (typeaheadOnSelect)="selectProtein($event, p.index)"
                    (typeaheadNoResults)="changeTypeaheadNoResults($event, 3)"
                    class="form-control verticalLine3"
@@ -130,7 +130,7 @@
                    [typeahead]="diseaseSearch"
                    [typeaheadItemTemplate]="customDisease"
                    [typeaheadOptionField]="'search'"
-                   [typeaheadOptionsLimit]="7"
+                   [typeaheadOptionsLimit]="10"
                    (typeaheadOnSelect)="selectDisease($event, d.index)"
                    (typeaheadNoResults)="changeTypeaheadNoResults($event, 4)"
                    class="form-control verticalLine4"
