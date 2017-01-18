@@ -2,6 +2,7 @@
 import glob
 import time
 import json
+import datetime
 
 def main():
     dirpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/plant-list'
@@ -9,6 +10,7 @@ def main():
 
 def parsePlaList(dirpath):
     latin2idr = {}
+    timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
     fpathList = glob.glob(dirpath+"/*.list")
     for fpath in fpathList:
@@ -31,12 +33,14 @@ def parsePlaList(dirpath):
                 idr = idr.replace(')','')
 
                 idrWords = idr.split(' ')
-                idrWords = [w.strip().lower() for w in idrWords if (len(w)!=0)]
+                idrWords = [w.strip().lower() for w in idrWords]
+                idrWords = [w for w in idrWords if (len(w)!=0)]
                 idr = ' '.join(idrWords)
 
                 idrComps = idr.split(',')
                 idrComps = [i.strip().capitalize() for i in idrComps if ',' not in i]
-                idr = ','.join(idrComps)
+                idrComps = [c for c in idrComps if (len(c)!=0)]
+                idr = '/'.join(idrComps)
 
                 if (len(idr))==0:
                     continue
@@ -59,15 +63,17 @@ def parsePlaList(dirpath):
                 else:
                     latin2idr[latin] = idr
 
+                # because there are so many writing variance in the original list
+                # we need to do yet another conditioning here
                 latin2idr2 = {}
                 for k,i in latin2idr.iteritems():
 
                     comps = i.split(',')
                     comps = list( set(comps) )
-                    latin2idr2[k] = ','.join(comps)
+                    latin2idr2[k] = '/'.join(comps)
 
     print(len(latin2idr2))
-    with open(dirpath+'/latin2idr.json', 'w') as fp:
+    with open(dirpath+'/latin2idr_'+timestamp+'.json', 'w') as fp:
         json.dump(latin2idr2, fp, indent=2, sort_keys=True)
 
 if __name__ == '__main__':
