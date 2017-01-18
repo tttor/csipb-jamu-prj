@@ -34,7 +34,7 @@ if [ $4 -ne 0 ]; then
   read dbLinkSet
   if [ "$dbLinkSet" -ne 0 ]; then
     echo "deploying APIs ..."
-    scp -r api/* tor@apps.cs.ipb.ac.id:/var/www/ijah/ijah
+    scp -r api/* tor@apps.cs.ipb.ac.id:/var/www/ijah/api
   fi
 fi
 

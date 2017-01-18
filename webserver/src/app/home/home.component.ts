@@ -115,11 +115,11 @@ export class Home {
   }
 
   constructor(public appState: AppState, private http: Http) {
-    this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/ijah/';
+    this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
     // this.baseAPI ='http://localhost/';// Comment this if you run online!
 
-    this.interactionQueryAPI = this.baseAPI+'query_interaction.php';
-    this.metaQueryAPI = this.baseAPI+'query_metadata.php';
+    this.interactionQueryAPI = this.baseAPI+'connectivity.php';
+    this.metaQueryAPI = this.baseAPI+'metadata.php';
 
     this.plant = [{ 'index': this.countTanaman, 'value' : ''}];
     this.compound = [{ 'index': this.countCompound, 'value' : ''}];
