@@ -7,10 +7,10 @@ import yaml
 import MySQLdb
 import pickle
 import psycopg2
+import datetime
 from collections import defaultdict
 from bs4 import BeautifulSoup
 from urllib2 import urlopen
-from datetime import datetime
 
 def main(argv):
     assert len(argv)>=8
@@ -34,6 +34,7 @@ def main(argv):
     conn.close()
 
 def updatePlantIdrName(csr,outDir,fpath):
+    timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     latin2idr = {}
     with open(fpath,'r') as f:
         latin2idr = yaml.load(f)
@@ -54,7 +55,7 @@ def updatePlantIdrName(csr,outDir,fpath):
         if affectedRows==0:
             log.append('NOT FOUND:'+s)
 
-    with open(outDir+'/updatePlantIdrName.log','w') as f:
+    with open(outDir+'/updatePlantIdrName_'+timestamp+'.log','w') as f:
         for i in log: f.write(i+'\n');
 
 def insertPlantsFromKnapsack(plantList,db,user,passwd,host,port):
