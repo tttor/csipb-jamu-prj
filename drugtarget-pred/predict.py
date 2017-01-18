@@ -57,30 +57,44 @@ if __name__ == "__main__":
         sys.stderr.write("Closing connection...\n")
         sock.close()
 
+    timeEx = time.time()
     metaPred = [[pair.split(":")[0], pair.split(":")[1].split("=")[0]] for pair in data.split(",")]
     resPred = [ 0.65*float(res.split(":")[1].split("=")[1]) for res in data.split(",")]
 
-    jsonOut = '{"comp":['
+
+    strOut = ''
     for i,pair in enumerate(metaPred):
         if i>0:
-            jsonOut += ', '
-        jsonOut += '"'+pair[0]+'"'
-    jsonOut += '], '
+            strOut += ','
+        strOut += pair[0]
+    strOut += '|'
 
-    jsonOut += ' "prot":['
     for i,pair in enumerate(metaPred):
         if i>0:
-            jsonOut += ', '
-        jsonOut += '"'+pair[1]+'"'
-    jsonOut += '], '
+            strOut += ','
+        strOut += pair[1]
+    strOut += '|'
 
-    jsonOut += '"weight": ['
     for i,res in enumerate(resPred):
         if i>0:
-            jsonOut += ', '
-        jsonOut += str(res)
-    jsonOut += ']}'
-    print jsonOut
+            strOut += ','
+        strOut += str(res)
+    strOut += '|'
+
+    for i,res in enumerate(resPred):
+        if i>0:
+            strOut += ','
+        strOut += "blm-nii-svm"
+    strOut += '|'
+
+    for i,res in enumerate(resPred):
+        if i>0:
+            strOut += ','
+        strOut += '%s.%04f' % (time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(int(timeEx))), timeEx-int(timeEx))
+    strOut += '|'
+
+
+    print strOut
     ############## Update database ##############
     query = ""
     query1 = ""
@@ -89,27 +103,28 @@ if __name__ == "__main__":
     queryCheck = ""
 
     sys.stderr.write ("Push data to DB...\n")
-    for i in range(maxIter):
+    for i in range(len(compList)):
         ## Check row in the table ##
         queryCheck = "SELECT * FROM compound_vs_protein WHERE "
-        queryChect += "com_id='"+pairIdList[i][0]+"', pro_id='"+pairIdList[i][1]+"' "
-        queryCheck += "source = 'blm-nii-svm'"
+        queryCheck += "com_id='"+pairIdList[i][0]+"' AND pro_id='"+pairIdList[i][1]+"'"
+        queryCheck += " AND source = 'blm-nii-svm'"
         cur.execute(queryCheck)
         dataRows = cur.fetchall()
-        ## Update row if data is already exsist on table ##
+        # ## Update row if data is already exsist on table ##
         if len(dataRows)>0:
             query1 = "UPDATE compound_vs_protein "
-            query2 = "SET source='blm-nii-svm', weight="+ str(max(dataRows[0][4],resPred[i]))+" "
-            query3 = "WHERE com_id='" + pairIdList[i][0] + "', pro_id='" + pairIdList[i][1]+"'"
+            query2 = "SET source='blm-nii-svm', weight="+ str(resPred[i])+", time_stamp=now() "
+            query3 = "WHERE com_id='" + pairIdList[i][0] + "'AND pro_id='" + pairIdList[i][1]+"'"
 
-        ## Insert if no record found ##
+        # ## Insert if no record found ##
         else:
             #May use INSERT INTO .. VALUE ... ON DUPLICATE KEY UPDATE
             query1 = "INSERT INTO compound_vs_protein (com_id, pro_id, source, weight) "
-            query2 = "VALUES ( "+ "'" + pairIdList[i][0] + "', "+ "'" + pairIdList[i][1]+" "
+            query2 = "VALUES ( "+ "'" + pairIdList[i][0] + "', "+ "'" + pairIdList[i][1]
             query3 = "', " + "'blm-nii-svm', "+ str(resPred[i])+" )"
 
         query = query1 + query2 + query3
+        print query
         cur.execute(query)
 
     conn.commit()
