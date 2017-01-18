@@ -7,12 +7,12 @@ fi
 if [ $2 -ne 0 ]; then
   echo "#######################################################################"
   echo "backing up /var/www/ijah at apps.cs..."
-# stamp=`date +%Y-%m-%d-%H-%M-%S`
-# backdir='/home/tor/ijah-backup/ijah-backup_'
-# cmd='mkdir '
-# cmd2=$cmd$backdir$stamp
-# ssh tor@apps.cs.ipb.ac.id $cmd2
-# ssh tor@apps.cs.ipb.ac.id find /var/www/ijah/ -type f ! -name "backup*" -exec cp --parents -t $backdir$stamp/ {} +
+  stamp=`date +%Y-%m-%d-%H-%M-%S`
+  backdir='/home/tor/ijah-backup/ijah-backup_'
+  cmd='mkdir '
+  cmd2=$cmd$backdir$stamp
+  ssh tor@apps.cs.ipb.ac.id $cmd2
+  ssh tor@apps.cs.ipb.ac.id find /var/www/ijah/ -type f ! -name "backup*" -exec cp --parents -t $backdir$stamp/ {} +
 fi
 
 
