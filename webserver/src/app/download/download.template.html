@@ -5,7 +5,7 @@ To download, click any .txt listed below.<br /><br />
 
 <div class="col-md-8 text-left">
 
-<b>List of all individual data:</b><br />
+<b>List of all metadata:</b><br />
 <button
 style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
 (click)="dlMeta('pla')"
@@ -34,7 +34,7 @@ style="background:none!important; border:none; padding:0!important; font: inheri
 disease_list.txt
 </button> <br /><br />
 
-<b>List of all interaction data:</b><br />
+<b>List of all connectivity data:</b><br />
 <button
 style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
 (click)="downloadList(5, 'http://ijah.apps.cs.ipb.ac.id/api/connectivity.php', 'ijah_plant_vs_compound_list.txt')"
@@ -56,19 +56,12 @@ style="background:none!important; border:none; padding:0!important; font: inheri
 protein_vs_disease_list.txt
 </button> <br /> <br />
 
-<b>Documentation:</b><br />
+<b>Documents:</b><br />
 <button
 style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
 onclick="location.href='http://ijah.apps.cs.ipb.ac.id/api/ijah_webserver_manual.pdf'">
 ijah_webserver_manual.pdf
 </button> <br />
-
-<!-- <button
-style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
-(click)="downloadList()"
->
-compound_vs_protein_interaction.txt
-</button> -->
 
 </div>
 
