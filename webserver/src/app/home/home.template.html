@@ -162,11 +162,13 @@
   </div>
 
   <div class="row" *ngIf="show">
-    <div class="col-md-2 col-md-offset-5">
-      <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
+    <div class="row text-center">
+        <font color="#696969">_____________________________________________________________________________________________________________________________________</font>
     </div>
+    <div class="text-center col-md-12">
+     <h2><strong>Multi-partite Connectivity Graph Output</strong></h2>
+   </div>
   </div>
-  <br />
 
   <!-- The multi-partite graph output ////////////////////////////////////// -->
   <div class="row" *ngIf="baseAPI != 'http://localhost/'">
@@ -175,6 +177,12 @@
 
   <!-- Text Output ///////////////////////////////////////////////////////// -->
   <div class="row" *ngIf="show">
+    <div class="row text-center">
+        <font color="#696969">_____________________________________________________________________________________________________________________________________</font>
+    </div>
+    <div class="text-center col-md-12">
+     <h2><strong>Connectivity Text Output</strong></h2>
+    </div>
     <div class="col-md-4">
       Plant - Compound Connectivity
       <pre [innerHTML]="jsonPlantCompound">
