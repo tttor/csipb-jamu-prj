@@ -438,7 +438,7 @@ export class Home {
         // make it JSON-format
         let comVSproStr = '';
         for (let k=0;k<comVSproList.length;k++) {
-          comVSproStr = comVSproStr+comVSproList[k];
+          comVSproStr += comVSproList[k];
           if (k<comVSproList.length-1) {
             comVSproStr = comVSproStr + ',';
           }
