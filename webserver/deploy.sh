@@ -18,7 +18,7 @@ fi
 
 #build the src in production stage
 echo "#######################################################################"
-echo 'Have you set the baseAPI to apps.cs at src/app/home/home.component.ts? [0/1]'
+echo 'Have you set the baseAPI to apps.cs at home.component.ts _and_ download.component.ts? [0/1]'
 read baseAPISet
 if [ "$baseAPISet" -ne 0 ]; then
   echo 'Yeay, lets roll...'
