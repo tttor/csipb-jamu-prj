@@ -5,57 +5,60 @@ To download, click any filename listed below.<br /><br />
 
 <div class="col-md-8 text-left">
 
+<!-- ####################################################################### -->
 <b>List of all metadata:</b><br />
 <button
 style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
-(click)="dlMeta('pla')"
+(click)="download('pla')"
 >
-plant_list.txt
+plant_metadata.txt
 </button> <br />
 
 <button
 style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
-(click)="dlMeta('com')"
+(click)="download('com')"
 >
-compound_list.txt
+compound_metadata.txt
 </button> <br />
 
 <button
 style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
-(click)="dlMeta('pro')"
+(click)="download('pro')"
 >
-protein_list.txt
+protein_metadata.txt
 </button> <br />
 
 <button
 style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
-(click)="dlMeta('dis')"
+(click)="download('dis')"
 >
-disease_list.txt
+disease_metadata.txt
 </button> <br /><br />
 
+<!-- ####################################################################### -->
 <b>List of all connectivity data:</b><br />
 <button
 style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
-(click)="downloadList(5, 'http://ijah.apps.cs.ipb.ac.id/api/connectivity.php', 'ijah_plant_vs_compound_list.txt')"
+(click)="download('pla_vs_com')"
 >
-plant_vs_compound_list.txt
+plant_vs_compound_connectivity.txt
 </button> <br />
 
 <button
 style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
-(click)="downloadList(6, 'http://ijah.apps.cs.ipb.ac.id/api/connectivity.php', 'ijah_compound_vs_protein_list.txt')"
+(click)="download('com_vs_pro')"
 >
-compound_vs_protein_list.txt
+compound_vs_protein_connectivity.txt
 </button> <br />
 
 <button
 style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
-(click)="downloadList(7, 'http://ijah.apps.cs.ipb.ac.id/api/connectivity.php', 'ijah_protein_vs_disease_list.txt')"
+(click)="download('pro_vs_dis')"
 >
-protein_vs_disease_list.txt
+protein_vs_disease_connectivity.txt
 </button> <br /> <br />
 
+<!-- ####################################################################### -->
 <b>Documents:</b><br />
 <button
 style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer;"
