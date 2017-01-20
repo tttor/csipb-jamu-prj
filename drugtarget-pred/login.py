@@ -1,0 +1,5 @@
+database = 'ijah'
+user = 'ijah'
+passwd = '123'
+host = '127.0.0.1'
+port = '5432'
