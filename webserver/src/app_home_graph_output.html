@@ -6,7 +6,8 @@
 
 <div onload="render()">
   <div id="html-content-holder">
-    <div class="text-center graph" id="sankey_multiple" style="height: 600px; background-color:white;"></div>
+    <!-- When setting this width, please adjust the width in the sankey options below too (See "Set chart options") -->
+    <div class="text-center graph" id="sankey_multiple" style="width: 1180px; height: 1200px; background-color:white;"></div>
   </div>
 </div>
 
@@ -74,9 +75,9 @@
       data.addColumn('number', 'Weight');
       data.addRows(JSON.parse(localStorage.getItem('data')) );
 
-      // Set chart options
+      // Set chart options (the width must be 10px SMALLER than the width above)
       var options = {
-        width: 1190,
+        width: 1170,
         sankey: {
           node: {
             label: {
