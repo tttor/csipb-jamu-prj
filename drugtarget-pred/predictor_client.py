@@ -1,11 +1,19 @@
 #!/usr/bin/python
-
 import random
 import numpy as np
 import sys
 import time
 import os
 import socket
+
+################################################################################
+# This channel is not specified in a separate file because
+# importing custom py causes error on .py executed from .php
+predictor_channel = {}
+predictor_channel['host'] = 'localhost'
+predictor_channel['port'] = 5557
+ch = predictor_channel
+################################################################################
 
 if __name__ == "__main__":
 
@@ -30,7 +38,7 @@ if __name__ == "__main__":
         queryString += pair[0]+":"+pair[1]
 
     ##### Send Data to server
-    addr = ('localhost',5557)
+    addr = (ch['host'],ch['port'])
     data = ""
     dataTemp = ""
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
