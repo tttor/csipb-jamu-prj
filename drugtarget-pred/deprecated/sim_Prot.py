@@ -14,17 +14,18 @@ from scoop import futures
 
 def alignprot(rowSeqProtein,colSeqProtein,i,j):
     alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
-    print str(i)+" "+str(j)
+    sys.stderr.write("Aligning "+str(i)+" "+str(j)+",")
     return [alignres, j]
 
 
 if __name__ == '__main__':
     start = time.time()
 
-    rowStart = int(sys.argv[1])-1
+    rowStart = int(sys.argv[1])
     rowEnd = int(sys.argv[2])
     colStart = 0
     colEnd = 3334
+    step = int(sys.argv[3])
 
     nProtCol = colEnd-colStart
     nProtRow = rowEnd-rowStart
@@ -48,6 +49,7 @@ if __name__ == '__main__':
     it = 0
 
     ###Parse uniprot ID from csv###
+    sys.stderr.write("Parsing input\n")
     with open(listDir,'r') as f:
         csvContent = csv.reader(f,  delimiter=',', quotechar='\"')
         for row in csvContent:
@@ -58,6 +60,8 @@ if __name__ == '__main__':
     ###############################
 
     ###Read file and parse (with library)###
+
+    sys.stderr.write("Load fasta file\n")
     for i in xrange(rowStart,rowEnd):
         fastaDir = fastaFileDir + uniprotId[i] + ".fasta"
         recTemp = SeqIO.read(fastaDir, "fasta")
@@ -75,6 +79,7 @@ if __name__ == '__main__':
         colMetaProtein.append(recTemp[1])
 
     ###Cleanning sequance###
+    sys.stderr.write("Cleaning Sequance\n")
     for i in range(nProtRow):
         for j in range(len(rowSeqProtein[i])):
             if(rowSeqProtein[i][j]=='U'):
@@ -87,41 +92,52 @@ if __name__ == '__main__':
                 colSeqProtein[i][j]='C'
         colSeqProtein[i] = "".join(colSeqProtein[i])
     ########################################
-    #sequance
+    sys.stderr.write("Preparing output file\n")
     outMatDir = OutDir+"RealProtKernel"+str(rowStart+1)+"_"+str(rowEnd)+".txt"
     outMetaDir = OutDir+"MetaProtKernel"+str(rowStart+1)+"_"+str(rowEnd)+".txt"
     listScore = []
+
     with open(outMatDir, 'w') as matF, open(outMetaDir, 'w') as metaF:
         for i in range(nProtRow):
             ###Preparing data for parallel mapping###
-            for j in xrange(rowStart+i,nProtCol):
-                rowProtein.append(rowSeqProtein[i])
-                colProtein.append(colSeqProtein[j])
-                rowIndex.append(i)
-                colIndex.append(j)
-            ### Calculation ###
-            listScore = list(futures.map(alignprot, rowProtein, colProtein, rowIndex, colIndex))
-            ###Put into row
-            for j in range(len(listScore)):
-                simMatProt[listScore[j][1]] = listScore[j][0]
+            columnCursor = rowStart+i
+            while columnCursor < nProtCol:
 
-            ###Print Row
+                if columnCursor+step > colEnd:
+                    batchLen = 3334-columnCursor
+                else:
+                    batchLen = step
+
+                for j in xrange(columnCursor,columnCursor+batchLen):
+                    rowProtein.append(rowSeqProtein[i])
+                    rowIndex.append(i)
+                    colProtein.append(colSeqProtein[j])
+                    colIndex.append(j)
+                ### Calculation ###
+                listScore = list(futures.map(alignprot, rowProtein, colProtein, rowIndex, colIndex))
+                ###Put into row
+                for j in range(len(listScore)):
+                    simMatProt[listScore[j][1]] = listScore[j][0]
+                #Reset value
+                colIndex = []
+                rowIndex = []
+                rowProtein = []
+                colProtein = []
+                columnCursor += batchLen
+                listScore = []
+
+            sys.stderr.write("Writing output\n")
             for j in range(nProtCol):
                 if j>0:
                     matF.write(",")
                 matF.write(str(simMatProt[j]))
             matF.write("\n")
             metaF.write(rowMetaProtein[i]+"\n")
-            #Reset value
-            colIndex = []
-            rowIndex = []
-            rowProtein = []
-            colProtein = []
-            listScore = []
-            simMatProt = [0.0 for i in range(nProtCol)]
-
+            simMatProt = [0.0 for k in range(nProtCol)]
+    sys.stderr.write("Closing file output\n")
     matF.close()
     metaF.close()
+
     ##################
 
     #############Debugging section#############

@@ -1,18 +1,28 @@
 #!/usr/bin/python
 import numpy as np
 import json
+
+import signal
 import socket
 import time
 import sys
+
 import psycopg2
 from sklearn import svm
 from sklearn.preprocessing import MinMaxScaler
+
 from scipy import interp
 
-import login
-conn = psycopg2.connect(database=login.database, user=login.user,
+#from scoop import futures as fu
+
+connDB = psycopg2.connect(database=login.database, user=login.user,
                         password=login.passwd, host=login.host, port=login.port)
-cur = conn.cursor()
+cur = connDB.cursor()
+
+def signal_handler(signal, frame):
+    sys.stderr.write("Closing Port\n")
+    sock.close()
+    sys.exit(0)
 
 def MakeKernel(dataList,mode):
     dataList = list(set(dataList))
@@ -118,7 +128,7 @@ def BLM_NII(adjMatrix,sourceSim,targetSim,sourceIndex,targetIndex,mode):
         #Predict
         prediction = model.predict(gramTest)
     else:
-        prediction = np.random.uniform(0.0,1.0,1)[0] # TODO fix me
+        prediction = 0
     return prediction
 ##################################################################
 
@@ -161,7 +171,6 @@ def coreProgram(queryString):
     maxIter = None
     pairIdList = None
     pairQueryList = None
-
 
     compList = None
     compMeta = None
@@ -232,6 +241,39 @@ def coreProgram(queryString):
         #PredictEveryPair
         resPred[i] = predictBLMNII(adjMat,compSimMat,protSimMat,pair[0],pair[1])
         sendRes += str(pairIdList[i][0])+':'+str(pairIdList[i][1])+'='+str(resPred[i])
+    ############## push to DB ##################
+    query = ""
+    query1 = ""
+    query2 = ""
+    query3 = ""
+    queryCheck = ""
+    #
+    sys.stderr.write ("Push data to DB...\n")
+    for i in range(len(pairQueryList)):
+        if i == maxIter:
+            break
+        ## Check row in the table ##
+        queryCheck = "SELECT * FROM compound_vs_protein WHERE "
+        queryCheck += "com_id='"+pairIdList[i][0]+"' AND pro_id='"+pairIdList[i][1]+"'"
+        queryCheck += " AND source = 'blm-nii-svm'"
+        cur.execute(queryCheck)
+        dataRows = cur.fetchall()
+        # ## Update row if data is already exsist on table ##
+        if len(dataRows)>0:
+            query1 = "UPDATE compound_vs_protein "
+            query2 = "SET source='blm-nii-svm', weight="+ str(resPred[i])+", time_stamp=now() "
+            query3 = "WHERE com_id='" + pairIdList[i][0] + "'AND pro_id='" + pairIdList[i][1]+"'"
+
+        # ## Insert if no record found ##
+        else:
+            #May use INSERT INTO .. VALUE ... ON DUPLICATE KEY UPDATE
+            query1 = "INSERT INTO compound_vs_protein (com_id, pro_id, source, weight) "
+            query2 = "VALUES ( "+ "'" + pairIdList[i][0] + "', "+ "'" + pairIdList[i][1]
+            query3 = "', " + "'blm-nii-svm', "+ str(resPred[i])+" )"
+
+        query = query1 + query2 + query3
+        sys.stderr.write(query+"\n")
+        cur.execute(query)
 
     return sendRes
 
@@ -248,8 +290,8 @@ if __name__ == '__main__':
 
     sock.listen(1)
     while True:
-        sys.stderr.write("##################################################\n")
         sys.stderr.write("Waiting connection...\n")
+        signal.signal(signal.SIGINT, signal_handler)
         conn, addr = sock.accept()
         try:
             print >>sys.stderr, 'Connection from', addr
