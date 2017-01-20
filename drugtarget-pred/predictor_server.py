@@ -1,22 +1,18 @@
 #!/usr/bin/python
 import numpy as np
 import json
-
 import socket
 import time
 import sys
-
 import psycopg2
 from sklearn import svm
 from sklearn.preprocessing import MinMaxScaler
-
 from scipy import interp
 
-#from scoop import futures as fu
-
-conn = psycopg2.connect(database="ijah", user="ijah", password="ijahdb", host= "127.0.0.1", port = "5432")
+import login
+conn = psycopg2.connect(database=login.database, user=login.user,
+                        password=login.passwd, host=login.host, port=login.port)
 cur = conn.cursor()
-
 
 def MakeKernel(dataList,mode):
     dataList = list(set(dataList))
@@ -122,7 +118,7 @@ def BLM_NII(adjMatrix,sourceSim,targetSim,sourceIndex,targetIndex,mode):
         #Predict
         prediction = model.predict(gramTest)
     else:
-        prediction = 0
+        prediction = np.random.uniform(0.0,1.0,1)[0] # TODO fix me
     return prediction
 ##################################################################
 
@@ -245,13 +241,14 @@ if __name__ == '__main__':
     message = ""
 
     ##### Socket Part #####
-    server_addr = ('localhost',5556)
+    server_addr = ('localhost',5557)
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(server_addr)
     sys.stderr.write("Starting up server...\n")
 
     sock.listen(1)
     while True:
+        sys.stderr.write("##################################################\n")
         sys.stderr.write("Waiting connection...\n")
         conn, addr = sock.accept()
         try:
