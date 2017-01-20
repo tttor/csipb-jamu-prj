@@ -147,7 +147,7 @@ export class Download {
 
   download(type) {
     this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-    // this.baseAPI ='http://localhost/';// Comment this if you run online!
+    // this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
 
     let api = this.baseAPI+'metadata.php';
     if (type.indexOf('_vs_') !== -1) {

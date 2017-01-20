@@ -1,22 +1,20 @@
 #!/usr/bin/python
 import numpy as np
 import json
-
 import signal
 import socket
 import time
 import sys
-
 import psycopg2
 from sklearn import svm
 from sklearn.preprocessing import MinMaxScaler
-
 from scipy import interp
 
-#from scoop import futures as fu
+from predictor_config import database as db
+from predictor_config import predictor_channel as ch
 
-connDB = psycopg2.connect(database=login.database, user=login.user,
-                        password=login.passwd, host=login.host, port=login.port)
+connDB = psycopg2.connect(database=db['name'],user=db['user'],password=db['passwd'],
+                          host=db['host'],port=db['port'])
 cur = connDB.cursor()
 
 def signal_handler(signal, frame):
@@ -277,19 +275,19 @@ def coreProgram(queryString):
 
     return sendRes
 
-
 if __name__ == '__main__':
     dataTemp= ""
     message = ""
 
     ##### Socket Part #####
-    server_addr = ('localhost',5557)
+    server_addr = (ch['host'],ch['port'])
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(server_addr)
     sys.stderr.write("Starting up server...\n")
 
     sock.listen(1)
     while True:
+        sys.stderr.write("##################################################\n")
         sys.stderr.write("Waiting connection...\n")
         signal.signal(signal.SIGINT, signal_handler)
         conn, addr = sock.accept()
