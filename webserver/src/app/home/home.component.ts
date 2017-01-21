@@ -61,9 +61,12 @@ export class Home {
   dataLocal = [];
   FileSaver: any;
   click = false;
+
   baseAPI;
   interactionQueryAPI;
   metaQueryAPI;
+  predictAPI;
+
   typeaheadNoResults:boolean = false;
   noResultPlant = false;
   noResultCompound = false;
@@ -120,6 +123,7 @@ export class Home {
 
     this.interactionQueryAPI = this.baseAPI+'connectivity.php';
     this.metaQueryAPI = this.baseAPI+'metadata.php';
+    this.predictAPI = this.baseAPI+'predict.php';
 
     this.plant = [{ 'index': this.countTanaman, 'value' : ''}];
     this.compound = [{ 'index': this.countCompound, 'value' : ''}];
@@ -421,12 +425,42 @@ export class Home {
     .subscribe(plaVScom => {
       this.http.post(this.interactionQueryAPI,tsi).map(resp2 => resp2.json())
       .subscribe(proVSdis => {
-        let comVSproList = [];
+        // Ijah also accomodates syntetic compoound vs protein.
+        // This means that some compounds have no plant, and some some protein have no disease.
+        // However, all plants have compounds, and all diseases have proteins
+        let comArr = [];
+        if (plaVScom.length===0) {
+          for (let i=0;i<drugSideInput.length;i++) {
+            let comId = drugSideInput[i]['value'];
+            comArr.push(comId)
+          }
+        }
+        else {
+          for (let i=0;i<plaVScom.length;i++) {
+            let comId = plaVScom[i]['com_id'];
+            comArr.push(comId)
+          }
+        }
 
-        for (let i=0;i<plaVScom.length;i++) {
+        let proArr = [];
+        if (proVSdis.length===0) {
+          for (let i=0;i<targetSideInput.length;i++) {
+            let proId = targetSideInput[i]['value'];
+            proArr.push(proId)
+          }
+        }
+        else {
+          for (let i=0;i<proVSdis.length;i++) {
+            let proId = proVSdis[i]['pro_id'];
+            proArr.push(proId)
+          }
+        }
+
+        let comVSproList = [];
+        for (let i=0;i<comArr.length;i++) {
           for (let j=0;j<proVSdis.length;j++) {
-            let comId = '"'+plaVScom[i]['com_id']+'"';
-            let proId = '"'+proVSdis[j]['pro_id']+'"';
+            let comId = '"'+comArr[i]+'"';
+            let proId = '"'+proArr[j]+'"';
             let comVSpro = '{'+'"comId":'+comId+','+'"proId":'+proId+'}';
             comVSproList.push(comVSpro);
           }
@@ -438,26 +472,58 @@ export class Home {
         // make it JSON-format
         let comVSproStr = '';
         for (let k=0;k<comVSproList.length;k++) {
-          comVSproStr = comVSproStr+comVSproList[k];
+          comVSproStr += comVSproList[k];
           if (k<comVSproList.length-1) {
             comVSproStr = comVSproStr + ',';
           }
         }
         comVSproStr = '['+comVSproStr+']';
-        // console.log(comVSproStr);
 
         this.http.post(this.interactionQueryAPI,comVSproStr).map(resp3 => resp3.json())
         .subscribe(comVSpro => {
-          // Get unique items
-          let plaSet = this.getSet(plaVScom,'pla_id');
-          let comSet = this.getSet(plaVScom,'com_id');
-          let proSet = this.getSet(proVSdis,'pro_id');
-          let disSet = this.getSet(proVSdis,'dis_id');
-          // let comSet2 = this.getSet(comVSpro,'com_id');
-          // let proSet2 = this.getSet(comVSpro,'pro_id');
+          let comToPredictArr = [];
+          let proToPredictArr = [];
+          let idxToPredictArr = [];
+          for (let i=0;i<comVSpro.length;i++) {
+            let src = comVSpro[i]['source'];
+            if (src==='null') {
+              comToPredictArr.push(comVSpro[i]['com_id']);
+              proToPredictArr.push(comVSpro[i]['pro_id']);
+              idxToPredictArr.push(i);
+            }
+          }
+          let comVSproToPredictStr = '';
+          for (let i=0;i<comToPredictArr.length;i++) {
+            let comId = '"'+comToPredictArr[i]+'"';
+            let proId = '"'+proToPredictArr[i]+'"';
+            comVSproToPredictStr += '{'+'"comId":'+comId+','+'"proId":'+proId+'}';
+            if (i<comToPredictArr.length-1) {
+              comVSproToPredictStr += ',';
+            }
+          }
+          comVSproToPredictStr = '['+comVSproToPredictStr+']';
+          // console.log(comVSproToPredictStr);
 
-          this.makeOutput(plaSet,comSet,proSet,disSet,
-                          plaVScom,comVSpro,proVSdis);
+          this.http.post(this.predictAPI,comVSproToPredictStr).map(resp4 => resp4.json())
+          .subscribe(comVSproPred => {
+            let comVSproMerged = comVSpro;
+            for (let i=0; i<comVSproPred.length; i++) {
+              let idx = idxToPredictArr[i];
+              comVSproMerged[idx]['com_id'] = comVSproPred[i]['com_id'];
+              comVSproMerged[idx]['pro_id'] = comVSproPred[i]['pro_id'];
+              comVSproMerged[idx]['weight'] = comVSproPred[i]['weight'];
+              comVSproMerged[idx]['source'] = comVSproPred[i]['source'];
+              comVSproMerged[idx]['timestamp'] = comVSproPred[i]['timestamp'];
+            }
+            // Get unique items
+            let plaSet = this.getSet(plaVScom,'pla_id');
+            let comSet = this.getSet(comVSproMerged,'com_id');
+            let proSet = this.getSet(comVSproMerged,'pro_id');
+            let disSet = this.getSet(proVSdis,'dis_id');
+
+            this.makeOutput(plaSet,comSet,proSet,disSet,
+                            plaVScom,comVSpro,proVSdis);
+          })
         })
       })
     })

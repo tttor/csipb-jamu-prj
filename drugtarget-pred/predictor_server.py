@@ -10,8 +10,8 @@ from sklearn import svm
 from sklearn.preprocessing import MinMaxScaler
 from scipy import interp
 
-from predictor_config import database as db
-from predictor_config import predictor_channel as ch
+from config import database as db
+from predictor_client import predictor_channel as ch
 
 connDB = psycopg2.connect(database=db['name'],user=db['user'],password=db['passwd'],
                           host=db['host'],port=db['port'])
@@ -126,7 +126,7 @@ def BLM_NII(adjMatrix,sourceSim,targetSim,sourceIndex,targetIndex,mode):
         #Predict
         prediction = model.predict(gramTest)
     else:
-        prediction = 0
+        prediction = 1 # TODO fix me!
     return prediction
 ##################################################################
 

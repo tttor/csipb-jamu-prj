@@ -97,9 +97,9 @@
 
     if ($respLen===0 and $mode==='SEARCH_AND_PREDICT') {
       // TODO @Ajmal: run real predictors!
-      $weight = '0.5';
-      $source = 'predictor';
-      $timestamp = '2017-01-14 00:00:00.00000';
+      $weight = 'null';
+      $source = 'null';
+      $timestamp = 'null';
 
       $row = array('com_id'=>$comIdArr[$i],'pro_id'=>$proIdArr[$i],
                    'weight'=>$weight,'source'=>$source,'timestamp'=>$timestamp);
