@@ -1,6 +1,6 @@
 #!/bin/bash
-if [ "$#" -ne 6 ]; then
-  echo "USAGE: bash deploy.sh -bak [0/1] -api [0/1] -asset [0/1]"
+if [ "$#" -ne 8 ]; then
+  echo "USAGE: bash deploy.sh -bak [0/1] -api [0/1] -predictor [0/1] -asset [0/1]"
   exit 1
 fi
 
@@ -39,6 +39,16 @@ if [ $4 -ne 0 ]; then
 fi
 
 if [ $6 -ne 0 ]; then
+  echo "#######################################################################"
+  echo 'Have you set the comm-channel and the DB link to apps.cs at config.py? [0/1]'
+  read predictorConfigSet
+  if [ "$predictorConfigSet" -ne 0 ]; then
+    echo "deploying predictors ..."
+    scp -r ../drugtarget-pred/* tor@apps.cs.ipb.ac.id:/home/tor/ijah-predictor/
+  fi
+fi
+
+if [ $8 -ne 0 ]; then
   echo "#######################################################################"
   echo "deploying assets(css,img) ..."
   scp -r src/assets/css tor@apps.cs.ipb.ac.id:/var/www/ijah/
