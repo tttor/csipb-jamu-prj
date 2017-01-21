@@ -126,7 +126,7 @@ def BLM_NII(adjMatrix,sourceSim,targetSim,sourceIndex,targetIndex,mode):
         #Predict
         prediction = model.predict(gramTest)
     else:
-        prediction = 0
+        prediction = 1 # TODO fix me!
     return prediction
 ##################################################################
 

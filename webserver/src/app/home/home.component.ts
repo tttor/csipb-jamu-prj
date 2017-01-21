@@ -61,9 +61,12 @@ export class Home {
   dataLocal = [];
   FileSaver: any;
   click = false;
+
   baseAPI;
   interactionQueryAPI;
   metaQueryAPI;
+  predictAPI;
+
   typeaheadNoResults:boolean = false;
   noResultPlant = false;
   noResultCompound = false;
@@ -120,6 +123,7 @@ export class Home {
 
     this.interactionQueryAPI = this.baseAPI+'connectivity.php';
     this.metaQueryAPI = this.baseAPI+'metadata.php';
+    this.predictAPI = this.baseAPI+'predict.php';
 
     this.plant = [{ 'index': this.countTanaman, 'value' : ''}];
     this.compound = [{ 'index': this.countCompound, 'value' : ''}];
@@ -477,14 +481,49 @@ export class Home {
 
         this.http.post(this.interactionQueryAPI,comVSproStr).map(resp3 => resp3.json())
         .subscribe(comVSpro => {
-          // Get unique items
-          let plaSet = this.getSet(plaVScom,'pla_id');
-          let comSet = this.getSet(comVSpro,'com_id');
-          let proSet = this.getSet(comVSpro,'pro_id');
-          let disSet = this.getSet(proVSdis,'dis_id');
+          let comToPredictArr = [];
+          let proToPredictArr = [];
+          let idxToPredictArr = [];
+          for (let i=0;i<comVSpro.length;i++) {
+            let src = comVSpro[i]['source'];
+            if (src==='null') {
+              comToPredictArr.push(comVSpro[i]['com_id']);
+              proToPredictArr.push(comVSpro[i]['pro_id']);
+              idxToPredictArr.push(i);
+            }
+          }
+          let comVSproToPredictStr = '';
+          for (let i=0;i<comToPredictArr.length;i++) {
+            let comId = '"'+comToPredictArr[i]+'"';
+            let proId = '"'+proToPredictArr[i]+'"';
+            comVSproToPredictStr += '{'+'"comId":'+comId+','+'"proId":'+proId+'}';
+            if (i<comToPredictArr.length-1) {
+              comVSproToPredictStr += ',';
+            }
+          }
+          comVSproToPredictStr = '['+comVSproToPredictStr+']';
+          // console.log(comVSproToPredictStr);
 
-          this.makeOutput(plaSet,comSet,proSet,disSet,
-                          plaVScom,comVSpro,proVSdis);
+          this.http.post(this.predictAPI,comVSproToPredictStr).map(resp4 => resp4.json())
+          .subscribe(comVSproPred => {
+            let comVSproMerged = comVSpro;
+            for (let i=0; i<comVSproPred.length; i++) {
+              let idx = idxToPredictArr[i];
+              comVSproMerged[idx]['com_id'] = comVSproPred[i]['com_id'];
+              comVSproMerged[idx]['pro_id'] = comVSproPred[i]['pro_id'];
+              comVSproMerged[idx]['weight'] = comVSproPred[i]['weight'];
+              comVSproMerged[idx]['source'] = comVSproPred[i]['source'];
+              comVSproMerged[idx]['timestamp'] = comVSproPred[i]['timestamp'];
+            }
+            // Get unique items
+            let plaSet = this.getSet(plaVScom,'pla_id');
+            let comSet = this.getSet(comVSproMerged,'com_id');
+            let proSet = this.getSet(comVSproMerged,'pro_id');
+            let disSet = this.getSet(proVSdis,'dis_id');
+
+            this.makeOutput(plaSet,comSet,proSet,disSet,
+                            plaVScom,comVSpro,proVSdis);
+          })
         })
       })
     })
