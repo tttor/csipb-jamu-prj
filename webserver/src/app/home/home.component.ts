@@ -421,12 +421,42 @@ export class Home {
     .subscribe(plaVScom => {
       this.http.post(this.interactionQueryAPI,tsi).map(resp2 => resp2.json())
       .subscribe(proVSdis => {
-        let comVSproList = [];
+        // Ijah also accomodates syntetic compoound vs protein.
+        // This means that some compounds have no plant, and some some protein have no disease.
+        // However, all plants have compounds, and all diseases have proteins
+        let comArr = [];
+        if (plaVScom.length===0) {
+          for (let i=0;i<drugSideInput.length;i++) {
+            let comId = drugSideInput[i]['value'];
+            comArr.push(comId)
+          }
+        }
+        else {
+          for (let i=0;i<plaVScom.length;i++) {
+            let comId = plaVScom[i]['com_id'];
+            comArr.push(comId)
+          }
+        }
 
-        for (let i=0;i<plaVScom.length;i++) {
+        let proArr = [];
+        if (proVSdis.length===0) {
+          for (let i=0;i<targetSideInput.length;i++) {
+            let proId = targetSideInput[i]['value'];
+            proArr.push(proId)
+          }
+        }
+        else {
+          for (let i=0;i<proVSdis.length;i++) {
+            let proId = proVSdis[i]['pro_id'];
+            proArr.push(proId)
+          }
+        }
+
+        let comVSproList = [];
+        for (let i=0;i<comArr.length;i++) {
           for (let j=0;j<proVSdis.length;j++) {
-            let comId = '"'+plaVScom[i]['com_id']+'"';
-            let proId = '"'+proVSdis[j]['pro_id']+'"';
+            let comId = '"'+comArr[i]+'"';
+            let proId = '"'+proArr[j]+'"';
             let comVSpro = '{'+'"comId":'+comId+','+'"proId":'+proId+'}';
             comVSproList.push(comVSpro);
           }
@@ -444,17 +474,14 @@ export class Home {
           }
         }
         comVSproStr = '['+comVSproStr+']';
-        // console.log(comVSproStr);
 
         this.http.post(this.interactionQueryAPI,comVSproStr).map(resp3 => resp3.json())
         .subscribe(comVSpro => {
           // Get unique items
           let plaSet = this.getSet(plaVScom,'pla_id');
-          let comSet = this.getSet(plaVScom,'com_id');
-          let proSet = this.getSet(proVSdis,'pro_id');
+          let comSet = this.getSet(comVSpro,'com_id');
+          let proSet = this.getSet(comVSpro,'pro_id');
           let disSet = this.getSet(proVSdis,'dis_id');
-          // let comSet2 = this.getSet(comVSpro,'com_id');
-          // let proSet2 = this.getSet(comVSpro,'pro_id');
 
           this.makeOutput(plaSet,comSet,proSet,disSet,
                           plaVScom,comVSpro,proVSdis);
