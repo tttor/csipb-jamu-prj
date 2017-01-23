@@ -40,7 +40,7 @@ fi
 
 if [ $6 -ne 0 ]; then
   echo "#######################################################################"
-  echo 'Have you set the comm-channel and the DB link to apps.cs at config.py? [0/1]'
+  echo 'Have you set the DB link to apps.cs at drugtarget-pred/config.py? [0/1]'
   read predictorConfigSet
   if [ "$predictorConfigSet" -ne 0 ]; then
     echo "deploying predictors ..."
