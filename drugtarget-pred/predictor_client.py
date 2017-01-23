@@ -61,7 +61,7 @@ if __name__ == "__main__":
 
     timeEx = time.time()
     metaPred = [[pair.split(":")[0], pair.split(":")[1].split("=")[0]] for pair in data.split(",")]
-    resPred = [0.65*float(res.split(":")[1].split("=")[1]) for res in data.split(",")]
+    resPred = [float(res.split(":")[1].split("=")[1]) for res in data.split(",")]
 
 
     strOut = ''
