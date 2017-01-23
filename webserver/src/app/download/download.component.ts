@@ -12,19 +12,15 @@ declare var saveAs: any;
 })
 export class Download {
   baseAPI;
-  interactionQueryAPI;
-  metaQueryAPI;
-  localState;
   constructor(public route: ActivatedRoute, private http: Http) {
-
+    this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+    // this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
   }
 
   ngOnInit() {
-
-
   }
-  asyncDataWithWebpack() {
 
+  asyncDataWithWebpack() {
   }
 
   getProps(type){
@@ -146,9 +142,6 @@ export class Download {
   }
 
   download(type) {
-    this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-    // this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
-
     let api = this.baseAPI+'metadata.php';
     if (type.indexOf('_vs_') !== -1) {
       api = this.baseAPI+'connectivity.php';
