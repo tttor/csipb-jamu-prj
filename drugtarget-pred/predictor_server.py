@@ -20,6 +20,7 @@ cur = connDB.cursor()
 def signal_handler(signal, frame):
     sys.stderr.write("Closing Port\n")
     sock.close()
+    conn.close()
     sys.exit(0)
 
 def MakeKernel(dataList,mode):
@@ -272,6 +273,7 @@ def coreProgram(queryString):
         query = query1 + query2 + query3
         sys.stderr.write(query+"\n")
         cur.execute(query)
+    connDB.commit()
 
     return sendRes
 
