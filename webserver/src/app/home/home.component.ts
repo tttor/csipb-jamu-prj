@@ -809,7 +809,7 @@ export class Home {
 
     // Make _dummy_ interaction (... vs anchor) to beautify the graph rendering
     let wDummy = 0.00001;// to become "invisible"
-    let prefix = 'z';
+    let prefix = '';
     let srcDummyText = prefix+srcType.toUpperCase();
     let destDummyText = prefix+destType.toUpperCase();
 
