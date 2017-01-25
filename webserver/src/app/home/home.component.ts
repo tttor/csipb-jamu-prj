@@ -119,7 +119,7 @@ export class Home {
 
   constructor(public appState: AppState, private http: Http) {
     this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-    this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
+    // this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
 
     this.interactionQueryAPI = this.baseAPI+'connectivity.php';
     this.metaQueryAPI = this.baseAPI+'metadata.php';
@@ -746,6 +746,18 @@ export class Home {
     return str;
   }
 
+  truncateText(text) {
+    let MAX_NODE_LABEL_LEN = 32;
+    let suffix = '...';
+
+    let trunText = text.substr(0,MAX_NODE_LABEL_LEN);
+    if (text.length>MAX_NODE_LABEL_LEN) {
+      trunText += suffix;
+    }
+
+    return trunText;
+  }
+
   makeGraphData(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
     let srcPropKeys = this.getPropKeys(srcType);
     let destPropKeys = this.getPropKeys(destType);
@@ -784,6 +796,9 @@ export class Home {
         let srcText = this.concatProps(srcProps);
         let destText = this.concatProps(destProps);
 
+        srcText = this.truncateText(srcText);
+        destText = this.truncateText(destText);
+
         datum.push(srcText);
         datum.push(destText);
         datum.push(weight);
@@ -792,41 +807,54 @@ export class Home {
       }
     }
 
-    // Make _dummy_ interaction to beautify the graph rendering
+    // Make _dummy_ interaction (... vs anchor) to beautify the graph rendering
     let wDummy = 0.00001;// to become "invisible"
     let prefix = 'z';
     let srcDummyText = prefix+srcType.toUpperCase();
     let destDummyText = prefix+destType.toUpperCase();
-    for (let i=0;i<srcHasDestArr.length;i++) {
-      if (srcHasDestArr[i] === false) {
-        let dummy = [];
-        let src = srcItems[i];
-        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-        let srcText = this.concatProps(srcProps);
-        dummy.push(srcText);
-        dummy.push(destDummyText);
-        dummy.push(wDummy);
-        data.push(dummy);
-      }
-    }
-    for (let i=0;i<destHasSrcArr.length;i++) {
-      if (destHasSrcArr[i] === false) {
-        let dummy = [];
-        let dest = destItems[i];
-        let destProps = this.getProps(dest,destPropKeys,destMeta);
-        let destText = this.concatProps(destProps);
-        dummy.push(srcDummyText);
-        dummy.push(destText);
-        dummy.push(wDummy);
-        data.push(dummy);
-      }
-    }
 
     let anchor = [];
     anchor.push(srcDummyText);
     anchor.push(destDummyText);
     anchor.push(wDummy);
     data.push(anchor);
+
+    for (let i=0;i<srcHasDestArr.length;i++) {
+      if (srcHasDestArr[i] === false) {
+        let src = srcItems[i];
+        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
+        let srcText = this.concatProps(srcProps);
+        let destText = destDummyText;
+        let w = wDummy;
+
+        srcText = this.truncateText(srcText);
+        destText = this.truncateText(destText);
+
+        let dummy = [];
+        dummy.push(srcText);
+        dummy.push(destText);
+        dummy.push(w);
+        data.push(dummy);
+      }
+    }
+    for (let i=0;i<destHasSrcArr.length;i++) {
+      if (destHasSrcArr[i] === false) {
+        let srcText = srcDummyText;
+        let dest = destItems[i];
+        let destProps = this.getProps(dest,destPropKeys,destMeta);
+        let destText = this.concatProps(destProps);
+        let w = wDummy;
+
+        srcText = this.truncateText(srcText);
+        destText = this.truncateText(destText);
+
+        let dummy = [];
+        dummy.push(srcText);
+        dummy.push(destText);
+        dummy.push(w);
+        data.push(dummy);
+      }
+    }
 
     return data;
   }
