@@ -150,7 +150,7 @@
   <div class="row" *ngIf="!show">
     <div class="col-md-4 col-md-offset-4">
       <a>
-        <button class="form-control btn btn-success" (click)="searchAndPredictButtonCallback()"> Search and Predict</button>
+        <button class="form-control btn btn-success" (click)="searchAndPredictButtonCallback()"> Search <span *ngIf="(this.selectedPlants.length!==0 || this.selectedCompounds.length!==0) && (this.selectedProteins.length!==0 || this.selectedDiseases.length!==0)">and Predict</span></button>
       </a>
     </div>
   </div>
