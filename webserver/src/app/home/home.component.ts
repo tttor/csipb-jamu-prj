@@ -955,6 +955,7 @@ export class Home {
 
   downloadTextOutput(type){
     let txt = '';
+
     if (type === 'pla_vs_com') {
       txt = this.plaVScomTxtOutput;
     }
@@ -963,6 +964,19 @@ export class Home {
     }
     if (type === 'pro_vs_dis') {
       txt = this.proVSdisTxtOutput;
+    }
+
+    if (type === 'pla') {
+      txt = this.plaMetaTxtOutput;
+    }
+    if (type === 'com') {
+      txt = this.comMetaTxtOutput;
+    }
+    if (type === 'pro') {
+      txt = this.proMetaTxtOutput;
+    }
+    if (type === 'dis') {
+      txt = this.disMetaTxtOutput;
     }
 
     let blob = new Blob([txt], {type: "text/plain;charset=utf-8"});
