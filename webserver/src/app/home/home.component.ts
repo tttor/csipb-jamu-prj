@@ -535,7 +535,7 @@ export class Home {
     })
   }
 
-  // UTILITY METHODS ///////////////////////////////////////////////////////////
+  // OUTPUT MAKING METHODS /////////////////////////////////////////////////////
   makeOutput(plaSet,comSet,proSet,disSet,plaVScom,comVSpro,proVSdis) {
     plaSet = this.handleIfEmptySet(plaSet,'pla');
     comSet = this.handleIfEmptySet(comSet,'com');
@@ -628,6 +628,158 @@ export class Home {
     return txt;
   }
 
+  makeGraphData(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
+    let srcPropKeys = this.getPropKeys(srcType);
+    let destPropKeys = this.getPropKeys(destType);
+    let data = [];
+
+    let srcHasDestArr = [];
+    let destHasSrcArr = [];
+    for (let i=0;i<srcItems.length;i++) {
+      srcHasDestArr.push(false);
+    }
+    for (let i=0;i<destItems.length;i++) {
+      destHasSrcArr.push(false);
+    }
+
+    for(let i=0;i<interaction.length;i++) {
+      let datum = [];
+
+      let srcKey = srcType+'_id';
+      let destKey = destType+'_id';
+
+      let src = interaction[i][srcKey];
+      let dest = interaction[i][destKey];
+
+      let srcIdx = srcItems.indexOf(src);
+      let destIdx = destItems.indexOf(dest);
+
+      if ((srcIdx!==-1)&&(destIdx!==-1)) {
+        srcHasDestArr[srcIdx] = true;
+        destHasSrcArr[destIdx] = true;
+
+        let source = interaction[i]['source'];
+        let weight = parseFloat( interaction[i]['weight'] );
+
+        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
+        let destProps = this.getProps(dest,destPropKeys,destMeta);
+        let srcText = this.concatProps(srcProps);
+        let destText = this.concatProps(destProps);
+
+        srcText = this.truncateText(srcText);
+        destText = this.truncateText(destText);
+
+        datum.push(srcText);
+        datum.push(destText);
+        datum.push(weight);
+
+        data.push(datum);
+      }
+    }
+
+    // Make _dummy_ interaction (... vs anchor) to beautify the graph rendering
+    let wDummy = 0.00001;// to become "invisible"
+    let prefix = '';
+    let srcDummyText = prefix+srcType.toUpperCase();
+    let destDummyText = prefix+destType.toUpperCase();
+
+    let anchor = [];
+    anchor.push(srcDummyText);
+    anchor.push(destDummyText);
+    anchor.push(wDummy);
+    data.push(anchor);
+
+    for (let i=0;i<srcHasDestArr.length;i++) {
+      if (srcHasDestArr[i] === false) {
+        let src = srcItems[i];
+        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
+        let srcText = this.concatProps(srcProps);
+        let destText = destDummyText;
+        let w = wDummy;
+
+        srcText = this.truncateText(srcText);
+        destText = this.truncateText(destText);
+
+        let dummy = [];
+        dummy.push(srcText);
+        dummy.push(destText);
+        dummy.push(w);
+        data.push(dummy);
+      }
+    }
+    for (let i=0;i<destHasSrcArr.length;i++) {
+      if (destHasSrcArr[i] === false) {
+        let srcText = srcDummyText;
+        let dest = destItems[i];
+        let destProps = this.getProps(dest,destPropKeys,destMeta);
+        let destText = this.concatProps(destProps);
+        let w = wDummy;
+
+        srcText = this.truncateText(srcText);
+        destText = this.truncateText(destText);
+
+        let dummy = [];
+        dummy.push(srcText);
+        dummy.push(destText);
+        dummy.push(w);
+        data.push(dummy);
+      }
+    }
+
+    return data;
+  }
+
+  makeTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
+    let text: string = '';
+    let srcPropKeys = this.getPropKeys(srcType);
+    let destPropKeys = this.getPropKeys(destType);
+
+    let nUnique = 0;
+    let prevSrc = '';
+    for(let i=0;i<interaction.length;i++) {
+      let srcKey = srcType+'_id';
+      let destKey = destType+'_id'
+      let src = interaction[i][srcKey];
+      let dest = interaction[i][destKey];
+      let source = interaction[i]['source'];
+      let weight = interaction[i]['weight'];
+
+      if (prevSrc!=src) {
+        nUnique = nUnique + 1;
+        text = text+'#'+nUnique.toString()+' ';
+
+        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
+        for (let j=0;j<srcProps.length;j++) {
+          text = text+this.getHyperlinkStr( srcPropKeys[j],srcProps[j] );
+          if (j<srcProps.length-1) {
+            text = text + ',';
+          }
+        }
+        text = text+':\n';
+        text = text+'  '+this.getHeader(srcType+'_vs_'+destType)+'\n';
+
+        prevSrc = src;
+      }
+
+      let destProps = this.getProps(dest,destPropKeys,destMeta);
+      text = text+'  ';
+      for (let jj=0;jj<destProps.length;jj++) {
+        text = text+this.getHyperlinkStr( destPropKeys[jj],destProps[jj] );
+        if (jj<destProps.length-1) {
+          text = text + ',';
+        }
+      }
+      text = text+','+weight+','+source;
+      text = text+'\n';
+    }
+
+    if (text==='') {
+      text = 'None';
+    }
+    return text;
+  }
+
+  // UTILITY METHODS ///////////////////////////////////////////////////////////
   makeJSONFormat(arr,key) {
     let str = '';
     for (let j=0;j<arr.length;j++){
@@ -798,157 +950,6 @@ export class Home {
     }
 
     return trunText;
-  }
-
-  makeGraphData(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
-    let srcPropKeys = this.getPropKeys(srcType);
-    let destPropKeys = this.getPropKeys(destType);
-    let data = [];
-
-    let srcHasDestArr = [];
-    let destHasSrcArr = [];
-    for (let i=0;i<srcItems.length;i++) {
-      srcHasDestArr.push(false);
-    }
-    for (let i=0;i<destItems.length;i++) {
-      destHasSrcArr.push(false);
-    }
-
-    for(let i=0;i<interaction.length;i++) {
-      let datum = [];
-
-      let srcKey = srcType+'_id';
-      let destKey = destType+'_id';
-
-      let src = interaction[i][srcKey];
-      let dest = interaction[i][destKey];
-
-      let srcIdx = srcItems.indexOf(src);
-      let destIdx = destItems.indexOf(dest);
-
-      if ((srcIdx!==-1)&&(destIdx!==-1)) {
-        srcHasDestArr[srcIdx] = true;
-        destHasSrcArr[destIdx] = true;
-
-        let source = interaction[i]['source'];
-        let weight = parseFloat( interaction[i]['weight'] );
-
-        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-        let destProps = this.getProps(dest,destPropKeys,destMeta);
-        let srcText = this.concatProps(srcProps);
-        let destText = this.concatProps(destProps);
-
-        srcText = this.truncateText(srcText);
-        destText = this.truncateText(destText);
-
-        datum.push(srcText);
-        datum.push(destText);
-        datum.push(weight);
-
-        data.push(datum);
-      }
-    }
-
-    // Make _dummy_ interaction (... vs anchor) to beautify the graph rendering
-    let wDummy = 0.00001;// to become "invisible"
-    let prefix = '';
-    let srcDummyText = prefix+srcType.toUpperCase();
-    let destDummyText = prefix+destType.toUpperCase();
-
-    let anchor = [];
-    anchor.push(srcDummyText);
-    anchor.push(destDummyText);
-    anchor.push(wDummy);
-    data.push(anchor);
-
-    for (let i=0;i<srcHasDestArr.length;i++) {
-      if (srcHasDestArr[i] === false) {
-        let src = srcItems[i];
-        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-        let srcText = this.concatProps(srcProps);
-        let destText = destDummyText;
-        let w = wDummy;
-
-        srcText = this.truncateText(srcText);
-        destText = this.truncateText(destText);
-
-        let dummy = [];
-        dummy.push(srcText);
-        dummy.push(destText);
-        dummy.push(w);
-        data.push(dummy);
-      }
-    }
-    for (let i=0;i<destHasSrcArr.length;i++) {
-      if (destHasSrcArr[i] === false) {
-        let srcText = srcDummyText;
-        let dest = destItems[i];
-        let destProps = this.getProps(dest,destPropKeys,destMeta);
-        let destText = this.concatProps(destProps);
-        let w = wDummy;
-
-        srcText = this.truncateText(srcText);
-        destText = this.truncateText(destText);
-
-        let dummy = [];
-        dummy.push(srcText);
-        dummy.push(destText);
-        dummy.push(w);
-        data.push(dummy);
-      }
-    }
-
-    return data;
-  }
-
-  makeTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
-    let text: string = '';
-    let srcPropKeys = this.getPropKeys(srcType);
-    let destPropKeys = this.getPropKeys(destType);
-
-    let nUnique = 0;
-    let prevSrc = '';
-    for(let i=0;i<interaction.length;i++) {
-      let srcKey = srcType+'_id';
-      let destKey = destType+'_id'
-      let src = interaction[i][srcKey];
-      let dest = interaction[i][destKey];
-      let source = interaction[i]['source'];
-      let weight = interaction[i]['weight'];
-
-      if (prevSrc!=src) {
-        nUnique = nUnique + 1;
-        text = text+'#'+nUnique.toString()+' ';
-
-        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-        for (let j=0;j<srcProps.length;j++) {
-          text = text+this.getHyperlinkStr( srcPropKeys[j],srcProps[j] );
-          if (j<srcProps.length-1) {
-            text = text + ',';
-          }
-        }
-        text = text+':\n';
-        text = text+'  '+this.getHeader(srcType+'_vs_'+destType)+'\n';
-
-        prevSrc = src;
-      }
-
-      let destProps = this.getProps(dest,destPropKeys,destMeta);
-      text = text+'  ';
-      for (let jj=0;jj<destProps.length;jj++) {
-        text = text+this.getHyperlinkStr( destPropKeys[jj],destProps[jj] );
-        if (jj<destProps.length-1) {
-          text = text + ',';
-        }
-      }
-      text = text+','+weight+','+source;
-      text = text+'\n';
-    }
-
-    if (text==='') {
-      text = 'None';
-    }
-    return text;
   }
 
   downloadJSON(idata,ifname){
