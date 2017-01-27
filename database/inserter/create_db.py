@@ -40,7 +40,8 @@ def main(argv):
                 pro_name varchar(512) NOT NULL UNIQUE,
                 pro_uniprot_id varchar(8) NOT NULL UNIQUE,
                 pro_uniprot_abbrv varchar(64) NOT NULL UNIQUE,
-                pro_similarity_smithwaterman text
+                pro_similarity_smithwaterman text,
+                pro_pdb_id text
                 );
                 ''')
 
@@ -84,10 +85,10 @@ def main(argv):
                 ''')
 
     cur.execute('DROP VIEW IF EXISTS total_view;')
-    curr.execute('''create view total_view as select 
-                (select count (*) from plant) as plant_total, 
-                (select count (*) from compound) as compound_total, 
-                (select count (*) from protein) as protein_total, 
+    curr.execute('''create view total_view as select
+                (select count (*) from plant) as plant_total,
+                (select count (*) from compound) as compound_total,
+                (select count (*) from protein) as protein_total,
                 (select count (*) from disease) as disease_total;
                 ''')
 

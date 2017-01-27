@@ -31,11 +31,34 @@ def main(argv):
         insertProteinUniprot(csr,paths[0])
     elif mode=='updateProteinSmithWaterman':
         updateProteinSmithWaterman(csr,paths[0],paths[1])
+    elif mode=='updateProteinPDB':
+        updateProteinPDB(csr,paths[0])
     else:
         assert False,'Unknown Mode!'
 
     conn.commit()
     conn.close()
+
+def updateProteinPDB(csr,path):
+    uniprot2pdb = None
+    with open(path,'r') as f:
+        uniprot2pdb = pickle.load(f)
+
+    # _ = [len(i) for i in uniprot2pdb.values()]
+    # print max(_)
+
+    i = 0
+    for uniprot,pdbList in uniprot2pdb.iteritems():
+        i += 1
+        s = 'updating pdb '+uniprot+' idx= '+str(i)+' of '+str(len(uniprot2pdb))
+        print s
+
+        simStrMerged = ','.join(pdbList)
+        simStrMerged = "'"+simStrMerged+"'"
+        qf = "UPDATE protein SET pro_pdb_id="+simStrMerged
+        qr = " WHERE pro_uniprot_id="+"'"+uniprot+"'"
+        q = qf+qr
+        csr.execute(q)
 
 def updateProteinSmithWaterman(csr,simFpath,metaFpath):
     proList = [] # uniprodID

@@ -50,6 +50,10 @@ elif [ "$1" == "upsw" ]; then
   simFpath=/home/tor/robotics/prj/csipb-jamu-prj/dataset/smithwaterman/20161230/normCombProtKernel2500_3334.csv
   metaFpath=/home/tor/robotics/prj/csipb-jamu-prj/dataset/smithwaterman/20161230/metaCombProtKernel2500_3334.txt
   python insert_protein.py $db $user $passwd $host $port $mode $outDir $simFpath $metaFpath
+elif [ "$1" == "uppdb" ]; then
+  mode=updateProteinPDB
+  uniprot2pdbFpath=/home/tor/robotics/prj/csipb-jamu-prj/dataset/pdb/27Nov2016/uniprot2pdb.pkl
+  python insert_protein.py $db $user $passwd $host $port $mode $outDir $uniprot2pdbFpath
 elif [ "$1" == "idu" ]; then
   ### insert_disease
   path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/uniprot/uniprot_human_dat_20160928/uniprot_sprot_human_disease.pkl
