@@ -634,41 +634,45 @@ export class Home {
   }
 
   makeConnectivityTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
-    let text: string = '';
+    let text = '';
+    let indent = '  ';
     let srcPropKeys = this.getPropKeys(srcType);
     let destPropKeys = this.getPropKeys(destType);
 
     let nUnique = 0;
     let prevSrc = '';
+    let prevConnSource = '';
     for(let i=0;i<interaction.length;i++) {
-      let srcKey = srcType+'_id';
-      let destKey = destType+'_id'
-      let src = interaction[i][srcKey];
-      let dest = interaction[i][destKey];
+      let src = interaction[i][srcType+'_id'];
+      let dest = interaction[i][destType+'_id'];
       let source = interaction[i]['source'];
       let weight = interaction[i]['weight'];
 
-      if (prevSrc!=src) {
+      if (prevSrc!==src) {
         nUnique = nUnique + 1;
         text = text+'#'+nUnique.toString()+' ';
 
         let srcProps = this.getProps(src,srcPropKeys,srcMeta);
         text += this.concatProps(srcProps,srcPropKeys,true,true)
         text +=':\n';
-        text += '  '+this.getHeader(srcType+'_vs_'+destType)+'\n';
 
         prevSrc = src;
+        prevConnSource = '';
+      }
+
+      if (prevConnSource!==source) {
+        text += indent+'['+source+']:\n';
+        prevConnSource = source;
       }
 
       let destProps = this.getProps(dest,destPropKeys,destMeta);
-      text += '  ';
+      text += indent+'['+weight+'] ';
       text += this.concatProps(destProps,destPropKeys,true,true)
-      text += ','+weight+','+source;
       text += '\n';
     }
 
     if (text==='') {
-      text = 'None';
+      text = 'No Connectivity';
     }
 
     return text;
