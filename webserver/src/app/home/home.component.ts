@@ -627,12 +627,7 @@ export class Home {
     for (let i=0; i<idList.length;i++) {
       txt += '#'+(i+1).toString()+' ';
       let props = this.getProps(idList[i],keys,meta);
-      for (let j=0;j<props.length;j++) {
-        txt += this.getHyperlinkStr( keys[j],props[j] );
-        if (j<props.length-1) {
-          txt += ',';
-        }
-      }
+      txt += this.concatProps(props,keys,true,true)
       txt += '\n';
     }
     return txt;
@@ -658,28 +653,18 @@ export class Home {
         text = text+'#'+nUnique.toString()+' ';
 
         let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-        for (let j=0;j<srcProps.length;j++) {
-          text = text+this.getHyperlinkStr( srcPropKeys[j],srcProps[j] );
-          if (j<srcProps.length-1) {
-            text = text + ',';
-          }
-        }
-        text = text+':\n';
-        text = text+'  '+this.getHeader(srcType+'_vs_'+destType)+'\n';
+        text += this.concatProps(srcProps,srcPropKeys,true,true)
+        text +=':\n';
+        text += '  '+this.getHeader(srcType+'_vs_'+destType)+'\n';
 
         prevSrc = src;
       }
 
       let destProps = this.getProps(dest,destPropKeys,destMeta);
-      text = text+'  ';
-      for (let jj=0;jj<destProps.length;jj++) {
-        text = text+this.getHyperlinkStr( destPropKeys[jj],destProps[jj] );
-        if (jj<destProps.length-1) {
-          text = text + ',';
-        }
-      }
-      text = text+','+weight+','+source;
-      text = text+'\n';
+      text += '  ';
+      text += this.concatProps(destProps,destPropKeys,true,true)
+      text += ','+weight+','+source;
+      text += '\n';
     }
 
     if (text==='') {
@@ -724,8 +709,8 @@ export class Home {
 
         let srcProps = this.getProps(src,srcPropKeys,srcMeta);
         let destProps = this.getProps(dest,destPropKeys,destMeta);
-        let srcText = this.concatProps(srcProps);
-        let destText = this.concatProps(destProps);
+        let srcText = this.concatProps(srcProps,srcPropKeys,false,false);
+        let destText = this.concatProps(destProps,destPropKeys,false,false);
 
         srcText = this.truncateText(srcText);
         destText = this.truncateText(destText);
@@ -754,7 +739,7 @@ export class Home {
       if (srcHasDestArr[i] === false) {
         let src = srcItems[i];
         let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-        let srcText = this.concatProps(srcProps);
+        let srcText = this.concatProps(srcProps,srcPropKeys,false,false);
         let destText = destDummyText;
         let w = wDummy;
 
@@ -773,7 +758,7 @@ export class Home {
         let srcText = srcDummyText;
         let dest = destItems[i];
         let destProps = this.getProps(dest,destPropKeys,destMeta);
-        let destText = this.concatProps(destProps);
+        let destText = this.concatProps(destProps,destPropKeys,false,false);
         let w = wDummy;
 
         srcText = this.truncateText(srcText);
@@ -935,20 +920,30 @@ export class Home {
     return header;
   }
 
-  concatProps(props) {
+  concatProps(props,keys,showNull,hyperlinked) {
+    let sep = '|';
     let str = '';
+
     for (let j=0;j<props.length;j++) {
       let prop = props[j];
-      if (prop && prop!=='') {
-        str = str+prop;
-        if (j<props.length-1) {
-          str = str + ',';
-        }
+      let key = keys[j];
+
+      if (!showNull && (!prop || prop==='')) {
+        continue;
+      }
+
+      if (hyperlinked) {
+        str += this.getHyperlinkStr(key,prop);
+      }
+      else {
+        str += prop;
+      }
+
+      if (j<props.length-1) {
+          str += sep;
       }
     }
-    if (str.charAt(str.length-1)===',') {
-      str = str.substr(0,str.length-1);
-    }
+
     return str;
   }
 
