@@ -9,33 +9,41 @@ from bs4 import BeautifulSoup
 
 def main():
     # dirpath = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/plant-list'
-    # parsePlaList(dirpath)
+    # parseMiscPlantList(dirpath)
 
     latin2idr = None
-    with open('/home/tor/robotics/prj/csipb-jamu-prj/dataset/plant-list/latin2idr_20170118-114630.json','r') as f:
+    with open('/home/tor/robotics/prj/csipb-jamu-prj/dataset/plant-list/misc/latin2idr_20170118-114630.json','r') as f:
         latin2idr = yaml.load(f)
 
     list2 = parseHerbalisnusantara()
-    strVal = ' '.join( latin2idr.values() )
+    print list2
+
+    existingIdrNames = ' '.join( latin2idr.values() )
     list3 = []
     for i in list2:
-        if i.capitalize() not in strVal:
+        if i.capitalize() not in existingIdrNames:
             list3.append(i)
+    print list3
+    print len(list3)
 
 def parseHerbalisnusantara():
-    url = 'http://www.herbalisnusantara.com/obatherbal/index.html'
-    # url = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/plant-list/herbalisnusantara.html'
-
-    # html = urlopen(url).read()
-
+    baseURL = 'http://www.herbalisnusantara.com/obatherbal/'
+    ##
     html = None
-    with open('/home/tor/robotics/prj/csipb-jamu-prj/dataset/plant-list/herbalisnusantara.html','r') as f:
-        html = f.read()
 
+    url = baseURL+'index.html'
+    html = urlopen(url).read()
+
+    # url = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/plant-list/herbalisnusantara.html'
+    # with open(url,'r') as f:
+    #     html = f.read()
+
+    ##
     soup = BeautifulSoup(html, "lxml")
     # with open('soup.html','w') as f:
     #     f.write( soup.prettify().encode('utf-8').strip() )
 
+    ##
     atags = [i for i in soup.find_all('a') if 'view' in i.get('href')];
     hrefs = [i.get('href') for i in atags]
     names = [i.getText() for i in atags]
@@ -43,38 +51,44 @@ def parseHerbalisnusantara():
     names2 = []
     for n in names:
         _ = n.split()
-        nn = [i.strip() for i in _ if len(i)!=0]
+        nn = [i.encode('utf-8').strip() for i in _ if len(i)!=0]
         names2.append(' '.join(nn))
     names = list(set(names2[:]))
     names = [n.capitalize() for n in names]
 
-    print hrefs
+    for h in hrefs:
+        html2 = None
+
+        url2 = baseURL+h
+        html2 = urlopen(url2).read()
+
+        # url2 = '/home/tor/robotics/prj/csipb-jamu-prj/dataset/plant-list/herbalisnusantara/herbalisnusantara_jahe.html'
+        # with open(url2,'r') as f:
+        #     html2 = f.read()
+
+        print url2
+
+        soup2 = BeautifulSoup(html2, "lxml")
+        itags = soup2.find_all('td')
+        # ttt = [i.getText() for i in itags]
+        # for t in ttt:
+        #     print t
+        # itags = [i.encode('utf-8').strip() for i in itags]
+        itags = [str(i) for i in itags]
+        itags = [i for i in itags if '/blockquote' in i]
+        itags = [i for i in itags if '(' in i and ')' in i]
+
+        # for i in itags:
+        #     s = BeautifulSoup(i, "lxml")
+        #     ss = s.find_all('td')
+        #     for j in ss:
+        #         print j.getText()
+        break
+
+    # print hrefs
     return names
-    # for i in names:
-    #     print i
 
-    # html2 = None
-    # with open('/home/tor/robotics/prj/csipb-jamu-prj/dataset/plant-list/herbalisnusantara_jahe.html','r') as f:
-    #     html2 = f.read()
-
-    # soup2 = BeautifulSoup(html2, "lxml")
-    # itags = soup2.find_all('td')
-    # # ttt = [i.getText() for i in itags]
-    # # for t in ttt:
-    # #     print t
-    # # itags = [i.encode('utf-8').strip() for i in itags]
-    # itags = [str(i) for i in itags]
-    # itags = [i for i in itags if '/blockquote' in i]
-    # itags = [i for i in itags if '(' in i and ')' in i]
-    # print len(itags)
-
-    # # for i in itags:
-    # #     s = BeautifulSoup(i, "lxml")
-    # #     ss = s.find_all('td')
-    # #     for j in ss:
-    # #         print j.getText()
-
-def parsePlaList(dirpath):
+def parseMiscPlantList(dirpath):
     latin2idr = {}
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     idrSeparator = '/'
