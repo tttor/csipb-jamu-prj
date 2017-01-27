@@ -50,10 +50,16 @@ export class Home {
   selectedProteins = [];
   selectedDiseases = [];
 
-  // This 3 vars are used in text output
-  jsonPlantCompound;
-  jsonCompoundProtein;
-  jsonProteinDisease;
+  // Used in connectivity text output
+  plaVScomTxtOutput;
+  comVSproTxtOutput;
+  proVSdisTxtOutput;
+
+  // Used in metadata text output
+  plaMetaTxtOutput;
+  comMetaTxtOutput;
+  proMetaTxtOutput;
+  disMetaTxtOutput;
 
   // Misc.
   // TODO explain the usage
@@ -529,7 +535,7 @@ export class Home {
     })
   }
 
-  // UTILITY METHODS ///////////////////////////////////////////////////////////
+  // OUTPUT MAKING METHODS /////////////////////////////////////////////////////
   makeOutput(plaSet,comSet,proSet,disSet,plaVScom,comVSpro,proVSdis) {
     plaSet = this.handleIfEmptySet(plaSet,'pla');
     comSet = this.handleIfEmptySet(comSet,'com');
@@ -551,18 +557,24 @@ export class Home {
         .subscribe(proMeta => {
           this.http.post(this.metaQueryAPI,disMetaPost).map(resp7=>resp7.json())
           .subscribe(disMeta => {
-            // text output with detail metadata //////////////////////////
-            this.jsonPlantCompound = this.makeTextOutput(plaVScom,
-                                                         plaMeta,comMeta,
-                                                         'pla','com');
-            this.jsonCompoundProtein = this.makeTextOutput(comVSpro,
-                                                           comMeta,proMeta,
-                                                           'com','pro');
-            this.jsonProteinDisease = this.makeTextOutput(proVSdis,
-                                                         proMeta,disMeta,
-                                                         'pro','dis');
+            // connectivity text output ////////////////////////////////////////
+            this.plaVScomTxtOutput = this.makeConnectivityTextOutput(plaVScom,
+                                                                     plaMeta,comMeta,
+                                                                     'pla','com');
+            this.comVSproTxtOutput = this.makeConnectivityTextOutput(comVSpro,
+                                                                       comMeta,proMeta,
+                                                                       'com','pro');
+            this.proVSdisTxtOutput = this.makeConnectivityTextOutput(proVSdis,
+                                                                      proMeta,disMeta,
+                                                                      'pro','dis');
 
-            // graph output data prep ////////////////////////////////////
+            // metadata text output ////////////////////////////////////////
+            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',plaSet,plaMeta);
+            this.comMetaTxtOutput = this.makeMetaTextOutput('com',comSet,comMeta);
+            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',proSet,proMeta);
+            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',disSet,disMeta);
+
+            // connectivity graph output ///////////////////////////////////////
             let graphData = [];
             let nNodeMax = 20;
 
@@ -571,18 +583,18 @@ export class Home {
             let proForGraph = proSet.slice(0,nNodeMax);
             let disForGraph = disSet.slice(0,nNodeMax);
 
-            let graphDataArr = [this.makeGraphData(plaVScom,
-                                                  plaMeta,comMeta,
-                                                  'pla','com',
-                                                  plaForGraph,comForGraph),
-                                this.makeGraphData(comVSpro,
-                                                  comMeta,proMeta,
-                                                  'com','pro',
-                                                  comForGraph,proForGraph),
-                                this.makeGraphData(proVSdis,
-                                                  proMeta,disMeta,
-                                                   'pro','dis',
-                                                   proForGraph,disForGraph)];
+            let graphDataArr = [this.makeGraphDataOutput(plaVScom,
+                                                         plaMeta,comMeta,
+                                                         'pla','com',
+                                                         plaForGraph,comForGraph),
+                                this.makeGraphDataOutput(comVSpro,
+                                                         comMeta,proMeta,
+                                                         'com','pro',
+                                                         comForGraph,proForGraph),
+                                this.makeGraphDataOutput(proVSdis,
+                                                         proMeta,disMeta,
+                                                         'pro','dis',
+                                                         proForGraph,disForGraph)];
 
             for (let ii=0;ii<graphDataArr.length;ii++) {
               for(let jj=0;jj<graphDataArr[ii].length;jj++) {
@@ -591,7 +603,7 @@ export class Home {
               }
             }
 
-            localStorage.setItem('data', JSON.stringify(graphData));
+            localStorage.setItem('connectivityGraphData', JSON.stringify(graphData));
             this.show = true;
           })//disMeta
         })//proMeta
@@ -599,6 +611,176 @@ export class Home {
     })//plaMeta
   }
 
+  makeMetaTextOutput(type,idList,meta) {
+    let keys = this.getPropKeys(type);
+    let txt = '#0 '+this.getHeader(type)+'\n';
+    for (let i=0; i<idList.length;i++) {
+      txt += '#'+(i+1).toString()+' ';
+      let props = this.getProps(idList[i],keys,meta);
+      for (let j=0;j<props.length;j++) {
+        txt += this.getHyperlinkStr( keys[j],props[j] );
+        if (j<props.length-1) {
+          txt += ',';
+        }
+      }
+      txt += '\n';
+    }
+    return txt;
+  }
+
+  makeConnectivityTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
+    let text: string = '';
+    let srcPropKeys = this.getPropKeys(srcType);
+    let destPropKeys = this.getPropKeys(destType);
+
+    let nUnique = 0;
+    let prevSrc = '';
+    for(let i=0;i<interaction.length;i++) {
+      let srcKey = srcType+'_id';
+      let destKey = destType+'_id'
+      let src = interaction[i][srcKey];
+      let dest = interaction[i][destKey];
+      let source = interaction[i]['source'];
+      let weight = interaction[i]['weight'];
+
+      if (prevSrc!=src) {
+        nUnique = nUnique + 1;
+        text = text+'#'+nUnique.toString()+' ';
+
+        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
+        for (let j=0;j<srcProps.length;j++) {
+          text = text+this.getHyperlinkStr( srcPropKeys[j],srcProps[j] );
+          if (j<srcProps.length-1) {
+            text = text + ',';
+          }
+        }
+        text = text+':\n';
+        text = text+'  '+this.getHeader(srcType+'_vs_'+destType)+'\n';
+
+        prevSrc = src;
+      }
+
+      let destProps = this.getProps(dest,destPropKeys,destMeta);
+      text = text+'  ';
+      for (let jj=0;jj<destProps.length;jj++) {
+        text = text+this.getHyperlinkStr( destPropKeys[jj],destProps[jj] );
+        if (jj<destProps.length-1) {
+          text = text + ',';
+        }
+      }
+      text = text+','+weight+','+source;
+      text = text+'\n';
+    }
+
+    if (text==='') {
+      text = 'None';
+    }
+
+    return text;
+  }
+
+  makeGraphDataOutput(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
+    let srcPropKeys = this.getPropKeys(srcType);
+    let destPropKeys = this.getPropKeys(destType);
+    let data = [];
+
+    let srcHasDestArr = [];
+    let destHasSrcArr = [];
+    for (let i=0;i<srcItems.length;i++) {
+      srcHasDestArr.push(false);
+    }
+    for (let i=0;i<destItems.length;i++) {
+      destHasSrcArr.push(false);
+    }
+
+    for(let i=0;i<interaction.length;i++) {
+      let datum = [];
+
+      let srcKey = srcType+'_id';
+      let destKey = destType+'_id';
+
+      let src = interaction[i][srcKey];
+      let dest = interaction[i][destKey];
+
+      let srcIdx = srcItems.indexOf(src);
+      let destIdx = destItems.indexOf(dest);
+
+      if ((srcIdx!==-1)&&(destIdx!==-1)) {
+        srcHasDestArr[srcIdx] = true;
+        destHasSrcArr[destIdx] = true;
+
+        let source = interaction[i]['source'];
+        let weight = parseFloat( interaction[i]['weight'] );
+
+        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
+        let destProps = this.getProps(dest,destPropKeys,destMeta);
+        let srcText = this.concatProps(srcProps);
+        let destText = this.concatProps(destProps);
+
+        srcText = this.truncateText(srcText);
+        destText = this.truncateText(destText);
+
+        datum.push(srcText);
+        datum.push(destText);
+        datum.push(weight);
+
+        data.push(datum);
+      }
+    }
+
+    // Make _dummy_ interaction (... vs anchor) to beautify the graph rendering
+    let wDummy = 0.00001;// to become "invisible"
+    let prefix = '';
+    let srcDummyText = prefix+srcType.toUpperCase();
+    let destDummyText = prefix+destType.toUpperCase();
+
+    let anchor = [];
+    anchor.push(srcDummyText);
+    anchor.push(destDummyText);
+    anchor.push(wDummy);
+    data.push(anchor);
+
+    for (let i=0;i<srcHasDestArr.length;i++) {
+      if (srcHasDestArr[i] === false) {
+        let src = srcItems[i];
+        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
+        let srcText = this.concatProps(srcProps);
+        let destText = destDummyText;
+        let w = wDummy;
+
+        srcText = this.truncateText(srcText);
+        destText = this.truncateText(destText);
+
+        let dummy = [];
+        dummy.push(srcText);
+        dummy.push(destText);
+        dummy.push(w);
+        data.push(dummy);
+      }
+    }
+    for (let i=0;i<destHasSrcArr.length;i++) {
+      if (destHasSrcArr[i] === false) {
+        let srcText = srcDummyText;
+        let dest = destItems[i];
+        let destProps = this.getProps(dest,destPropKeys,destMeta);
+        let destText = this.concatProps(destProps);
+        let w = wDummy;
+
+        srcText = this.truncateText(srcText);
+        destText = this.truncateText(destText);
+
+        let dummy = [];
+        dummy.push(srcText);
+        dummy.push(destText);
+        dummy.push(w);
+        data.push(dummy);
+      }
+    }
+
+    return data;
+  }
+
+  // UTILITY METHODS ///////////////////////////////////////////////////////////
   makeJSONFormat(arr,key) {
     let str = '';
     for (let j=0;j<arr.length;j++){
@@ -717,13 +899,26 @@ export class Home {
 
   getHeader(type) {
     let header = 'DEFAULT_HEADER';
+    if (type === 'pla') {
+      header = 'LatinName,IndonesianName';
+    }
     if (type === 'com') {
-      header = 'CAS,DrugbankID,KnapsackID,KeggID,weight,source';
+      header = 'CAS,DrugbankID,KnapsackID,KeggID';
     }
     if (type === 'pro') {
-      header = 'UniprotID,UniprotAbbrv,UniprotName,weight,source';
+      header = 'UniprotID,UniprotAbbrv,UniprotName';
     }
     if (type === 'dis') {
+      header = 'OmimID,OmimName';
+    }
+
+    if (type === 'pla_vs_com') {
+      header = 'CAS,DrugbankID,KnapsackID,KeggID,weight,source';
+    }
+    if (type === 'com_vs_pro') {
+      header = 'UniprotID,UniprotAbbrv,UniprotName,weight,source';
+    }
+    if (type === 'pro_vs_dis') {
       header = 'OmimID,OmimName,weight,source';
     }
     return header;
@@ -758,161 +953,74 @@ export class Home {
     return trunText;
   }
 
-  makeGraphData(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
-    let srcPropKeys = this.getPropKeys(srcType);
-    let destPropKeys = this.getPropKeys(destType);
-    let data = [];
+  downloadTextOutput(type){
+    let txt = '';
 
-    let srcHasDestArr = [];
-    let destHasSrcArr = [];
-    for (let i=0;i<srcItems.length;i++) {
-      srcHasDestArr.push(false);
+    if (type === 'pla_vs_com') {
+      txt = this.plaVScomTxtOutput;
     }
-    for (let i=0;i<destItems.length;i++) {
-      destHasSrcArr.push(false);
+    if (type === 'com_vs_pro') {
+      txt = this.comVSproTxtOutput;
     }
-
-    for(let i=0;i<interaction.length;i++) {
-      let datum = [];
-
-      let srcKey = srcType+'_id';
-      let destKey = destType+'_id';
-
-      let src = interaction[i][srcKey];
-      let dest = interaction[i][destKey];
-
-      let srcIdx = srcItems.indexOf(src);
-      let destIdx = destItems.indexOf(dest);
-
-      if ((srcIdx!==-1)&&(destIdx!==-1)) {
-        srcHasDestArr[srcIdx] = true;
-        destHasSrcArr[destIdx] = true;
-
-        let source = interaction[i]['source'];
-        let weight = parseFloat( interaction[i]['weight'] );
-
-        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-        let destProps = this.getProps(dest,destPropKeys,destMeta);
-        let srcText = this.concatProps(srcProps);
-        let destText = this.concatProps(destProps);
-
-        srcText = this.truncateText(srcText);
-        destText = this.truncateText(destText);
-
-        datum.push(srcText);
-        datum.push(destText);
-        datum.push(weight);
-
-        data.push(datum);
-      }
+    if (type === 'pro_vs_dis') {
+      txt = this.proVSdisTxtOutput;
     }
 
-    // Make _dummy_ interaction (... vs anchor) to beautify the graph rendering
-    let wDummy = 0.00001;// to become "invisible"
-    let prefix = '';
-    let srcDummyText = prefix+srcType.toUpperCase();
-    let destDummyText = prefix+destType.toUpperCase();
-
-    let anchor = [];
-    anchor.push(srcDummyText);
-    anchor.push(destDummyText);
-    anchor.push(wDummy);
-    data.push(anchor);
-
-    for (let i=0;i<srcHasDestArr.length;i++) {
-      if (srcHasDestArr[i] === false) {
-        let src = srcItems[i];
-        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-        let srcText = this.concatProps(srcProps);
-        let destText = destDummyText;
-        let w = wDummy;
-
-        srcText = this.truncateText(srcText);
-        destText = this.truncateText(destText);
-
-        let dummy = [];
-        dummy.push(srcText);
-        dummy.push(destText);
-        dummy.push(w);
-        data.push(dummy);
-      }
+    if (type === 'pla') {
+      txt = this.plaMetaTxtOutput;
     }
-    for (let i=0;i<destHasSrcArr.length;i++) {
-      if (destHasSrcArr[i] === false) {
-        let srcText = srcDummyText;
-        let dest = destItems[i];
-        let destProps = this.getProps(dest,destPropKeys,destMeta);
-        let destText = this.concatProps(destProps);
-        let w = wDummy;
-
-        srcText = this.truncateText(srcText);
-        destText = this.truncateText(destText);
-
-        let dummy = [];
-        dummy.push(srcText);
-        dummy.push(destText);
-        dummy.push(w);
-        data.push(dummy);
-      }
+    if (type === 'com') {
+      txt = this.comMetaTxtOutput;
+    }
+    if (type === 'pro') {
+      txt = this.proMetaTxtOutput;
+    }
+    if (type === 'dis') {
+      txt = this.disMetaTxtOutput;
     }
 
-    return data;
+    let blob = new Blob([txt], {type: "text/plain;charset=utf-8"});
+    saveAs(blob,this.getFilename(type));
   }
 
-  makeTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
-    let text: string = '';
-    let srcPropKeys = this.getPropKeys(srcType);
-    let destPropKeys = this.getPropKeys(destType);
+  getFilename(type) {
+    let prefix = 'ijah_'
+    let suffix = '';
+    let ext = '.txt';
+    let body = '';
 
-    let nUnique = 0;
-    let prevSrc = '';
-    for(let i=0;i<interaction.length;i++) {
-      let srcKey = srcType+'_id';
-      let destKey = destType+'_id'
-      let src = interaction[i][srcKey];
-      let dest = interaction[i][destKey];
-      let source = interaction[i]['source'];
-      let weight = interaction[i]['weight'];
-
-      if (prevSrc!=src) {
-        nUnique = nUnique + 1;
-        text = text+'#'+nUnique.toString()+' ';
-
-        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-        for (let j=0;j<srcProps.length;j++) {
-          text = text+this.getHyperlinkStr( srcPropKeys[j],srcProps[j] );
-          if (j<srcProps.length-1) {
-            text = text + ',';
-          }
-        }
-        text = text+':\n';
-        text = text+'  '+this.getHeader(destType)+'\n';
-
-        prevSrc = src;
-      }
-
-      let destProps = this.getProps(dest,destPropKeys,destMeta);
-      text = text+'  ';
-      for (let jj=0;jj<destProps.length;jj++) {
-        text = text+this.getHyperlinkStr( destPropKeys[jj],destProps[jj] );
-        if (jj<destProps.length-1) {
-          text = text + ',';
-        }
-      }
-      text = text+','+weight+','+source;
-      text = text+'\n';
+    if (type === 'pla') {
+      body = 'plant';
+      suffix = '_metadata';
+    }
+    if (type === 'com') {
+      body = 'compound';
+      suffix = '_metadata';
+    }
+    if (type === 'pro') {
+      body = 'protein';
+      suffix = '_metadata';
+    }
+    if (type === 'dis') {
+      body = 'disease';
+      suffix = '_metadata';
     }
 
-    if (text==='') {
-      text = 'None';
+    if (type === 'pla_vs_com') {
+      body = 'plant_vs_compound';
+      suffix = '_connectivity';
     }
-    return text;
-  }
+    if (type === 'com_vs_pro') {
+      body = 'compound_vs_protein';
+      suffix = '_connectivity';
+    }
+    if (type === 'pro_vs_dis') {
+      body = 'protein_vs_disease';
+      suffix = '_connectivity';
+    }
 
-  downloadJSON(idata,ifname){
-    var json = localStorage.getItem(idata);
-    var blob = new Blob([json], {type: "text/plain;charset=utf-8"});
-    saveAs(blob, ifname);
+    let filename = prefix+body+suffix+ext;
+    return filename;
   }
 
   reset() {

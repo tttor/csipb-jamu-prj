@@ -28,7 +28,7 @@
 </div>
 
 <br />
-<a id="btn-convert" class="btn btn-success col-md-4 col-md-offset-4 text-center">Download graph as .png (double-click)</a>
+<a id="btn-convert" class="btn btn-success col-md-4 col-md-offset-4 text-center">Download Connectivity Graph</a>
 <br />
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -73,7 +73,7 @@
       data.addColumn('string', 'From');
       data.addColumn('string', 'To');
       data.addColumn('number', 'Weight');
-      data.addRows(JSON.parse(localStorage.getItem('data')) );
+      data.addRows(JSON.parse(localStorage.getItem('connectivityGraphData')) );
 
       // Set chart options (the width must be 10px SMALLER than the width above)
       var options = {
