@@ -634,8 +634,8 @@ export class Home {
   }
 
   makeConnectivityTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
-    let text = '';
     let indent = '  ';
+    let text = this.getHeader(srcType+'_vs_'+destType)+'\n';
     let srcPropKeys = this.getPropKeys(srcType);
     let destPropKeys = this.getPropKeys(destType);
 
@@ -898,30 +898,24 @@ export class Home {
   }
 
   getHeader(type) {
-    let header = 'DEFAULT_HEADER';
-    if (type === 'pla') {
-      header = 'LatinName,IndonesianName';
-    }
-    if (type === 'com') {
-      header = 'CAS,DrugbankID,KnapsackID,KeggID';
-    }
-    if (type === 'pro') {
-      header = 'UniprotID,UniprotAbbrv,UniprotName';
-    }
-    if (type === 'dis') {
-      header = 'OmimID,OmimName';
-    }
+    let indent = '  ';
+    let headerArr = new Array();
+    headerArr['pla'] = 'LatinName|IndonesianName';
+    headerArr['com'] = 'CAS|DrugbankID|KnapsackID|KeggID';
+    headerArr['pro'] = 'UniprotID|UniprotName|PDBId(s)';
+    headerArr['dis'] = 'OmimID|OmimName';
 
-    if (type === 'pla_vs_com') {
-      header = 'CAS,DrugbankID,KnapsackID,KeggID,weight,source';
-    }
-    if (type === 'com_vs_pro') {
-      header = 'UniprotID,UniprotAbbrv,UniprotName,weight,source';
-    }
-    if (type === 'pro_vs_dis') {
-      header = 'OmimID,OmimName,weight,source';
-    }
-    return header;
+    headerArr['pla_vs_com'] ='#0 '+headerArr['pla']+'\n'+
+                              indent+'[source]:'+'\n'+
+                              indent+'[weight] '+headerArr['com'];
+    headerArr['com_vs_pro'] = '#0 '+headerArr['com']+'\n'+
+                              indent+'[source]:'+'\n'+
+                              indent+'[weight] '+headerArr['pro'];
+    headerArr['pro_vs_dis'] = '#0 '+headerArr['pro']+'\n'+
+                              indent+'[source]:'+'\n'+
+                              indent+'[weight] '+headerArr['dis'];
+
+    return headerArr[type];
   }
 
   concatProps(props,keys,showNull,hyperlinked) {
