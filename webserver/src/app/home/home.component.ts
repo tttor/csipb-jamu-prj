@@ -51,9 +51,9 @@ export class Home {
   selectedDiseases = [];
 
   // Used in connectivity text output
-  jsonPlantCompound;
-  jsonCompoundProtein;
-  jsonProteinDisease;
+  plaVScomTxtOutput;
+  comVSproTxtOutput;
+  proVSdisTxtOutput;
 
   // Used in metadata text output
   plaMetaTxtOutput;
@@ -558,13 +558,13 @@ export class Home {
           this.http.post(this.metaQueryAPI,disMetaPost).map(resp7=>resp7.json())
           .subscribe(disMeta => {
             // connectivity text output ////////////////////////////////////////
-            this.jsonPlantCompound = this.makeConnectivityTextOutput(plaVScom,
+            this.plaVScomTxtOutput = this.makeConnectivityTextOutput(plaVScom,
                                                                      plaMeta,comMeta,
                                                                      'pla','com');
-            this.jsonCompoundProtein = this.makeConnectivityTextOutput(comVSpro,
+            this.comVSproTxtOutput = this.makeConnectivityTextOutput(comVSpro,
                                                                        comMeta,proMeta,
                                                                        'com','pro');
-            this.jsonProteinDisease = this.makeConnectivityTextOutput(proVSdis,
+            this.proVSdisTxtOutput = this.makeConnectivityTextOutput(proVSdis,
                                                                       proMeta,disMeta,
                                                                       'pro','dis');
 
@@ -956,13 +956,13 @@ export class Home {
   downloadTextOutput(type){
     let txt = '';
     if (type === 'pla_vs_com') {
-      txt = this.jsonPlantCompound;
+      txt = this.plaVScomTxtOutput;
     }
     if (type === 'com_vs_pro') {
-      txt = this.jsonCompoundProtein;
+      txt = this.comVSproTxtOutput;
     }
     if (type === 'pro_vs_dis') {
-      txt = this.jsonProteinDisease;
+      txt = this.proVSdisTxtOutput;
     }
 
     let blob = new Blob([txt], {type: "text/plain;charset=utf-8"});
