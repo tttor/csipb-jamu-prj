@@ -50,10 +50,16 @@ export class Home {
   selectedProteins = [];
   selectedDiseases = [];
 
-  // This 3 vars are used in text output
+  // Used in connectivity text output
   jsonPlantCompound;
   jsonCompoundProtein;
   jsonProteinDisease;
+
+  // Used in metadata text output
+  plaMetaTxtOutput;
+  comMetaTxtOutput;
+  proMetaTxtOutput;
+  disMetaTxtOutput;
 
   // Misc.
   // TODO explain the usage
@@ -551,7 +557,7 @@ export class Home {
         .subscribe(proMeta => {
           this.http.post(this.metaQueryAPI,disMetaPost).map(resp7=>resp7.json())
           .subscribe(disMeta => {
-            // text output with detail metadata //////////////////////////
+            // connectivity text output ////////////////////////////////////////
             this.jsonPlantCompound = this.makeTextOutput(plaVScom,
                                                          plaMeta,comMeta,
                                                          'pla','com');
@@ -562,7 +568,13 @@ export class Home {
                                                          proMeta,disMeta,
                                                          'pro','dis');
 
-            // graph output data prep ////////////////////////////////////
+            // metadata text output ////////////////////////////////////////
+            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',plaSet,plaMeta);
+            this.comMetaTxtOutput = this.makeMetaTextOutput('com',comSet,comMeta);
+            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',proSet,proMeta);
+            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',disSet,disMeta);
+
+            // connectivity graph output ///////////////////////////////////////
             let graphData = [];
             let nNodeMax = 20;
 
@@ -597,6 +609,23 @@ export class Home {
         })//proMeta
       })//comMeta
     })//plaMeta
+  }
+
+  makeMetaTextOutput(type,idList,meta) {
+    let keys = this.getPropKeys(type);
+    let txt = '#0 '+this.getHeader(type)+'\n';
+    for (let i=0; i<idList.length;i++) {
+      txt += '#'+(i+1).toString()+' ';
+      let props = this.getProps(idList[i],keys,meta);
+      for (let j=0;j<props.length;j++) {
+        txt += this.getHyperlinkStr( keys[j],props[j] );
+        if (j<props.length-1) {
+          txt += ',';
+        }
+      }
+      txt += '\n';
+    }
+    return txt;
   }
 
   makeJSONFormat(arr,key) {
@@ -717,13 +746,26 @@ export class Home {
 
   getHeader(type) {
     let header = 'DEFAULT_HEADER';
+    if (type === 'pla') {
+      header = 'LatinName,IndonesianName';
+    }
     if (type === 'com') {
-      header = 'CAS,DrugbankID,KnapsackID,KeggID,weight,source';
+      header = 'CAS,DrugbankID,KnapsackID,KeggID';
     }
     if (type === 'pro') {
-      header = 'UniprotID,UniprotAbbrv,UniprotName,weight,source';
+      header = 'UniprotID,UniprotAbbrv,UniprotName';
     }
     if (type === 'dis') {
+      header = 'OmimID,OmimName';
+    }
+
+    if (type === 'pla_vs_com') {
+      header = 'CAS,DrugbankID,KnapsackID,KeggID,weight,source';
+    }
+    if (type === 'com_vs_pro') {
+      header = 'UniprotID,UniprotAbbrv,UniprotName,weight,source';
+    }
+    if (type === 'pro_vs_dis') {
       header = 'OmimID,OmimName,weight,source';
     }
     return header;
@@ -886,7 +928,7 @@ export class Home {
           }
         }
         text = text+':\n';
-        text = text+'  '+this.getHeader(destType)+'\n';
+        text = text+'  '+this.getHeader(srcType+'_vs_'+destType)+'\n';
 
         prevSrc = src;
       }
