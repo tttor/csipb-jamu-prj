@@ -675,6 +675,7 @@ export class Home {
     if (text==='') {
       text = 'None';
     }
+
     return text;
   }
 
@@ -952,10 +953,60 @@ export class Home {
     return trunText;
   }
 
-  downloadJSON(idata,ifname){
-    var json = localStorage.getItem(idata);
-    var blob = new Blob([json], {type: "text/plain;charset=utf-8"});
-    saveAs(blob, ifname);
+  downloadTextOutput(type){
+    let txt = '';
+    if (type === 'pla_vs_com') {
+      txt = this.jsonPlantCompound;
+    }
+    if (type === 'com_vs_pro') {
+      txt = this.jsonCompoundProtein;
+    }
+    if (type === 'pro_vs_dis') {
+      txt = this.jsonProteinDisease;
+    }
+
+    let blob = new Blob([txt], {type: "text/plain;charset=utf-8"});
+    saveAs(blob,this.getFilename(type));
+  }
+
+  getFilename(type) {
+    let prefix = 'ijah_'
+    let suffix = '';
+    let ext = '.txt';
+    let body = '';
+
+    if (type === 'pla') {
+      body = 'plant';
+      suffix = '_metadata';
+    }
+    if (type === 'com') {
+      body = 'compound';
+      suffix = '_metadata';
+    }
+    if (type === 'pro') {
+      body = 'protein';
+      suffix = '_metadata';
+    }
+    if (type === 'dis') {
+      body = 'disease';
+      suffix = '_metadata';
+    }
+
+    if (type === 'pla_vs_com') {
+      body = 'plant_vs_compound';
+      suffix = '_connectivity';
+    }
+    if (type === 'com_vs_pro') {
+      body = 'compound_vs_protein';
+      suffix = '_connectivity';
+    }
+    if (type === 'pro_vs_dis') {
+      body = 'protein_vs_disease';
+      suffix = '_connectivity';
+    }
+
+    let filename = prefix+body+suffix+ext;
+    return filename;
   }
 
   reset() {
