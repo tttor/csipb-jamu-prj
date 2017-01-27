@@ -825,7 +825,7 @@ export class Home {
     }
     if (type==='pro') {
       keys.push('pro_uniprot_id');
-      keys.push('pro_uniprot_abbrv');
+      // keys.push('pro_uniprot_abbrv');
       keys.push('pro_name');
       keys.push('pro_pdb_id');
     }
