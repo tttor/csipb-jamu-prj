@@ -61,27 +61,30 @@ export class Home {
   proMetaTxtOutput;
   disMetaTxtOutput;
 
-  // Misc.
-  // TODO explain the usage
-  show = false;
-  dataLocal = [];
-  FileSaver: any;
-  click = false;
-
+  // API URL addresses
   baseAPI;
   interactionQueryAPI;
   metaQueryAPI;
   predictAPI;
 
+  show = false;// whether to show the output in home.page
+  click = false;// whether searchAndPredictButton was clicked
+
+  // Misc.
+  // TODO explain the usage
+  dataLocal = [];
   typeaheadNoResults:boolean = false;
+
   noResultPlant = false;
   noResultCompound = false;
   noResultProtein = false;
   noResultDisease = false;
+
   pTanaman = false;
   pProtein = false;
   pCompound = false;
   pDisease = false;
+
   data: any;
   plant: any;
   compound: any;
