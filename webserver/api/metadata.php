@@ -26,7 +26,7 @@
       elseif (strpos($val, 'PRO') !== false) {
         $id = 'pro_id';
         $table = 'protein';
-        $col = 'pro_id,pro_name,pro_uniprot_id,pro_uniprot_abbrv';
+        $col = 'pro_id,pro_name,pro_uniprot_id,pro_uniprot_abbrv,pro_pdb_id';
       }
       elseif (strpos($val, 'DIS') !== false) {
         $id = 'dis_id';

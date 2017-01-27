@@ -838,6 +838,7 @@ export class Home {
       keys.push('pro_uniprot_id');
       keys.push('pro_uniprot_abbrv');
       keys.push('pro_name');
+      keys.push('pro_pdb_id');
     }
     if (type==='dis') {
       keys.push('dis_omim_id');
