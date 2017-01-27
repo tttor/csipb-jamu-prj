@@ -73,7 +73,7 @@
       data.addColumn('string', 'From');
       data.addColumn('string', 'To');
       data.addColumn('number', 'Weight');
-      data.addRows(JSON.parse(localStorage.getItem('data')) );
+      data.addRows(JSON.parse(localStorage.getItem('connectivityGraphData')) );
 
       // Set chart options (the width must be 10px SMALLER than the width above)
       var options = {

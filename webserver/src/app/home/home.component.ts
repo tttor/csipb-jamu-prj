@@ -603,7 +603,7 @@ export class Home {
               }
             }
 
-            localStorage.setItem('data', JSON.stringify(graphData));
+            localStorage.setItem('connectivityGraphData', JSON.stringify(graphData));
             this.show = true;
           })//disMeta
         })//proMeta
