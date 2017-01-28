@@ -61,27 +61,30 @@ export class Home {
   proMetaTxtOutput;
   disMetaTxtOutput;
 
-  // Misc.
-  // TODO explain the usage
-  show = false;
-  dataLocal = [];
-  FileSaver: any;
-  click = false;
-
+  // API URL addresses
   baseAPI;
   interactionQueryAPI;
   metaQueryAPI;
   predictAPI;
 
+  show = false;// whether to show the output in home.page
+  click = false;// whether searchAndPredictButton was clicked
+
+  // Misc.
+  // TODO explain the usage
+  dataLocal = [];
   typeaheadNoResults:boolean = false;
+
   noResultPlant = false;
   noResultCompound = false;
   noResultProtein = false;
   noResultDisease = false;
+
   pTanaman = false;
   pProtein = false;
   pCompound = false;
   pDisease = false;
+
   data: any;
   plant: any;
   compound: any;
@@ -624,63 +627,52 @@ export class Home {
     for (let i=0; i<idList.length;i++) {
       txt += '#'+(i+1).toString()+' ';
       let props = this.getProps(idList[i],keys,meta);
-      for (let j=0;j<props.length;j++) {
-        txt += this.getHyperlinkStr( keys[j],props[j] );
-        if (j<props.length-1) {
-          txt += ',';
-        }
-      }
+      txt += this.concatProps(props,keys,true,true)
       txt += '\n';
     }
     return txt;
   }
 
   makeConnectivityTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
-    let text: string = '';
+    let indent = '  ';
+    let text = this.getHeader(srcType+'_vs_'+destType)+'\n';
     let srcPropKeys = this.getPropKeys(srcType);
     let destPropKeys = this.getPropKeys(destType);
 
     let nUnique = 0;
     let prevSrc = '';
+    let prevConnSource = '';
     for(let i=0;i<interaction.length;i++) {
-      let srcKey = srcType+'_id';
-      let destKey = destType+'_id'
-      let src = interaction[i][srcKey];
-      let dest = interaction[i][destKey];
+      let src = interaction[i][srcType+'_id'];
+      let dest = interaction[i][destType+'_id'];
       let source = interaction[i]['source'];
       let weight = interaction[i]['weight'];
 
-      if (prevSrc!=src) {
+      if (prevSrc!==src) {
         nUnique = nUnique + 1;
         text = text+'#'+nUnique.toString()+' ';
 
         let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-        for (let j=0;j<srcProps.length;j++) {
-          text = text+this.getHyperlinkStr( srcPropKeys[j],srcProps[j] );
-          if (j<srcProps.length-1) {
-            text = text + ',';
-          }
-        }
-        text = text+':\n';
-        text = text+'  '+this.getHeader(srcType+'_vs_'+destType)+'\n';
+        text += this.concatProps(srcProps,srcPropKeys,true,true)
+        text +=':\n';
 
         prevSrc = src;
+        prevConnSource = '';
+      }
+
+      if (prevConnSource!==source) {
+        text += indent+'['+source+']:\n';
+        prevConnSource = source;
       }
 
       let destProps = this.getProps(dest,destPropKeys,destMeta);
-      text = text+'  ';
-      for (let jj=0;jj<destProps.length;jj++) {
-        text = text+this.getHyperlinkStr( destPropKeys[jj],destProps[jj] );
-        if (jj<destProps.length-1) {
-          text = text + ',';
-        }
-      }
-      text = text+','+weight+','+source;
-      text = text+'\n';
+      text += indent+'['+weight+'] ';
+      text += this.concatProps(destProps,destPropKeys,true,true)
+      text += '\n';
     }
 
     if (text==='') {
-      text = 'None';
+      text = 'No Connectivity';
     }
 
     return text;
@@ -721,8 +713,8 @@ export class Home {
 
         let srcProps = this.getProps(src,srcPropKeys,srcMeta);
         let destProps = this.getProps(dest,destPropKeys,destMeta);
-        let srcText = this.concatProps(srcProps);
-        let destText = this.concatProps(destProps);
+        let srcText = this.concatProps(srcProps,srcPropKeys,false,false);
+        let destText = this.concatProps(destProps,destPropKeys,false,false);
 
         srcText = this.truncateText(srcText);
         destText = this.truncateText(destText);
@@ -751,7 +743,7 @@ export class Home {
       if (srcHasDestArr[i] === false) {
         let src = srcItems[i];
         let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-        let srcText = this.concatProps(srcProps);
+        let srcText = this.concatProps(srcProps,srcPropKeys,false,false);
         let destText = destDummyText;
         let w = wDummy;
 
@@ -770,7 +762,7 @@ export class Home {
         let srcText = srcDummyText;
         let dest = destItems[i];
         let destProps = this.getProps(dest,destPropKeys,destMeta);
-        let destText = this.concatProps(destProps);
+        let destText = this.concatProps(destProps,destPropKeys,false,false);
         let w = wDummy;
 
         srcText = this.truncateText(srcText);
@@ -833,8 +825,9 @@ export class Home {
     }
     if (type==='pro') {
       keys.push('pro_uniprot_id');
-      keys.push('pro_uniprot_abbrv');
+      // keys.push('pro_uniprot_abbrv');
       keys.push('pro_name');
+      keys.push('pro_pdb_id');
     }
     if (type==='dis') {
       keys.push('dis_omim_id');
@@ -844,37 +837,49 @@ export class Home {
   }
 
   getHyperlinkStr(type,seed) {
-    let baseUrl: string = 'null';
-
+    let baseUrl = '';
     if (type==='pla_name') {
       baseUrl = 'https://en.wikipedia.org/wiki/';
     }
-    if (type==='com_knapsack_id') {
+    else if (type==='com_knapsack_id') {
       baseUrl = 'http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=';
     }
-    if (type==='com_drugbank_id') {
+    else if (type==='com_drugbank_id') {
       baseUrl = 'https://www.drugbank.ca/drugs/';
     }
-    if (type==='com_kegg_id') {
+    else if (type==='com_kegg_id') {
       baseUrl = 'http://www.genome.jp/dbget-bin/www_bget?cpd:';
     }
-
-    if (type==='pro_uniprot_id') {
+    else if (type==='pro_uniprot_id') {
       baseUrl = 'http://www.uniprot.org/uniprot/';
     }
-
-    if (type==='dis_omim_id') {
+    else if (type==='pro_pdb_id') {
+      baseUrl = 'http://www.rcsb.org/pdb/explore/explore.do?structureId='
+    }
+    else if (type==='dis_omim_id') {
       baseUrl = 'https://www.omim.org/entry/';
     }
-
-    let urlStr:string = seed;
-    if (seed!=='' && seed!=='null') {
-      let url: string = baseUrl + seed;
-      urlStr = '<a href="'+url+'" target="_blank">'+seed+'</a>';
+    else {
+      baseUrl = 'unknown';
     }
-    if (urlStr.indexOf('null') !==-1 ) {
+
+    let urlStr = '';
+    if (baseUrl.indexOf('unknown')===-1 && seed && seed!=='' && seed!=='null') {
+      let seedComps = seed.split(',');
+      for (let i=0; i<seedComps.length;i++) {
+        let s = seedComps[i];
+        let url: string = baseUrl + s;
+
+        urlStr += '<a href="'+url+'" target="_blank">'+s+'</a>';
+        if (i < seedComps.length-1) {
+          urlStr += ',';
+        }
+      }
+    }
+    else {
       urlStr = seed;
     }
+
     return urlStr;
   }
 
@@ -905,46 +910,50 @@ export class Home {
   }
 
   getHeader(type) {
-    let header = 'DEFAULT_HEADER';
-    if (type === 'pla') {
-      header = 'LatinName,IndonesianName';
-    }
-    if (type === 'com') {
-      header = 'CAS,DrugbankID,KnapsackID,KeggID';
-    }
-    if (type === 'pro') {
-      header = 'UniprotID,UniprotAbbrv,UniprotName';
-    }
-    if (type === 'dis') {
-      header = 'OmimID,OmimName';
-    }
+    let indent = '  ';
+    let headerArr = new Array();
+    headerArr['pla'] = 'LatinName|IndonesianName';
+    headerArr['com'] = 'CAS|DrugbankID|KnapsackID|KeggID';
+    headerArr['pro'] = 'UniprotID|UniprotName|PDBId(s)';
+    headerArr['dis'] = 'OmimID|OmimName';
 
-    if (type === 'pla_vs_com') {
-      header = 'CAS,DrugbankID,KnapsackID,KeggID,weight,source';
-    }
-    if (type === 'com_vs_pro') {
-      header = 'UniprotID,UniprotAbbrv,UniprotName,weight,source';
-    }
-    if (type === 'pro_vs_dis') {
-      header = 'OmimID,OmimName,weight,source';
-    }
-    return header;
+    headerArr['pla_vs_com'] ='#0 '+headerArr['pla']+'\n'+
+                              indent+'[source]:'+'\n'+
+                              indent+'[weight] '+headerArr['com'];
+    headerArr['com_vs_pro'] = '#0 '+headerArr['com']+'\n'+
+                              indent+'[source]:'+'\n'+
+                              indent+'[weight] '+headerArr['pro'];
+    headerArr['pro_vs_dis'] = '#0 '+headerArr['pro']+'\n'+
+                              indent+'[source]:'+'\n'+
+                              indent+'[weight] '+headerArr['dis'];
+
+    return headerArr[type];
   }
 
-  concatProps(props) {
+  concatProps(props,keys,showNull,hyperlinked) {
+    let sep = '|';
     let str = '';
+
     for (let j=0;j<props.length;j++) {
       let prop = props[j];
-      if (prop && prop!=='') {
-        str = str+prop;
-        if (j<props.length-1) {
-          str = str + ',';
-        }
+      let key = keys[j];
+
+      if (!showNull && (!prop || prop==='')) {
+        continue;
+      }
+
+      if (hyperlinked) {
+        str += this.getHyperlinkStr(key,prop);
+      }
+      else {
+        str += prop;
+      }
+
+      if (j<props.length-1) {
+          str += sep;
       }
     }
-    if (str.charAt(str.length-1)===',') {
-      str = str.substr(0,str.length-1);
-    }
+
     return str;
   }
 
