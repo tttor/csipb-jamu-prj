@@ -837,37 +837,49 @@ export class Home {
   }
 
   getHyperlinkStr(type,seed) {
-    let baseUrl: string = 'null';
-
+    let baseUrl = '';
     if (type==='pla_name') {
       baseUrl = 'https://en.wikipedia.org/wiki/';
     }
-    if (type==='com_knapsack_id') {
+    else if (type==='com_knapsack_id') {
       baseUrl = 'http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=';
     }
-    if (type==='com_drugbank_id') {
+    else if (type==='com_drugbank_id') {
       baseUrl = 'https://www.drugbank.ca/drugs/';
     }
-    if (type==='com_kegg_id') {
+    else if (type==='com_kegg_id') {
       baseUrl = 'http://www.genome.jp/dbget-bin/www_bget?cpd:';
     }
-
-    if (type==='pro_uniprot_id') {
+    else if (type==='pro_uniprot_id') {
       baseUrl = 'http://www.uniprot.org/uniprot/';
     }
-
-    if (type==='dis_omim_id') {
+    else if (type==='pro_pdb_id') {
+      baseUrl = 'http://www.rcsb.org/pdb/explore/explore.do?structureId='
+    }
+    else if (type==='dis_omim_id') {
       baseUrl = 'https://www.omim.org/entry/';
     }
-
-    let urlStr:string = seed;
-    if (seed!=='' && seed!=='null') {
-      let url: string = baseUrl + seed;
-      urlStr = '<a href="'+url+'" target="_blank">'+seed+'</a>';
+    else {
+      baseUrl = 'unknown';
     }
-    if (urlStr.indexOf('null') !==-1 ) {
+
+    let urlStr = '';
+    if (baseUrl.indexOf('unknown')===-1 && seed && seed!=='' && seed!=='null') {
+      let seedComps = seed.split(',');
+      for (let i=0; i<seedComps.length;i++) {
+        let s = seedComps[i];
+        let url: string = baseUrl + s;
+
+        urlStr += '<a href="'+url+'" target="_blank">'+s+'</a>';
+        if (i < seedComps.length-1) {
+          urlStr += ',';
+        }
+      }
+    }
+    else {
       urlStr = seed;
     }
+
     return urlStr;
   }
 
