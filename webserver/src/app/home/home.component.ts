@@ -75,7 +75,7 @@ export class Home {
   show = false;// whether to show the output in home.page
   click = false;// whether searchAndPredictButton was clicked
   elapsedTime = 0;
-  mode = 'Unknown';// valid: 1) Search, 2) SearchAndPredict
+  mode = 'unknown';
 
   // Misc.
   // TODO explain the usage
@@ -309,40 +309,40 @@ export class Home {
 
     if (this.plant.length > 1 && this.disease.length <= 1 && this.protein.length <= 1) {
       this.searchFromDrugSide(this.selectedPlants);
-      this.mode = 'Search';
+      this.mode = 'search_with_input:_plants';
       showPlant = true;
     }
     else if (this.compound.length > 1 && this.protein.length <= 1 && this.disease.length <= 1) {
       this.searchFromDrugSide(this.selectedCompounds);
-      this.mode = 'Search';
+      this.mode = 'search_with_input:_compounds';
       showCompound = true;
     }
 
     else if (this.protein.length > 1 && this.plant.length <= 1 && this.compound.length <= 1) {
       this.searchFromTargetSide(this.selectedProteins);
-      this.mode = 'Search';
+      this.mode = 'search_with_input:_proteins';
       showProtein = true;
     }
     else if (this.disease.length > 1 && this.plant.length <= 1 && this.compound.length <= 1) {
-      this.mode = 'Search';
+      this.mode = 'Search_with_input:_diseases';
       this.searchFromTargetSide(this.selectedDiseases);
       showDisease = true;
     }
     // Use case 1: both sides are specified ////////////////////////////////////
     else if (this.plant.length > 1 && this.protein.length > 1) {
-      this.mode = 'SearchAndPredict';
+      this.mode = 'search_and_predict_with_inputs:_plants_and_proteins';
       this.searchAndPredict(this.selectedPlants,this.selectedProteins);
     }
     else if (this.plant.length > 1 && this.disease.length > 1) {
-      this.mode = 'SearchAndPredict';
+      this.mode = 'search_and_predict_with_inputs:_plants_and_diseases';
       this.searchAndPredict(this.selectedPlants,this.selectedDiseases)
     }
     else if (this.compound.length > 1 && this.protein.length > 1) {
-      this.mode = 'SearchAndPredict';
+      this.mode = 'search_and_predict_with_inputs:_compounds_and_proteins';
       this.searchAndPredict(this.selectedCompounds,this.selectedProteins);
     }
     else if (this.compound.length > 1 && this.disease.length > 1) {
-      this.mode = 'SearchAndPredict';
+      this.mode = 'search_and_predict_with_inputs:_compounds_and_diseases';
       this.searchAndPredict(this.selectedCompounds,this.selectedDiseases);
     }
 
@@ -1123,7 +1123,7 @@ export class Home {
     this.selectedProteins = [];
     this.selectedDiseases = [];
 
-    this.mode = 'Unknown';
+    this.mode = 'unknown';
     this.elapsedTime = 0;
     this.show = false;
     localStorage.clear();

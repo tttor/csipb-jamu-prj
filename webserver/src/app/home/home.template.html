@@ -8,7 +8,7 @@
 <div>
   <div class="loading text-center" *ngIf="click">
     <div class="bounceball"></div>
-    <div class="text">Please be patient. We are searching<span *ngIf="this.mode==='SearchAndPredict'"> and predicting</span> ...</div>
+    <div class="text">Please be patient. We are searching<span *ngIf="this.mode.indexOf('predict')!==-1"> and predicting</span> ...</div>
   </div>
 </div>
 
