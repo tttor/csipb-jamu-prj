@@ -659,10 +659,10 @@ export class Home {
             this.summaryTxtOutput += '   Protein-Disease : '+proDisConnScore.toString()+'\n';
 
             this.summaryTxtOutput2 = 'Number of unique items:\n';
-            this.summaryTxtOutput2 += '   #Plants   : '+iplaSet.length.toString()+this.shouldBeMarkAsInput('plants')+'\n';
-            this.summaryTxtOutput2 += '   #Compounds: '+icomSet.length.toString()+this.shouldBeMarkAsInput('compounds')+'\n';
-            this.summaryTxtOutput2 += '   #Proteins : '+iproSet.length.toString()+this.shouldBeMarkAsInput('proteins')+'\n';
-            this.summaryTxtOutput2 += '   #Diseases : '+idisSet.length.toString()+this.shouldBeMarkAsInput('diseases')+'\n';
+            this.summaryTxtOutput2 += '   #Plants   : '+iplaSet.length.toString()+this.getInputMark('plants')+'\n';
+            this.summaryTxtOutput2 += '   #Compounds: '+icomSet.length.toString()+this.getInputMark('compounds')+'\n';
+            this.summaryTxtOutput2 += '   #Proteins : '+iproSet.length.toString()+this.getInputMark('proteins')+'\n';
+            this.summaryTxtOutput2 += '   #Diseases : '+idisSet.length.toString()+this.getInputMark('diseases')+'\n';
 
             let t1 = performance.now();
             this.elapsedTime += (t1-t0);
@@ -845,7 +845,7 @@ export class Home {
     return score;
   }
 
-  shouldBeMarkAsInput(type) {
+  getInputMark(type) {
     let mark = '';
     if (this.mode.indexOf(type)!==-1) {
       mark = ' (as inputs)';
