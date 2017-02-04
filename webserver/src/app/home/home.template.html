@@ -8,7 +8,7 @@
 <div>
   <div class="loading text-center" *ngIf="click">
     <div class="bounceball"></div>
-    <div class="text">Please be patient. We are processing ...</div>
+    <div class="text">Please be patient. We are searching<span *ngIf="this.mode.indexOf('predict')!==-1"> and predicting</span> ...</div>
   </div>
 </div>
 
@@ -161,6 +161,29 @@
     </div>
   </div>
 
+  <!-- The summary output ////////////////////////////////////// -->
+  <div class="row" *ngIf="show">
+    <div class="row text-center">
+        <font color="#696969">_____________________________________________________________________________________________________________________________________</font>
+    </div>
+    <div class="text-center col-md-12"><h2><strong>Summary</strong></h2></div>
+    <div class="col-md-4">
+      <pre [innerHTML]="summaryTxtOutput"></pre>
+    </div>
+    <div class="col-md-4">
+      <pre [innerHTML]="summaryTxtOutput2"></pre>
+    </div>
+    <div class="col-md-4">
+      <pre [innerHTML]="summaryTxtOutput3"></pre>
+    </div>
+
+    <div class="col-md-2 col-md-offset-5">
+      <br />
+      <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
+    </div>
+  </div>
+
+  <!-- The multi-partite graph output ////////////////////////////////////// -->
   <div class="row" *ngIf="show">
     <div class="row text-center">
         <font color="#696969">_____________________________________________________________________________________________________________________________________</font>
@@ -170,7 +193,6 @@
    </div>
   </div>
 
-  <!-- The multi-partite graph output ////////////////////////////////////// -->
   <div class="row" *ngIf="baseAPI != 'http://localhost/ijah-api/'">
     <iframe id="graph" class="text-center" *ngIf="show" src="app_home_graph_output.html" height="750px" width="100%" frameBorder="0"></iframe>
 
