@@ -61,6 +61,9 @@ export class Home {
   proMetaTxtOutput;
   disMetaTxtOutput;
 
+  // Used in summary text output
+  summaryTxtOutput;
+
   // API URL addresses
   baseAPI;
   interactionQueryAPI;
@@ -546,11 +549,11 @@ export class Home {
   }
 
   // OUTPUT MAKING METHODS /////////////////////////////////////////////////////
-  makeOutput(plaSet,comSet,proSet,disSet,plaVScom,comVSpro,proVSdis) {
-    plaSet = this.handleIfEmptySet(plaSet,'pla');
-    comSet = this.handleIfEmptySet(comSet,'com');
-    proSet = this.handleIfEmptySet(proSet,'pro');
-    disSet = this.handleIfEmptySet(disSet,'dis');
+  makeOutput(iplaSet,icomSet,iproSet,idisSet,plaVScom,comVSpro,proVSdis) {
+    let plaSet = this.handleIfEmptySet(iplaSet,'pla');
+    let comSet = this.handleIfEmptySet(icomSet,'com');
+    let proSet = this.handleIfEmptySet(iproSet,'pro');
+    let disSet = this.handleIfEmptySet(idisSet,'dis');
 
     // Get metadata of each unique item
     let plaMetaPost = this.makeJSONFormat(plaSet,'id');
@@ -615,6 +618,32 @@ export class Home {
 
             localStorage.setItem('connectivityGraphData', JSON.stringify(graphData));
             this.show = true;
+
+            // summary text output /////////////////////////////////////////////
+            let plaComConnScore = this.getConnectivityScore(plaVScom);
+            let comProConnScore = this.getConnectivityScore(comVSpro);
+            let proDisConnScore = this.getConnectivityScore(proVSdis);
+            let totConnScore = plaComConnScore+comProConnScore+proDisConnScore;
+            let unknownComProConn = 0;
+
+            this.summaryTxtOutput = 'Connectivity Score:\n';
+            this.summaryTxtOutput += '   Total: '+totConnScore.toString()+'\n';
+            this.summaryTxtOutput += '   Plant-Compound  : '+plaComConnScore.toString()+'\n';
+            this.summaryTxtOutput += '   Compound-Protein: '+comProConnScore.toString()+' (#unknown: '+unknownComProConn.toString()+')\n';
+            this.summaryTxtOutput += '   Protein-Disease : '+proDisConnScore.toString()+'\n';
+            this.summaryTxtOutput += '\n';
+
+            this.summaryTxtOutput += 'Number of unique items:\n';
+            this.summaryTxtOutput += '   #Plants   : '+iplaSet.length.toString()+'\n';
+            this.summaryTxtOutput += '   #Compounds: '+icomSet.length.toString()+'\n';
+            this.summaryTxtOutput += '   #Proteins : '+iproSet.length.toString()+'\n';
+            this.summaryTxtOutput += '   #Diseases : '+idisSet.length.toString()+'\n';
+            this.summaryTxtOutput += '\n';
+
+            let elapsedTime = 60;
+            let mode = 'Search';
+            this.summaryTxtOutput += 'Mode: '+mode+'\n';
+            this.summaryTxtOutput += 'Elapsed Time: '+elapsedTime.toString()+' s\n';
           })//disMeta
         })//proMeta
       })//comMeta
@@ -780,6 +809,14 @@ export class Home {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
+  getConnectivityScore(connectivity) {
+    let score = 0.0;
+    for (let i=0;i<connectivity.length;i++) {
+      score += parseFloat(connectivity[i]['weight'])
+    }
+    return score;
+  }
+
   makeJSONFormat(arr,key) {
     let str = '';
     for (let j=0;j<arr.length;j++){

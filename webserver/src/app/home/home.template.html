@@ -161,6 +161,22 @@
     </div>
   </div>
 
+  <!-- The summary output ////////////////////////////////////// -->
+  <div class="row" *ngIf="show">
+    <div class="row text-center">
+        <font color="#696969">_____________________________________________________________________________________________________________________________________</font>
+    </div>
+    <div class="text-center col-md-12"><h2><strong>Summary</strong></h2></div>
+    <div class="col-md-12">
+      <pre [innerHTML]="summaryTxtOutput"></pre>
+    </div>
+
+    <div class="col-md-2 col-md-offset-5">
+      <br />
+      <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
+    </div>
+  </div>
+
   <!-- The multi-partite graph output ////////////////////////////////////// -->
   <div class="row" *ngIf="show">
     <div class="row text-center">
