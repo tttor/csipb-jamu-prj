@@ -8,7 +8,7 @@ import socket
 # importing custom py causes error on .py executed from .php
 predictor_channel = {}
 predictor_channel['host'] = 'localhost'
-predictor_channel['port'] = 5557
+predictor_channel['port'] = 5558
 ch = predictor_channel
 ################################################################################
 
