@@ -72,6 +72,7 @@ export class Home {
 
   show = false;// whether to show the output in home.page
   click = false;// whether searchAndPredictButton was clicked
+  elapsedTime = 0;
 
   // Misc.
   // TODO explain the usage
@@ -374,6 +375,7 @@ export class Home {
 
   searchFromDrugSide(drugSideInput) {
     console.log('searchOnly: drugSideInput');
+    let t0 = performance.now();
 
     let dsi = JSON.stringify(drugSideInput);
     // console.log(dsi);
@@ -395,6 +397,9 @@ export class Home {
           let plaSet = this.getSet(plaVScom,'pla_id');
           let disSet = this.getSet(proVSdis,'dis_id');
 
+          let t1 = performance.now();
+          this.elapsedTime += (t1-t0);
+
           this.makeOutput(plaSet,comSet,proSet,disSet,
                           plaVScom,comVSpro,proVSdis);
         })
@@ -404,6 +409,7 @@ export class Home {
 
   searchFromTargetSide(targetSideInput) {
     console.log('searchOnly: targetSideInput');
+    let t0 = performance.now();
 
     let tsi = JSON.stringify(targetSideInput);
     // console.log(tsi);
@@ -425,6 +431,9 @@ export class Home {
           let plaSet = this.getSet(plaVScom,'pla_id');
           let disSet = this.getSet(proVSdis,'dis_id');
 
+          let t1 = performance.now();
+          this.elapsedTime += (t1-t0);
+
           this.makeOutput(plaSet,comSet,proSet,disSet,
                           plaVScom,comVSpro,proVSdis);
         })
@@ -434,6 +443,7 @@ export class Home {
 
   searchAndPredict(drugSideInput,targetSideInput) {
     console.log('searchAndPredict');
+    let t0 = performance.now();
 
     let dsi = JSON.stringify(drugSideInput);
     let tsi = JSON.stringify(targetSideInput);
@@ -540,6 +550,9 @@ export class Home {
             let proSet = this.getSet(comVSproMerged,'pro_id');
             let disSet = this.getSet(proVSdis,'dis_id');
 
+            let t1 = performance.now();
+            this.elapsedTime += (t1-t0);
+
             this.makeOutput(plaSet,comSet,proSet,disSet,
                             plaVScom,comVSpro,proVSdis);
           })
@@ -550,6 +563,8 @@ export class Home {
 
   // OUTPUT MAKING METHODS /////////////////////////////////////////////////////
   makeOutput(iplaSet,icomSet,iproSet,idisSet,plaVScom,comVSpro,proVSdis) {
+    let t0 = performance.now();
+
     let plaSet = this.handleIfEmptySet(iplaSet,'pla');
     let comSet = this.handleIfEmptySet(icomSet,'com');
     let proSet = this.handleIfEmptySet(iproSet,'pro');
@@ -640,10 +655,14 @@ export class Home {
             this.summaryTxtOutput += '   #Diseases : '+idisSet.length.toString()+'\n';
             this.summaryTxtOutput += '\n';
 
-            let elapsedTime = 60;
+            let t1 = performance.now();
+            this.elapsedTime += (t1-t0);
+
             let mode = 'Search';
+            this.elapsedTime = this.elapsedTime/1000.0;// from ms to s
+
             this.summaryTxtOutput += 'Mode: '+mode+'\n';
-            this.summaryTxtOutput += 'Elapsed Time: '+elapsedTime.toString()+' s\n';
+            this.summaryTxtOutput += 'Elapsed Time: '+this.elapsedTime.toString()+' s\n';
           })//disMeta
         })//proMeta
       })//comMeta
@@ -1097,6 +1116,7 @@ export class Home {
     this.selectedProteins = [];
     this.selectedDiseases = [];
 
+    this.elapsedTime = 0;
     this.show = false;
     localStorage.clear();
     this.dataLocal = [];
