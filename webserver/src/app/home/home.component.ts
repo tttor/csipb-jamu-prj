@@ -309,22 +309,22 @@ export class Home {
 
     if (this.plant.length > 1 && this.disease.length <= 1 && this.protein.length <= 1) {
       this.searchFromDrugSide(this.selectedPlants);
-      this.mode = 'search_with_input:_plants';
+      this.mode = 'search_with_inputs:_plants';
       showPlant = true;
     }
     else if (this.compound.length > 1 && this.protein.length <= 1 && this.disease.length <= 1) {
       this.searchFromDrugSide(this.selectedCompounds);
-      this.mode = 'search_with_input:_compounds';
+      this.mode = 'search_with_inputs:_compounds';
       showCompound = true;
     }
 
     else if (this.protein.length > 1 && this.plant.length <= 1 && this.compound.length <= 1) {
       this.searchFromTargetSide(this.selectedProteins);
-      this.mode = 'search_with_input:_proteins';
+      this.mode = 'search_with_inputs:_proteins';
       showProtein = true;
     }
     else if (this.disease.length > 1 && this.plant.length <= 1 && this.compound.length <= 1) {
-      this.mode = 'Search_with_input:_diseases';
+      this.mode = 'search_with_inputs:_diseases';
       this.searchFromTargetSide(this.selectedDiseases);
       showDisease = true;
     }
@@ -668,8 +668,10 @@ export class Home {
             this.elapsedTime += (t1-t0);
             this.elapsedTime = this.elapsedTime/1000.0;// from ms to s
 
-            this.summaryTxtOutput3 = 'Mode: '+this.mode+'\n';
-            this.summaryTxtOutput3 += 'Elapsed Time: '+this.elapsedTime.toString()+' s\n';
+            this.summaryTxtOutput3 = 'Mode: \n';
+            this.summaryTxtOutput3 += '   '+this.mode+'\n';
+            this.summaryTxtOutput3 += 'Elapsed Time: \n';
+            this.summaryTxtOutput3 += '   '+this.elapsedTime.toString()+' seconds\n';
           })//disMeta
         })//proMeta
       })//comMeta
