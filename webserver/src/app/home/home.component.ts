@@ -63,6 +63,8 @@ export class Home {
 
   // Used in summary text output
   summaryTxtOutput;
+  summaryTxtOutput2;
+  summaryTxtOutput3;
 
   // API URL addresses
   baseAPI;
@@ -655,21 +657,19 @@ export class Home {
             this.summaryTxtOutput += '   Plant-Compound  : '+plaComConnScore.toString()+'\n';
             this.summaryTxtOutput += '   Compound-Protein: '+comProConnScore.toString()+' (#unknown: '+unknownComProConn.toString()+')\n';
             this.summaryTxtOutput += '   Protein-Disease : '+proDisConnScore.toString()+'\n';
-            this.summaryTxtOutput += '\n';
 
-            this.summaryTxtOutput += 'Number of unique items:\n';
-            this.summaryTxtOutput += '   #Plants   : '+iplaSet.length.toString()+'\n';
-            this.summaryTxtOutput += '   #Compounds: '+icomSet.length.toString()+'\n';
-            this.summaryTxtOutput += '   #Proteins : '+iproSet.length.toString()+'\n';
-            this.summaryTxtOutput += '   #Diseases : '+idisSet.length.toString()+'\n';
-            this.summaryTxtOutput += '\n';
+            this.summaryTxtOutput2 = 'Number of unique items:\n';
+            this.summaryTxtOutput2 += '   #Plants   : '+iplaSet.length.toString()+'\n';
+            this.summaryTxtOutput2 += '   #Compounds: '+icomSet.length.toString()+'\n';
+            this.summaryTxtOutput2 += '   #Proteins : '+iproSet.length.toString()+'\n';
+            this.summaryTxtOutput2 += '   #Diseases : '+idisSet.length.toString()+'\n';
 
             let t1 = performance.now();
             this.elapsedTime += (t1-t0);
             this.elapsedTime = this.elapsedTime/1000.0;// from ms to s
 
-            this.summaryTxtOutput += 'Mode: '+this.mode+'\n';
-            this.summaryTxtOutput += 'Elapsed Time: '+this.elapsedTime.toString()+' s\n';
+            this.summaryTxtOutput3 = 'Mode: '+this.mode+'\n';
+            this.summaryTxtOutput3 += 'Elapsed Time: '+this.elapsedTime.toString()+' s\n';
           })//disMeta
         })//proMeta
       })//comMeta
