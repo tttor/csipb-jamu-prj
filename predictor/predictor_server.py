@@ -1,29 +1,28 @@
 #!/usr/bin/python
 import numpy as np
-import json
 import signal
 import socket
 import time
 import sys
 import psycopg2
-from sklearn import svm
-from sklearn.preprocessing import MinMaxScaler
-from scipy import interp
 
 from config import database as db
 from predictor_client import predictor_channel as ch
+
+import blmnii
+import util
 
 connDB = psycopg2.connect(database=db['name'],user=db['user'],password=db['passwd'],
                           host=db['host'],port=db['port'])
 cur = connDB.cursor()
 
 def signal_handler(signal, frame):
-    sys.stderr.write("Closing Port\n")
+    sys.stderr.write("Closing socket and database ...\n")
     sock.close()
-    conn.close()
+    connDB.close()
     sys.exit(0)
 
-def MakeKernel(dataList,mode):
+def makeKernel(dataList,mode):
     dataList = list(set(dataList))
     dataDict = {e:i for i,e in enumerate(dataList)}#for Index
     simMat = np.zeros((len(dataList),len(dataList)), dtype=float)
@@ -52,121 +51,7 @@ def MakeKernel(dataList,mode):
 
     return dataDict, simMat
 
-######################## The BLM-NII Procedue ########################
-
-def BLM_NII(adjMatrix,sourceSim,targetSim,sourceIndex,targetIndex,mode):
-    rowSum = 0 #Param for BLM/NII
-    nSource = len(sourceSim)
-    nTarget = len(targetSim)
-    originalValue = 0
-    #Flag Variables
-    foo = 0
-    boo = 0
-    #####
-
-    intProfileTemp = np.zeros(nTarget-1,dtype=float)
-    intProfile = np.zeros(nTarget-1,dtype=float)
-    gramTrain = np.zeros((nTarget-1,nTarget-1))
-    gramTest = np.zeros(nTarget-1)
-
-    #Make Kernel For Testing
-    gramTest = targetSim[targetIndex]
-    gramTest = np.delete(gramTest, targetIndex, 0)
-
-    #Make Kernel for Training
-    gramTrain = targetSim
-    gramTrain = np.delete(gramTrain,targetIndex, 0)
-    gramTrain = np.delete(gramTrain,targetIndex, 1)
-
-    if (mode == 1):
-        #transpose adjacency Matrix
-        adjMatrix = [[row[i] for row in adjMatrix] for i in range(len(adjMatrix[0]))]
-
-    #Since the current index is our testing data so we set current element to 0
-    originalValue = adjMatrix[sourceIndex][targetIndex]
-    adjMatrix[sourceIndex][targetIndex] = 0
-
-    #Compute number interaction from the source
-    for row in range(len(adjMatrix[0])):
-        rowSum += adjMatrix[sourceIndex][row]
-
-    if (rowSum == 0):
-        for i in range(nSource):
-            for j in range(nTarget):
-                if (j!=targetIndex):
-                    intProfileTemp[j-boo] += sourceSim [sourceIndex][i] * adjMatrix[i][j]
-                else:
-                    boo = 1
-        scale = MinMaxScaler()
-        intProfileTemp = intProfileTemp.reshape(-1,1)
-        intProfileTemp = scale.fit_transform(intProfileTemp)
-
-        #### use threshold ####
-        #-------- Using Fix Number --------#
-        threshold = 0.01
-        for i in range(nTarget-1):
-            if intProfileTemp[i] >= threshold:
-                intProfileTemp[i] = 1.0
-            else:
-                intProfileTemp[i] = 0.0
-
-
-    else:
-        for i in range(nTarget):
-            if(i != targetIndex):
-                intProfileTemp[i - foo] = adjMatrix[sourceIndex][i]
-            else:
-                foo = 1
-    ##### debugging section
-
-    ######################
-    if (len(set(intProfile)))>1:
-        #Train SVM
-        model = svm.SVC(kernel='precomputed')
-        model.fit(gramTrain, intProfile)
-        #Predict
-        prediction = model.predict(gramTest)
-    else:
-        prediction = 0.65*np.random.randint(0,50)/100.0 # TODO fix me!
-    return prediction
-##################################################################
-
-def predictBLMNII(adjMatrix,compSimMat,protSimMat,compIndex,protIndex):
-    #Make A prediction from DrugSide
-    pComp = BLM_NII(adjMatrix,compSimMat,protSimMat,compIndex,protIndex,0)
-    #Make A prediction form TargetSide
-    pProt = BLM_NII(adjMatrix,protSimMat,compSimMat,protIndex,compIndex,1)
-    #Merge Both prediction
-    pred=max(pComp, pProt)
-
-    return pred
-
-def randData(pairList,limit):
-############# Generate random ID #############
-    sys.stderr.write ("Generating additional random data...\n")
-    temp1 = None
-    tempC = None
-    tempP = None
-    idP = None
-    idC = None
-
-    nPair = len(pairList)
-    while nPair < 1000:
-        temp1 = np.random.randint(1,3334*17277)
-        if temp1%3334 == 0:
-            idP = 3334
-            idC = temp1/3334
-        else:
-            idP = temp1%3334
-            idC = (temp1/3334)+1
-        tempC = "COM"+str(idC).zfill(8)
-
-        tempP = "PRO"+str(idP).zfill(8)
-        pairList.append([tempC, tempP])
-        nPair += 1
-    return pairList
-
-def coreProgram(queryString):
+def predict(queryString):
     maxIter = None
     pairIdList = None
     pairQueryList = None
@@ -191,15 +76,15 @@ def coreProgram(queryString):
     pairQueryList = [[pair.split(":")[0],pair.split(":")[1]] for pair in queryString.split(",")]
     ##Parsing to pair id list
     maxIter = len(pairQueryList)
-    pairIdList = randData(pairQueryList,1000)
+    pairIdList = util.randData(pairQueryList,1000)
 
     ############# Make simMat and dict #############
     sys.stderr.write ("Making kernel....\n")
     compList = [i[0] for i in pairIdList]
-    compMeta, compSimMat = MakeKernel(compList,"com")
+    compMeta, compSimMat = makeKernel(compList,"com")
 
     protList = [i[1] for i in pairIdList]
-    protMeta, protSimMat = MakeKernel(protList,"pro")
+    protMeta, protSimMat = makeKernel(protList,"pro")
 
     ############# Make adjacency list #############
     sys.stderr.write ("Building connectivity data...\n")
@@ -225,6 +110,7 @@ def coreProgram(queryString):
     rows = cur.fetchall()
     for row in rows:
         adjMat[compMeta[row[0]]][protMeta[row[1]]]=(row[2])
+
     ########### Prediction ###################
     sys.stderr.write ("Running BLM-NII...\n")
     #Transform from PairId to PairIndex
@@ -237,9 +123,10 @@ def coreProgram(queryString):
             break
         if i > 0:
             sendRes += ","
-        #PredictEveryPair
-        resPred[i] = predictBLMNII(adjMat,compSimMat,protSimMat,pair[0],pair[1])
+
+        resPred[i] = blmnii.predict(adjMat,compSimMat,protSimMat,pair[0],pair[1])
         sendRes += str(pairIdList[i][0])+':'+str(pairIdList[i][1])+'='+str(resPred[i])
+
     ############## push to DB ##################
     query = ""
     query1 = ""
@@ -290,7 +177,7 @@ if __name__ == '__main__':
     sock.listen(1)
     while True:
         sys.stderr.write("##################################################\n")
-        sys.stderr.write("Waiting connection...\n")
+        sys.stderr.write("Waiting for connection...\n")
         signal.signal(signal.SIGINT, signal_handler)
         conn, addr = sock.accept()
         try:
@@ -306,9 +193,11 @@ if __name__ == '__main__':
                     break
         finally:
             print message
-            predictResult = coreProgram(message)
+            predictResult = predict(message)
             conn.sendall(predictResult)
             conn.close()
 
             message = ""
             dataTemp= ""
+
+    connDB.close()
