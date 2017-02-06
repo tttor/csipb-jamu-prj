@@ -4,17 +4,20 @@ if [ "$#" -ne 8 ]; then
   exit 1
 fi
 
+IJAH_SERVER=ijah@ijahserver
+IJAH_DIR=/home/ijah/ijah/web
+PREDICTOR_DIR=/home/ijah/ijah-predictor/python
+
 if [ $2 -ne 0 ]; then
   echo "#######################################################################"
-  echo "backing up /var/www/ijah at apps.cs..."
-  stamp=`date +%Y-%m-%d-%H-%M-%S`
-  backdir='/home/tor/ijah-backup/ijah-backup_'
-  cmd='mkdir '
-  cmd2=$cmd$backdir$stamp
-  ssh tor@apps.cs.ipb.ac.id $cmd2
-  ssh tor@apps.cs.ipb.ac.id find /var/www/ijah/ -type f ! -name "backup*" -exec cp --parents -t $backdir$stamp/ {} +
+  echo "TODO: backing up ..."
+  # stamp=`date +%Y-%m-%d-%H-%M-%S`
+  # backdir='/home/ijah/ijah-backup/ijah-backup_'
+  # cmd='mkdir '
+  # cmd2=$cmd$backdir$stamp
+  # ssh $IJAH_SERVER $cmd2
+  # ssh $IJAH_SERVER find /var/www/ijah/ -type f ! -name "backup*" -exec cp --parents -t $backdir$stamp/ {} +
 fi
-
 
 #build the src in production stage
 echo "#######################################################################"
@@ -24,8 +27,8 @@ if [ "$baseAPISet" -ne 0 ]; then
   echo 'Yeay, lets roll...'
   echo "building then deploying dist ..."
   npm run build:prod
-  scp -r dist/* tor@apps.cs.ipb.ac.id:/var/www/ijah/
-  scp -r src/app_home_graph_output.html tor@apps.cs.ipb.ac.id:/var/www/ijah/
+  scp -r dist/* $IJAH_SERVER:$IJAH_DIR
+  scp -r src/app_home_graph_output.html $IJAH_SERVER:$IJAH_DIR
 fi
 
 if [ $4 -ne 0 ]; then
@@ -34,23 +37,23 @@ if [ $4 -ne 0 ]; then
   read dbLinkSet
   if [ "$dbLinkSet" -ne 0 ]; then
     echo "deploying APIs ..."
-    scp -r api/* tor@apps.cs.ipb.ac.id:/var/www/ijah/api
+    scp -r api/* $IJAH_SERVER:$IJAH_DIR/api
   fi
 fi
 
 if [ $6 -ne 0 ]; then
   echo "#######################################################################"
-  echo 'Have you set the DB link to apps.cs at drugtarget-pred/config.py? [0/1]'
+  echo 'Have you set the DB link to apps.cs at predictor/config.py? [0/1]'
   read predictorConfigSet
   if [ "$predictorConfigSet" -ne 0 ]; then
     echo "deploying predictors ..."
-    scp -r ../drugtarget-pred/* tor@apps.cs.ipb.ac.id:/home/tor/ijah-predictor/
+    scp -r ../predictor/* $IJAH_SERVER:$PREDICTOR_DIR
   fi
 fi
 
 if [ $8 -ne 0 ]; then
   echo "#######################################################################"
   echo "deploying assets(css,img) ..."
-  scp -r src/assets/css tor@apps.cs.ipb.ac.id:/var/www/ijah/
-  scp -r src/assets/img tor@apps.cs.ipb.ac.id:/var/www/ijah/
+  scp -r src/assets/css $IJAH_SERVER:$IJAH_DIR
+  scp -r src/assets/img $IJAH_SERVER:$IJAH_DIR
 fi
