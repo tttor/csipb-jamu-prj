@@ -195,7 +195,9 @@
 
   <div class="row" *ngIf="baseAPI != 'http://localhost/ijah-api/'">
     <iframe id="graph" class="text-center" *ngIf="show" src="app_home_graph_output.html" height="750px" width="100%" frameBorder="0"></iframe>
+  </div>
 
+  <div class="row" *ngIf="show">
     <div class="col-md-2 col-md-offset-5">
       <br />
       <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
