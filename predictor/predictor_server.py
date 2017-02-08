@@ -71,6 +71,7 @@ def predict(queryString):
 
     resPred = None
     sendRes = ""
+    timeEx = time.time()
 
     sys.stderr.write ("Processing Query.... \n")
     pairQueryList = [[pair.split(":")[0],pair.split(":")[1]] for pair in queryString.split(",")]
@@ -125,7 +126,7 @@ def predict(queryString):
             sendRes += ","
 
         resPred[i] = blmnii.predict(adjMat,compSimMat,protSimMat,pair[0],pair[1])
-        sendRes += str(pairIdList[i][0])+':'+str(pairIdList[i][1])+'='+str(resPred[i])
+        sendRes += str(resPred[i])+"|blm-nii-svm|"+'%s.%04f' % (time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(int(timeEx))), timeEx-int(timeEx))
 
     ############## push to DB ##################
     query = ""
