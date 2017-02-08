@@ -135,7 +135,7 @@ export class Home {
 
   constructor(public appState: AppState, private http: Http) {
     this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-    this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
+    // this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
 
     this.interactionQueryAPI = this.baseAPI+'connectivity.php';
     this.metaQueryAPI = this.baseAPI+'metadata.php';
@@ -260,34 +260,46 @@ export class Home {
   }
 
   focusPlant(index: number) {
+    let MAX_INPUT_PLANTS = 5;
     this.activeCompound = false;
     if (index == this.countTanaman) {
-      this.countTanaman++;
-      this.plant.push({ 'index': this.countTanaman, 'value' : ''});
+      if (this.countTanaman+1 < MAX_INPUT_PLANTS) {
+        this.countTanaman++;
+        this.plant.push({ 'index': this.countTanaman, 'value' : ''});
+      }
     }
   }
 
   focusCompound(index: number) {
+    let MAX_INPUT_COMPOUNDS = 5;
     this.activeTanaman = false;
     if (index == this.countCompound) {
-      this.countCompound++;
-      this.compound.push({ 'index': this.countCompound, 'value' : ''});
+      if (this.countCompound+1 < MAX_INPUT_COMPOUNDS) {
+        this.countCompound++;
+        this.compound.push({ 'index': this.countCompound, 'value' : ''});
+      }
     }
   }
 
   focusProtein(index: number) {
+    let MAX_INPUT_PROTEINS = 5;
     this.activeDisease = false;
     if (index == this.countProtein) {
-      this.countProtein++;
-      this.protein.push({ 'index': this.countProtein, 'value' : ''});
+      if (this.countProtein+1 < MAX_INPUT_PROTEINS) {
+        this.countProtein++;
+        this.protein.push({ 'index': this.countProtein, 'value' : ''});
+      }
     }
   }
 
   focusDisease(index: number) {
+    let MAX_INPUT_DISEASES = 5;
     this.activeProtein = false;
     if (index == this.countDisease) {
-      this.countDisease++;
-      this.disease.push({ 'index': this.countDisease, 'value' : ''});
+      if (this.countDisease+1 < MAX_INPUT_DISEASES) {
+        this.countDisease++;
+        this.disease.push({ 'index': this.countDisease, 'value' : ''});
+      }
     }
   }
 
