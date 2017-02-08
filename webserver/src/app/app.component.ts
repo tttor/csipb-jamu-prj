@@ -1,24 +1,25 @@
-import { Component, ViewEncapsulation} from '@angular/core';
-
+import {
+  Component,
+  OnInit,
+  ViewEncapsulation
+} from '@angular/core';
 import { AppState } from './app.service';
+import { PageScrollConfig } from 'ng2-page-scroll';
 
 @Component({
   selector: 'app',
   encapsulation: ViewEncapsulation.None,
   styleUrls: [
-    './app.style.css'
+    './app.component.css'
   ],
-  templateUrl: './app.html'
+  templateUrl: './app.component.html'
 })
-export class App {
-
+export class AppComponent implements OnInit {
 
   constructor(
-    public appState: AppState) {
-
+    public appState: AppState
+  ) {
+    PageScrollConfig.defaultDuration = 300;
   }
-
-  ngOnInit() {
-  }
-
+  public ngOnInit() {}
 }
