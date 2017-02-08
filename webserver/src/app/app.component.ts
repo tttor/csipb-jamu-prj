@@ -21,5 +21,8 @@ export class AppComponent implements OnInit {
   ) {
     PageScrollConfig.defaultDuration = 300;
   }
-  public ngOnInit() {}
+
+  public ngOnInit() {
+    // Do nothing
+  }
 }

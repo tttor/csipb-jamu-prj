@@ -32,10 +32,10 @@ export class Home implements OnInit {
   activeDisease = true;
 
   // Search data for auto completion, search while filling
-  plantSearch: Array<string>;
-  compoundSearch: Array<string>;
-  proteinSearch: Array<string>;
-  diseaseSearch: Array<string>;
+  plantSearch = [];
+  compoundSearch = [];
+  proteinSearch = [];
+  diseaseSearch = [];
 
   // Total number of items in each set
   plant_total;
@@ -391,7 +391,9 @@ export class Home implements OnInit {
           clearInterval(inter);
         }
       }
-      if (this.show) this.click = false;
+      if (this.show) {
+        this.click = false;
+      }
     }, 100);
   }
 
@@ -683,10 +685,10 @@ export class Home implements OnInit {
             this.summaryTxtOutput3 += '   '+this.mode+'\n';
             this.summaryTxtOutput3 += 'Elapsed Time: \n';
             this.summaryTxtOutput3 += '   '+this.elapsedTime.toString()+' seconds\n';
-          })//disMeta
-        })//proMeta
-      })//comMeta
-    })//plaMeta
+          }) // disMeta
+        }) // proMeta
+      }) // comMeta
+    }) // plaMeta
   }
 
   makeMetaTextOutput(type,idList,meta) {
