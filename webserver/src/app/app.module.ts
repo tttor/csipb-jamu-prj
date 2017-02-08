@@ -34,7 +34,6 @@ const APP_PROVIDERS = [
   bootstrap: [ App ],
   declarations: [
     App,
-
     Home,
     Manual,
     Help,
