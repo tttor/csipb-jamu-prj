@@ -32,7 +32,7 @@ if [ "$baseAPISet" -ne 0 ]; then
   echo "building then deploying dist ..."
   npm run build:prod
   scp -r dist/* $IJAH_SERVER:$IJAH_DIR
-  scp -r src/app_home_graph_output.html $IJAH_SERVER:$IJAH_DIR
+  scp -r src/assets/app_home_graph_output.html $IJAH_SERVER:$IJAH_DIR
 fi
 
 if [ $4 -ne 0 ]; then
