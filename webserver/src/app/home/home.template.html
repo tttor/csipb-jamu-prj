@@ -36,23 +36,29 @@
           <h4>
             Plants (of {{plant_total}})
           </h4>
-          <div *ngFor="let t of plant">
-            <template #customTanaman let-model="item" let-index="index">
-              <h5>{{model.pla_name}} <span *ngIf="model.pla_idr_name">|</span> {{model.pla_idr_name}}</h5>
-            </template>
-            <input [(ngModel)]="t.value"
-                   [typeahead]="plantSearch"
-                   [typeaheadItemTemplate]="customTanaman"
-                   [typeaheadOptionField]="'search'"
-                   [typeaheadOptionsLimit]="10"
-                   (typeaheadOnSelect)="selectPlant($event, t.index)"
-                   (typeaheadNoResults)="changeTypeaheadNoResults($event, 1)"
-                   class="form-control verticalLine1"
-                   placeholder="Latin Name | Indonesian Name"
-                   (focus)="focusPlant(t.index)">
-             <div *ngIf="noResultPlant===true" class="" style="">
-               <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
-             </div>
+
+          <div *ngIf=!plantSearch>
+            Loading plants ...
+          </div>
+          <div *ngIf=plantSearch>
+            <div *ngFor="let t of plant">
+              <template #customTanaman let-model="item" let-index="index">
+                <h5>{{model.pla_name}} <span *ngIf="model.pla_idr_name">|</span> {{model.pla_idr_name}}</h5>
+              </template>
+              <input [(ngModel)]="t.value"
+                     [typeahead]="plantSearch"
+                     [typeaheadItemTemplate]="customTanaman"
+                     [typeaheadOptionField]="'search'"
+                     [typeaheadOptionsLimit]="10"
+                     (typeaheadOnSelect)="selectPlant($event, t.index)"
+                     (typeaheadNoResults)="changeTypeaheadNoResults($event, 1)"
+                     class="form-control verticalLine1"
+                     placeholder="Latin Name | Indonesian Name"
+                     (focus)="focusPlant(t.index)">
+               <div *ngIf="noResultPlant===true" class="" style="">
+                 <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
+               </div>
+            </div>
           </div>
         </div>
       </div>
@@ -62,23 +68,29 @@
           <h4>
             Compounds (of {{compound_total}})
           </h4>
-          <div *ngFor="let c of compound">
-            <template #customCompound let-model="item" let-index="index">
-              <h5>{{model.com_cas_id}} <span *ngIf="model.com_knapsack_id">|</span> {{model.com_knapsack_id}} <span *ngIf="model.com_drugbank_id">|</span> {{model.com_drugbank_id}}</h5>
-            </template>
-            <input [(ngModel)]="c.value"
-                   [typeahead]="compoundSearch"
-                   [typeaheadItemTemplate]="customCompound"
-                   [typeaheadOptionField]="'search'"
-                   [typeaheadOptionsLimit]="10"
-                   (typeaheadOnSelect)="selectCompound($event, c.index)"
-                   (typeaheadNoResults)="changeTypeaheadNoResults($event, 2)"
-                   class="form-control verticalLine2"
-                   placeholder="CAS | KnapSack ID | DrugBank ID"
-                   (focus)="focusCompound(c.index)">
-             <div *ngIf="noResultCompound===true" class="" style="">
-               <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
-             </div>
+
+          <div *ngIf=!compoundSearch>
+            Loading compounds ...
+          </div>
+          <div *ngIf=compoundSearch>
+            <div *ngFor="let c of compound">
+              <template #customCompound let-model="item" let-index="index">
+                <h5>{{model.com_cas_id}} <span *ngIf="model.com_knapsack_id">|</span> {{model.com_knapsack_id}} <span *ngIf="model.com_drugbank_id">|</span> {{model.com_drugbank_id}}</h5>
+              </template>
+              <input [(ngModel)]="c.value"
+                     [typeahead]="compoundSearch"
+                     [typeaheadItemTemplate]="customCompound"
+                     [typeaheadOptionField]="'search'"
+                     [typeaheadOptionsLimit]="10"
+                     (typeaheadOnSelect)="selectCompound($event, c.index)"
+                     (typeaheadNoResults)="changeTypeaheadNoResults($event, 2)"
+                     class="form-control verticalLine2"
+                     placeholder="CAS | KnapSack ID | DrugBank ID"
+                     (focus)="focusCompound(c.index)">
+               <div *ngIf="noResultCompound===true" class="" style="">
+                 <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
+               </div>
+            </div>
           </div>
         </div>
       </div>
@@ -96,23 +108,29 @@
           <h4>
             Proteins (of {{protein_total}})
           </h4>
-          <div *ngFor="let p of protein">
-            <template #customProtein let-model="item" let-index="index">
-              <h5>{{model.pro_uniprot_id}} | {{model.pro_name}}</h5>
-            </template>
-            <input [(ngModel)]="p.value"
-                   [typeahead]="proteinSearch"
-                   [typeaheadItemTemplate]="customProtein"
-                   [typeaheadOptionField]="'search'"
-                   [typeaheadOptionsLimit]="10"
-                   (typeaheadOnSelect)="selectProtein($event, p.index)"
-                   (typeaheadNoResults)="changeTypeaheadNoResults($event, 3)"
-                   class="form-control verticalLine3"
-                   placeholder="Uniprot ID | Uniprot Name"
-                   (focus)="focusProtein(p.index)">
-             <div *ngIf="noResultProtein===true" class="" style="">
-               <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
-             </div>
+
+          <div *ngIf=!proteinSearch>
+            Loading proteins ...
+          </div>
+          <div *ngIf=proteinSearch>
+            <div *ngFor="let p of protein">
+              <template #customProtein let-model="item" let-index="index">
+                <h5>{{model.pro_uniprot_id}} | {{model.pro_name}}</h5>
+              </template>
+              <input [(ngModel)]="p.value"
+                     [typeahead]="proteinSearch"
+                     [typeaheadItemTemplate]="customProtein"
+                     [typeaheadOptionField]="'search'"
+                     [typeaheadOptionsLimit]="10"
+                     (typeaheadOnSelect)="selectProtein($event, p.index)"
+                     (typeaheadNoResults)="changeTypeaheadNoResults($event, 3)"
+                     class="form-control verticalLine3"
+                     placeholder="Uniprot ID | Uniprot Name"
+                     (focus)="focusProtein(p.index)">
+               <div *ngIf="noResultProtein===true" class="" style="">
+                 <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
+               </div>
+            </div>
           </div>
         </div>
       </div>
@@ -122,26 +140,33 @@
           <h4>
             Diseases (of {{disease_total}})
           </h4>
-          <div *ngFor="let d of disease">
-            <template #customDisease let-model="item" let-index="index" class="right-input">
-              <h5>{{model.dis_omim_id}} | {{model.dis_name}}</h5>
-            </template>
-            <input [(ngModel)]="d.value"
-                   [typeahead]="diseaseSearch"
-                   [typeaheadItemTemplate]="customDisease"
-                   [typeaheadOptionField]="'search'"
-                   [typeaheadOptionsLimit]="10"
-                   (typeaheadOnSelect)="selectDisease($event, d.index)"
-                   (typeaheadNoResults)="changeTypeaheadNoResults($event, 4)"
-                   class="form-control verticalLine4"
-                   placeholder="OMIM ID | OMIM Name"
-                   (focus)="focusDisease(d.index)">
-             <div *ngIf="noResultDisease===true" class="" style="">
-               <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
-             </div>
+
+          <div *ngIf=!diseaseSearch>
+            Loading diseases ...
+          </div>
+          <div *ngIf=diseaseSearch>
+            <div *ngFor="let d of disease">
+              <template #customDisease let-model="item" let-index="index" class="right-input">
+                <h5>{{model.dis_omim_id}} | {{model.dis_name}}</h5>
+              </template>
+              <input [(ngModel)]="d.value"
+                     [typeahead]="diseaseSearch"
+                     [typeaheadItemTemplate]="customDisease"
+                     [typeaheadOptionField]="'search'"
+                     [typeaheadOptionsLimit]="10"
+                     (typeaheadOnSelect)="selectDisease($event, d.index)"
+                     (typeaheadNoResults)="changeTypeaheadNoResults($event, 4)"
+                     class="form-control verticalLine4"
+                     placeholder="OMIM ID | OMIM Name"
+                     (focus)="focusDisease(d.index)">
+               <div *ngIf="noResultDisease===true" class="" style="">
+                 <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
+               </div>
+            </div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
