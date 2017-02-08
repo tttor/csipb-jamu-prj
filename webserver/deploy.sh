@@ -17,9 +17,8 @@ if [ $2 -ne 0 ]; then
   echo "#######################################################################"
   echo "backing up ..."
   stamp=`date +%Y-%m-%d-%H-%M-%S`
-  copyCMD='cp -r '
-  space=' '
-  cmd=$copyCMD$IJAH_DIR_STR$space$BACKUP_DIR_STR$stamp
+  copyCMD='cp -r'
+  cmd=$copyCMD' '$IJAH_DIR_STR' '$BACKUP_DIR_STR$stamp
   ssh $IJAH_SERVER $cmd
 fi
 
