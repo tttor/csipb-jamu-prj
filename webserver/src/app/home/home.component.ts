@@ -20,11 +20,11 @@ declare var saveAs: any;
   templateUrl: './home.template.html'
 })
 export class Home {
-  // count variable
-  countTanaman = 0;
-  countCompound = 0;
-  countProtein = 0;
-  countDisease = 0;
+  // count number of input rows
+  nPlaInputRows = 0;
+  nComInputRows = 0;
+  nProInputRows = 0;
+  nDisInputRows = 0;
 
   // active variable
   activeTanaman = true;
@@ -141,10 +141,10 @@ export class Home {
     this.metaQueryAPI = this.baseAPI+'metadata.php';
     this.predictAPI = this.baseAPI+'predict.php';
 
-    this.plant = [{ 'index': this.countTanaman, 'value' : ''}];
-    this.compound = [{ 'index': this.countCompound, 'value' : ''}];
-    this.protein = [{ 'index': this.countProtein, 'value' : ''}];
-    this.disease = [{ 'index': this.countDisease, 'value' : ''}];
+    this.plant = [{ 'index': this.nPlaInputRows, 'value' : ''}];
+    this.compound = [{ 'index': this.nComInputRows, 'value' : ''}];
+    this.protein = [{ 'index': this.nProInputRows, 'value' : ''}];
+    this.disease = [{ 'index': this.nDisInputRows, 'value' : ''}];
 
     this.http.get(this.baseAPI+'total.php').map(res => res.json())
       .subscribe(data => {
@@ -236,36 +236,36 @@ export class Home {
 
   // INPUT HANDLING METHODS ////////////////////////////////////////////////////
   selectPlant(e:any, index):void {
-    if (index != this.countTanaman) {
-      this.selectedPlants.push({ 'index': this.countTanaman, 'value' : e.item.pla_id});
+    if (index != this.nPlaInputRows) {
+      this.selectedPlants.push({ 'index': this.nPlaInputRows, 'value' : e.item.pla_id});
     }
   }
 
   selectCompound(e:any, index):void {
-    if (index != this.countCompound) {
-      this.selectedCompounds.push({ 'index': this.countCompound, 'value' : e.item.com_id});
+    if (index != this.nComInputRows) {
+      this.selectedCompounds.push({ 'index': this.nComInputRows, 'value' : e.item.com_id});
     }
   }
 
   selectProtein(e:any, index):void {
-    if (index != this.countProtein) {
-      this.selectedProteins.push({ 'index': this.countProtein, 'value' : e.item.pro_id});
+    if (index != this.nProInputRows) {
+      this.selectedProteins.push({ 'index': this.nProInputRows, 'value' : e.item.pro_id});
     }
   }
 
   selectDisease(e:any, index):void {
-    if (index != this.countDisease) {
-      this.selectedDiseases.push({ 'index': this.countDisease, 'value' : e.item.dis_id});
+    if (index != this.nDisInputRows) {
+      this.selectedDiseases.push({ 'index': this.nDisInputRows, 'value' : e.item.dis_id});
     }
   }
 
   focusPlant(index: number) {
     let MAX_INPUT_PLANTS = 5;
     this.activeCompound = false;
-    if (index == this.countTanaman) {
-      if (this.countTanaman+1 < MAX_INPUT_PLANTS) {
-        this.countTanaman++;
-        this.plant.push({ 'index': this.countTanaman, 'value' : ''});
+    if (index == this.nPlaInputRows) {
+      if (this.nPlaInputRows+1 < MAX_INPUT_PLANTS) {
+        this.nPlaInputRows++;
+        this.plant.push({ 'index': this.nPlaInputRows, 'value' : ''});
       }
     }
   }
@@ -273,10 +273,10 @@ export class Home {
   focusCompound(index: number) {
     let MAX_INPUT_COMPOUNDS = 5;
     this.activeTanaman = false;
-    if (index == this.countCompound) {
-      if (this.countCompound+1 < MAX_INPUT_COMPOUNDS) {
-        this.countCompound++;
-        this.compound.push({ 'index': this.countCompound, 'value' : ''});
+    if (index == this.nComInputRows) {
+      if (this.nComInputRows+1 < MAX_INPUT_COMPOUNDS) {
+        this.nComInputRows++;
+        this.compound.push({ 'index': this.nComInputRows, 'value' : ''});
       }
     }
   }
@@ -284,10 +284,10 @@ export class Home {
   focusProtein(index: number) {
     let MAX_INPUT_PROTEINS = 5;
     this.activeDisease = false;
-    if (index == this.countProtein) {
-      if (this.countProtein+1 < MAX_INPUT_PROTEINS) {
-        this.countProtein++;
-        this.protein.push({ 'index': this.countProtein, 'value' : ''});
+    if (index == this.nProInputRows) {
+      if (this.nProInputRows+1 < MAX_INPUT_PROTEINS) {
+        this.nProInputRows++;
+        this.protein.push({ 'index': this.nProInputRows, 'value' : ''});
       }
     }
   }
@@ -295,10 +295,10 @@ export class Home {
   focusDisease(index: number) {
     let MAX_INPUT_DISEASES = 5;
     this.activeProtein = false;
-    if (index == this.countDisease) {
-      if (this.countDisease+1 < MAX_INPUT_DISEASES) {
-        this.countDisease++;
-        this.disease.push({ 'index': this.countDisease, 'value' : ''});
+    if (index == this.nDisInputRows) {
+      if (this.nDisInputRows+1 < MAX_INPUT_DISEASES) {
+        this.nDisInputRows++;
+        this.disease.push({ 'index': this.nDisInputRows, 'value' : ''});
       }
     }
   }
@@ -1135,10 +1135,10 @@ export class Home {
     this.pProtein = false;
     this.pDisease = false;
 
-    this.plant = [{ 'index': this.countTanaman, 'value' : ''}];
-    this.compound = [{ 'index': this.countCompound, 'value' : ''}];
-    this.protein = [{ 'index': this.countProtein, 'value' : ''}];
-    this.disease = [{ 'index': this.countDisease, 'value' : ''}];
+    this.plant = [{ 'index': this.nPlaInputRows, 'value' : ''}];
+    this.compound = [{ 'index': this.nComInputRows, 'value' : ''}];
+    this.protein = [{ 'index': this.nProInputRows, 'value' : ''}];
+    this.disease = [{ 'index': this.nDisInputRows, 'value' : ''}];
 
     this.selectedPlants = [];
     this.selectedCompounds = [];
@@ -1165,7 +1165,7 @@ export class Home {
   this.plant = [{ 'index': 1, 'value' : 'Datura stramonium'}, { 'index': 2, 'value' : 'Trifolium pratense'}, { 'index': 3, 'value' : 'Acacia senegal'}, { 'index': 4, 'value' : ''}];
   this.selectedPlants = [{"index":1,"value":"PLA00002565"},{"index":2,"value":"PLA00001090"},{"index":3,"value":"PLA00000325"}];
 
-  this.countTanaman = 4;
+  this.nPlaInputRows = 4;
   this.activeCompound = false;
   this.activeProtein = false;
   this.activeDisease = false;
@@ -1176,7 +1176,7 @@ export class Home {
   this.compound = [{ 'index': 1, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 4, 'value' : ''}];
   this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000058'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000039'}];
 
-  this.countCompound = 2;
+  this.nComInputRows = 2;
   this.activeDisease = false;
   this.activeTanaman = false;
   this.activeProtein = false;
@@ -1187,7 +1187,7 @@ export class Home {
   this.protein = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
   this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
 
-  this.countProtein = 3;
+  this.nProInputRows = 3;
   this.activeDisease = false;
   this.activeTanaman = false;
   this.activeCompound = false;
@@ -1198,7 +1198,7 @@ export class Home {
   this.disease = [{ 'index': 1, 'value' : '156610 | Skin creases, congenital symmetric circumferential, 1'}, { 'index': 2, 'value' : '614373 | Amyotrophic lateral sclerosis 16, juvenile'}, { 'index': 3, 'value' : '612244 | Inflammatory bowel disease 13'}, { 'index': 4, 'value' : ''}];
   this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00001455'}, { 'index': 2, 'value' : 'DIS00000803'}, { 'index': 3, 'value' : 'DIS00003796'}];
 
-  this.countDisease = 4;
+  this.nDisInputRows = 4;
   this.activeProtein = false;
   this.activeTanaman = false;
   this.activeCompound = false;
@@ -1208,12 +1208,12 @@ export class Home {
   this.reset();
   this.plant = [{ 'index': 1, 'value' : 'Catharanthus roseus'}, { 'index': 2, 'value' : 'Nigella sativa'}, { 'index': 3, 'value' : 'Cocos nucifera'}, { 'index': 4, 'value' : ''}];
   this.selectedPlants = [{"index":1,"value":"PLA00001025"},{"index":2,"value":"PLA00003511"},{"index":3,"value":"PLA00001600"}];
-  this.countTanaman = 4;
+  this.nPlaInputRows = 4;
 
   this.protein = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
   this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
 
-  this.countProtein = 3;
+  this.nProInputRows = 3;
 
   this.activeDisease = false;
   this.activeCompound = false;
@@ -1224,12 +1224,12 @@ export class Home {
   this.compound = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '51-34-3 | DB00747 | C00002292 | C01851'}, { 'index': 3, 'value' : '53-86-1 | DB00328 | C00030512 | C01926'}, { 'index': 4, 'value' : ''}];
   this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00001628'}, { 'index': 3, 'value' : 'COM00005599'}];
 
-  this.countCompound = 2;
+  this.nComInputRows = 2;
 
   this.disease = [{ 'index': 1, 'value' : '608516 | Major depressive disorder'}, { 'index': 2, 'value' : '100100 | Prune belly syndrome'}, { 'index': 3, 'value' : '614473 | Arterial calcification of infancy, generalized, 2'}, { 'index': 4, 'value' : ''}];
   this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000849'}, { 'index': 2, 'value' : 'DIS00003796'}, { 'index': 3, 'value' : 'DIS00000853'}];
 
-  this.countDisease = 4;
+  this.nDisInputRows = 4;
 
   this.activeTanaman = false;
   this.activeProtein = false;
@@ -1239,12 +1239,12 @@ export class Home {
   this.reset();
   this.plant = [{ 'index': 1, 'value' : 'Aloe vera'}, { 'index': 2, 'value' : 'Cocos nucifera'}, { 'index': 3, 'value' : 'Panax ginseng'}, { 'index': 4, 'value' : ''}];
   this.selectedPlants = [{"index":1,"value":"PLA00001504"},{"index":2,"value":"PLA00001600"},{"index":3,"value":"PLA00003447"}];
-  this.countDisease = 4;
+  this.nDisInputRows = 4;
 
   this.disease = [{ 'index': 1, 'value' : '61600 | Analbuminemia'}, { 'index': 2, 'value' : '615999 | Hyperthyroxinemia, familial dysalbuminemic'}, { 'index': 3, 'value' : ''}];
   this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00003787'}, { 'index': 2, 'value' : 'DIS00003675'}];
 
-  this.countDisease = 3;
+  this.nDisInputRows = 3;
 
   this.activeCompound = false;
   this.activeProtein = false;
@@ -1255,12 +1255,12 @@ export class Home {
   this.compound = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 4, 'value' : ''}];
   this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000058'}];
 
-  this.countCompound = 2;
+  this.nComInputRows = 2;
 
   this.protein = [{ 'index': 1, 'value' : 'P53985 | Monocarboxylate transporter 1'}, { 'index': 2, 'value' : 'P20309 | Muscarinic acetylcholine receptor M3'}, { 'index': 3, 'value' : 'Q99720 | Sigma non-opioid intracellular receptor 1'}, { 'index': 4, 'value' : ''}];
   this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00000040'}, { 'index': 2, 'value' : 'PRO00000452'}, { 'index': 3, 'value' : 'PRO00000377'}];
 
-  this.countProtein = 4;
+  this.nProInputRows = 4;
 
   this.activeTanaman = false;
   this.activeDisease = false;
