@@ -1,0 +1,21 @@
+html, body{
+  height: 100%;
+  font-family: Helvetica, sans-serif;
+}
+
+span.active {
+  background-color: gray;
+}
+
+iframe {
+  padding: 0;
+  margin: 0;
+}
+
+.foot {
+  color: #34495e;
+}
+
+footer {
+  bottom: 0;
+}
