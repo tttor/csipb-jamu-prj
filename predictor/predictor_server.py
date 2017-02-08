@@ -7,13 +7,13 @@ import sys
 import psycopg2
 
 from config import database as db
-from predictor_client import predictor_channel as ch
-
+from config import predictor_channel as ch
+from config import MAX_ELAPSED_TIME
 import blmnii
 import util
 
 connDB = psycopg2.connect(database=db['name'],user=db['user'],password=db['passwd'],
-                          host=db['host'],port=db['port'])
+                      host=db['host'],port=db['port'])
 cur = connDB.cursor()
 
 def signal_handler(signal, frame):
@@ -74,10 +74,10 @@ def predict(queryString):
     timeEx = time.time()
 
     sys.stderr.write ("Processing Query.... \n")
-    pairQueryList = [[pair.split(":")[0],pair.split(":")[1]] for pair in queryString.split(",")]
+    pairQuery = [queryString.split(":")]
+
     ##Parsing to pair id list
-    maxIter = len(pairQueryList)
-    pairIdList = util.randData(pairQueryList,1000)
+    pairIdList = util.randData(pairQuery,1000)
 
     ############# Make simMat and dict #############
     sys.stderr.write ("Making kernel....\n")
@@ -116,17 +116,10 @@ def predict(queryString):
     sys.stderr.write ("Running BLM-NII...\n")
     #Transform from PairId to PairIndex
     pairIndexList = [[compMeta[i[0]],protMeta[i[1]]] for i in pairIdList]
-    resPred = np.zeros((len(pairIndexList)),dtype=float)
 
-    sendRes = ""
-    for i,pair in enumerate(pairIndexList):
-        if i == maxIter:
-            break
-        if i > 0:
-            sendRes += ","
-
-        resPred[i] = blmnii.predict(adjMat,compSimMat,protSimMat,pair[0],pair[1])
-        sendRes += str(resPred[i])+"|blm-nii-svm|"+'%s.%04f' % (time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(int(timeEx))), timeEx-int(timeEx))
+    resPred = blmnii.predict(adjMat,compSimMat,protSimMat,pairIndexList[0][0],pairIndexList[0][1])
+    sendRes += pairIdList[0][0]+'|'+pairIdList[0][1]+'|'+str(resPred)
+    sendRes += "|blm-nii-svm|"+'%s.%04f' % (time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(int(timeEx))), timeEx-int(timeEx))
 
     ############## push to DB ##################
     query = ""
@@ -136,31 +129,28 @@ def predict(queryString):
     queryCheck = ""
     #
     sys.stderr.write ("Push data to DB...\n")
-    for i in range(len(pairQueryList)):
-        if i == maxIter:
-            break
-        ## Check row in the table ##
-        queryCheck = "SELECT * FROM compound_vs_protein WHERE "
-        queryCheck += "com_id='"+pairIdList[i][0]+"' AND pro_id='"+pairIdList[i][1]+"'"
-        queryCheck += " AND source = 'blm-nii-svm'"
-        cur.execute(queryCheck)
-        dataRows = cur.fetchall()
-        # ## Update row if data is already exsist on table ##
-        if len(dataRows)>0:
-            query1 = "UPDATE compound_vs_protein "
-            query2 = "SET source='blm-nii-svm', weight="+ str(resPred[i])+", time_stamp=now() "
-            query3 = "WHERE com_id='" + pairIdList[i][0] + "'AND pro_id='" + pairIdList[i][1]+"'"
+    ## Check row in the table ##
+    queryCheck = "SELECT * FROM compound_vs_protein WHERE "
+    queryCheck += "com_id='"+pairIdList[0][0]+"' AND pro_id='"+pairIdList[0][1]+"'"
+    queryCheck += " AND source = 'blm-nii-svm'"
+    cur.execute(queryCheck)
+    dataRows = cur.fetchall()
+    # ## Update row if data is already exsist on table ##
+    if len(dataRows)>0:
+        query1 = "UPDATE compound_vs_protein "
+        query2 = "SET source='blm-nii-svm', weight="+ str(resPred)+", time_stamp=now() "
+        query3 = "WHERE com_id='" + pairIdList[0][0] + "'AND pro_id='" + pairIdList[0][1]+"'"
 
-        # ## Insert if no record found ##
-        else:
-            #May use INSERT INTO .. VALUE ... ON DUPLICATE KEY UPDATE
-            query1 = "INSERT INTO compound_vs_protein (com_id, pro_id, source, weight) "
-            query2 = "VALUES ( "+ "'" + pairIdList[i][0] + "', "+ "'" + pairIdList[i][1]
-            query3 = "', " + "'blm-nii-svm', "+ str(resPred[i])+" )"
+    # ## Insert if no record found ##
+    else:
+        #May use INSERT INTO .. VALUE ... ON DUPLICATE KEY UPDATE
+        query1 = "INSERT INTO compound_vs_protein (com_id, pro_id, source, weight) "
+        query2 = "VALUES ( "+ "'" + pairIdList[0][0] + "', "+ "'" + pairIdList[0][1]
+        query3 = "', " + "'blm-nii-svm', "+ str(resPred)+" )"
 
-        query = query1 + query2 + query3
-        sys.stderr.write(query+"\n")
-        cur.execute(query)
+    query = query1 + query2 + query3
+    sys.stderr.write(query+"\n")
+    cur.execute(query)
     connDB.commit()
 
     return sendRes
@@ -193,8 +183,18 @@ if __name__ == '__main__':
                     message = message.split("|")[0]
                     break
         finally:
-            print message
-            predictResult = predict(message)
+            predictResult = ""
+            queryPair = message.split(",")
+            start_time = time.time()
+            for i,query in enumerate(queryPair):
+                print time.time()-start_time
+                if (i>0):
+                    predictResult += ","
+                if time.time()-start_time  <= MAX_ELAPSED_TIME:
+                    predictResult += predict(query)
+                else:
+                    predictResult += query.split(":")[0]+"|"+query.split(":")[1]
+                    predictResult += "|Null|Null|Null"
             conn.sendall(predictResult)
             conn.close()
 

@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import numpy as np
 import time
 import math
@@ -7,10 +9,7 @@ import sys
 from Bio import SeqIO
 from Bio import pairwise2
 from Bio.SubsMat.MatrixInfo import blosum62
-from scoop import futures
-
-
-#Parsing
+from multiprocessing import Pool
 
 def alignprot(rowSeqProtein,colSeqProtein,i,j):
     alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
@@ -47,6 +46,9 @@ if __name__ == '__main__':
     colIndex = []
 
     it = 0
+    ### MultiProcessing ###
+    pool = Pool(processes=4)
+    ###################
 
     ###Parse uniprot ID from csv###
     sys.stderr.write("Parsing input\n")
@@ -93,8 +95,8 @@ if __name__ == '__main__':
         colSeqProtein[i] = "".join(colSeqProtein[i])
     ########################################
     sys.stderr.write("Preparing output file\n")
-    outMatDir = OutDir+"RealProtKernel"+str(rowStart+1)+"_"+str(rowEnd)+".txt"
-    outMetaDir = OutDir+"MetaProtKernel"+str(rowStart+1)+"_"+str(rowEnd)+".txt"
+    outMatDir = OutDir+"RealProtKernel"+str(rowStart)+"_"+str(rowEnd)+".txt"
+    outMetaDir = OutDir+"MetaProtKernel"+str(rowStart)+"_"+str(rowEnd)+".txt"
     listScore = []
 
     with open(outMatDir, 'w') as matF, open(outMetaDir, 'w') as metaF:
@@ -114,10 +116,10 @@ if __name__ == '__main__':
                     colProtein.append(colSeqProtein[j])
                     colIndex.append(j)
                 ### Calculation ###
-                listScore = list(futures.map(alignprot, rowProtein, colProtein, rowIndex, colIndex))
+                listScore = [pool.apply_async(alignprot,(rowProtein[i], colProtein[i], rowIndex[i], colIndex[i],)) for i in range(batchLen)]
                 ###Put into row
-                for j in range(len(listScore)):
-                    simMatProt[listScore[j][1]] = listScore[j][0]
+                for listS in listScore:
+                    simMatProt[listS.get()[1]] = listS.get()[0]
                 #Reset value
                 colIndex = []
                 rowIndex = []
