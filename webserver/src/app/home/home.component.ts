@@ -1080,73 +1080,26 @@ export class Home implements OnInit {
   }
 
   private downloadTextOutput(type){
-    let txt = '';
+    let txtArr = new Array();
+    txtArr['plant_vs_compound'] = this.plaVScomTxtOutput;
+    txtArr['compound_vs_protein'] = this.comVSproTxtOutput;
+    txtArr['protein_vs_disease'] = this.proVSdisTxtOutput;
+    txtArr['compound_vs_plant'] = this.comVSplaTxtOutput;
+    txtArr['protein_vs_compound'] = this.proVScomTxtOutput;
+    txtArr['disease_vs_protein'] = this.disVSproTxtOutput;
+    txtArr['plant'] = this.plaMetaTxtOutput;
+    txtArr['compound'] = this.comMetaTxtOutput;
+    txtArr['protein'] = this.proMetaTxtOutput;
+    txtArr['disease'] = this.disMetaTxtOutput;
 
-    if (type === 'pla_vs_com') {
-      txt = this.plaVScomTxtOutput;
-    }
-    if (type === 'com_vs_pro') {
-      txt = this.comVSproTxtOutput;
-    }
-    if (type === 'pro_vs_dis') {
-      txt = this.proVSdisTxtOutput;
-    }
-
-    if (type === 'pla') {
-      txt = this.plaMetaTxtOutput;
-    }
-    if (type === 'com') {
-      txt = this.comMetaTxtOutput;
-    }
-    if (type === 'pro') {
-      txt = this.proMetaTxtOutput;
-    }
-    if (type === 'dis') {
-      txt = this.disMetaTxtOutput;
-    }
-
-    let blob = new Blob([txt], {type: "text/plain;charset=utf-8"});
-    saveAs(blob,this.getFilename(type));
-  }
-
-  private getFilename(type) {
-    let prefix = 'ijah_'
-    let suffix = '';
-    let ext = '.txt';
-    let body = '';
-
-    if (type === 'pla') {
-      body = 'plant';
-      suffix = '_metadata';
-    }
-    if (type === 'com') {
-      body = 'compound';
-      suffix = '_metadata';
-    }
-    if (type === 'pro') {
-      body = 'protein';
-      suffix = '_metadata';
-    }
-    if (type === 'dis') {
-      body = 'disease';
-      suffix = '_metadata';
-    }
-
-    if (type === 'pla_vs_com') {
-      body = 'plant_vs_compound';
-      suffix = '_connectivity';
-    }
-    if (type === 'com_vs_pro') {
-      body = 'compound_vs_protein';
-      suffix = '_connectivity';
-    }
-    if (type === 'pro_vs_dis') {
-      body = 'protein_vs_disease';
+    let suffix = '_metadata';
+    if (type.indexOf('vs')!==-1) {
       suffix = '_connectivity';
     }
 
-    let filename = prefix+body+suffix+ext;
-    return filename;
+    let filename = 'ijah_'+type+suffix+'.txt';
+    let blob = new Blob([ txtArr[type] ], {type: "text/plain;charset=utf-8"});
+    saveAs(blob,filename);
   }
 
   private reset() {
