@@ -277,6 +277,46 @@
         <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
       </div>
 
+      <!-- Connectivity Text Output Flipped //////////////////////////////// -->
+      <div class="row text-center">
+        <font color="#696969"  id="text">_____________________________________________________________________________________________________________________________________</font>
+      </div>
+      <div class="text-center col-md-12">
+        <h2><strong>Connectivity Text (Flipped)</strong></h2>
+      </div>
+      <div class="col-md-4">
+        Compound - Plant Connectivity
+        <pre [innerHTML]="comVSplaTxtOutput">
+      </pre>
+      </div>
+      <div class="col-md-4">
+        Protein - Compound Connectivity
+        <pre [innerHTML]="proVScomTxtOutput">
+      </pre>
+      </div>
+      <div class="col-md-4">
+        Disease - Protein Connectivity
+        <pre [innerHTML]="disVSproTxtOutput">
+      </pre>
+      </div>
+      <br />
+
+      <div class="col-md-4">
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('pla_vs_com')">Download Compound-Plant Connectivity</button>
+      </div>
+      <div class="col-md-4">
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('com_vs_pro')">Download Protein-Compound Connectivity</button>
+      </div>
+      <div class="col-md-4">
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('pro_vs_dis')">Download Disease-Protein Connectivity</button>
+      </div>
+      <br />
+
+      <div class="col-md-2 col-md-offset-5">
+        <br />
+        <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
+      </div>
+
       <!-- Metadata Text Output /////////////////////////////////////////// -->
       <div class="row text-center">
         <font color="#696969" id="metadata">_____________________________________________________________________________________________________________________________________</font>
