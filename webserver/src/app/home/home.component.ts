@@ -38,10 +38,10 @@ export class Home implements OnInit {
   diseaseSearch = [];
 
   // Total number of items in each set
-  plant_total;
-  compound_total;
-  protein_total;
-  disease_total;
+  nPlantInDB;
+  nCompoundInDB;
+  nProteinInDB;
+  nDiseaseInDB;
 
   // Items selected by users
   selectedPlants = [];
@@ -150,10 +150,10 @@ export class Home implements OnInit {
 
     this.http.get(this.baseAPI+'total.php').map(res => res.json())
       .subscribe(data => {
-        this.plant_total = data[0]['plant_total'];
-        this.compound_total = data[0]['compound_total'];
-        this.protein_total = data[0]['protein_total'];
-        this.disease_total = data[0]['disease_total'];
+        this.nPlantInDB = data[0]['plant_total'];
+        this.nCompoundInDB = data[0]['compound_total'];
+        this.nProteinInDB = data[0]['protein_total'];
+        this.nDiseaseInDB = data[0]['disease_total'];
       })
 
     // Query for metadata for _text_ _completion_ //////////////////////////////
