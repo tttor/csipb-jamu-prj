@@ -4,7 +4,7 @@ db_drug_target
 ===
 DATABASE WEBSERVER
 
-DRUGBANK
+[x] DRUGBANK
 http://www.drugbank.ca/
 contains UniprotID
 
@@ -29,6 +29,12 @@ BindingDB
 http://www.bindingdb.org/bind/index.jsp
 
 STITCH
+
+[ ] Pubchem
+https://pubchem.ncbi.nlm.nih.gov
+most compound-protein info is from drugbank,
+may use ftp service to download compound info,
+then look for "Target"
 
 KEGG
 http://www.drugbank.ca/drugs/DB00149
