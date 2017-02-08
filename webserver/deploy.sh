@@ -1,4 +1,7 @@
 #!/bin/bash
+# $ npm install
+# $ npm run start:hmr
+# $ npm run build:prod
 if [ "$#" -ne 8 ]; then
   echo "USAGE: bash deploy.sh -bak [0/1] -api [0/1] -predictor [0/1] -asset [0/1]"
   exit 1
