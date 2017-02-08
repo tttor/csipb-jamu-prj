@@ -98,8 +98,8 @@ export class Home implements OnInit {
   disease: any;
 
   //////////////////////////////////////////////////////////////////////////////
-  ngOnInit() {
-
+  public ngOnInit() {
+    // Do nothing
   }
 
   public stateCtrl:FormControl = new FormControl();
@@ -109,7 +109,7 @@ export class Home implements OnInit {
   });
 
   public typeaheadOnSelect(e:any):void {
-
+    // Do nothing
   }
 
   public changeTypeaheadNoResults(e:boolean, id):void {
@@ -223,7 +223,7 @@ export class Home implements OnInit {
           let str = '';
           for (let j=0;j<valid.length;j++) {
             str = str + valid[j];
-            if (j<valid.length-1) {
+            if (j < valid.length -1) {
               str = str + ' | ';
             }
           }
@@ -234,31 +234,31 @@ export class Home implements OnInit {
   }
 
   // INPUT HANDLING METHODS ////////////////////////////////////////////////////
-  selectPlant(e:any, index):void {
+  private selectPlant(e:any, index):void {
     if (index != this.nPlaInputRows) {
       this.selectedPlants.push({ 'index': this.nPlaInputRows, 'value' : e.item.pla_id});
     }
   }
 
-  selectCompound(e:any, index):void {
+  private selectCompound(e:any, index):void {
     if (index != this.nComInputRows) {
       this.selectedCompounds.push({ 'index': this.nComInputRows, 'value' : e.item.com_id});
     }
   }
 
-  selectProtein(e:any, index):void {
+  private selectProtein(e:any, index):void {
     if (index != this.nProInputRows) {
       this.selectedProteins.push({ 'index': this.nProInputRows, 'value' : e.item.pro_id});
     }
   }
 
-  selectDisease(e:any, index):void {
+  private selectDisease(e:any, index):void {
     if (index != this.nDisInputRows) {
       this.selectedDiseases.push({ 'index': this.nDisInputRows, 'value' : e.item.dis_id});
     }
   }
 
-  focusPlant(index: number) {
+  private focusPlant(index: number) {
     let MAX_INPUT_PLANTS = 5;
     this.activeCompound = false;
     if (index == this.nPlaInputRows) {
@@ -269,7 +269,7 @@ export class Home implements OnInit {
     }
   }
 
-  focusCompound(index: number) {
+  private focusCompound(index: number) {
     let MAX_INPUT_COMPOUNDS = 5;
     this.activeTanaman = false;
     if (index == this.nComInputRows) {
@@ -280,7 +280,7 @@ export class Home implements OnInit {
     }
   }
 
-  focusProtein(index: number) {
+  private focusProtein(index: number) {
     let MAX_INPUT_PROTEINS = 5;
     this.activeDisease = false;
     if (index == this.nProInputRows) {
@@ -291,7 +291,7 @@ export class Home implements OnInit {
     }
   }
 
-  focusDisease(index: number) {
+  private focusDisease(index: number) {
     let MAX_INPUT_DISEASES = 5;
     this.activeProtein = false;
     if (index == this.nDisInputRows) {
@@ -303,7 +303,7 @@ export class Home implements OnInit {
   }
 
   // SEARCH+PREDICT METHODS ////////////////////////////////////////////////////
-  searchAndPredictButtonCallback() {
+  private searchAndPredictButtonCallback() {
     if (this.selectedPlants.length==0 && this.selectedCompounds.length==0 &&
         this.selectedProteins.length==0 && this.selectedDiseases.length==0) {
       this.reset();
@@ -358,7 +358,7 @@ export class Home implements OnInit {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    var inter = setInterval(() => {
+    let inter = setInterval(() => {
       if (showPlant && !showProtein && !showDisease) {
         if (this.pTanaman) {
           localStorage.setItem('data', JSON.stringify(this.dataLocal));
@@ -850,7 +850,7 @@ export class Home implements OnInit {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
-  getConnectivityScore(connectivity) {
+  private getConnectivityScore(connectivity) {
     let score = 0.0;
     for (let i=0;i<connectivity.length;i++) {
       score += parseFloat(connectivity[i]['weight'])
@@ -858,7 +858,7 @@ export class Home implements OnInit {
     return score;
   }
 
-  getInputMark(type) {
+  private getInputMark(type) {
     let mark = '';
     if (this.mode.indexOf(type)!==-1) {
       mark = ' (as inputs)';
@@ -866,7 +866,7 @@ export class Home implements OnInit {
     return mark;
   }
 
-  makeJSONFormat(arr,key) {
+  private makeJSONFormat(arr,key) {
     let str = '';
     for (let j=0;j<arr.length;j++){
       str = str+'{'+'"'+key+'"'+':'+'"'+arr[j]+'"'+'}';
@@ -878,7 +878,7 @@ export class Home implements OnInit {
     return str;
   }
 
-  handleIfEmptySet(set,type) {
+  private handleIfEmptySet(set,type) {
     if (set.length>0) {
       return set;
     }
@@ -886,7 +886,7 @@ export class Home implements OnInit {
     return newSet;
   }
 
-  getSet(interaction,id) {
+  private getSet(interaction,id) {
     let set = [];
     for (let i=0;i<interaction.length;i++) {
       let item = interaction[i][id];
@@ -897,7 +897,7 @@ export class Home implements OnInit {
     return set;
   }
 
-  getPropKeys(type) {
+  private getPropKeys(type) {
     let keys: string[] = [];
     if (type==='pla') {
       keys.push('pla_name');
@@ -922,7 +922,7 @@ export class Home implements OnInit {
     return keys;
   }
 
-  getHyperlinkStr(type,seed) {
+  private getHyperlinkStr(type,seed) {
     let baseUrl = '';
     if (type==='pla_name') {
       baseUrl = 'https://en.wikipedia.org/wiki/';
@@ -969,7 +969,7 @@ export class Home implements OnInit {
     return urlStr;
   }
 
-  getProps(id,keys,meta) {
+  private getProps(id,keys,meta) {
     let prefix = id.substr(0,3);
     prefix = prefix.toLowerCase() + '_id';
 
@@ -995,7 +995,7 @@ export class Home implements OnInit {
     return props;
   }
 
-  getHeader(type) {
+  private getHeader(type) {
     let indent = '  ';
     let headerArr = new Array();
     headerArr['pla'] = 'LatinName|IndonesianName';
@@ -1016,7 +1016,7 @@ export class Home implements OnInit {
     return headerArr[type];
   }
 
-  concatProps(props,keys,showNull,hyperlinked) {
+  private concatProps(props,keys,showNull,hyperlinked) {
     let sep = '|';
     let str = '';
 
@@ -1043,7 +1043,7 @@ export class Home implements OnInit {
     return str;
   }
 
-  truncateText(text) {
+  private truncateText(text) {
     let MAX_NODE_LABEL_LEN = 32;
     let suffix = '...';
 
@@ -1055,7 +1055,7 @@ export class Home implements OnInit {
     return trunText;
   }
 
-  downloadTextOutput(type){
+  private downloadTextOutput(type){
     let txt = '';
 
     if (type === 'pla_vs_com') {
@@ -1085,7 +1085,7 @@ export class Home implements OnInit {
     saveAs(blob,this.getFilename(type));
   }
 
-  getFilename(type) {
+  private getFilename(type) {
     let prefix = 'ijah_'
     let suffix = '';
     let ext = '.txt';
@@ -1125,7 +1125,7 @@ export class Home implements OnInit {
     return filename;
   }
 
-  reset() {
+  private reset() {
     this.activeTanaman = true;
     this.activeCompound = true;
     this.activeProtein = true;
@@ -1161,7 +1161,7 @@ export class Home implements OnInit {
   }
 
   // EXAMPLE-BUTTON METHODS ////////////////////////////////////////////////////
-  example1() {
+  private example1() {
   this.reset();
   this.plant = [{ 'index': 1, 'value' : 'Datura stramonium'}, { 'index': 2, 'value' : 'Trifolium pratense'}, { 'index': 3, 'value' : 'Acacia senegal'}, { 'index': 4, 'value' : ''}];
   this.selectedPlants = [{"index":1,"value":"PLA00002565"},{"index":2,"value":"PLA00001090"},{"index":3,"value":"PLA00000325"}];
@@ -1172,7 +1172,7 @@ export class Home implements OnInit {
   this.activeDisease = false;
   }
 
-  example2() {
+  private example2() {
   this.reset();
   this.compound = [{ 'index': 1, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 4, 'value' : ''}];
   this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000058'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000039'}];
@@ -1183,7 +1183,7 @@ export class Home implements OnInit {
   this.activeProtein = false;
   }
 
-  example3() {
+  private example3() {
   this.reset();
   this.protein = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
   this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
@@ -1194,7 +1194,7 @@ export class Home implements OnInit {
   this.activeCompound = false;
   }
 
-  example4() {
+  private example4() {
   this.reset();
   this.disease = [{ 'index': 1, 'value' : '156610 | Skin creases, congenital symmetric circumferential, 1'}, { 'index': 2, 'value' : '614373 | Amyotrophic lateral sclerosis 16, juvenile'}, { 'index': 3, 'value' : '612244 | Inflammatory bowel disease 13'}, { 'index': 4, 'value' : ''}];
   this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00001455'}, { 'index': 2, 'value' : 'DIS00000803'}, { 'index': 3, 'value' : 'DIS00003796'}];
@@ -1205,7 +1205,7 @@ export class Home implements OnInit {
   this.activeCompound = false;
   }
 
-  example5() {
+  private example5() {
   this.reset();
   this.plant = [{ 'index': 1, 'value' : 'Catharanthus roseus'}, { 'index': 2, 'value' : 'Nigella sativa'}, { 'index': 3, 'value' : 'Cocos nucifera'}, { 'index': 4, 'value' : ''}];
   this.selectedPlants = [{"index":1,"value":"PLA00001025"},{"index":2,"value":"PLA00003511"},{"index":3,"value":"PLA00001600"}];
@@ -1220,7 +1220,7 @@ export class Home implements OnInit {
   this.activeCompound = false;
   }
 
-  example6() {
+  private example6() {
   this.reset();
   this.compound = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '51-34-3 | DB00747 | C00002292 | C01851'}, { 'index': 3, 'value' : '53-86-1 | DB00328 | C00030512 | C01926'}, { 'index': 4, 'value' : ''}];
   this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00001628'}, { 'index': 3, 'value' : 'COM00005599'}];
@@ -1236,7 +1236,7 @@ export class Home implements OnInit {
   this.activeProtein = false;
   }
 
-  example7() {
+  private example7() {
   this.reset();
   this.plant = [{ 'index': 1, 'value' : 'Aloe vera'}, { 'index': 2, 'value' : 'Cocos nucifera'}, { 'index': 3, 'value' : 'Panax ginseng'}, { 'index': 4, 'value' : ''}];
   this.selectedPlants = [{"index":1,"value":"PLA00001504"},{"index":2,"value":"PLA00001600"},{"index":3,"value":"PLA00003447"}];
@@ -1251,7 +1251,7 @@ export class Home implements OnInit {
   this.activeProtein = false;
   }
 
-  example8() {
+  private example8() {
   this.reset();
   this.compound = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 4, 'value' : ''}];
   this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000058'}];
