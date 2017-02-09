@@ -4,15 +4,6 @@
   <meta charset="utf-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Bootstrap -->
-  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/fields.css">
-
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script type="text/javascript" src="assets/js/filesaver.js"></script>
-  <script type="text/javascript" src="assets/js/jszip.min.js"></script>
-
 
   <title><%= htmlWebpackPlugin.options.title %></title>
 
@@ -22,6 +13,18 @@
   <!-- Configured Head Tags  -->
   <%= webpackConfig.htmlElements.headTags %>
   <% } %>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/fields.css">
+
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript" src="assets/js/filesaver.js"></script>
+  <script type="text/javascript" src="assets/js/jszip.min.js"></script>
+
+  <!--Font-->
+  <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600" rel="stylesheet" type="text/css">
 
   <!-- base url -->
   <base href="<%= htmlWebpackPlugin.options.metadata.baseUrl %>">
