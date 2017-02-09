@@ -678,6 +678,12 @@ export class Home implements OnInit {
             let proDisConnScore = this.getConnectivityScore(proVSdis);
             let totConnScore = plaComConnScore+comProConnScore+proDisConnScore;
             let unknownComProConn = 0;
+            for (let i=0; i<comVSpro.length; i++) {
+              let src = comVSpro[i]['source']
+              if (src==='null') {
+                unknownComProConn += 1;
+              }
+            }
 
             this.summaryTxtOutput = 'Connectivity Score:\n';
             this.summaryTxtOutput += '   Total: '+totConnScore.toString()+'\n';
