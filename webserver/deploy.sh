@@ -50,6 +50,7 @@ if [ $6 -ne 0 ]; then
   read predictorConfigSet
   if [ "$predictorConfigSet" -ne 0 ]; then
     echo "deploying predictors ..."
+    rm -f ../predictor/*.pyc
     scp -r ../predictor/* $IJAH_SERVER:$PREDICTOR_DIR
   fi
 fi
