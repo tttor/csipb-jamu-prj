@@ -22,7 +22,7 @@ import { ROUTES } from './app.routes';
 import { AppComponent } from './app.component';
 import { APP_RESOLVER_PROVIDERS } from './app.resolver';
 import { AppState, InternalStateType } from './app.service';
-import { HomeComponent } from './home';
+import { Home } from './home';
 import { Manual } from './manual';
 import { Download } from './download';
 import { Help } from './help';
@@ -49,7 +49,7 @@ type StoreType = {
   bootstrap: [ AppComponent ],
   declarations: [
     AppComponent,
-    HomeComponent,
+    Home,
     About,
     Manual,
     Help,

@@ -11,16 +11,15 @@ IJAH_SERVER=ijah@ijahserver
 IJAH_DIR=/home/ijah/ijah/web
 IJAH_DIR_STR='/home/ijah/ijah/web'
 PREDICTOR_DIR=/home/ijah/ijah-predictor/python
-BACKUP_DIR='/home/ijah/ijah-backup/ijah-web-backup_'
+BACKUP_DIR_STR='/home/ijah/ijah-backup/ijah-web-backup_'
 
 if [ $2 -ne 0 ]; then
   echo "#######################################################################"
   echo "backing up ..."
   stamp=`date +%Y-%m-%d-%H-%M-%S`
-  copyCMD='cp -r '
-  space=' '
-  tmp2=$copyCMD$IJAH_DIR_STR$space$BACKUP_DIR$stamp
-  ssh $IJAH_SERVER $tmp2
+  copyCMD='cp -r'
+  cmd=$copyCMD' '$IJAH_DIR_STR' '$BACKUP_DIR_STR$stamp
+  ssh $IJAH_SERVER $cmd
 fi
 
 #build the src in production stage

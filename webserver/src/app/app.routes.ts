@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './home';
+import { Home } from './home';
 import { Manual } from './manual';
 import { Download } from './download';
 import { Help } from './help';
@@ -10,8 +10,8 @@ import { NoContentComponent } from './no-content';
 import { DataResolver } from './app.resolver';
 
 export const ROUTES: Routes = [
-  { path: '',      component: HomeComponent },
-  { path: 'home',  component: HomeComponent },
+  { path: '',      component: Home },
+  { path: 'home',  component: Home },
   { path: 'manual',  component: Manual },
   { path: 'downloads', component: Download },
   { path: 'help-faq', component: Help },

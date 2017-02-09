@@ -2,6 +2,7 @@
   <div class="col-sm-12 col-md-12" id="top">
     <h1>Ijah Webserver</h1>
     <h3>Search for (Plant - Compound) - (Protein - Disease) Connectivity</h3>
+    <h3>(Apologize. Ijah is currently under heavy development. Be aware of unstable operations. Thank you.)</h3>
   </div>
 </div>
 
@@ -39,24 +40,30 @@
       <div class="col-md-6">
         <div *ngIf="activeTanaman">
           <h4>
-            Plants (of {{plant_total}})
+            Plants (of {{nPlantInDB}})
           </h4>
-          <div *ngFor="let t of plant">
-            <template #customTanaman let-model="item" let-index="index">
-              <h5>{{model.pla_name}} <span *ngIf="model.pla_idr_name">|</span> {{model.pla_idr_name}}</h5>
-            </template>
-            <input [(ngModel)]="t.value"
-                   [typeahead]="plantSearch"
-                   [typeaheadItemTemplate]="customTanaman"
-                   [typeaheadOptionField]="'search'"
-                   [typeaheadOptionsLimit]="10"
-                   (typeaheadOnSelect)="selectPlant($event, t.index)"
-                   (typeaheadNoResults)="changeTypeaheadNoResults($event, 1)"
-                   class="form-control verticalLine1"
-                   placeholder="Latin Name | Indonesian Name"
-                   (focus)="focusPlant(t.index)">
-            <div *ngIf="noResultPlant===true" class="" style="">
-              <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
+
+          <div *ngIf=!plantSearch>
+            Preparing plant inputs ...
+          </div>
+          <div *ngIf=plantSearch>
+            <div *ngFor="let t of plant">
+              <template #customTanaman let-model="item" let-index="index">
+                <h5>{{model.pla_name}} <span *ngIf="model.pla_idr_name">|</span> {{model.pla_idr_name}}</h5>
+              </template>
+              <input [(ngModel)]="t.value"
+                     [typeahead]="plantSearch"
+                     [typeaheadItemTemplate]="customTanaman"
+                     [typeaheadOptionField]="'search'"
+                     [typeaheadOptionsLimit]="10"
+                     (typeaheadOnSelect)="selectPlant($event, t.index)"
+                     (typeaheadNoResults)="changeTypeaheadNoResults($event, 1)"
+                     class="form-control verticalLine1"
+                     placeholder="Latin Name | Indonesian Name"
+                     (focus)="focusPlant(t.index)">
+               <div *ngIf="noResultPlant===true" class="" style="">
+                 <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
+               </div>
             </div>
           </div>
         </div>
@@ -65,24 +72,30 @@
       <div class="col-md-6">
         <div *ngIf="activeCompound">
           <h4>
-            Compounds (of {{compound_total}})
+            Compounds (of {{nCompoundInDB}})
           </h4>
-          <div *ngFor="let c of compound">
-            <template #customCompound let-model="item" let-index="index">
-              <h5>{{model.com_cas_id}} <span *ngIf="model.com_knapsack_id">|</span> {{model.com_knapsack_id}} <span *ngIf="model.com_drugbank_id">|</span> {{model.com_drugbank_id}}</h5>
-            </template>
-            <input [(ngModel)]="c.value"
-                   [typeahead]="compoundSearch"
-                   [typeaheadItemTemplate]="customCompound"
-                   [typeaheadOptionField]="'search'"
-                   [typeaheadOptionsLimit]="10"
-                   (typeaheadOnSelect)="selectCompound($event, c.index)"
-                   (typeaheadNoResults)="changeTypeaheadNoResults($event, 2)"
-                   class="form-control verticalLine2"
-                   placeholder="CAS | KnapSack ID | DrugBank ID"
-                   (focus)="focusCompound(c.index)">
-            <div *ngIf="noResultCompound===true" class="" style="">
-              <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
+
+          <div *ngIf=!compoundSearch>
+            Preparing compound inputs ...
+          </div>
+          <div *ngIf=compoundSearch>
+            <div *ngFor="let c of compound">
+              <template #customCompound let-model="item" let-index="index">
+                <h5>{{model.com_cas_id}} <span *ngIf="model.com_knapsack_id">|</span> {{model.com_knapsack_id}} <span *ngIf="model.com_drugbank_id">|</span> {{model.com_drugbank_id}}</h5>
+              </template>
+              <input [(ngModel)]="c.value"
+                     [typeahead]="compoundSearch"
+                     [typeaheadItemTemplate]="customCompound"
+                     [typeaheadOptionField]="'search'"
+                     [typeaheadOptionsLimit]="10"
+                     (typeaheadOnSelect)="selectCompound($event, c.index)"
+                     (typeaheadNoResults)="changeTypeaheadNoResults($event, 2)"
+                     class="form-control verticalLine2"
+                     placeholder="CAS | KnapSack ID | DrugBank ID"
+                     (focus)="focusCompound(c.index)">
+               <div *ngIf="noResultCompound===true" class="" style="">
+                 <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
+               </div>
             </div>
           </div>
         </div>
@@ -99,24 +112,30 @@
       <div class="col-md-6" >
         <div *ngIf="activeProtein">
           <h4>
-            Proteins (of {{protein_total}})
+            Proteins (of {{nProteinInDB}})
           </h4>
-          <div *ngFor="let p of protein">
-            <template #customProtein let-model="item" let-index="index">
-              <h5>{{model.pro_uniprot_id}} | {{model.pro_name}}</h5>
-            </template>
-            <input [(ngModel)]="p.value"
-                   [typeahead]="proteinSearch"
-                   [typeaheadItemTemplate]="customProtein"
-                   [typeaheadOptionField]="'search'"
-                   [typeaheadOptionsLimit]="10"
-                   (typeaheadOnSelect)="selectProtein($event, p.index)"
-                   (typeaheadNoResults)="changeTypeaheadNoResults($event, 3)"
-                   class="form-control verticalLine3"
-                   placeholder="Uniprot ID | Uniprot Name"
-                   (focus)="focusProtein(p.index)">
-            <div *ngIf="noResultProtein===true" class="" style="">
-              <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
+
+          <div *ngIf=!proteinSearch>
+            Preparing protein inputs ...
+          </div>
+          <div *ngIf=proteinSearch>
+            <div *ngFor="let p of protein">
+              <template #customProtein let-model="item" let-index="index">
+                <h5>{{model.pro_uniprot_id}} | {{model.pro_name}}</h5>
+              </template>
+              <input [(ngModel)]="p.value"
+                     [typeahead]="proteinSearch"
+                     [typeaheadItemTemplate]="customProtein"
+                     [typeaheadOptionField]="'search'"
+                     [typeaheadOptionsLimit]="10"
+                     (typeaheadOnSelect)="selectProtein($event, p.index)"
+                     (typeaheadNoResults)="changeTypeaheadNoResults($event, 3)"
+                     class="form-control verticalLine3"
+                     placeholder="Uniprot ID | Uniprot Name"
+                     (focus)="focusProtein(p.index)">
+               <div *ngIf="noResultProtein===true" class="" style="">
+                 <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
+               </div>
             </div>
           </div>
         </div>
@@ -125,28 +144,35 @@
       <div class="col-md-6">
         <div *ngIf="activeDisease">
           <h4>
-            Diseases (of {{disease_total}})
+            Diseases (of {{nDiseaseInDB}})
           </h4>
-          <div *ngFor="let d of disease">
-            <template #customDisease let-model="item" let-index="index" class="right-input">
-              <h5>{{model.dis_omim_id}} | {{model.dis_name}}</h5>
-            </template>
-            <input [(ngModel)]="d.value"
-                   [typeahead]="diseaseSearch"
-                   [typeaheadItemTemplate]="customDisease"
-                   [typeaheadOptionField]="'search'"
-                   [typeaheadOptionsLimit]="10"
-                   (typeaheadOnSelect)="selectDisease($event, d.index)"
-                   (typeaheadNoResults)="changeTypeaheadNoResults($event, 4)"
-                   class="form-control verticalLine4"
-                   placeholder="OMIM ID | OMIM Name"
-                   (focus)="focusDisease(d.index)">
-            <div *ngIf="noResultDisease===true" class="" style="">
-              <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
+
+          <div *ngIf=!diseaseSearch>
+            Preparing disease inputs ...
+          </div>
+          <div *ngIf=diseaseSearch>
+            <div *ngFor="let d of disease">
+              <template #customDisease let-model="item" let-index="index" class="right-input">
+                <h5>{{model.dis_omim_id}} | {{model.dis_name}}</h5>
+              </template>
+              <input [(ngModel)]="d.value"
+                     [typeahead]="diseaseSearch"
+                     [typeaheadItemTemplate]="customDisease"
+                     [typeaheadOptionField]="'search'"
+                     [typeaheadOptionsLimit]="10"
+                     (typeaheadOnSelect)="selectDisease($event, d.index)"
+                     (typeaheadNoResults)="changeTypeaheadNoResults($event, 4)"
+                     class="form-control verticalLine4"
+                     placeholder="OMIM ID | OMIM Name"
+                     (focus)="focusDisease(d.index)">
+               <div *ngIf="noResultDisease===true" class="" style="">
+                 <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
+               </div>
             </div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -166,43 +192,33 @@
     </div>
   </div>
 
-  <!-- The summary output ////////////////////////////////////// -->
   <div class="row" *ngIf="show">
-
+    <!-- The summary output //////////////////////////////////////////////// -->
     <div>
       <div class="row text-center" id="summary">
         <font color="#696969">_____________________________________________________________________________________________________________________________________</font>
       </div>
       <div class="text-center col-md-12"><h2><strong>Summary</strong></h2></div>
       <div class="col-md-4">
-        <pre [innerHTML]="summaryTxtOutput" style="height:150px"></pre>
+        <pre [innerHTML]="summaryTxtOutput" style="height:120px"></pre>
       </div>
       <div class="col-md-4">
-        <pre [innerHTML]="summaryTxtOutput2" style="height:150px"></pre>
+        <pre [innerHTML]="summaryTxtOutput2" style="height:120px"></pre>
       </div>
       <div class="col-md-4">
-        <pre [innerHTML]="summaryTxtOutput3" style="height:150px"></pre>
+        <pre [innerHTML]="summaryTxtOutput3" style="height:120px"></pre>
       </div>
 
       <div class="row col-md-12">
         <br>
       </div>
 
-      <div class="row text-center">
-        <div class="col-md-3"><b>Jump to Connectivity :</b></div>
-        <div class="col-md-2">
-          <a pageScroll href="#graph"> Connectivity Graph
-          </a>
-        </div>
-        <div class="col-md-2">
-          <a pageScroll href="#text"> Connectivity text
-          </a>
-        </div>
-        <div class="col-md-2">
-          <a pageScroll href="#metadata"> Metadata Text
-          </a>
-        </div>
-        <div class="col-md-3"></div>
+      <div>
+        <b>Jump to Outputs:</b>
+        1) <a pageScroll href="#connectivityGraph">Connectivity Graph</a> or
+        2) <a pageScroll href="#connectivityText">Connectivity Text</a> or
+        3) <a pageScroll href="#connectivityTextFlipped">Connectivity Text (Flipped)</a> or
+        4) <a pageScroll href="#metadataText">Metadata Text</a>
       </div>
 
       <div class="col-md-2 col-md-offset-5">
@@ -210,8 +226,9 @@
         <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
       </div>
 
+      <!-- The multi-partite graph output ////////////////////////////////// -->
       <div class="row text-center">
-        <font color="#696969" id="graph">_____________________________________________________________________________________________________________________________________</font>
+        <font color="#696969" id="connectivityGraph">_____________________________________________________________________________________________________________________________________</font>
       </div>
       <div class="text-center col-md-12"><h2><strong>Connectivity Graph</strong></h2></div>
 
@@ -221,8 +238,9 @@
         <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
       </div>
 
+      <!-- Connectivity Text Output ///////////////////////////////////////////////////////// -->
       <div class="row text-center">
-        <font color="#696969"  id="text">_____________________________________________________________________________________________________________________________________</font>
+        <font color="#696969"  id="connectivityText">_____________________________________________________________________________________________________________________________________</font>
       </div>
       <div class="text-center col-md-12">
         <h2><strong>Connectivity Text</strong></h2>
@@ -245,13 +263,13 @@
       <br />
 
       <div class="col-md-4">
-        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('pla_vs_com')">Download Plant-Compound Connectivity</button>
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('plant_vs_compound')">Download Plant-Compound Connectivity</button>
       </div>
       <div class="col-md-4">
-        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('com_vs_pro')">Download Compound-Protein Connectivity</button>
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('compound_vs_protein')">Download Compound-Protein Connectivity</button>
       </div>
       <div class="col-md-4">
-        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('pro_vs_dis')">Download Protein-Disease Connectivity</button>
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('protein_vs_disease')">Download Protein-Disease Connectivity</button>
       </div>
       <br />
 
@@ -260,8 +278,49 @@
         <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
       </div>
 
+      <!-- Connectivity Text Output Flipped //////////////////////////////// -->
       <div class="row text-center">
-        <font color="#696969" id="metadata">_____________________________________________________________________________________________________________________________________</font>
+        <font color="#696969"  id="connectivityTextFlipped">_____________________________________________________________________________________________________________________________________</font>
+      </div>
+      <div class="text-center col-md-12">
+        <h2><strong>Connectivity Text (Flipped)</strong></h2>
+      </div>
+      <div class="col-md-4">
+        Compound - Plant Connectivity
+        <pre [innerHTML]="comVSplaTxtOutput">
+      </pre>
+      </div>
+      <div class="col-md-4">
+        Protein - Compound Connectivity
+        <pre [innerHTML]="proVScomTxtOutput">
+      </pre>
+      </div>
+      <div class="col-md-4">
+        Disease - Protein Connectivity
+        <pre [innerHTML]="disVSproTxtOutput">
+      </pre>
+      </div>
+      <br />
+
+      <div class="col-md-4">
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('compound_vs_plant')">Download Compound-Plant Connectivity</button>
+      </div>
+      <div class="col-md-4">
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('protein_vs_compound')">Download Protein-Compound Connectivity</button>
+      </div>
+      <div class="col-md-4">
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('disease_vs_protein')">Download Disease-Protein Connectivity</button>
+      </div>
+      <br />
+
+      <div class="col-md-2 col-md-offset-5">
+        <br />
+        <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
+      </div>
+
+      <!-- Metadata Text Output /////////////////////////////////////////// -->
+      <div class="row text-center">
+        <font color="#696969" id="metadataText">_____________________________________________________________________________________________________________________________________</font>
       </div>
       <div class="text-center col-md-12">
         <h2><strong>Metadata Text</strong></h2>
@@ -290,16 +349,16 @@
       <br />
 
       <div class="col-md-3">
-        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('pla')">Download Plant Meta</button>
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('plant')">Download Plant Meta</button>
       </div>
       <div class="col-md-3">
-        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('com')">Download Compound Meta</button>
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('compound')">Download Compound Meta</button>
       </div>
       <div class="col-md-3">
-        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('pro')">Download Protein Meta</button>
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('protein')">Download Protein Meta</button>
       </div>
       <div class="col-md-3">
-        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('dis')">Download Disease Meta</button>
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('disease')">Download Disease Meta</button>
       </div>
       <br />
 
@@ -309,7 +368,5 @@
       </div>
 
     </div>
-
   </div>
-
 </div>
