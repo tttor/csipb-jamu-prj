@@ -7,7 +7,6 @@ import sys
 import psycopg2
 
 from config import database as db
-from config import predictor_channel as ch
 from config import MAX_ELAPSED_TIME
 import blmnii
 import util
@@ -15,6 +14,68 @@ import util
 connDB = psycopg2.connect(database=db['name'],user=db['user'],password=db['passwd'],
                       host=db['host'],port=db['port'])
 cur = connDB.cursor()
+
+def main():
+    if len(sys.argv)!=3:
+        print 'USAGE: phyton prediction_server.py [host] [port]'
+        return
+
+    host = sys.argv[1]
+    port = int(sys.argv[2])
+
+    dataTemp= ""
+    message = ""
+
+    global sock
+    server_addr = (host,port)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(server_addr)
+
+    sock.listen(1)
+    while True:
+        print("###############################################################")
+        print("Ijah predictor server!")
+        print("Waiting for connection in "+host+":"+str(port))
+        signal.signal(signal.SIGINT, signal_handler)
+        conn, addr = sock.accept()
+        try:
+            print >>sys.stderr, 'Connection from', addr
+            while True:
+                dataTemp = conn.recv(1024)
+                print >>sys.stderr, 'Received "%s"' % dataTemp
+                message += dataTemp
+
+                if message[-3:]=="end":
+                    # sys.stderr.write ("Fetching Data Finished....\n")
+                    message = message.split("|")[0]
+                    break
+        finally:
+            predictionStr = ""
+            queryPair = message.split(",")
+            nPairs = len(queryPair)
+            startTime = time.time()
+            for i,query in enumerate(queryPair):
+                print '*********************************************************'
+                print 'predicting pair= '+str(i+1)+' of '+str(nPairs)
+                if (i>0):
+                    predictionStr += ","
+
+                elapsedTime = time.time()-startTime
+                print 'elapsedTime= '+str(elapsedTime)
+
+                if  elapsedTime <= MAX_ELAPSED_TIME:
+                    predictionStr += predict(query)
+                else:
+                    predictionStr += predictDummy(query)
+
+            # print 'predictionStr= '+predictionStr
+            conn.sendall(predictionStr)
+            conn.close()
+
+            message = ""
+            dataTemp = ""
+
+    connDB.close()
 
 def signal_handler(signal, frame):
     sys.stderr.write("Closing socket and database ...\n")
@@ -149,7 +210,6 @@ def predict(queryString):
         query3 = "', " + "'blm-nii-svm', "+ str(resPred)+" )"
 
     query = query1 + query2 + query3
-    sys.stderr.write(query+"\n")
     cur.execute(query)
     connDB.commit()
 
@@ -165,56 +225,4 @@ def predictDummy(query):
     return predictionStr
 
 if __name__ == '__main__':
-    dataTemp= ""
-    message = ""
-
-    ##### Socket Part #####
-    server_addr = (ch['host'],ch['port'])
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(server_addr)
-    sys.stderr.write("Starting up server...\n")
-
-    sock.listen(1)
-    while True:
-        sys.stderr.write("##################################################\n")
-        sys.stderr.write("Waiting for connection...\n")
-        signal.signal(signal.SIGINT, signal_handler)
-        conn, addr = sock.accept()
-        try:
-            print >>sys.stderr, 'Connection from', addr
-            while True:
-                dataTemp = conn.recv(1024)
-                print >>sys.stderr, 'Received "%s"' % dataTemp
-                message += dataTemp
-
-                if message[-3:]=="end":
-                    sys.stderr.write ("Fetching Data Finished....\n")
-                    message = message.split("|")[0]
-                    break
-        finally:
-            predictionStr = ""
-            queryPair = message.split(",")
-            nPairs = len(queryPair)
-            startTime = time.time()
-            for i,query in enumerate(queryPair):
-                print '*********************************************************'
-                print 'predicting pair= '+str(i+1)+' of '+str(nPairs)
-                if (i>0):
-                    predictionStr += ","
-
-                elapsedTime = time.time()-startTime
-                print 'elapsedTime= '+str(elapsedTime)
-
-                if  elapsedTime <= MAX_ELAPSED_TIME:
-                    predictionStr += predict(query)
-                else:
-                    predictionStr += predictDummy(query)
-
-            # print 'predictionStr= '+predictionStr
-            conn.sendall(predictionStr)
-            conn.close()
-
-            message = ""
-            dataTemp = ""
-
-    connDB.close()
+    main()
