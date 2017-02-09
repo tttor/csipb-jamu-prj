@@ -1123,6 +1123,10 @@ export class Home implements OnInit {
     this.pProtein = false;
     this.pDisease = false;
 
+    this.nPlaInputRows = 0;
+    this.nComInputRows = 0;
+    this.nProInputRows = 0;
+    this.nDisInputRows = 0;
     this.plant = [{ 'index': this.nPlaInputRows, 'value' : ''}];
     this.compound = [{ 'index': this.nComInputRows, 'value' : ''}];
     this.protein = [{ 'index': this.nProInputRows, 'value' : ''}];
