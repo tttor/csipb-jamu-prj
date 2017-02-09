@@ -155,6 +155,15 @@ def predict(queryString):
 
     return sendRes
 
+def predictDummy(query):
+    comId,proId = query.split(":")
+    weight = 0
+    source = 'null'
+    timestamp = 'null'
+    predictionStrList = [comId,proId,str(weight),source,timestamp]
+    predictionStr = '|'.join(predictionStrList)
+    return predictionStr
+
 if __name__ == '__main__':
     dataTemp= ""
     message = ""
@@ -183,22 +192,29 @@ if __name__ == '__main__':
                     message = message.split("|")[0]
                     break
         finally:
-            predictResult = ""
+            predictionStr = ""
             queryPair = message.split(",")
-            start_time = time.time()
+            nPairs = len(queryPair)
+            startTime = time.time()
             for i,query in enumerate(queryPair):
-                print time.time()-start_time
+                print '*********************************************************'
+                print 'predicting pair= '+str(i+1)+' of '+str(nPairs)
                 if (i>0):
-                    predictResult += ","
-                if time.time()-start_time  <= MAX_ELAPSED_TIME:
-                    predictResult += predict(query)
+                    predictionStr += ","
+
+                elapsedTime = time.time()-startTime
+                print 'elapsedTime= '+str(elapsedTime)
+
+                if  elapsedTime <= MAX_ELAPSED_TIME:
+                    predictionStr += predict(query)
                 else:
-                    predictResult += query.split(":")[0]+"|"+query.split(":")[1]
-                    predictResult += "|Null|Null|Null"
-            conn.sendall(predictResult)
+                    predictionStr += predictDummy(query)
+
+            # print 'predictionStr= '+predictionStr
+            conn.sendall(predictionStr)
             conn.close()
 
             message = ""
-            dataTemp= ""
+            dataTemp = ""
 
     connDB.close()

@@ -4,58 +4,62 @@
   $postdata = file_get_contents("php://input");
   $requestList = json_decode($postdata, true);
 
-  foreach($requestList as $req){
-    //PHP will call python each pair one by one
-    //Python will return string in format=weight|source|time_stamp
+  //Create Socket
+  $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+  if ($socket === false){
+    echo "socket_create() failed: reason:". socket_strerror(socket_last_error())."\n";
+    continue;
+  }
 
-    /*--- Move this to config ---*/
-    $service_port = 5558;
-    $address = '127.0.0.1';
-    /*---------------------------*/
+  //Connect to the predictor server
+  $result = socket_connect($socket, $predictorChannelHost, $predictorChannelPort);
+  if ($result === false){
+    echo "socket_connect() failed.\nReason:($result) ".socket_strerror(socket_last_error($socket))."\n";
+    continue;
+  }
 
-    //---------Socket Part---------//
-    //Create Socket
-    $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-    if ($socket === false){
-      echo "socket_create() failed: reason:". socket_strerror(socket_last_error())."\n";
-      continue;
+  // Send data
+  $msgTo = "";
+  $counter = 0;
+  $reqListLen = count($requestList);
+  foreach ($requestList as $req) {
+    $msgTo .= $req['comId'].":".$req['proId'];
+    if ($counter<$reqListLen-1) {
+      $msgTo .= ",";
     }
-    //Connect to Server
-    $result = socket_connect($socket, $address, $service_port);
-    if ($result === false){
-      echo "socket_connect() failed.\nReason:($result) ".socket_strerror(socket_last_error($socket))."\n";
-      continue;
-    }
-    //Preparing Input and output
-    $in = $req['comId'].":".$req['proId'];
-    $in .= "|end";
+    $counter += 1;
+  }
+  $msgTo .= "|end";
 
-    $sockOut = '';
-    $output = "";
+  socket_write($socket, $msgTo, strlen($msgTo));
 
-    //Sending data
-    socket_write($socket, $in, strlen($in));
+  // Receive Data from the predictor server
+  // The predictor_server in Python will return string in format=weight|source|time_stamp
+  $msgFrom = "";
+  $predictionStr = "";
+  while($msgFrom = socket_read($socket, 2048)){
+    $predictionStr .= $msgFrom;
+  }
+  socket_close($socket);
 
-    //Catch Data
-    while($sockOut = socket_read($socket, 2048)){
-      $output .= $sockOut;
-    }
-    socket_close($socket);
-
-    //--------Preparing Output--------//
-    if ($output!==null) {
-      $output = explode("|",$output);
-      $source = $output[1];
-      $weight = trim($output[0]);
-      $timestamp = $output[2];
-      $row = array('com_id'=>$req['comId'],'pro_id'=>$req['proId'],
+  if ($predictionStr!==null) {
+    $predictionStrPairList = explode(",",$predictionStr);
+    foreach ($predictionStrPairList as $perPairStr) {
+      $words = explode("|",$perPairStr);
+      $comId = $words[0];
+      $proId = $words[1];
+      $weight = trim($words[2]);
+      $source = $words[3];
+      $timestamp = $words[4];
+      $row = array('com_id'=>$comId,'pro_id'=>$proId,
                    'weight'=>$weight,'source'=>$source,'timestamp'=>$timestamp);
       $respArr[] = $row;
     }
-    else {
-      echo '___ERROR: output is empty';
-    }
   }
+  else {
+    echo '_ERROR_: predictionStr is empty';
+  }
+
   header('Content-type: application/json');
   echo json_encode($respArr);
 
