@@ -20,10 +20,14 @@ import { AppState } from '../app.service';
 })
 export class Home implements OnInit {
   // count number of input rows
-  nPlaInputRows = 0;
-  nComInputRows = 0;
-  nProInputRows = 0;
-  nDisInputRows = 0;
+  nPlaInputHolders = 0;
+  nComInputHolders = 0;
+  nProInputHolders = 0;
+  nDisInputHolders = 0;
+  plaInputHolders = [];
+  comInputHolders = [];
+  proInputHolders = [];
+  disInputHolders = [];
 
   // active variable
   activeTanaman = true;
@@ -95,10 +99,6 @@ export class Home implements OnInit {
   pDisease = false;
 
   data: any;
-  plant: any;
-  compound: any;
-  protein: any;
-  disease: any;
 
   //////////////////////////////////////////////////////////////////////////////
   public ngOnInit() {
@@ -143,10 +143,10 @@ export class Home implements OnInit {
     this.metaQueryAPI = this.baseAPI+'metadata.php';
     this.predictAPI = this.baseAPI+'predict.php';
 
-    this.plant = [{ 'index': this.nPlaInputRows, 'value' : ''}];
-    this.compound = [{ 'index': this.nComInputRows, 'value' : ''}];
-    this.protein = [{ 'index': this.nProInputRows, 'value' : ''}];
-    this.disease = [{ 'index': this.nDisInputRows, 'value' : ''}];
+    this.plaInputHolders = [{ 'index': this.nPlaInputHolders, 'value' : ''}];
+    this.comInputHolders = [{ 'index': this.nComInputHolders, 'value' : ''}];
+    this.proInputHolders = [{ 'index': this.nProInputHolders, 'value' : ''}];
+    this.disInputHolders = [{ 'index': this.nDisInputHolders, 'value' : ''}];
 
     this.http.get(this.baseAPI+'total.php').map(res => res.json())
       .subscribe(data => {
@@ -238,36 +238,36 @@ export class Home implements OnInit {
 
   // INPUT HANDLING METHODS ////////////////////////////////////////////////////
   private selectPlant(e:any, index):void {
-    if (index != this.nPlaInputRows) {
-      this.selectedPlants.push({ 'index': this.nPlaInputRows, 'value' : e.item.pla_id});
+    if (index != this.nPlaInputHolders) {
+      this.selectedPlants.push({ 'index': this.nPlaInputHolders, 'value' : e.item.pla_id});
     }
   }
 
   private selectCompound(e:any, index):void {
-    if (index != this.nComInputRows) {
-      this.selectedCompounds.push({ 'index': this.nComInputRows, 'value' : e.item.com_id});
+    if (index != this.nComInputHolders) {
+      this.selectedCompounds.push({ 'index': this.nComInputHolders, 'value' : e.item.com_id});
     }
   }
 
   private selectProtein(e:any, index):void {
-    if (index != this.nProInputRows) {
-      this.selectedProteins.push({ 'index': this.nProInputRows, 'value' : e.item.pro_id});
+    if (index != this.nProInputHolders) {
+      this.selectedProteins.push({ 'index': this.nProInputHolders, 'value' : e.item.pro_id});
     }
   }
 
   private selectDisease(e:any, index):void {
-    if (index != this.nDisInputRows) {
-      this.selectedDiseases.push({ 'index': this.nDisInputRows, 'value' : e.item.dis_id});
+    if (index != this.nDisInputHolders) {
+      this.selectedDiseases.push({ 'index': this.nDisInputHolders, 'value' : e.item.dis_id});
     }
   }
 
   private focusPlant(index: number) {
     let MAX_INPUT_PLANTS = 5;
     this.activeCompound = false;
-    if (index == this.nPlaInputRows) {
-      if (this.nPlaInputRows+1 < MAX_INPUT_PLANTS) {
-        this.nPlaInputRows++;
-        this.plant.push({ 'index': this.nPlaInputRows, 'value' : ''});
+    if (index == this.nPlaInputHolders) {
+      if (this.nPlaInputHolders+1 < MAX_INPUT_PLANTS) {
+        this.nPlaInputHolders++;
+        this.plaInputHolders.push({ 'index': this.nPlaInputHolders, 'value' : ''});
       }
     }
   }
@@ -275,10 +275,10 @@ export class Home implements OnInit {
   private focusCompound(index: number) {
     let MAX_INPUT_COMPOUNDS = 5;
     this.activeTanaman = false;
-    if (index == this.nComInputRows) {
-      if (this.nComInputRows+1 < MAX_INPUT_COMPOUNDS) {
-        this.nComInputRows++;
-        this.compound.push({ 'index': this.nComInputRows, 'value' : ''});
+    if (index == this.nComInputHolders) {
+      if (this.nComInputHolders+1 < MAX_INPUT_COMPOUNDS) {
+        this.nComInputHolders++;
+        this.comInputHolders.push({ 'index': this.nComInputHolders, 'value' : ''});
       }
     }
   }
@@ -286,10 +286,10 @@ export class Home implements OnInit {
   private focusProtein(index: number) {
     let MAX_INPUT_PROTEINS = 5;
     this.activeDisease = false;
-    if (index == this.nProInputRows) {
-      if (this.nProInputRows+1 < MAX_INPUT_PROTEINS) {
-        this.nProInputRows++;
-        this.protein.push({ 'index': this.nProInputRows, 'value' : ''});
+    if (index == this.nProInputHolders) {
+      if (this.nProInputHolders+1 < MAX_INPUT_PROTEINS) {
+        this.nProInputHolders++;
+        this.proInputHolders.push({ 'index': this.nProInputHolders, 'value' : ''});
       }
     }
   }
@@ -297,10 +297,10 @@ export class Home implements OnInit {
   private focusDisease(index: number) {
     let MAX_INPUT_DISEASES = 5;
     this.activeProtein = false;
-    if (index == this.nDisInputRows) {
-      if (this.nDisInputRows+1 < MAX_INPUT_DISEASES) {
-        this.nDisInputRows++;
-        this.disease.push({ 'index': this.nDisInputRows, 'value' : ''});
+    if (index == this.nDisInputHolders) {
+      if (this.nDisInputHolders+1 < MAX_INPUT_DISEASES) {
+        this.nDisInputHolders++;
+        this.disInputHolders.push({ 'index': this.nDisInputHolders, 'value' : ''});
       }
     }
   }
@@ -321,41 +321,41 @@ export class Home implements OnInit {
     let showProtein = false;
     let showDisease = false;
 
-    if (this.plant.length > 1 && this.disease.length <= 1 && this.protein.length <= 1) {
+    if (this.plaInputHolders.length > 1 && this.disInputHolders.length <= 1 && this.proInputHolders.length <= 1) {
       this.searchFromDrugSide(this.selectedPlants);
       this.mode = 'search_with_inputs:_plants';
       showPlant = true;
     }
-    else if (this.compound.length > 1 && this.protein.length <= 1 && this.disease.length <= 1) {
+    else if (this.comInputHolders.length > 1 && this.proInputHolders.length <= 1 && this.disInputHolders.length <= 1) {
       this.searchFromDrugSide(this.selectedCompounds);
       this.mode = 'search_with_inputs:_compounds';
       showCompound = true;
     }
 
-    else if (this.protein.length > 1 && this.plant.length <= 1 && this.compound.length <= 1) {
+    else if (this.proInputHolders.length > 1 && this.plaInputHolders.length <= 1 && this.comInputHolders.length <= 1) {
       this.searchFromTargetSide(this.selectedProteins);
       this.mode = 'search_with_inputs:_proteins';
       showProtein = true;
     }
-    else if (this.disease.length > 1 && this.plant.length <= 1 && this.compound.length <= 1) {
+    else if (this.disInputHolders.length > 1 && this.plaInputHolders.length <= 1 && this.comInputHolders.length <= 1) {
       this.mode = 'search_with_inputs:_diseases';
       this.searchFromTargetSide(this.selectedDiseases);
       showDisease = true;
     }
     // Use case 1: both sides are specified ////////////////////////////////////
-    else if (this.plant.length > 1 && this.protein.length > 1) {
+    else if (this.plaInputHolders.length > 1 && this.proInputHolders.length > 1) {
       this.mode = 'search_and_predict_with_inputs:_plants_and_proteins';
       this.searchAndPredict(this.selectedPlants,this.selectedProteins);
     }
-    else if (this.plant.length > 1 && this.disease.length > 1) {
+    else if (this.plaInputHolders.length > 1 && this.disInputHolders.length > 1) {
       this.mode = 'search_and_predict_with_inputs:_plants_and_diseases';
       this.searchAndPredict(this.selectedPlants,this.selectedDiseases)
     }
-    else if (this.compound.length > 1 && this.protein.length > 1) {
+    else if (this.comInputHolders.length > 1 && this.proInputHolders.length > 1) {
       this.mode = 'search_and_predict_with_inputs:_compounds_and_proteins';
       this.searchAndPredict(this.selectedCompounds,this.selectedProteins);
     }
-    else if (this.compound.length > 1 && this.disease.length > 1) {
+    else if (this.comInputHolders.length > 1 && this.disInputHolders.length > 1) {
       this.mode = 'search_and_predict_with_inputs:_compounds_and_diseases';
       this.searchAndPredict(this.selectedCompounds,this.selectedDiseases);
     }
@@ -481,7 +481,7 @@ export class Home implements OnInit {
     .subscribe(plaVScom => {
       this.http.post(this.interactionQueryAPI,tsi).map(resp2 => resp2.json())
       .subscribe(proVSdis => {
-        // Ijah also accomodates syntetic compoound vs protein.
+        // Ijah also accomodates syntetic compound vs protein.
         // This means that some compounds have no plant, and some some protein have no disease.
         // However, all plants have compounds, and all diseases have proteins
         let comArr = [];
@@ -763,6 +763,7 @@ export class Home implements OnInit {
       text += this.concatProps(destProps,destPropKeys,true,true)
       text += '\n';
     }
+    text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
 
     if (text==='') {
       text = 'No Connectivity';
@@ -1122,10 +1123,14 @@ export class Home implements OnInit {
     this.pProtein = false;
     this.pDisease = false;
 
-    this.plant = [{ 'index': this.nPlaInputRows, 'value' : ''}];
-    this.compound = [{ 'index': this.nComInputRows, 'value' : ''}];
-    this.protein = [{ 'index': this.nProInputRows, 'value' : ''}];
-    this.disease = [{ 'index': this.nDisInputRows, 'value' : ''}];
+    this.nPlaInputHolders = 0;
+    this.nComInputHolders = 0;
+    this.nProInputHolders = 0;
+    this.nDisInputHolders = 0;
+    this.plaInputHolders = [{ 'index': this.nPlaInputHolders, 'value' : ''}];
+    this.comInputHolders = [{ 'index': this.nComInputHolders, 'value' : ''}];
+    this.proInputHolders = [{ 'index': this.nProInputHolders, 'value' : ''}];
+    this.disInputHolders = [{ 'index': this.nDisInputHolders, 'value' : ''}];
 
     this.selectedPlants = [];
     this.selectedCompounds = [];
@@ -1149,10 +1154,10 @@ export class Home implements OnInit {
   // EXAMPLE-BUTTON METHODS ////////////////////////////////////////////////////
   private example1() {
   this.reset();
-  this.plant = [{ 'index': 1, 'value' : 'Datura stramonium'}, { 'index': 2, 'value' : 'Trifolium pratense'}, { 'index': 3, 'value' : 'Acacia senegal'}, { 'index': 4, 'value' : ''}];
+  this.plaInputHolders = [{ 'index': 1, 'value' : 'Datura stramonium'}, { 'index': 2, 'value' : 'Trifolium pratense'}, { 'index': 3, 'value' : 'Acacia senegal'}, { 'index': 4, 'value' : ''}];
   this.selectedPlants = [{"index":1,"value":"PLA00002565"},{"index":2,"value":"PLA00001090"},{"index":3,"value":"PLA00000325"}];
 
-  this.nPlaInputRows = 4;
+  this.nPlaInputHolders = 4;
   this.activeCompound = false;
   this.activeProtein = false;
   this.activeDisease = false;
@@ -1160,10 +1165,10 @@ export class Home implements OnInit {
 
   private example2() {
   this.reset();
-  this.compound = [{ 'index': 1, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 4, 'value' : ''}];
+  this.comInputHolders = [{ 'index': 1, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 4, 'value' : ''}];
   this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000058'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000039'}];
 
-  this.nComInputRows = 2;
+  this.nComInputHolders = 2;
   this.activeDisease = false;
   this.activeTanaman = false;
   this.activeProtein = false;
@@ -1171,10 +1176,10 @@ export class Home implements OnInit {
 
   private example3() {
   this.reset();
-  this.protein = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
+  this.proInputHolders = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
   this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
 
-  this.nProInputRows = 3;
+  this.nProInputHolders = 3;
   this.activeDisease = false;
   this.activeTanaman = false;
   this.activeCompound = false;
@@ -1182,10 +1187,10 @@ export class Home implements OnInit {
 
   private example4() {
   this.reset();
-  this.disease = [{ 'index': 1, 'value' : '156610 | Skin creases, congenital symmetric circumferential, 1'}, { 'index': 2, 'value' : '614373 | Amyotrophic lateral sclerosis 16, juvenile'}, { 'index': 3, 'value' : '612244 | Inflammatory bowel disease 13'}, { 'index': 4, 'value' : ''}];
+  this.disInputHolders = [{ 'index': 1, 'value' : '156610 | Skin creases, congenital symmetric circumferential, 1'}, { 'index': 2, 'value' : '614373 | Amyotrophic lateral sclerosis 16, juvenile'}, { 'index': 3, 'value' : '612244 | Inflammatory bowel disInputHolders 13'}, { 'index': 4, 'value' : ''}];
   this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00001455'}, { 'index': 2, 'value' : 'DIS00000803'}, { 'index': 3, 'value' : 'DIS00003796'}];
 
-  this.nDisInputRows = 4;
+  this.nDisInputHolders = 4;
   this.activeProtein = false;
   this.activeTanaman = false;
   this.activeCompound = false;
@@ -1193,14 +1198,14 @@ export class Home implements OnInit {
 
   private example5() {
   this.reset();
-  this.plant = [{ 'index': 1, 'value' : 'Catharanthus roseus'}, { 'index': 2, 'value' : 'Nigella sativa'}, { 'index': 3, 'value' : 'Cocos nucifera'}, { 'index': 4, 'value' : ''}];
+  this.plaInputHolders = [{ 'index': 1, 'value' : 'Catharanthus roseus'}, { 'index': 2, 'value' : 'Nigella sativa'}, { 'index': 3, 'value' : 'Cocos nucifera'}, { 'index': 4, 'value' : ''}];
   this.selectedPlants = [{"index":1,"value":"PLA00001025"},{"index":2,"value":"PLA00003511"},{"index":3,"value":"PLA00001600"}];
-  this.nPlaInputRows = 4;
+  this.nPlaInputHolders = 4;
 
-  this.protein = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
+  this.proInputHolders = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
   this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
 
-  this.nProInputRows = 3;
+  this.nProInputHolders = 3;
 
   this.activeDisease = false;
   this.activeCompound = false;
@@ -1208,15 +1213,15 @@ export class Home implements OnInit {
 
   private example6() {
   this.reset();
-  this.compound = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '51-34-3 | DB00747 | C00002292 | C01851'}, { 'index': 3, 'value' : '53-86-1 | DB00328 | C00030512 | C01926'}, { 'index': 4, 'value' : ''}];
+  this.comInputHolders = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '51-34-3 | DB00747 | C00002292 | C01851'}, { 'index': 3, 'value' : '53-86-1 | DB00328 | C00030512 | C01926'}, { 'index': 4, 'value' : ''}];
   this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00001628'}, { 'index': 3, 'value' : 'COM00005599'}];
 
-  this.nComInputRows = 2;
+  this.nComInputHolders = 2;
 
-  this.disease = [{ 'index': 1, 'value' : '608516 | Major depressive disorder'}, { 'index': 2, 'value' : '100100 | Prune belly syndrome'}, { 'index': 3, 'value' : '614473 | Arterial calcification of infancy, generalized, 2'}, { 'index': 4, 'value' : ''}];
+  this.disInputHolders = [{ 'index': 1, 'value' : '608516 | Major depressive disorder'}, { 'index': 2, 'value' : '100100 | Prune belly syndrome'}, { 'index': 3, 'value' : '614473 | Arterial calcification of infancy, generalized, 2'}, { 'index': 4, 'value' : ''}];
   this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000849'}, { 'index': 2, 'value' : 'DIS00003796'}, { 'index': 3, 'value' : 'DIS00000853'}];
 
-  this.nDisInputRows = 4;
+  this.nDisInputHolders = 4;
 
   this.activeTanaman = false;
   this.activeProtein = false;
@@ -1224,14 +1229,14 @@ export class Home implements OnInit {
 
   private example7() {
   this.reset();
-  this.plant = [{ 'index': 1, 'value' : 'Aloe vera'}, { 'index': 2, 'value' : 'Cocos nucifera'}, { 'index': 3, 'value' : 'Panax ginseng'}, { 'index': 4, 'value' : ''}];
+  this.plaInputHolders = [{ 'index': 1, 'value' : 'Aloe vera'}, { 'index': 2, 'value' : 'Cocos nucifera'}, { 'index': 3, 'value' : 'Panax ginseng'}, { 'index': 4, 'value' : ''}];
   this.selectedPlants = [{"index":1,"value":"PLA00001504"},{"index":2,"value":"PLA00001600"},{"index":3,"value":"PLA00003447"}];
-  this.nDisInputRows = 4;
+  this.nDisInputHolders = 4;
 
-  this.disease = [{ 'index': 1, 'value' : '61600 | Analbuminemia'}, { 'index': 2, 'value' : '615999 | Hyperthyroxinemia, familial dysalbuminemic'}, { 'index': 3, 'value' : ''}];
+  this.disInputHolders = [{ 'index': 1, 'value' : '61600 | Analbuminemia'}, { 'index': 2, 'value' : '615999 | Hyperthyroxinemia, familial dysalbuminemic'}, { 'index': 3, 'value' : ''}];
   this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00003787'}, { 'index': 2, 'value' : 'DIS00003675'}];
 
-  this.nDisInputRows = 3;
+  this.nDisInputHolders = 3;
 
   this.activeCompound = false;
   this.activeProtein = false;
@@ -1239,15 +1244,15 @@ export class Home implements OnInit {
 
   private example8() {
   this.reset();
-  this.compound = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 4, 'value' : ''}];
+  this.comInputHolders = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 4, 'value' : ''}];
   this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000058'}];
 
-  this.nComInputRows = 2;
+  this.nComInputHolders = 2;
 
-  this.protein = [{ 'index': 1, 'value' : 'P53985 | Monocarboxylate transporter 1'}, { 'index': 2, 'value' : 'P20309 | Muscarinic acetylcholine receptor M3'}, { 'index': 3, 'value' : 'Q99720 | Sigma non-opioid intracellular receptor 1'}, { 'index': 4, 'value' : ''}];
+  this.proInputHolders = [{ 'index': 1, 'value' : 'P53985 | Monocarboxylate transporter 1'}, { 'index': 2, 'value' : 'P20309 | Muscarinic acetylcholine receptor M3'}, { 'index': 3, 'value' : 'Q99720 | Sigma non-opioid intracellular receptor 1'}, { 'index': 4, 'value' : ''}];
   this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00000040'}, { 'index': 2, 'value' : 'PRO00000452'}, { 'index': 3, 'value' : 'PRO00000377'}];
 
-  this.nProInputRows = 4;
+  this.nProInputHolders = 4;
 
   this.activeTanaman = false;
   this.activeDisease = false;

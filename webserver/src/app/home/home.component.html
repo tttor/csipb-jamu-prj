@@ -7,8 +7,11 @@
 </div>
 
 <div *ngIf="show">
-  <a style="color:white" pageScroll href="#top" class="btn fab text-center" id="masterfab"><span class="text-center" style="padding-top:3px">Back to Top</span>
-  </a>
+  <a style="color:white" pageScroll href="#top" class="btn fab text-center"><span class="text-center" style="padding-top:3px">Back to Top (Summary)</span></a>
+  <a style="color:white" pageScroll href="#connectivityGraph" class="btn fab2 text-center"><span class="text-center" style="padding-top:3px">Connectivity Graph</span></a>
+  <a style="color:white" pageScroll href="#connectivityText" class="btn fab3 text-center"><span class="text-center" style="padding-top:3px">Connectivity Text</span></a>
+  <a style="color:white" pageScroll href="#connectivityTextSwapped" class="btn fab4 text-center"><span class="text-center" style="padding-top:3px">Connectivity Text 2</span></a>
+  <a style="color:white" pageScroll href="#metadataText" class="btn fab5 text-center"><span class="text-center" style="padding-top:3px">Metadata Text</span></a>
 </div>
 
 <div>
@@ -47,20 +50,20 @@
             Preparing plant inputs ...
           </div>
           <div *ngIf=plantSearch>
-            <div *ngFor="let t of plant">
+            <div *ngFor="let p of plaInputHolders">
               <template #customTanaman let-model="item" let-index="index">
                 <h5>{{model.pla_name}} <span *ngIf="model.pla_idr_name">|</span> {{model.pla_idr_name}}</h5>
               </template>
-              <input [(ngModel)]="t.value"
+              <input [(ngModel)]="p.value"
                      [typeahead]="plantSearch"
                      [typeaheadItemTemplate]="customTanaman"
                      [typeaheadOptionField]="'search'"
                      [typeaheadOptionsLimit]="10"
-                     (typeaheadOnSelect)="selectPlant($event, t.index)"
+                     (typeaheadOnSelect)="selectPlant($event, p.index)"
                      (typeaheadNoResults)="changeTypeaheadNoResults($event, 1)"
                      class="form-control verticalLine1"
                      placeholder="Latin Name | Indonesian Name"
-                     (focus)="focusPlant(t.index)">
+                     (focus)="focusPlant(p.index)">
                <div *ngIf="noResultPlant===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
                </div>
@@ -79,7 +82,7 @@
             Preparing compound inputs ...
           </div>
           <div *ngIf=compoundSearch>
-            <div *ngFor="let c of compound">
+            <div *ngFor="let c of comInputHolders">
               <template #customCompound let-model="item" let-index="index">
                 <h5>{{model.com_cas_id}} <span *ngIf="model.com_knapsack_id">|</span> {{model.com_knapsack_id}} <span *ngIf="model.com_drugbank_id">|</span> {{model.com_drugbank_id}}</h5>
               </template>
@@ -119,7 +122,7 @@
             Preparing protein inputs ...
           </div>
           <div *ngIf=proteinSearch>
-            <div *ngFor="let p of protein">
+            <div *ngFor="let p of proInputHolders">
               <template #customProtein let-model="item" let-index="index">
                 <h5>{{model.pro_uniprot_id}} | {{model.pro_name}}</h5>
               </template>
@@ -151,7 +154,7 @@
             Preparing disease inputs ...
           </div>
           <div *ngIf=diseaseSearch>
-            <div *ngFor="let d of disease">
+            <div *ngFor="let d of disInputHolders">
               <template #customDisease let-model="item" let-index="index" class="right-input">
                 <h5>{{model.dis_omim_id}} | {{model.dis_name}}</h5>
               </template>
@@ -217,7 +220,7 @@
         <b>Jump to Outputs:</b>
         1) <a pageScroll href="#connectivityGraph">Connectivity Graph</a> or
         2) <a pageScroll href="#connectivityText">Connectivity Text</a> or
-        3) <a pageScroll href="#connectivityTextFlipped">Connectivity Text (Swapped)</a> or
+        3) <a pageScroll href="#connectivityTextSwapped">Connectivity Text 2 (Swapped)</a> or
         4) <a pageScroll href="#metadataText">Metadata Text</a>
       </div>
 
@@ -277,10 +280,10 @@
 
       <!-- Connectivity Text Output Swapped //////////////////////////////// -->
       <div class="row text-center">
-        <font color="#696969"  id="connectivityTextFlipped">_____________________________________________________________________________________________________________________________________</font>
+        <font color="#696969"  id="connectivityTextSwapped">_____________________________________________________________________________________________________________________________________</font>
       </div>
       <div class="text-center col-md-12">
-        <h2><strong>Connectivity Text (Swapped)</strong></h2>
+        <h2><strong>Connectivity Text 2 (Swapped)</strong></h2>
       </div>
       <div class="col-md-4">
         Compound - Plant Connectivity
