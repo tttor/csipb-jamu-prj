@@ -400,6 +400,10 @@ export class Home implements OnInit {
     }, 100);
   }
 
+  predictMore() {
+    this.searchAndPredictButtonCallback();
+  }
+
   searchFromDrugSide(drugSideInput) {
     console.log('searchOnly: drugSideInput');
     let t0 = performance.now();
