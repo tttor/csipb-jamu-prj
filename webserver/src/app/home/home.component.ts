@@ -763,6 +763,7 @@ export class Home implements OnInit {
       text += this.concatProps(destProps,destPropKeys,true,true)
       text += '\n';
     }
+    text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
 
     if (text==='') {
       text = 'No Connectivity';
