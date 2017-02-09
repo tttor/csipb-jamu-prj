@@ -323,40 +323,40 @@ export class Home implements OnInit {
 
     if (this.plaInputHolders.length > 1 && this.disInputHolders.length <= 1 && this.proInputHolders.length <= 1) {
       this.searchFromDrugSide(this.selectedPlants);
-      this.mode = 'search_with_inputs:_plants';
+      this.mode = 'search_only';
       showPlant = true;
     }
     else if (this.comInputHolders.length > 1 && this.proInputHolders.length <= 1 && this.disInputHolders.length <= 1) {
       this.searchFromDrugSide(this.selectedCompounds);
-      this.mode = 'search_with_inputs:_compounds';
+      this.mode = 'search_only';
       showCompound = true;
     }
 
     else if (this.proInputHolders.length > 1 && this.plaInputHolders.length <= 1 && this.comInputHolders.length <= 1) {
       this.searchFromTargetSide(this.selectedProteins);
-      this.mode = 'search_with_inputs:_proteins';
+      this.mode = 'search_only';
       showProtein = true;
     }
     else if (this.disInputHolders.length > 1 && this.plaInputHolders.length <= 1 && this.comInputHolders.length <= 1) {
-      this.mode = 'search_with_inputs:_diseases';
+      this.mode = 'search_only';
       this.searchFromTargetSide(this.selectedDiseases);
       showDisease = true;
     }
     // Use case 1: both sides are specified ////////////////////////////////////
     else if (this.plaInputHolders.length > 1 && this.proInputHolders.length > 1) {
-      this.mode = 'search_and_predict_with_inputs:_plants_and_proteins';
+      this.mode = 'search_and_predict';
       this.searchAndPredict(this.selectedPlants,this.selectedProteins);
     }
     else if (this.plaInputHolders.length > 1 && this.disInputHolders.length > 1) {
-      this.mode = 'search_and_predict_with_inputs:_plants_and_diseases';
+      this.mode = 'search_and_predict';
       this.searchAndPredict(this.selectedPlants,this.selectedDiseases)
     }
     else if (this.comInputHolders.length > 1 && this.proInputHolders.length > 1) {
-      this.mode = 'search_and_predict_with_inputs:_compounds_and_proteins';
+      this.mode = 'search_and_predict';
       this.searchAndPredict(this.selectedCompounds,this.selectedProteins);
     }
     else if (this.comInputHolders.length > 1 && this.disInputHolders.length > 1) {
-      this.mode = 'search_and_predict_with_inputs:_compounds_and_diseases';
+      this.mode = 'search_and_predict';
       this.searchAndPredict(this.selectedCompounds,this.selectedDiseases);
     }
 
