@@ -141,17 +141,26 @@ export class Download {
     const dateTime = +new Date();
     const unixTS = Math.floor(dateTime/1000);
     let date = new Date(unixTS*1000);
-    let d = date.getDate();
     let y = date.getFullYear();
-    let m = date.getMonth()+1;
-    let hh = date.getHours();
-    let mm = date.getMinutes();
-    let ss = date.getSeconds();
-    let timestamp = '_'+y+'-'+m+'-'+d+'_'+hh+'-'+mm+'-'+ss;
+    let m = this.makeTwoDigitStr(date.getMonth()+1);
+    let d = this.makeTwoDigitStr(date.getDate());
+    let hh = this.makeTwoDigitStr(date.getHours());
+    let mm = this.makeTwoDigitStr(date.getMinutes());
+    let ss = this.makeTwoDigitStr(date.getSeconds());
+    let timestamp = '_'+y+m+d+'-'+hh+mm+ss;
 
     let filename = prefix+body+suffix+timestamp+ext;
-    console.log(filename);
     return filename;
+  }
+
+  makeTwoDigitStr(str) {
+    str = str.toString();
+    if (str.length===2) {
+      return str;
+    }
+    else {
+      return '0'+str;
+    }
   }
 
   download(type) {
