@@ -923,9 +923,14 @@ export class Home implements OnInit {
   floatToStrTruncated(f,nDecimalDigits) {
     let raw = f.toString();
     let radixPos = raw.indexOf('.');
-    let intStr = raw.slice(0,radixPos);
-    let decStr = raw.slice(radixPos+1,radixPos+nDecimalDigits+1);
-    return intStr+'.'+decStr;
+    if (radixPos===-1) {
+      return raw;
+    }
+    else {
+      let intStr = raw.slice(0,radixPos);
+      let decStr = raw.slice(radixPos+1,radixPos+nDecimalDigits+1);
+      return intStr+'.'+decStr;
+    }
   }
 
   private getConnectivityScore(connectivity) {
