@@ -41,11 +41,10 @@
       </div>
 
       <div class="col-md-6">
+        <h4>
+          Plants (of {{nPlantInDB}})
+        </h4>
         <div *ngIf="activeTanaman">
-          <h4>
-            Plants (of {{nPlantInDB}})
-          </h4>
-
           <div *ngIf="plantSearch.length===0">
             Preparing plant inputs ...
           </div>
@@ -73,11 +72,10 @@
       </div>
 
       <div class="col-md-6">
-        <div *ngIf="activeCompound">
-          <h4>
+        <h4>
             Compounds (of {{nCompoundInDB}})
-          </h4>
-
+        </h4>
+        <div *ngIf="activeCompound">
           <div *ngIf="compoundSearch.length===0">
             Preparing compound inputs ...
           </div>
@@ -113,11 +111,10 @@
       </div>
 
       <div class="col-md-6" >
+        <h4>
+          Proteins (of {{nProteinInDB}})
+        </h4>
         <div *ngIf="activeProtein">
-          <h4>
-            Proteins (of {{nProteinInDB}})
-          </h4>
-
           <div *ngIf="proteinSearch.length===0">
             Preparing protein inputs ...
           </div>
@@ -145,11 +142,10 @@
       </div>
 
       <div class="col-md-6">
-        <div *ngIf="activeDisease">
-          <h4>
+        <h4>
             Diseases (of {{nDiseaseInDB}})
           </h4>
-
+        <div *ngIf="activeDisease">
           <div *ngIf="diseaseSearch.length===0">
             Preparing disease inputs ...
           </div>
