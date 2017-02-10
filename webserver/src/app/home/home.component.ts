@@ -82,6 +82,9 @@ export class Home implements OnInit {
   click = false;// whether searchAndPredictButton was clicked
   elapsedTime = 0;
   mode = 'unknown';
+  inputType = 'unknown';
+  unknownComProConn = 0;
+  newPredictedComProConn = 0;
 
   // Misc.
   // TODO explain the usage
@@ -323,40 +326,48 @@ export class Home implements OnInit {
 
     if (this.plaInputHolders.length > 1 && this.disInputHolders.length <= 1 && this.proInputHolders.length <= 1) {
       this.searchFromDrugSide(this.selectedPlants);
-      this.mode = 'search_with_inputs:_plants';
+      this.mode = 'search_only';
+      this.inputType = 'plant';
       showPlant = true;
     }
     else if (this.comInputHolders.length > 1 && this.proInputHolders.length <= 1 && this.disInputHolders.length <= 1) {
       this.searchFromDrugSide(this.selectedCompounds);
-      this.mode = 'search_with_inputs:_compounds';
+      this.mode = 'search_only';
+      this.inputType = 'compound';
       showCompound = true;
     }
 
     else if (this.proInputHolders.length > 1 && this.plaInputHolders.length <= 1 && this.comInputHolders.length <= 1) {
       this.searchFromTargetSide(this.selectedProteins);
-      this.mode = 'search_with_inputs:_proteins';
+      this.mode = 'search_only';
+      this.inputType = 'protein';
       showProtein = true;
     }
     else if (this.disInputHolders.length > 1 && this.plaInputHolders.length <= 1 && this.comInputHolders.length <= 1) {
-      this.mode = 'search_with_inputs:_diseases';
+      this.mode = 'search_only';
+      this.inputType = 'disease';
       this.searchFromTargetSide(this.selectedDiseases);
       showDisease = true;
     }
     // Use case 1: both sides are specified ////////////////////////////////////
     else if (this.plaInputHolders.length > 1 && this.proInputHolders.length > 1) {
-      this.mode = 'search_and_predict_with_inputs:_plants_and_proteins';
+      this.mode = 'search_and_predict';
+      this.inputType = 'plant+protein';
       this.searchAndPredict(this.selectedPlants,this.selectedProteins);
     }
     else if (this.plaInputHolders.length > 1 && this.disInputHolders.length > 1) {
-      this.mode = 'search_and_predict_with_inputs:_plants_and_diseases';
+      this.mode = 'search_and_predict';
+      this.inputType = 'plant+disease';
       this.searchAndPredict(this.selectedPlants,this.selectedDiseases)
     }
     else if (this.comInputHolders.length > 1 && this.proInputHolders.length > 1) {
-      this.mode = 'search_and_predict_with_inputs:_compounds_and_proteins';
+      this.mode = 'search_and_predict';
+      this.inputType = 'compound+protein';
       this.searchAndPredict(this.selectedCompounds,this.selectedProteins);
     }
     else if (this.comInputHolders.length > 1 && this.disInputHolders.length > 1) {
-      this.mode = 'search_and_predict_with_inputs:_compounds_and_diseases';
+      this.mode = 'search_and_predict';
+      this.inputType = 'compound+disease';
       this.searchAndPredict(this.selectedCompounds,this.selectedDiseases);
     }
 
@@ -398,6 +409,11 @@ export class Home implements OnInit {
         this.click = false;
       }
     }, 100);
+  }
+
+  predictMore() {
+    this.show = false;
+    this.searchAndPredictButtonCallback();
   }
 
   searchFromDrugSide(drugSideInput) {
@@ -579,7 +595,14 @@ export class Home implements OnInit {
 
             let t1 = performance.now();
             this.elapsedTime += (t1-t0);
-
+            this.unknownComProConn = 0;
+            for (let i=0; i<comVSpro.length; i++) {
+              let src = comVSpro[i]['source']
+              if (src==='null') {
+                this.unknownComProConn += 1;
+              }
+            }
+            this.newPredictedComProConn = comVSproPred.length - this.unknownComProConn;
             this.makeOutput(plaSet,comSet,proSet,disSet,
                             plaVScom,comVSpro,proVSdis);
           })
@@ -677,19 +700,19 @@ export class Home implements OnInit {
             let comProConnScore = this.getConnectivityScore(comVSpro);
             let proDisConnScore = this.getConnectivityScore(proVSdis);
             let totConnScore = plaComConnScore+comProConnScore+proDisConnScore;
-            let unknownComProConn = 0;
+            let nDecimalDigits = 3;
 
             this.summaryTxtOutput = 'Connectivity Score:\n';
-            this.summaryTxtOutput += '   Total: '+totConnScore.toString()+'\n';
+            this.summaryTxtOutput += '   Total: '+this.floatToStrTruncated(totConnScore,nDecimalDigits)+'\n';
             this.summaryTxtOutput += '   Plant-Compound  : '+plaComConnScore.toString()+'\n';
-            this.summaryTxtOutput += '   Compound-Protein: '+comProConnScore.toString()+' (#unknown: '+unknownComProConn.toString()+')\n';
+            this.summaryTxtOutput += '   Compound-Protein: '+this.floatToStrTruncated(comProConnScore,nDecimalDigits)+' (#unknown: '+this.unknownComProConn.toString()+')\n';
             this.summaryTxtOutput += '   Protein-Disease : '+proDisConnScore.toString()+'\n';
 
             this.summaryTxtOutput2 = 'Number of unique items:\n';
-            this.summaryTxtOutput2 += '   #Plants   : '+iplaSet.length.toString()+this.getInputMark('plants')+'\n';
-            this.summaryTxtOutput2 += '   #Compounds: '+icomSet.length.toString()+this.getInputMark('compounds')+'\n';
-            this.summaryTxtOutput2 += '   #Proteins : '+iproSet.length.toString()+this.getInputMark('proteins')+'\n';
-            this.summaryTxtOutput2 += '   #Diseases : '+idisSet.length.toString()+this.getInputMark('diseases')+'\n';
+            this.summaryTxtOutput2 += '   #Plants   : '+iplaSet.length.toString()+this.getInputMark('plant')+'\n';
+            this.summaryTxtOutput2 += '   #Compounds: '+icomSet.length.toString()+this.getInputMark('compound')+'\n';
+            this.summaryTxtOutput2 += '   #Proteins : '+iproSet.length.toString()+this.getInputMark('protein')+'\n';
+            this.summaryTxtOutput2 += '   #Diseases : '+idisSet.length.toString()+this.getInputMark('disease')+'\n';
 
             let t1 = performance.now();
             this.elapsedTime += (t1-t0);
@@ -698,7 +721,9 @@ export class Home implements OnInit {
             this.summaryTxtOutput3 = 'Mode: \n';
             this.summaryTxtOutput3 += '   '+this.mode+'\n';
             this.summaryTxtOutput3 += 'Elapsed Time: \n';
-            this.summaryTxtOutput3 += '   '+this.elapsedTime.toString()+' seconds\n';
+            this.summaryTxtOutput3 += '   '+this.floatToStrTruncated(this.elapsedTime,nDecimalDigits)+' seconds\n';
+            this.summaryTxtOutput3 += 'New Compound-Protein Predictions: \n';
+            this.summaryTxtOutput3 += '   '+this.newPredictedComProConn.toString()+' connectivities\n';
           }) // disMeta
         }) // proMeta
       }) // comMeta
@@ -874,6 +899,14 @@ export class Home implements OnInit {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
+  floatToStrTruncated(f,nDecimalDigits) {
+    let raw = f.toString();
+    let radixPos = raw.indexOf('.');
+    let intStr = raw.slice(0,radixPos);
+    let decStr = raw.slice(radixPos+1,radixPos+nDecimalDigits+1);
+    return intStr+'.'+decStr;
+  }
+
   private getConnectivityScore(connectivity) {
     let score = 0.0;
     for (let i=0;i<connectivity.length;i++) {
@@ -884,7 +917,7 @@ export class Home implements OnInit {
 
   private getInputMark(type) {
     let mark = '';
-    if (this.mode.indexOf(type)!==-1) {
+    if (this.inputType.indexOf(type)!==-1) {
       mark = ' (as inputs)';
     }
     return mark;
@@ -1138,7 +1171,10 @@ export class Home implements OnInit {
     this.selectedDiseases = [];
 
     this.mode = 'unknown';
+    this.inputType = 'unknown';
     this.elapsedTime = 0;
+    this.unknownComProConn = 0;
+    this.newPredictedComProConn = 0;
     this.show = false;
     localStorage.clear();
     this.dataLocal = [];

@@ -41,15 +41,14 @@
       </div>
 
       <div class="col-md-6">
+        <h4>
+          Plants (of {{nPlantInDB}})
+        </h4>
         <div *ngIf="activeTanaman">
-          <h4>
-            Plants (of {{nPlantInDB}})
-          </h4>
-
-          <div *ngIf=!plantSearch>
+          <div *ngIf="plantSearch.length===0">
             Preparing plant inputs ...
           </div>
-          <div *ngIf=plantSearch>
+          <div *ngIf="plantSearch.length>0">
             <div *ngFor="let p of plaInputHolders">
               <template #customTanaman let-model="item" let-index="index">
                 <h5>{{model.pla_name}} <span *ngIf="model.pla_idr_name">|</span> {{model.pla_idr_name}}</h5>
@@ -73,15 +72,14 @@
       </div>
 
       <div class="col-md-6">
-        <div *ngIf="activeCompound">
-          <h4>
+        <h4>
             Compounds (of {{nCompoundInDB}})
-          </h4>
-
-          <div *ngIf=!compoundSearch>
+        </h4>
+        <div *ngIf="activeCompound">
+          <div *ngIf="compoundSearch.length===0">
             Preparing compound inputs ...
           </div>
-          <div *ngIf=compoundSearch>
+          <div *ngIf="compoundSearch.length>0">
             <div *ngFor="let c of comInputHolders">
               <template #customCompound let-model="item" let-index="index">
                 <h5>{{model.com_cas_id}} <span *ngIf="model.com_knapsack_id">|</span> {{model.com_knapsack_id}} <span *ngIf="model.com_drugbank_id">|</span> {{model.com_drugbank_id}}</h5>
@@ -113,15 +111,14 @@
       </div>
 
       <div class="col-md-6" >
+        <h4>
+          Proteins (of {{nProteinInDB}})
+        </h4>
         <div *ngIf="activeProtein">
-          <h4>
-            Proteins (of {{nProteinInDB}})
-          </h4>
-
-          <div *ngIf=!proteinSearch>
+          <div *ngIf="proteinSearch.length===0">
             Preparing protein inputs ...
           </div>
-          <div *ngIf=proteinSearch>
+          <div *ngIf="proteinSearch.length>0">
             <div *ngFor="let p of proInputHolders">
               <template #customProtein let-model="item" let-index="index">
                 <h5>{{model.pro_uniprot_id}} | {{model.pro_name}}</h5>
@@ -145,15 +142,14 @@
       </div>
 
       <div class="col-md-6">
-        <div *ngIf="activeDisease">
-          <h4>
+        <h4>
             Diseases (of {{nDiseaseInDB}})
           </h4>
-
-          <div *ngIf=!diseaseSearch>
+        <div *ngIf="activeDisease">
+          <div *ngIf="diseaseSearch.length===0">
             Preparing disease inputs ...
           </div>
-          <div *ngIf=diseaseSearch>
+          <div *ngIf="diseaseSearch.length>0">
             <div *ngFor="let d of disInputHolders">
               <template #customDisease let-model="item" let-index="index" class="right-input">
                 <h5>{{model.dis_omim_id}} | {{model.dis_name}}</h5>
@@ -203,13 +199,13 @@
       </div>
       <div class="text-center col-md-12"><h2><strong>Summary</strong></h2></div>
       <div class="col-md-4">
-        <pre [innerHTML]="summaryTxtOutput" style="height:120px"></pre>
+        <pre [innerHTML]="summaryTxtOutput" style="height:130px"></pre>
       </div>
       <div class="col-md-4">
-        <pre [innerHTML]="summaryTxtOutput2" style="height:120px"></pre>
+        <pre [innerHTML]="summaryTxtOutput2" style="height:130px"></pre>
       </div>
       <div class="col-md-4">
-        <pre [innerHTML]="summaryTxtOutput3" style="height:120px"></pre>
+        <pre [innerHTML]="summaryTxtOutput3" style="height:130px"></pre>
       </div>
 
       <div class="row col-md-12">
@@ -223,10 +219,22 @@
         3) <a pageScroll href="#connectivityTextSwapped">Connectivity Text 2 (Swapped)</a> or
         4) <a pageScroll href="#metadataText">Metadata Text</a>
       </div>
+      <br />
 
-      <div class="col-md-2 col-md-offset-5">
-        <br />
-        <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
+      <div *ngIf="(this.mode.indexOf('predict')===-1)||((this.mode.indexOf('predict')!==-1)&&(this.unknownComProConn===0))">
+        <div class="col-md-2 col-md-offset-5">
+          <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
+        </div>
+      </div>
+
+      <div *ngIf="(this.mode.indexOf('predict')!==-1)&&(this.unknownComProConn>0)">
+        <div class="col-md-2 col-md-offset-4">
+          <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
+        </div>
+
+        <div class="col-md-2">
+          <button class="form-control btn btn-danger" (click)="predictMore()">Predict more</button>
+        </div>
       </div>
 
       <!-- The multi-partite graph output ////////////////////////////////// -->
