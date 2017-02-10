@@ -412,6 +412,7 @@ export class Home implements OnInit {
   }
 
   predictMore() {
+    this.show = false;
     this.searchAndPredictButtonCallback();
   }
 
