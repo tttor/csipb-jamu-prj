@@ -5,6 +5,7 @@ import socket
 import time
 import sys
 import psycopg2
+from datetime import datetime
 
 from config import database as db
 import blmnii
@@ -13,6 +14,7 @@ import util
 connDB = psycopg2.connect(database=db['name'],user=db['user'],password=db['passwd'],
                       host=db['host'],port=db['port'])
 cur = connDB.cursor()
+socketConn = None
 
 def main():
     if len(sys.argv)!=4:
@@ -22,22 +24,30 @@ def main():
     host = sys.argv[1]
     port = int(sys.argv[2])
     maxElapsedTime = float(sys.argv[3])
+    upAt = datetime.now().strftime("%Y:%m:%d %H:%M:%S")
 
     dataTemp= ""
     message = ""
+    nQueries = 0
 
-    global sock
+    global socketConn
     server_addr = (host,port)
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(server_addr)
+    socketConn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    socketConn.bind(server_addr)
 
-    sock.listen(1)
+    socketConn.listen(1)
     while True:
         print("###############################################################")
-        print("Ijah predictor server [maxElapsedTimePerConnection= "+str(maxElapsedTime)+" seconds]")
-        print("Waiting for connection in "+host+":"+str(port))
+        print("Ijah predictor server :)")
+        print("[maxElapsedTimePerQuery= "+str(maxElapsedTime)+" seconds]")
+        print("[HasServed= "+str(nQueries)+" queries]")
+        print("[upFrom= "+upAt+"]")
+
+        print('')
+        print("Waiting for any query at "+host+":"+str(port))
+
         signal.signal(signal.SIGINT, signal_handler)
-        conn, addr = sock.accept()
+        conn, addr = socketConn.accept()
         try:
             print >>sys.stderr, 'Connection from', addr
             while True:
@@ -51,6 +61,7 @@ def main():
                     break
         finally:
             predictionStr = ""
+            nQueries += 1
             queryPair = message.split(",")
             nPairs = len(queryPair)
             startTime = time.time()
@@ -79,7 +90,7 @@ def main():
 
 def signal_handler(signal, frame):
     sys.stderr.write("Closing socket and database ...\n")
-    sock.close()
+    socketConn.close()
     connDB.close()
     sys.exit(0)
 
