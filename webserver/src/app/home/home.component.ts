@@ -691,6 +691,8 @@ export class Home implements OnInit {
             let comProConnScore = this.getConnectivityScore(comVSpro);
             let proDisConnScore = this.getConnectivityScore(proVSdis);
             let totConnScore = plaComConnScore+comProConnScore+proDisConnScore;
+            let nDecimalDigits = 3;
+
             this.unknownComProConn = 0;
             for (let i=0; i<comVSpro.length; i++) {
               let src = comVSpro[i]['source']
@@ -700,9 +702,9 @@ export class Home implements OnInit {
             }
 
             this.summaryTxtOutput = 'Connectivity Score:\n';
-            this.summaryTxtOutput += '   Total: '+totConnScore.toString()+'\n';
+            this.summaryTxtOutput += '   Total: '+this.floatToStrTruncated(totConnScore,nDecimalDigits)+'\n';
             this.summaryTxtOutput += '   Plant-Compound  : '+plaComConnScore.toString()+'\n';
-            this.summaryTxtOutput += '   Compound-Protein: '+comProConnScore.toString()+' (#unknown: '+this.unknownComProConn.toString()+')\n';
+            this.summaryTxtOutput += '   Compound-Protein: '+this.floatToStrTruncated(comProConnScore,nDecimalDigits)+' (#unknown: '+this.unknownComProConn.toString()+')\n';
             this.summaryTxtOutput += '   Protein-Disease : '+proDisConnScore.toString()+'\n';
 
             this.summaryTxtOutput2 = 'Number of unique items:\n';
@@ -718,7 +720,7 @@ export class Home implements OnInit {
             this.summaryTxtOutput3 = 'Mode: \n';
             this.summaryTxtOutput3 += '   '+this.mode+'\n';
             this.summaryTxtOutput3 += 'Elapsed Time: \n';
-            this.summaryTxtOutput3 += '   '+this.elapsedTime.toString()+' seconds\n';
+            this.summaryTxtOutput3 += '   '+this.floatToStrTruncated(this.elapsedTime,nDecimalDigits)+' seconds\n';
           }) // disMeta
         }) // proMeta
       }) // comMeta
@@ -894,6 +896,14 @@ export class Home implements OnInit {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
+  floatToStrTruncated(f,nDecimalDigits) {
+    let raw = f.toString();
+    let radixPos = raw.indexOf('.');
+    let intStr = raw.slice(0,radixPos);
+    let decStr = raw.slice(radixPos+1,radixPos+nDecimalDigits+1);
+    return intStr+'.'+decStr;
+  }
+
   private getConnectivityScore(connectivity) {
     let score = 0.0;
     for (let i=0;i<connectivity.length;i++) {
