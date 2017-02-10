@@ -58,8 +58,11 @@ def main():
                 if message[-3:]=="end":
                     # sys.stderr.write ("Fetching Data Finished....\n")
                     message = message.split("|")[0]
+                    conn.close()
                     break
         finally:
+            conn, addr = socketConn.accept()
+            print >>sys.stderr, 'Connection from', addr
             predictionStr = ""
             nQueries += 1
             queryPair = message.split(",")
@@ -79,7 +82,7 @@ def main():
                 else:
                     predictionStr += predictDummy(query)
 
-            # print 'predictionStr= '+predictionStr
+            print 'predictionStr= '+predictionStr
             conn.sendall(predictionStr)
             conn.close()
 
