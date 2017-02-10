@@ -31,9 +31,9 @@ def main():
     nQueries = 0
 
     global socketConn
-    server_addr = (host,port)
+    serverAddr = (host,port)
     socketConn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    socketConn.bind(server_addr)
+    socketConn.bind(serverAddr)
 
     socketConn.listen(1)
     while True:
