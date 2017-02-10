@@ -105,8 +105,6 @@ export class Download {
   }
 
   getFilename(type) {
-    // This method actually duplicates the one in apps.home class
-    // TODO merge them
     let prefix = 'ijah_all_'
     let suffix = '';
     let ext = '.txt';
