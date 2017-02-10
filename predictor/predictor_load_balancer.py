@@ -5,12 +5,12 @@ import signal
 from datetime import datetime
 
 socketConn = None
-serverPorts = [5556]
+serverPorts = [5556,5557]
 serverUsage = []
 
 def main():
     if len(sys.argv)!=3:
-        print 'USAGE: phyton prediction_server.py [host] [port]'
+        print 'USAGE: phyton prediction_load_balancer.py [host] [port]'
         return
 
     host = sys.argv[1]
@@ -26,6 +26,7 @@ def main():
 
     backlog = 1
     socketConn.listen(backlog)
+    message = ""
     while True:
         print("###############################################################")
         print("Ijah predictor load-balancer :)")
@@ -52,10 +53,23 @@ def main():
         finally:
             print 'pass to the least busy server'
             serverIdx = serverUsage.index(min(serverUsage))
+            serverUsage[serverIdx] += 1
 
+            #Connecting to server
             socketConn2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             serverAddr = (host,serverPorts[serverIdx])
-            socketConn2.bind(serverAddr)
+            socketConn2.connect(serverAddr)
+            #Forward the message
+            socketConn2.sendall(message)
+
+            #Send serverport to php
+            conn.sendall(str(serverAddr[1]))
+            #close every connection
+            conn.close()
+            socketConn2.close()
+
+            #Reset Variables
+            message = ""
 
 def signalHandler(signal, frame):
     sys.stderr.write("Closing socket and database ...\n")
