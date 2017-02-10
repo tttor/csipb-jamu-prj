@@ -82,8 +82,9 @@ export class Home implements OnInit {
   click = false;// whether searchAndPredictButton was clicked
   elapsedTime = 0;
   mode = 'unknown';
-  inputType = '';
+  inputType = 'unknown';
   unknownComProConn = 0;
+  newPredictedComProConn = 0;
 
   // Misc.
   // TODO explain the usage
@@ -593,7 +594,14 @@ export class Home implements OnInit {
 
             let t1 = performance.now();
             this.elapsedTime += (t1-t0);
-
+            this.unknownComProConn = 0;
+            for (let i=0; i<comVSpro.length; i++) {
+              let src = comVSpro[i]['source']
+              if (src==='null') {
+                this.unknownComProConn += 1;
+              }
+            }
+            this.newPredictedComProConn = comVSproPred.length - this.unknownComProConn;
             this.makeOutput(plaSet,comSet,proSet,disSet,
                             plaVScom,comVSpro,proVSdis);
           })
@@ -693,14 +701,6 @@ export class Home implements OnInit {
             let totConnScore = plaComConnScore+comProConnScore+proDisConnScore;
             let nDecimalDigits = 3;
 
-            this.unknownComProConn = 0;
-            for (let i=0; i<comVSpro.length; i++) {
-              let src = comVSpro[i]['source']
-              if (src==='null') {
-                this.unknownComProConn += 1;
-              }
-            }
-
             this.summaryTxtOutput = 'Connectivity Score:\n';
             this.summaryTxtOutput += '   Total: '+this.floatToStrTruncated(totConnScore,nDecimalDigits)+'\n';
             this.summaryTxtOutput += '   Plant-Compound  : '+plaComConnScore.toString()+'\n';
@@ -721,6 +721,8 @@ export class Home implements OnInit {
             this.summaryTxtOutput3 += '   '+this.mode+'\n';
             this.summaryTxtOutput3 += 'Elapsed Time: \n';
             this.summaryTxtOutput3 += '   '+this.floatToStrTruncated(this.elapsedTime,nDecimalDigits)+' seconds\n';
+            this.summaryTxtOutput3 += 'New Compound-Protein Predictions: \n';
+            this.summaryTxtOutput3 += '   '+this.newPredictedComProConn.toString()+' connectivities\n';
           }) // disMeta
         }) // proMeta
       }) // comMeta
@@ -1168,8 +1170,10 @@ export class Home implements OnInit {
     this.selectedDiseases = [];
 
     this.mode = 'unknown';
-    this.inputType = '';
+    this.inputType = 'unknown';
     this.elapsedTime = 0;
+    this.unknownComProConn = 0;
+    this.newPredictedComProConn = 0;
     this.show = false;
     localStorage.clear();
     this.dataLocal = [];
