@@ -82,6 +82,7 @@ export class Home implements OnInit {
   click = false;// whether searchAndPredictButton was clicked
   elapsedTime = 0;
   mode = 'unknown';
+  unknownComProConn = 0;
 
   // Misc.
   // TODO explain the usage
@@ -681,18 +682,18 @@ export class Home implements OnInit {
             let comProConnScore = this.getConnectivityScore(comVSpro);
             let proDisConnScore = this.getConnectivityScore(proVSdis);
             let totConnScore = plaComConnScore+comProConnScore+proDisConnScore;
-            let unknownComProConn = 0;
+            this.unknownComProConn = 0;
             for (let i=0; i<comVSpro.length; i++) {
               let src = comVSpro[i]['source']
               if (src==='null') {
-                unknownComProConn += 1;
+                this.unknownComProConn += 1;
               }
             }
 
             this.summaryTxtOutput = 'Connectivity Score:\n';
             this.summaryTxtOutput += '   Total: '+totConnScore.toString()+'\n';
             this.summaryTxtOutput += '   Plant-Compound  : '+plaComConnScore.toString()+'\n';
-            this.summaryTxtOutput += '   Compound-Protein: '+comProConnScore.toString()+' (#unknown: '+unknownComProConn.toString()+')\n';
+            this.summaryTxtOutput += '   Compound-Protein: '+comProConnScore.toString()+' (#unknown: '+this.unknownComProConn.toString()+')\n';
             this.summaryTxtOutput += '   Protein-Disease : '+proDisConnScore.toString()+'\n';
 
             this.summaryTxtOutput2 = 'Number of unique items:\n';

@@ -225,12 +225,20 @@
       </div>
       <br />
 
-      <div class="col-md-2 col-md-offset-4">
-        <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
+      <div *ngIf="(this.mode.indexOf('predict')===-1)||((this.mode.indexOf('predict')!==-1)&&(this.unknownComProConn===0))">
+        <div class="col-md-2 col-md-offset-5">
+          <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
+        </div>
       </div>
 
-      <div class="col-md-2">
-        <button class="form-control btn btn-danger" (click)="predictMore()">Predict more</button>
+      <div *ngIf="(this.mode.indexOf('predict')!==-1)&&(this.unknownComProConn>0)">
+        <div class="col-md-2 col-md-offset-4">
+          <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
+        </div>
+
+        <div class="col-md-2">
+          <button class="form-control btn btn-danger" (click)="predictMore()">Predict more</button>
+        </div>
       </div>
 
       <!-- The multi-partite graph output ////////////////////////////////// -->
