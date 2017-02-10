@@ -14,7 +14,7 @@ export class Download {
   baseAPI;
   constructor(public route: ActivatedRoute, private http: Http) {
     this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-    // this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
+    this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
   }
 
   ngOnInit() {
@@ -139,7 +139,20 @@ export class Download {
       body = 'protein_vs_disease';
       suffix = '_connectivity';
     }
-    let filename = prefix+body+suffix+ext;
+
+    const dateTime = +new Date();
+    const unixTS = Math.floor(dateTime/1000);
+    let date = new Date(unixTS*1000);
+    let d = date.getDate();
+    let y = date.getFullYear();
+    let m = date.getMonth()+1;
+    let hh = date.getHours();
+    let mm = date.getMinutes();
+    let ss = date.getSeconds();
+    let timestamp = '_'+y+'-'+m+'-'+d+'_'+hh+'-'+mm+'-'+ss;
+
+    let filename = prefix+body+suffix+timestamp+ext;
+    console.log(filename);
     return filename;
   }
 
