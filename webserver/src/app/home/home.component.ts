@@ -760,7 +760,9 @@ export class Home implements OnInit {
       let weight = interaction[i]['weight'];
 
       if (prevSrc!==src) {
-        text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
+        if (i>0) {
+          text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
+        }
 
         nUnique = nUnique + 1;
         text = text+'#'+nUnique.toString()+' ';
@@ -1070,7 +1072,7 @@ export class Home implements OnInit {
                               indent+'[source:#data]'+'\n'+
                               indent+'[weight] '+headerArr['dis'];
 
-    headerArr['com_vs_pla'] ='#0 '+headerArr['com']+':\n'+
+    headerArr['com_vs_pla'] = '#0 '+headerArr['com']+':\n'+
                               indent+'[source:#data]'+'\n'+
                               indent+'[weight] '+headerArr['pla'];
     headerArr['pro_vs_com'] = '#0 '+headerArr['pro']+':\n'+
