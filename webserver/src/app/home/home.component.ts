@@ -1061,23 +1061,23 @@ export class Home implements OnInit {
     headerArr['dis'] = 'OmimID|OmimName';
 
     headerArr['pla_vs_com'] ='#0 '+headerArr['pla']+':\n'+
-                              indent+'[source]'+'\n'+
+                              indent+'[source:#data]'+'\n'+
                               indent+'[weight] '+headerArr['com'];
     headerArr['com_vs_pro'] = '#0 '+headerArr['com']+':\n'+
-                              indent+'[source]'+'\n'+
+                              indent+'[source:#data]'+'\n'+
                               indent+'[weight] '+headerArr['pro'];
     headerArr['pro_vs_dis'] = '#0 '+headerArr['pro']+':\n'+
-                              indent+'[source]'+'\n'+
+                              indent+'[source:#data]'+'\n'+
                               indent+'[weight] '+headerArr['dis'];
 
     headerArr['com_vs_pla'] ='#0 '+headerArr['com']+':\n'+
-                              indent+'[source]'+'\n'+
+                              indent+'[source:#data]'+'\n'+
                               indent+'[weight] '+headerArr['pla'];
     headerArr['pro_vs_com'] = '#0 '+headerArr['pro']+':\n'+
-                              indent+'[source]'+'\n'+
+                              indent+'[source:#data]'+'\n'+
                               indent+'[weight] '+headerArr['com'];
     headerArr['dis_vs_pro'] = '#0 '+headerArr['dis']+':\n'+
-                              indent+'[source]'+'\n'+
+                              indent+'[source:#data]'+'\n'+
                               indent+'[weight] '+headerArr['pro'];
 
     return headerArr[type];
