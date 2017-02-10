@@ -46,10 +46,10 @@
             Plants (of {{nPlantInDB}})
           </h4>
 
-          <div *ngIf=!plantSearch>
+          <div *ngIf="plantSearch.length===0">
             Preparing plant inputs ...
           </div>
-          <div *ngIf=plantSearch>
+          <div *ngIf="plantSearch.length>0">
             <div *ngFor="let p of plaInputHolders">
               <template #customTanaman let-model="item" let-index="index">
                 <h5>{{model.pla_name}} <span *ngIf="model.pla_idr_name">|</span> {{model.pla_idr_name}}</h5>
@@ -78,10 +78,10 @@
             Compounds (of {{nCompoundInDB}})
           </h4>
 
-          <div *ngIf=!compoundSearch>
+          <div *ngIf="compoundSearch.length===0">
             Preparing compound inputs ...
           </div>
-          <div *ngIf=compoundSearch>
+          <div *ngIf="compoundSearch.length>0">
             <div *ngFor="let c of comInputHolders">
               <template #customCompound let-model="item" let-index="index">
                 <h5>{{model.com_cas_id}} <span *ngIf="model.com_knapsack_id">|</span> {{model.com_knapsack_id}} <span *ngIf="model.com_drugbank_id">|</span> {{model.com_drugbank_id}}</h5>
@@ -118,10 +118,10 @@
             Proteins (of {{nProteinInDB}})
           </h4>
 
-          <div *ngIf=!proteinSearch>
+          <div *ngIf="proteinSearch.length===0">
             Preparing protein inputs ...
           </div>
-          <div *ngIf=proteinSearch>
+          <div *ngIf="proteinSearch.length>0">
             <div *ngFor="let p of proInputHolders">
               <template #customProtein let-model="item" let-index="index">
                 <h5>{{model.pro_uniprot_id}} | {{model.pro_name}}</h5>
@@ -150,10 +150,10 @@
             Diseases (of {{nDiseaseInDB}})
           </h4>
 
-          <div *ngIf=!diseaseSearch>
+          <div *ngIf="diseaseSearch.length===0">
             Preparing disease inputs ...
           </div>
-          <div *ngIf=diseaseSearch>
+          <div *ngIf="diseaseSearch.length>0">
             <div *ngFor="let d of disInputHolders">
               <template #customDisease let-model="item" let-index="index" class="right-input">
                 <h5>{{model.dis_omim_id}} | {{model.dis_name}}</h5>
