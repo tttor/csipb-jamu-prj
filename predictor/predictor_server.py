@@ -7,7 +7,6 @@ import sys
 import psycopg2
 
 from config import database as db
-from config import MAX_ELAPSED_TIME
 import blmnii
 import util
 
@@ -16,12 +15,13 @@ connDB = psycopg2.connect(database=db['name'],user=db['user'],password=db['passw
 cur = connDB.cursor()
 
 def main():
-    if len(sys.argv)!=3:
-        print 'USAGE: phyton prediction_server.py [host] [port]'
+    if len(sys.argv)!=4:
+        print 'USAGE: phyton prediction_server.py [host] [port] [maxElapsedTime]'
         return
 
     host = sys.argv[1]
     port = int(sys.argv[2])
+    maxElapsedTime = float(sys.argv[3])
 
     dataTemp= ""
     message = ""
@@ -34,7 +34,7 @@ def main():
     sock.listen(1)
     while True:
         print("###############################################################")
-        print("Ijah predictor server!")
+        print("Ijah predictor server [maxElapsedTimePerConnection= "+str(maxElapsedTime)+" seconds]")
         print("Waiting for connection in "+host+":"+str(port))
         signal.signal(signal.SIGINT, signal_handler)
         conn, addr = sock.accept()
@@ -61,9 +61,9 @@ def main():
                     predictionStr += ","
 
                 elapsedTime = time.time()-startTime
-                print 'elapsedTime= '+str(elapsedTime)
+                print 'elapsedTime= '+str(elapsedTime)+' of max= '+str(maxElapsedTime)
 
-                if  elapsedTime <= MAX_ELAPSED_TIME:
+                if  elapsedTime <= maxElapsedTime:
                     predictionStr += predict(query)
                 else:
                     predictionStr += predictDummy(query)
