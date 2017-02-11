@@ -37,7 +37,7 @@ echo 'Have you set the _version_ at app.component.html? [0/1]'
 read vSet
 echo 'Have you set the _baseAPI_ at home.component.ts _and_ download.component.ts? [0/1]'
 read baseAPISet
-if [( "$baseAPISet" -ne 0) && ("$vSet" -ne 0)]; then
+if [ "$baseAPISet" -ne 0 ] && [ "$vSet" -ne 0 ]; then
   echo 'Yeay, lets roll...'
   echo "building then deploying dist ..."
   npm run build:prod
