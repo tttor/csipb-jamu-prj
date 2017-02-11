@@ -83,9 +83,6 @@ export class Home implements OnInit {
   elapsedTime = 0;
   mode = 'unknown';
   inputType = 'unknown';
-  unknownComProConn = 0;
-  knownByExperimentComProConn = 0;
-  knownByPredictionComProConn = 0;
 
   // Misc.
   // TODO explain the usage
@@ -696,27 +693,27 @@ export class Home implements OnInit {
             let totConnScore = plaComConnScore+comProConnScore+proDisConnScore;
             let nDecimalDigits = 5;
 
-            this.unknownComProConn = 0;
-            this.knownByExperimentComProConn = 0;
-            this.knownByPredictionComProConn = 0;
+            let nUnknownComProConn = 0;
+            let nKnownByExperimentComProConn = 0;
+            let nKnownByPredictionComProConn = 0;
             for (let i=0; i<comVSpro.length; i++) {
               let src = comVSpro[i]['source']
               if (src==='null') {// unknown
-                this.unknownComProConn += 1;
+                nUnknownComProConn += 1;
               }
               else {//known
                 let w = comVSpro[i]['weight'];
                 if (w==='1') {
-                  this.knownByExperimentComProConn += 1;
+                  nKnownByExperimentComProConn += 1;
                 }
                 else {
-                  this.knownByPredictionComProConn += 1;
+                  nKnownByPredictionComProConn += 1;
                 }
               }
             }
 
             if (this.mode==='search_only') {
-              this.unknownComProConn = (icomSet.length*iproSet.length)-(this.knownByPredictionComProConn+this.knownByExperimentComProConn);
+              nUnknownComProConn = (icomSet.length*iproSet.length)-(nKnownByPredictionComProConn+nKnownByExperimentComProConn);
             }
 
             this.summaryTxtOutput = 'Connectivity Score:\n';
@@ -731,9 +728,9 @@ export class Home implements OnInit {
             this.summaryTxtOutput2 += '   #Proteins : '+iproSet.length.toString()+this.getInputMark('protein')+'\n';
             this.summaryTxtOutput2 += '   #Diseases : '+idisSet.length.toString()+this.getInputMark('disease')+'\n';
             this.summaryTxtOutput2 += 'Compound-Protein Connectivity:\n';
-            this.summaryTxtOutput2 += '   #known_by_experiment: '+this.knownByExperimentComProConn.toString()+'\n';
-            this.summaryTxtOutput2 += '   #known_by_prediction: '+this.knownByPredictionComProConn.toString()+'\n';
-            this.summaryTxtOutput2 += '   #unknown            : '+this.unknownComProConn.toString()+'\n';
+            this.summaryTxtOutput2 += '   #known_by_experiment: '+nKnownByExperimentComProConn.toString()+'\n';
+            this.summaryTxtOutput2 += '   #known_by_prediction: '+nKnownByPredictionComProConn.toString()+'\n';
+            this.summaryTxtOutput2 += '   #unknown            : '+nUnknownComProConn.toString()+'\n';
 
             let t1 = performance.now();
             this.elapsedTime += (t1-t0);
@@ -1199,9 +1196,6 @@ export class Home implements OnInit {
     this.mode = 'unknown';
     this.inputType = 'unknown';
     this.elapsedTime = 0;
-    this.unknownComProConn = 0;
-    this.knownByExperimentComProConn = 0;
-    this.knownByPredictionComProConn = 0;
     this.show = false;
     localStorage.clear();
     this.dataLocal = [];
