@@ -78,14 +78,17 @@ export class Home implements OnInit {
   metaQueryAPI;
   predictAPI;
 
+  // Misc.
+  // TODO explain the usage
   show = false;// whether to show the output in home.page
   click = false;// whether searchAndPredictButton was clicked
   elapsedTime = 0;
   mode = 'unknown';
   inputType = 'unknown';
 
-  // Misc.
-  // TODO explain the usage
+  comProConnExperimentSrcs = 'drugbank.ca';
+  comProConnPredictionSrcs = 'blm-nii-svm';
+
   dataLocal = [];
   typeaheadNoResults:boolean = false;
 
@@ -694,6 +697,7 @@ export class Home implements OnInit {
             let nDecimalDigits = 5;
 
             let nUnknownComProConn = 0;
+            let nUndefinedComProConn = 0;
             let nKnownByExperimentComProConn = 0;
             let nKnownByPredictionComProConn = 0;
             for (let i=0; i<comVSpro.length; i++) {
@@ -701,14 +705,14 @@ export class Home implements OnInit {
               if (src==='null') {// unknown
                 nUnknownComProConn += 1;
               }
-              else {//known
-                let w = comVSpro[i]['weight'];
-                if (w==='1') {
-                  nKnownByExperimentComProConn += 1;
-                }
-                else {
-                  nKnownByPredictionComProConn += 1;
-                }
+              else if (this.comProConnExperimentSrcs.indexOf(src)!==-1) {
+                nKnownByExperimentComProConn += 1;
+              }
+              else if (this.comProConnPredictionSrcs.indexOf(src)!==-1) {
+                nKnownByPredictionComProConn += 1;
+              }
+              else {
+                nUndefinedComProConn += 1;
               }
             }
 
@@ -731,6 +735,9 @@ export class Home implements OnInit {
             this.summaryTxtOutput2 += '   #known_by_experiment: '+nKnownByExperimentComProConn.toString()+'\n';
             this.summaryTxtOutput2 += '   #known_by_prediction: '+nKnownByPredictionComProConn.toString()+'\n';
             this.summaryTxtOutput2 += '   #unknown            : '+nUnknownComProConn.toString()+'\n';
+            if (nUndefinedComProConn>0) {
+              this.summaryTxtOutput2 += '   #undefined            : '+nUndefinedComProConn.toString()+'\n';
+            }
 
             let t1 = performance.now();
             this.elapsedTime += (t1-t0);
