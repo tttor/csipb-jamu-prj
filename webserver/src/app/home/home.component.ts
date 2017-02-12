@@ -60,6 +60,9 @@ export class Home implements OnInit {
   comVSplaTxtOutput;
   proVScomTxtOutput;
   disVSproTxtOutput;
+  plaVScomSwapped = false;
+  comVSproSwapped = false;
+  proVSdisSwapped = false;
 
   // Used in metadata text output
   plaMetaTxtOutput;
@@ -924,6 +927,18 @@ export class Home implements OnInit {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
+  toggleConnectivitySwap(type) {
+    if (type==='plaVScom') {
+      this.plaVScomSwapped = !this.plaVScomSwapped;
+    }
+    if (type==='comVSpro') {
+      this.comVSproSwapped = !this.comVSproSwapped;
+    }
+    if (type==='proVSdis') {
+      this.proVSdisSwapped = !this.proVSdisSwapped;
+    }
+  }
+
   floatToStrTruncated(f,nDecimalDigits) {
     let raw = f.toString();
     let radixPos = raw.indexOf('.');
@@ -1185,6 +1200,10 @@ export class Home implements OnInit {
     this.pCompound = false;
     this.pProtein = false;
     this.pDisease = false;
+
+    this.plaVScomSwapped = false;
+    this.comVSproSwapped = false;
+    this.proVSdisSwapped = false;
 
     this.nPlaInputHolders = 0;
     this.nComInputHolders = 0;

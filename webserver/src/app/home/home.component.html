@@ -10,8 +10,7 @@
   <a style="color:white" pageScroll href="#top" class="btn fab text-center"><span class="text-center" style="padding-top:3px">Back to Top (Summary)</span></a>
   <a style="color:white" pageScroll href="#connectivityGraph" class="btn fab2 text-center"><span class="text-center" style="padding-top:3px">Connectivity Graph</span></a>
   <a style="color:white" pageScroll href="#connectivityText" class="btn fab3 text-center"><span class="text-center" style="padding-top:3px">Connectivity Text</span></a>
-  <a style="color:white" pageScroll href="#connectivityTextSwapped" class="btn fab4 text-center"><span class="text-center" style="padding-top:3px">Connectivity Text 2</span></a>
-  <a style="color:white" pageScroll href="#metadataText" class="btn fab5 text-center"><span class="text-center" style="padding-top:3px">Metadata Text</span></a>
+  <a style="color:white" pageScroll href="#metadataText" class="btn fab4 text-center"><span class="text-center" style="padding-top:3px">Metadata Text</span></a>
 </div>
 
 <div>
@@ -216,8 +215,7 @@
         <b>Jump to Outputs:</b>
         1) <a pageScroll href="#connectivityGraph">Connectivity Graph</a> or
         2) <a pageScroll href="#connectivityText">Connectivity Text</a> or
-        3) <a pageScroll href="#connectivityTextSwapped">Connectivity Text 2 (Swapped)</a> or
-        4) <a pageScroll href="#metadataText">Metadata Text</a>
+        3) <a pageScroll href="#metadataText">Metadata Text</a>
       </div>
       <br />
 
@@ -256,19 +254,57 @@
       <div class="text-center col-md-12">
         <h2><strong>Connectivity Text</strong></h2>
       </div>
-      <div class="col-md-4">
-        Plant - Compound Connectivity
+
+      <div class="col-md-4" *ngIf="!plaVScomSwapped">
+        Plant - Compound Connectivity:
+          <button style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer; color: blue"
+          (click)="toggleConnectivitySwap('plaVScom')">
+          . . . . . . . . . . . . . [ Swap! ]
+          </button>
         <pre [innerHTML]="plaVScomTxtOutput" style="height:750px"></pre>
       </div>
-      <div class="col-md-4">
-        Compound - Protein Connectivity
+      <div class="col-md-4" *ngIf="plaVScomSwapped">
+        Compound - Plant Connectivity:
+        <button style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer; color: blue"
+          (click)="toggleConnectivitySwap('plaVScom')">
+          . . . . . . . . . . . . . [ Swap! ]
+          </button>
+        <pre [innerHTML]="comVSplaTxtOutput" style="height:750px"></pre>
+      </div>
+
+      <div class="col-md-4" *ngIf="!comVSproSwapped">
+        Compound - Protein Connectivity:
+          <button style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer; color: blue"
+          (click)="toggleConnectivitySwap('comVSpro')">
+          . . . . . . . . . . . [ Swap! ]
+          </button>
         <pre [innerHTML]="comVSproTxtOutput" style="height:750px"></pre>
       </div>
-      <div class="col-md-4">
-        Protein - Disease Connectivity
+      <div class="col-md-4" *ngIf="comVSproSwapped">
+        Protein - Compound Connectivity:
+        <button style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer; color: blue"
+          (click)="toggleConnectivitySwap('comVSpro')">
+          . . . . . . . . . . . [ Swap! ]
+          </button>
+        <pre [innerHTML]="proVScomTxtOutput" style="height:750px"></pre>
+      </div>
+
+      <div class="col-md-4" *ngIf="!proVSdisSwapped">
+        Protein - Disease Connectivity:
+          <button style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer; color: blue"
+          (click)="toggleConnectivitySwap('proVSdis')">
+          . . . . . . . . . . . . . . [ Swap! ]
+          </button>
         <pre [innerHTML]="proVSdisTxtOutput" style="height:750px"></pre>
       </div>
-      <br />
+      <div class="col-md-4" *ngIf="proVSdisSwapped">
+        Disease - Protein Connectivity:
+        <button style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer; color: blue"
+          (click)="toggleConnectivitySwap('proVSdis')">
+          . . . . . . . . . . . . . . [ Swap! ]
+          </button>
+        <pre [innerHTML]="disVSproTxtOutput" style="height:750px"></pre>
+      </div>
 
       <div class="col-md-4">
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('plant_vs_compound')">Download Plant-Compound Connectivity</button>
@@ -278,43 +314,6 @@
       </div>
       <div class="col-md-4">
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('protein_vs_disease')">Download Protein-Disease Connectivity</button>
-      </div>
-      <br />
-
-      <div class="col-md-2 col-md-offset-5">
-        <br />
-        <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
-      </div>
-
-      <!-- Connectivity Text Output Swapped //////////////////////////////// -->
-      <div class="row text-center">
-        <font color="#696969"  id="connectivityTextSwapped">_____________________________________________________________________________________________________________________________________</font>
-      </div>
-      <div class="text-center col-md-12">
-        <h2><strong>Connectivity Text 2 (Swapped)</strong></h2>
-      </div>
-      <div class="col-md-4">
-        Compound - Plant Connectivity
-        <pre [innerHTML]="comVSplaTxtOutput" style="height:750px"></pre>
-      </div>
-      <div class="col-md-4">
-        Protein - Compound Connectivity
-        <pre [innerHTML]="proVScomTxtOutput" style="height:750px"></pre>
-      </div>
-      <div class="col-md-4">
-        Disease - Protein Connectivity
-        <pre [innerHTML]="disVSproTxtOutput" style="height:750px"></pre>
-      </div>
-      <br />
-
-      <div class="col-md-4">
-        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('compound_vs_plant')">Download Compound-Plant Connectivity</button>
-      </div>
-      <div class="col-md-4">
-        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('protein_vs_compound')">Download Protein-Compound Connectivity</button>
-      </div>
-      <div class="col-md-4">
-        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('disease_vs_protein')">Download Disease-Protein Connectivity</button>
       </div>
       <br />
 
