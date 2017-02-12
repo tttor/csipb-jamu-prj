@@ -306,15 +306,27 @@
         <pre [innerHTML]="disVSproTxtOutput" style="height:750px"></pre>
       </div>
 
-      <div class="col-md-4">
+      <div class="col-md-4" *ngIf="!plaVScomSwapped">
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('plant_vs_compound')">Download Plant-Compound Connectivity</button>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-4" *ngIf="plaVScomSwapped">
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('compound_vs_plant')">Download Compound-Plant Connectivity</button>
+      </div>
+
+      <div class="col-md-4" *ngIf="!comVSproSwapped">
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('compound_vs_protein')">Download Compound-Protein Connectivity</button>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-4" *ngIf="comVSproSwapped">
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('protein_vs_compound')">Download Protein-Compound Connectivity</button>
+      </div>
+
+      <div class="col-md-4" *ngIf="!proVSdisSwapped">
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('protein_vs_disease')">Download Protein-Disease Connectivity</button>
       </div>
+      <div class="col-md-4" *ngIf="proVSdisSwapped">
+        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('disease_vs_protein')">Download Disease-Protein Connectivity</button>
+      </div>
+
       <br />
 
       <div class="col-md-2 col-md-offset-5">
