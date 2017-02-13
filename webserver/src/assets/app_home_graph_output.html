@@ -6,8 +6,8 @@
 
 <div onload="render()">
   <div id="html-content-holder">
-    <!-- When setting this width, please adjust the width in the sankey options below too (See "Set chart options") -->
-    <div class="text-center graph" id="sankey_multiple" style="width: 1180px; height: 1200px; background-color:white;"></div>
+    <!-- Values of width and height below should have offset with respect to Sankey's width and height -->
+    <div class="text-center graph" id="sankey_multiple" style="width: 1180px; height: 2010px; background-color:white;"></div>
   </div>
 </div>
 
@@ -75,9 +75,9 @@
       data.addColumn('number', 'Weight');
       data.addRows(JSON.parse(localStorage.getItem('connectivityGraphData')) );
 
-      // Set chart options (the width must be 10px SMALLER than the width above)
       var options = {
         width: 1170,
+        height: 2000,
         sankey: {
           node: {
             label: {
