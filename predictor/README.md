@@ -1,6 +1,6 @@
 # Compound-protein connectivity prediction
 
-## Aliases
+## Aliases and Keywords
 * drug-target prediction
 * drug-target interactions (DTI) prediction
 * compound-protein interaction (CPI) prediction
@@ -9,6 +9,7 @@
 * in-silico drug screening
 * virtual drug screening
 * computational screening
+* compound-protein link prediction
 
 ## Challenges
 * small number of positive samples; unbalance ratio between #positive vs #negative samples
@@ -33,7 +34,7 @@
         * BLM–NII or Globalized BLM or bipartite local model with neighbor-based inferring (BLMN)
            *  Mei (2012)
             * Mei (2013)
-    Kernel
+    * Kernel
         * Gaussian Interaction Profile Kernel+ Kronecker regularized least squares approach (KronRLS)
             * Laarhoven (2011): GIP
             * Laarhoven (2013): WNN-GIP (for handling new drugs/new targets
