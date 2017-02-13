@@ -1139,15 +1139,15 @@ export class Home implements OnInit {
         continue;
       }
 
+      if (j>0) {
+        str += sep;
+      }
+
       if (hyperlinked) {
         str += this.getHyperlinkStr(key,prop);
       }
       else {
         str += prop;
-      }
-
-      if (j<props.length-1) {
-          str += sep;
       }
     }
 
