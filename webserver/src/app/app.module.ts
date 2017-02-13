@@ -29,7 +29,6 @@ import { Help } from './help';
 import { Disclaimer } from './disclaimer';
 import { V1 } from './v1';
 import { About } from './about';
-import { NoContentComponent } from './no-content';
 
 import '../styles/styles.scss';
 import '../styles/headings.css';
@@ -56,8 +55,7 @@ type StoreType = {
     Download,
     Disclaimer,
     V1,
-    About,
-    NoContentComponent
+    About
   ],
   imports: [
     BrowserModule,

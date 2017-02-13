@@ -33,9 +33,11 @@ fi
 
 #build the src in production stage
 echo "#########################################################################"
-echo 'Have you set the baseAPI to apps.cs at home.component.ts _and_ download.component.ts? [0/1]'
+echo 'Have you set the _version_ at app.component.html? [0/1]'
+read vSet
+echo 'Have you set the _baseAPI_ at home.component.ts _and_ download.component.ts? [0/1]'
 read baseAPISet
-if [ "$baseAPISet" -ne 0 ]; then
+if [ "$baseAPISet" -ne 0 ] && [ "$vSet" -ne 0 ]; then
   echo 'Yeay, lets roll...'
   echo "building then deploying dist ..."
   npm run build:prod
@@ -44,7 +46,7 @@ fi
 
 if [ $4 -ne 0 ]; then
   echo "#######################################################################"
-  echo 'Have you set the DB link to apps.cs at api/config.php? [0/1]'
+  echo 'Have you set the _DBlink_ at api/config.php? [0/1]'
   read dbLinkSet
   if [ "$dbLinkSet" -ne 0 ]; then
     echo "deploying APIs ..."
@@ -54,7 +56,7 @@ fi
 
 if [ $6 -ne 0 ]; then
   echo "#######################################################################"
-  echo 'Have you set the DB link to apps.cs at predictor/config.py? [0/1]'
+  echo 'Have you set the _DBlink_ at predictor/config.py? [0/1]'
   read predictorConfigSet
   if [ "$predictorConfigSet" -ne 0 ]; then
     echo "deploying predictors ..."

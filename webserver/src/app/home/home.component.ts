@@ -60,6 +60,9 @@ export class Home implements OnInit {
   comVSplaTxtOutput;
   proVScomTxtOutput;
   disVSproTxtOutput;
+  plaVScomSwapped = false;
+  comVSproSwapped = false;
+  proVSdisSwapped = false;
 
   // Used in metadata text output
   plaMetaTxtOutput;
@@ -78,17 +81,17 @@ export class Home implements OnInit {
   metaQueryAPI;
   predictAPI;
 
+  // Misc.
+  // TODO explain the usage
   show = false;// whether to show the output in home.page
   click = false;// whether searchAndPredictButton was clicked
   elapsedTime = 0;
   mode = 'unknown';
   inputType = 'unknown';
-  unknownComProConn = 0;
-  knownByExperimentComProConn = 0;
-  knownByPredictionComProConn = 0;
 
-  // Misc.
-  // TODO explain the usage
+  comProConnExperimentSrcs = 'drugbank.ca';
+  comProConnPredictionSrcs = 'blm-nii-svm';
+
   dataLocal = [];
   typeaheadNoResults:boolean = false;
 
@@ -658,13 +661,11 @@ export class Home implements OnInit {
             this.disMetaTxtOutput = this.makeMetaTextOutput('dis',disSet,disMeta);
 
             // connectivity graph output ///////////////////////////////////////
-            let graphData = [];
             let nNodeMax = 20;
-
-            let plaForGraph = plaSet.slice(0,nNodeMax);
-            let comForGraph = comSet.slice(0,nNodeMax);
-            let proForGraph = proSet.slice(0,nNodeMax);
-            let disForGraph = disSet.slice(0,nNodeMax);
+            let plaForGraph = plaSet;//plaSet.slice(0,nNodeMax);
+            let comForGraph = comSet;//comSet.slice(0,nNodeMax);
+            let proForGraph = proSet;//proSet.slice(0,nNodeMax);
+            let disForGraph = disSet;//disSet.slice(0,nNodeMax);
 
             let graphDataArr = [this.makeGraphDataOutput(plaVScom,
                                                          plaMeta,comMeta,
@@ -679,6 +680,7 @@ export class Home implements OnInit {
                                                          'pro','dis',
                                                          proForGraph,disForGraph)];
 
+            let graphData = [];
             for (let ii=0;ii<graphDataArr.length;ii++) {
               for(let jj=0;jj<graphDataArr[ii].length;jj++) {
                   let datum = graphDataArr[ii][jj];
@@ -696,27 +698,28 @@ export class Home implements OnInit {
             let totConnScore = plaComConnScore+comProConnScore+proDisConnScore;
             let nDecimalDigits = 5;
 
-            this.unknownComProConn = 0;
-            this.knownByExperimentComProConn = 0;
-            this.knownByPredictionComProConn = 0;
+            let nUnknownComProConn = 0;
+            let nUndefinedComProConn = 0;
+            let nKnownByExperimentComProConn = 0;
+            let nKnownByPredictionComProConn = 0;
             for (let i=0; i<comVSpro.length; i++) {
               let src = comVSpro[i]['source']
               if (src==='null') {// unknown
-                this.unknownComProConn += 1;
+                nUnknownComProConn += 1;
               }
-              else {//known
-                let w = comVSpro[i]['weight'];
-                if (w==='1') {
-                  this.knownByExperimentComProConn += 1;
-                }
-                else {
-                  this.knownByPredictionComProConn += 1;
-                }
+              else if (this.comProConnExperimentSrcs.indexOf(src)!==-1) {
+                nKnownByExperimentComProConn += 1;
+              }
+              else if (this.comProConnPredictionSrcs.indexOf(src)!==-1) {
+                nKnownByPredictionComProConn += 1;
+              }
+              else {
+                nUndefinedComProConn += 1;
               }
             }
 
             if (this.mode==='search_only') {
-              this.unknownComProConn = (icomSet.length*iproSet.length)-(this.knownByPredictionComProConn+this.knownByExperimentComProConn);
+              nUnknownComProConn = (icomSet.length*iproSet.length)-(nKnownByPredictionComProConn+nKnownByExperimentComProConn);
             }
 
             this.summaryTxtOutput = 'Connectivity Score:\n';
@@ -731,9 +734,12 @@ export class Home implements OnInit {
             this.summaryTxtOutput2 += '   #Proteins : '+iproSet.length.toString()+this.getInputMark('protein')+'\n';
             this.summaryTxtOutput2 += '   #Diseases : '+idisSet.length.toString()+this.getInputMark('disease')+'\n';
             this.summaryTxtOutput2 += 'Compound-Protein Connectivity:\n';
-            this.summaryTxtOutput2 += '   #known_by_experiment: '+this.knownByExperimentComProConn.toString()+'\n';
-            this.summaryTxtOutput2 += '   #known_by_prediction: '+this.knownByPredictionComProConn.toString()+'\n';
-            this.summaryTxtOutput2 += '   #unknown            : '+this.unknownComProConn.toString()+'\n';
+            this.summaryTxtOutput2 += '   #known_by_experiment: '+nKnownByExperimentComProConn.toString()+'\n';
+            this.summaryTxtOutput2 += '   #known_by_prediction: '+nKnownByPredictionComProConn.toString()+'\n';
+            this.summaryTxtOutput2 += '   #unknown            : '+nUnknownComProConn.toString()+'\n';
+            if (nUndefinedComProConn>0) {
+              this.summaryTxtOutput2 += '   #undefined            : '+nUndefinedComProConn.toString()+'\n';
+            }
 
             let t1 = performance.now();
             this.elapsedTime += (t1-t0);
@@ -920,6 +926,18 @@ export class Home implements OnInit {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
+  toggleConnectivitySwap(type) {
+    if (type==='plaVScom') {
+      this.plaVScomSwapped = !this.plaVScomSwapped;
+    }
+    if (type==='comVSpro') {
+      this.comVSproSwapped = !this.comVSproSwapped;
+    }
+    if (type==='proVSdis') {
+      this.proVSdisSwapped = !this.proVSdisSwapped;
+    }
+  }
+
   floatToStrTruncated(f,nDecimalDigits) {
     let raw = f.toString();
     let radixPos = raw.indexOf('.');
@@ -1182,6 +1200,10 @@ export class Home implements OnInit {
     this.pProtein = false;
     this.pDisease = false;
 
+    this.plaVScomSwapped = false;
+    this.comVSproSwapped = false;
+    this.proVSdisSwapped = false;
+
     this.nPlaInputHolders = 0;
     this.nComInputHolders = 0;
     this.nProInputHolders = 0;
@@ -1199,9 +1221,6 @@ export class Home implements OnInit {
     this.mode = 'unknown';
     this.inputType = 'unknown';
     this.elapsedTime = 0;
-    this.unknownComProConn = 0;
-    this.knownByExperimentComProConn = 0;
-    this.knownByPredictionComProConn = 0;
     this.show = false;
     localStorage.clear();
     this.dataLocal = [];

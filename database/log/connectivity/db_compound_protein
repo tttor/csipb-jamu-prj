@@ -28,7 +28,12 @@ http://bidd.nus.edu.sg/group/cjttd/
 BindingDB
 http://www.bindingdb.org/bind/index.jsp
 
-STITCH
+[ ] STITCH
+
+[ ] BRENDA
+Schomburg I, Chang A, Ebeling C, Gremse M, Heldt C, et al. (2004) BRENDA,
+the enzyme database: updates and major new developments. Nucleic Acids Res
+32: D431–433.
 
 [ ] Pubchem
 https://pubchem.ncbi.nlm.nih.gov
@@ -37,6 +42,7 @@ may use ftp service to download compound info,
 then look for "Target"
 
 KEGG
+KEGG BRITE
 http://www.drugbank.ca/drugs/DB00149
 http://www.genome.jp/dbget-bin/www_bget?dr:D00030
 http://www.genome.jp/dbget-bin/www_bget?cpd:C00123
