@@ -41,6 +41,9 @@ most compound-protein info is from drugbank,
 may use ftp service to download compound info,
 then look for "Target"
 
+[ ] GLIDA
+http://pharminfo.pharm.kyoto-u.ac.jp/services/glida/
+
 KEGG
 KEGG BRITE
 http://www.drugbank.ca/drugs/DB00149
