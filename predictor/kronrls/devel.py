@@ -1,5 +1,6 @@
 # devel.py
 import sys
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 from kronrls import KronRLS
@@ -89,4 +90,6 @@ def main(argv):
     plt.savefig(outDir+fname, bbox_inches='tight')
 
 if __name__ == '__main__':
+    start_time = time.time()
     main(sys.argv)
+    print("--- %s seconds ---" % (time.time() - start_time))
