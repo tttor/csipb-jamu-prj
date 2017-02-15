@@ -1,10 +1,12 @@
 #!/usr/bin/python
-import numpy as np
 import signal
 import socket
 import time
 import sys
+import threading
 import psycopg2
+
+import numpy as np
 from datetime import datetime
 
 from config import database as db
@@ -13,91 +15,129 @@ import util
 
 connDB = psycopg2.connect(database=db['name'],user=db['user'],password=db['passwd'],
                       host=db['host'],port=db['port'])
-cur = connDB.cursor()
-socketConn = None
+
+class socketThread(threading.Thread):
+    def __init__(self, threadId, name, host, port):
+        threading.Thread.__init__(self)
+        self.threadId = threadId
+        self.name = name
+        self.host = host
+        self.port = port
+        serverAddr = (self.host,self.port)
+        self.socketConn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socketConn.bind(serverAddr)
+        self.resPredict = ""
+
+    def run(self):
+        self.socketConn.listen(1)
+        nQueries = 0
+        dataTemp = ""
+        message = ""
+        while True:
+            print "###############################################################"
+            print >> sys.stderr,"Ijah predictor server :)"
+            print >> sys.stderr,"[port= "+str(self.port)+" on "+self.name+"]"
+            print >> sys.stderr,"[maxElapsedTimePerQuery= "+str(maxElapsedTime)+" seconds]"
+            print >> sys.stderr,"[HasServed= "+str(nQueries)+" queries]"
+            print >> sys.stderr,"[upFrom= "+upAt+"]"
+            print >> sys.stderr,self.name+": Waiting for any query at "+self.host+":"+str(self.port)
+
+            conn, addr = self.socketConn.accept()
+            try:
+                print >>sys.stderr, self.name+': Connection from', addr
+                while True:
+                    dataTemp = conn.recv(1024)
+                    print >>sys.stderr, self.name+': Received "%s"' % dataTemp
+                    message += dataTemp
+
+                    if message[-3:]=="end":
+                        # sys.stderr.write ("Fetching Data Finished....\n")
+                        message = message.split("|")[0]
+                        conn.close()
+                        break
+            finally:
+                conn, addr = self.socketConn.accept()
+                print >>sys.stderr, self.name+': Connection from', addr
+                nQueries += 1
+                queryPair = message.split(",")
+
+                predictThreads = [predictThread(i,key+" on Port: "+str(self.port), queryPair,key) for i,key in enumerate(funcPointer)]
+                for t in predictThreads:
+                    t.daemon=True
+                    t.start()
+                for t in predictThreads:
+                    self.resPredict += t.join()
+                #a lock for Synchronizing the query string...?
+
+                print >> sys.stderr, self.name+': resPredict = '+self.resPredict
+                conn.sendall(self.resPredict)
+                conn.close()
+
+                self.resPredict = ""
+                message = ""
+                dataTemp = ""
+
+class predictThread(threading.Thread):
+    def __init__ (self,threadId,name,queryPair,key):
+        threading.Thread.__init__(self)
+        self.threadId = threadId
+        self.name = name
+        self.queryPair = queryPair
+        self.cur = connDB.cursor()
+        self.funcKey = key
+    def run(self):
+        # Pass db cursor to predict
+        nPairs = len(self.queryPair)
+        startTime = time.time()
+        self.predictionStr = ""
+        print >> sys.stderr, "Start Predicting with "+self.name
+        for i,query in enumerate(self.queryPair):
+            print >> sys.stderr, '*********************************************************'
+            print >> sys.stderr, self.name+' predicting pair= '+str(i+1)+' of '+str(nPairs)
+            if (i>0):
+                self.predictionStr += ","
+
+            elapsedTime = time.time()-startTime
+            print >> sys.stderr, self.name+' elapsedTime= '+str(elapsedTime)+' of max= '+str(maxElapsedTime)
+
+            if  elapsedTime <= maxElapsedTime:
+                self.predictionStr += funcPointer[self.funcKey](query,self.cur)
+            else:
+                self.predictionStr += predictDummy(query)
+    def join(self):
+        threading.Thread.join(self)
+        return self.predictionStr
+
 
 def main():
-    if len(sys.argv)!=4:
-        print 'USAGE: phyton prediction_server.py [host] [port] [maxElapsedTime]'
+    if len(sys.argv)!=5:
+        print 'USAGE: phyton prediction_server.py [host] [portLow] [portHigh] [maxElapsedTime]'
         return
 
+    global maxElapsedTime
+    global upAt
     host = sys.argv[1]
-    port = int(sys.argv[2])
-    maxElapsedTime = float(sys.argv[3])
+    portLow = int(sys.argv[2])
+    portHigh = int(sys.argv[3])
+    maxElapsedTime = float(sys.argv[4])
     upAt = datetime.now().strftime("%Y:%m:%d %H:%M:%S")
 
-    dataTemp= ""
-    message = ""
-    nQueries = 0
-
-    global socketConn
-    serverAddr = (host,port)
-    socketConn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    socketConn.bind(serverAddr)
-
-    socketConn.listen(1)
+    socketThreads = [socketThread(i,"Thread-"+str(i), host, port) for i,port in enumerate(range(portLow, portHigh+1))]
+    signal.signal(signal.SIGINT, signal_handler)
+    for t in socketThreads:
+        t.daemon=True
+        t.start()
     while True:
-        print("###############################################################")
-        print("Ijah predictor server :)")
-        print("[maxElapsedTimePerQuery= "+str(maxElapsedTime)+" seconds]")
-        print("[HasServed= "+str(nQueries)+" queries]")
-        print("[upFrom= "+upAt+"]")
-
-        print('')
-        print("Waiting for any query at "+host+":"+str(port))
-
-        signal.signal(signal.SIGINT, signal_handler)
-        conn, addr = socketConn.accept()
-        try:
-            print >>sys.stderr, 'Connection from', addr
-            while True:
-                dataTemp = conn.recv(1024)
-                print >>sys.stderr, 'Received "%s"' % dataTemp
-                message += dataTemp
-
-                if message[-3:]=="end":
-                    # sys.stderr.write ("Fetching Data Finished....\n")
-                    message = message.split("|")[0]
-                    conn.close()
-                    break
-        finally:
-            conn, addr = socketConn.accept()
-            print >>sys.stderr, 'Connection from', addr
-            predictionStr = ""
-            nQueries += 1
-            queryPair = message.split(",")
-            nPairs = len(queryPair)
-            startTime = time.time()
-            for i,query in enumerate(queryPair):
-                print '*********************************************************'
-                print 'predicting pair= '+str(i+1)+' of '+str(nPairs)
-                if (i>0):
-                    predictionStr += ","
-
-                elapsedTime = time.time()-startTime
-                print 'elapsedTime= '+str(elapsedTime)+' of max= '+str(maxElapsedTime)
-
-                if  elapsedTime <= maxElapsedTime:
-                    predictionStr += predict(query)
-                else:
-                    predictionStr += predictDummy(query)
-
-            print 'predictionStr= '+predictionStr
-            conn.sendall(predictionStr)
-            conn.close()
-
-            message = ""
-            dataTemp = ""
+        pass
 
     connDB.close()
 
 def signal_handler(signal, frame):
-    sys.stderr.write("Closing socket and database ...\n")
-    socketConn.close()
+    sys.stderr.write("Closing thread, socket, and database ...\n")
     connDB.close()
     sys.exit(0)
 
-def makeKernel(dataList,mode):
+def makeKernel(dataList,mode,cur):
     dataList = list(set(dataList))
     dataDict = {e:i for i,e in enumerate(dataList)}#for Index
     simMat = np.zeros((len(dataList),len(dataList)), dtype=float)
@@ -126,7 +166,7 @@ def makeKernel(dataList,mode):
 
     return dataDict, simMat
 
-def predict(queryString):
+def predict(queryString,cur):
     maxIter = None
     pairIdList = None
     pairQueryList = None
@@ -157,10 +197,10 @@ def predict(queryString):
     ############# Make simMat and dict #############
     sys.stderr.write ("Making kernel....\n")
     compList = [i[0] for i in pairIdList]
-    compMeta, compSimMat = makeKernel(compList,"com")
+    compMeta, compSimMat = makeKernel(compList,"com",cur)
 
     protList = [i[1] for i in pairIdList]
-    protMeta, protSimMat = makeKernel(protList,"pro")
+    protMeta, protSimMat = makeKernel(protList,"pro",cur)
 
     ############# Make adjacency list #############
     sys.stderr.write ("Building connectivity data...\n")
@@ -239,4 +279,5 @@ def predictDummy(query):
     return predictionStr
 
 if __name__ == '__main__':
+    funcPointer = {'blm-nii':predict} # Add future predict function here
     main()
