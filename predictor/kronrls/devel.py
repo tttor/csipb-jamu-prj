@@ -4,21 +4,22 @@ from kronrls import KronRLS
 
 def main():
     # load development dataset, containing com-pro connectivity
-    mode = 'bind_orfhsa_drug_e.txt'
+    mode = 'nr'
     yamanishiData = yam.loadComProConn(mode)
+    kernelData = yam.loadKernel(mode)
 
     # spit as training and testing data
     trData = yamanishiData[1:]
     teData = yamanishiData[0:1]
 
     # instantiate a KronRLS predictor
-    kronrls = KronRLS(trData)
+    kronrls = KronRLS(trData,kernelData)
 
-    # # test
-    # com = 'D00002'
-    # pro = 'hsa:10'
-    # gamma = 1.0
-    # ypred = kronrls.predict(com,pro,gamma)
+    # test
+    gamma = 1.0
+    for com,pro in teData:
+        ypred = kronrls.predict(com,pro,gamma)
+        print 'ypred= ',ypred
 
 if __name__ == '__main__':
     main()
