@@ -42,7 +42,7 @@ def main(argv):
         nFolds = nData
         kfList = KFold(nData, n_folds=nFolds, shuffle=True)
     elif valMode=='kfcv':
-        nFolds = 5
+        nFolds = 10
         kfList = StratifiedKFold(dataY, n_folds=nFolds, shuffle=True)
     else:
         assert(False)
@@ -69,14 +69,14 @@ def main(argv):
 
     ##
     precision, recall, _ = precision_recall_curve(yTestList, yPredList)
-    prAUC = average_precision_score(yTestList, yPredList, average='micro')
+    aupr = average_precision_score(yTestList, yPredList, average='micro')
 
     ##
     plt.clf()
     plt.figure()
 
     plt.plot(recall, precision, 'r-',
-             label= '(area = %0.2f)' % prAUC, lw=2)
+             label= '(area = %0.2f)' % aupr, lw=2)
 
     plt.ylim([-0.05, 1.05])
     plt.xlim([-0.05, 1.05])
