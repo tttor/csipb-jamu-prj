@@ -12,16 +12,16 @@ import yamanishi_data_util as yam
 outDir = '../../xprmt'
 
 def main(argv):
-    if len(argv)!=2:
-        print 'USAGE: python devel.py [valMode]'
+    if len(argv)!=3:
+        print 'USAGE: python devel.py [dataMode] [valMode]'
         return
 
-    valMode = argv[1]
+    dataMode = argv[1]
+    valMode = argv[2]
 
     # load development dataset, containing com-pro connectivity
-    mode = 'nr'
-    connMat,comList,proList = yam.loadComProConnMat(mode)
-    kernel = yam.loadKernel(mode)
+    connMat,comList,proList = yam.loadComProConnMat(dataMode)
+    kernel = yam.loadKernel(dataMode)
 
     ##
     dataX = []
@@ -85,7 +85,7 @@ def main(argv):
     plt.title('Precision-Recall Curve')
     plt.legend(loc="lower left")
 
-    fname = '/pr_curve_'+valMode+'.png'
+    fname = '/pr_curve_'+dataMode+'_'+valMode+'.png'
     plt.savefig(outDir+fname, bbox_inches='tight')
 
 if __name__ == '__main__':
