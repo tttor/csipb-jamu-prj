@@ -9,6 +9,7 @@ import psycopg2
 import numpy as np
 from datetime import datetime
 
+from predictor_server_thread import PredictorServerThread as PST
 from config import database as db
 import blmnii
 import util
@@ -16,123 +17,39 @@ import util
 connDB = psycopg2.connect(database=db['name'],user=db['user'],password=db['passwd'],
                       host=db['host'],port=db['port'])
 
-class socketThread(threading.Thread):
-    def __init__(self, threadId, name, host, port):
-        threading.Thread.__init__(self)
-        self.threadId = threadId
-        self.name = name
-        self.host = host
-        self.port = port
-        serverAddr = (self.host,self.port)
-        self.socketConn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socketConn.bind(serverAddr)
-        self.resPredict = ""
-
-    def run(self):
-        self.socketConn.listen(1)
-        nQueries = 0
-        dataTemp = ""
-        message = ""
-        while True:
-            print "###############################################################"
-            print >> sys.stderr,"Ijah predictor server :)"
-            print >> sys.stderr,"[port= "+str(self.port)+" on "+self.name+"]"
-            print >> sys.stderr,"[maxElapsedTimePerQuery= "+str(maxElapsedTime)+" seconds]"
-            print >> sys.stderr,"[HasServed= "+str(nQueries)+" queries]"
-            print >> sys.stderr,"[upFrom= "+upAt+"]"
-            print >> sys.stderr,self.name+": Waiting for any query at "+self.host+":"+str(self.port)
-
-            conn, addr = self.socketConn.accept()
-            try:
-                print >>sys.stderr, self.name+': Connection from', addr
-                while True:
-                    dataTemp = conn.recv(1024)
-                    print >>sys.stderr, self.name+': Received "%s"' % dataTemp
-                    message += dataTemp
-
-                    if message[-3:]=="end":
-                        # sys.stderr.write ("Fetching Data Finished....\n")
-                        message = message.split("|")[0]
-                        conn.close()
-                        break
-            finally:
-                conn, addr = self.socketConn.accept()
-                print >>sys.stderr, self.name+': Connection from', addr
-                nQueries += 1
-                queryPair = message.split(",")
-
-                predictThreads = [predictThread(i,key+" on Port: "+str(self.port), queryPair,key) for i,key in enumerate(funcPointer)]
-                for t in predictThreads:
-                    t.daemon=True
-                    t.start()
-                for t in predictThreads:
-                    self.resPredict += t.join()
-                #a lock for Synchronizing the query string...?
-
-                print >> sys.stderr, self.name+': resPredict = '+self.resPredict
-                conn.sendall(self.resPredict)
-                conn.close()
-
-                self.resPredict = ""
-                message = ""
-                dataTemp = ""
-
-class predictThread(threading.Thread):
-    def __init__ (self,threadId,name,queryPair,key):
-        threading.Thread.__init__(self)
-        self.threadId = threadId
-        self.name = name
-        self.queryPair = queryPair
-        self.cur = connDB.cursor()
-        self.funcKey = key
-    def run(self):
-        # Pass db cursor to predict
-        nPairs = len(self.queryPair)
-        startTime = time.time()
-        self.predictionStr = ""
-        print >> sys.stderr, "Start Predicting with "+self.name
-        for i,query in enumerate(self.queryPair):
-            print >> sys.stderr, '*********************************************************'
-            print >> sys.stderr, self.name+' predicting pair= '+str(i+1)+' of '+str(nPairs)
-            if (i>0):
-                self.predictionStr += ","
-
-            elapsedTime = time.time()-startTime
-            print >> sys.stderr, self.name+' elapsedTime= '+str(elapsedTime)+' of max= '+str(maxElapsedTime)
-
-            if  elapsedTime <= maxElapsedTime:
-                self.predictionStr += funcPointer[self.funcKey](query,self.cur)
-            else:
-                self.predictionStr += predictDummy(query)
-    def join(self):
-        threading.Thread.join(self)
-        return self.predictionStr
-
-
 def main():
-    if len(sys.argv)!=5:
-        print 'USAGE: phyton prediction_server.py [host] [portLow] [portHigh] [maxElapsedTime]'
+    if len(sys.argv)!=6:
+        print 'USAGE: phyton prediction_server.py [host] [portLo] [portHi] [maxElapsedTime] [serverId]'
         return
 
     global maxElapsedTime
     global upAt
     host = sys.argv[1]
-    portLow = int(sys.argv[2])
-    portHigh = int(sys.argv[3])
+    portLo = int(sys.argv[2])
+    portHi = int(sys.argv[3])
     maxElapsedTime = float(sys.argv[4])
+    serverId = sys.argv[5]
     upAt = datetime.now().strftime("%Y:%m:%d %H:%M:%S")
 
-    socketThreads = [socketThread(i,"Thread-"+str(i), host, port) for i,port in enumerate(range(portLow, portHigh+1))]
-    signal.signal(signal.SIGINT, signal_handler)
-    for t in socketThreads:
+    print >> sys.stderr, '******************************************************'
+    print >> sys.stderr,"Ijah predictor server :)"
+    print >> sys.stderr,"[id= "+serverId+"]"
+    print >> sys.stderr,"[ports= "+str(portLo)+" to "+str(portHi)+"]"
+    print >> sys.stderr,"[maxElapsedTimePerQuery= "+str(maxElapsedTime)+" seconds]"
+    print >> sys.stderr,"[upFrom= "+upAt+"]"
+
+    threadList = [PST(i,"server-"+str(i), host, port) for i,port in enumerate(range(portLo, portHi+1))]
+    signal.signal(signal.SIGINT, signalHandler)
+    for t in threadList:
         t.daemon=True
         t.start()
+
     while True:
         pass
 
     connDB.close()
 
-def signal_handler(signal, frame):
+def signalHandler(signal, frame):
     sys.stderr.write("Closing thread, socket, and database ...\n")
     connDB.close()
     sys.exit(0)
