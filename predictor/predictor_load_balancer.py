@@ -30,7 +30,7 @@ def main():
     while True:
         print("###############################################################")
         print("Ijah predictor load-balancer :)")
-        print("[HasServed= "+str(nQueries)+" queries]")
+        print("[HasDispatched= "+str(nQueries)+" queries]")
         print("[upFrom= "+upAt+"]")
         print("[serverUsage= "+str(serverUsage)+']')
 
@@ -72,7 +72,7 @@ def main():
             message = ""
 
 def signalHandler(signal, frame):
-    sys.stderr.write("Closing socket and database ...\n")
+    sys.stderr.write("Closing socket ...\n")
     socketConn.close()
     sys.exit(0)
 
