@@ -6,82 +6,90 @@ from numpy import linalg as LA
 from scipy import sparse
 from collections import defaultdict
 
-import yamanishi_data_util as yam
-
 class KronRLS:
     '''
     in kronRLS, the (learned) model is the kernel
-    _trConnData contain com-pro connectivity for training
     '''
-    _trConnData = None
     _trConnMat = None
-    _trComKernel = None
-    _trProKernal = None
+    _trComList = None
+    _trProList = None
+    _trComKernelMat = None
+    _trProKernelMat = None
 
-    _yamanishiKernelDict = None
+    _kernelDict = None
 
-    def __init__(self,iTrConnData):
-        _yamanishiKernelDict = yam.loadKernel()
+    def __init__(self,iTrConnMat,iTrComList,iTrProList,iKernelDict):
+        self._trConnMat = iTrConnMat
+        self._trComList = iTrComList
+        self._trProList = iTrProList
+        self._kernelDict = iKernelDict
 
-        # _trConnData = iTrConnData
-        # _trConnMat, _trComList, _trProList = _makeConnMat(_trConnData)
-        # _trComKernel = _makeComKernel(_trComList)
-        # _trProKernel = _makeProKernel()
+        self._trComKernelMat = self._makeKernelMat(self._trComList,self._trComList)
+        self._trProKernelMat = self._makeKernelMat(self._trProList,self._trProList)
 
-    def predict(com,pro,gamma):
-        # make com-pro conn matrix (adjacency matrix)
+    def predict(self,xTest,gamma):
+        ##
+        connMat = self._trConnMat
+        xIdxTest = []
+        for c,p in xTest:
+            cIdx = self._trComList.index(c)
+            pIdx = self._trProList.index(p)
+            connMat[cIdx][pIdx] = 0
+            xIdxTest.append((cIdx,pIdx))
 
-        # make kernel dim1: com
+        ##
+        comKernelMat = self._trComKernelMat
+        proKernelMat = self._trProKernelMat
 
-        # make kernel dim2: pro
+        ## make prediction
+        connMatPred = self._predict(comKernelMat,proKernelMat,connMat,gamma)
 
-        # make prediction
-        ypred = _predict(comKernel,proKernel,connMat,gamma)
+        ##
+        yPred = []
+        for cIdx,pIdx in xIdxTest:
+            y = connMatPred[cIdx][pIdx]
+            y = int(y>=0.5)
+            yPred.append(y)
+
+        return yPred
 
     def _predict(self,k1,k2,y,gamma=1.0):
-        w1,v1 = LA.eig(k1)
-        w2,v2 = LA.eig(k2)
+        la,Qa = LA.eig(k1)
+        lb,Qb = LA.eig(k2)
+
+        la = la.flatten()
+        lb = lb.flatten()
+        la = np.diag(la)
+        lb = np.diag(lb)
 
         # http://stackoverflow.com/questions/17035767/kronecker-product-in-python-and-matlab
-        v = sparse.kron( np.diag(v2).transpose(),np.diag(v1) ).toarray()
-        inv = v / (v+gamma)
+        diagLa = np.diag(la)
+        diagLa = diagLa.reshape((len(diagLa),1))
+        diagLbTrans = np.diag(lb).transpose()
+        diagLbTrans = diagLbTrans.reshape((1,len(diagLbTrans)))
 
-        m1 = w1.transpose() * y * w2
-        m2 = m1 * inv
+        l = sparse.kron( diagLbTrans,diagLa ).toarray()
+        inverse = l / (l+gamma)
 
-        ypred = w1.dot(m2).dot( w2.transpose() )
+        m1 = Qa.transpose().dot(y).dot(Qb)
+        m2 = m1 * inverse
+
+        ypred = Qa.dot(m2).dot( Qb.transpose() )
+        ypred = ypred.real
+
         return ypred
 
-    def _makeConnMat(connData):
-        comProDict = defaultdict(list)
-        comList = []
-        proList = []
-        for d in connData:
-            com,pro = d
-            conProDict[com].append(pro)
-            comList.append(com)
-            proList.append(pro)
+    def _makeKernelMat(self,list1,list2):
+        m = len(list1)
+        n = len(list2)
+        kernel = np.zeros((m,n))
 
-        comList = list(set(comList))
-        proList = list(set(proList))
-        connMat = np.zeros( (len(comList),len(proList)) )
+        for i,ii in enumerate(list1):
+            for j,jj in enumerate(list2):
+                kernel[i][j] = self._computeKernel(ii,jj)
 
-        for com,proList in comProDict.iteritems():
-            comIdx = comList.index(com)
-            for pro in proList:
-                proIdx = proList.index(pro)
-                connMat[comIdx][proIdx] = 1
+        return kernel
 
-        return (connMat, comList, proList)
-
-    def _makeComKernel(comList):
-        n = len(comList)
-        kernel = mat.np.zeros((n,n))
-
-        for i,ci in enumerate(comList):
-            for j,cj in comList:
-                kernel[i][j] = _computeComKernel(ci,cj)
-
-    def _computeComKernel(com1,com2):
-        kernel = _yamanishiKernelDict[(com1,com2)]
+    def _computeKernel(self,di,dj):
+        kernel = self._kernelDict[(di,dj)]
         return kernel

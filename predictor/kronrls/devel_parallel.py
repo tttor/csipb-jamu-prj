@@ -8,6 +8,7 @@ from sklearn.cross_validation import KFold
 from sklearn.cross_validation import StratifiedKFold
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import average_precision_score
+from scoop import futures as fu
 import yamanishi_data_util as yam
 
 outDir = '../../xprmt'
@@ -33,9 +34,6 @@ def main(argv):
             dataY.append( connMat[i][j] )
     nData = len(dataY)
 
-    ## instantiate a KronRLS predictor
-    kronrls = KronRLS(connMat,comList,proList,kernel)
-
     ##
     nFolds = None
     kfList = None
@@ -48,46 +46,46 @@ def main(argv):
     else:
         assert(False)
 
-    yTestList = []
-    yPredList = []
-    fold = 0
-    for trIdxList, testIdxList in kfList:
-        fold += 1
-        print 'fold= ',fold,'of',nFolds,'######################################'
+    kronrls = KronRLS(connMat,comList,proList,kernel)
 
+    ## prep for parallel
+    xTestList = []
+    yTestList = []
+    for trIdxList, testIdxList in kfList:
         xTest = [dataX[i] for i in testIdxList]
         yTest = [dataY[i] for i in testIdxList]
-        # xTr = [dataX[i] for i in trIdxList]
-        # yTr = [dataY[i] for i in trIdxList]
 
-        # test
-        gamma = 1.0
-        yPred = kronrls.predict(xTest,gamma)
-
-        yTestList += yTest
-        yPredList += yPred
-
+        xTestList.append(xTest)
+        yTestList.append(yTest)
 
     ##
-    precision, recall, _ = precision_recall_curve(yTestList, yPredList)
-    aupr = average_precision_score(yTestList, yPredList, average='micro')
+    yPredList = fu.map(evalPerFold,xTestList,yTestList,[kronrls]*nFolds,
+                       [connMat]*nFolds,[comList]*nFolds,[proList]*nFolds,[kernel]*nFolds)
 
-    ##
-    plt.clf()
-    plt.figure()
+    # ##
+    # precision, recall, _ = precision_recall_curve(yTestList, yPredList)
+    # aupr = average_precision_score(yTestList, yPredList, average='micro')
 
-    plt.plot(recall, precision, 'r-',
-             label= '(area = %0.2f)' % aupr, lw=2)
+    # ##
+    # plt.clf()
+    # plt.figure()
 
-    plt.ylim([-0.05, 1.05])
-    plt.xlim([-0.05, 1.05])
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
-    plt.title('Precision-Recall Curve')
-    plt.legend(loc="lower left")
+    # plt.plot(recall, precision, 'r-',
+    #          label= '(area = %0.2f)' % aupr, lw=2)
 
-    fname = '/pr_curve_'+dataMode+'_'+valMode+'.png'
-    plt.savefig(outDir+fname, bbox_inches='tight')
+    # plt.ylim([-0.05, 1.05])
+    # plt.xlim([-0.05, 1.05])
+    # plt.xlabel('Recall')
+    # plt.ylabel('Precision')
+    # plt.title('Precision-Recall Curve')
+    # plt.legend(loc="lower left")
+
+    # fname = '/pr_curve_'+dataMode+'_'+valMode+'.png'
+    # plt.savefig(outDir+fname, bbox_inches='tight')
+
+def evalPerFold(xTest,yTest,kronrls,connMat,comList,proList,kernel):
+    gamma = 1.0
+    yPred = kronrls.predict(xTest,gamma)
 
 if __name__ == '__main__':
     start_time = time.time()
