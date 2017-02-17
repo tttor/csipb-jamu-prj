@@ -1,16 +1,19 @@
 # predictor_server_thread.py
 import threading
 import socket
+import sys
 
 from predictor_machine_thread import PredictorMachineThread as PMT
+from config import predictorConfig as pcfg
 
 class PredictorServerThread(threading.Thread):
-    def __init__(self, threadId, name, host, port):
+    def __init__(self,iid,iname,ihost,iport):
         threading.Thread.__init__(self)
-        self.threadId = threadId
-        self.name = name
-        self.host = host
-        self.port = port
+        self.id = iid
+        self.name = iname
+        self.host = ihost
+        self.port = iport
+
         serverAddr = (self.host,self.port)
         self.socketConn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socketConn.bind(serverAddr)
@@ -18,17 +21,10 @@ class PredictorServerThread(threading.Thread):
 
     def run(self):
         self.socketConn.listen(1)
-        nQueries = 0
         dataTemp = ""
         message = ""
         while True:
-            # print "###############################################################"
-            # print >> sys.stderr,"Ijah predictor server :)"
-            # print >> sys.stderr,"[port= "+str(self.port)+" on "+self.name+"]"
-            # print >> sys.stderr,"[maxElapsedTimePerQuery= "+str(maxElapsedTime)+" seconds]"
-            # print >> sys.stderr,"[HasServed= "+str(nQueries)+" queries]"
-            # print >> sys.stderr,"[upFrom= "+upAt+"]"
-            # print >> sys.stderr,self.name+": Waiting for any query at "+self.host+":"+str(self.port)
+            print >>sys.stderr,self.name+": Waiting for any query at "+self.host+":"+str(self.port)
 
             conn, addr = self.socketConn.accept()
             try:
@@ -46,13 +42,16 @@ class PredictorServerThread(threading.Thread):
             finally:
                 conn, addr = self.socketConn.accept()
                 print >>sys.stderr, self.name+': Connection from', addr
-                nQueries += 1
-                queryPair = message.split(",")
 
-                threadList = [PMT(i,key+" on Port: "+str(self.port), queryPair,key) for i,key in enumerate(funcPointer)]
+                queryList = message.split(",")
+                threadList = [PMT(i,'predictorThread_'+self.name+'_'+method,
+                                  queryList,method,pcfg['maxElapsedTime'])
+                              for i,method in enumerate(pcfg['methods'])]
+
                 for t in threadList:
                     t.daemon=True
                     t.start()
+
                 for t in threadList:
                     self.resPredict += t.join()
                 #a lock for Synchronizing the query string...?
