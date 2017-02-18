@@ -51,7 +51,7 @@ def main():
             while True:
                 bufsize = 1024
                 dataTemp = connToPredictorPHP.recv(bufsize)
-                print >>sys.stderr, 'Received "%s"' % dataTemp
+                # print >>sys.stderr, 'Received "%s"' % dataTemp
                 message += dataTemp
 
                 if message[-3:]=="end":
