@@ -96,7 +96,6 @@
     $respLen = pg_num_rows($resp);
 
     if ($respLen===0 and $mode==='SEARCH_AND_PREDICT') {
-      // TODO @Ajmal: run real predictors!
       $weight = 'null';
       $source = 'null';
       $timestamp = 'null';
