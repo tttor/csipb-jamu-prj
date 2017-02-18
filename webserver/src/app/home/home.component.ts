@@ -661,10 +661,10 @@ export class Home implements OnInit {
 
 
             // metadata text output ////////////////////////////////////////
-            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',plaSet,plaMeta);
-            this.comMetaTxtOutput = this.makeMetaTextOutput('com',comSet,comMeta);
-            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',proSet,proMeta);
-            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',disSet,disMeta);
+            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',iplaSet,plaMeta);
+            this.comMetaTxtOutput = this.makeMetaTextOutput('com',icomSet,comMeta);
+            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',iproSet,proMeta);
+            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',idisSet,disMeta);
 
             // connectivity graph output ///////////////////////////////////////
             let nNodeMax = 20;
@@ -762,6 +762,10 @@ export class Home implements OnInit {
   }
 
   makeMetaTextOutput(type,idList,meta) {
+    if (idList.length===0) {
+      return 'No Metadata';
+    }
+
     let keys = this.getPropKeys(type);
     let txt = '#0 '+this.getHeader(type)+'\n';
     for (let i=0; i<idList.length;i++) {
@@ -774,6 +778,10 @@ export class Home implements OnInit {
   }
 
   makeConnectivityTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
+    if (interaction.length===0) {
+      return 'No Connectivity';
+    }
+
     let conn = this.groupBy(srcType,destType,interaction);
 
     let text = this.getHeader(srcType+'_vs_'+destType)+'\n';
@@ -832,10 +840,6 @@ export class Home implements OnInit {
       }
     }
     text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
-
-    if (text==='') {
-      text = 'No Connectivity';
-    }
 
     return text;
   }
