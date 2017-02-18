@@ -82,8 +82,6 @@ def main():
             #Reset Variables
             message = ""
 
-            break
-
     print 'load-balancer: shutting down ...'
     conn.close()
 

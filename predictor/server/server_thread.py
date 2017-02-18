@@ -13,38 +13,33 @@ class ServerThread(threading.Thread):
         self.name = iname
         self.host = ihost
         self.port = iport
-
-        serverAddr = (self.host,self.port)
-        self.socketConn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socketConn.bind(serverAddr)
-        self.resPredict = ""
+        self.predMsg = ""
 
     def run(self):
-        self.socketConn.listen(1)
-        dataTemp = ""
-        message = ""
         while True:
+            LBConn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            LBConn.bind( (self.host,self.port) )
+            LBConn.listen(1)
             print >>sys.stderr,self.name+": Waiting for any query at "+self.host+":"+str(self.port)
 
-            conn, addr = self.socketConn.accept()
+            LBConnAccept, LBConnAcceptAddr = LBConn.accept()
             try:
-                print >>sys.stderr, self.name+': Connection from', addr
+                print >>sys.stderr, self.name+': Connection from', LBConnAcceptAddr
+
+                dataTemp = ""
+                message = ""
                 while True:
-                    dataTemp = conn.recv(1024)
+                    dataTemp = LBConnAccept.recv(1024)
                     print >>sys.stderr, self.name+': Received "%s"' % dataTemp
                     message += dataTemp
 
                     if message[-3:]=="end":
-                        # sys.stderr.write ("Fetching Data Finished....\n")
                         message = message.split("|")[0]
-                        conn.close()
-                        break
+                        LBConnAccept.close()
+                        LBConn.close()
             finally:
-                conn, addr = self.socketConn.accept()
-                print >>sys.stderr, self.name+': Connection from', addr
-
                 queryList = message.split(",")
-                threadList = [Predictor(i,'predictorThread_'+self.name+'_'+method,
+                threadList = [Predictor(i,self.name+'_'+method,
                                         queryList,method,pcfg['maxElapsedTime'])
                               for i,method in enumerate(pcfg['methods'])]
 
@@ -52,14 +47,16 @@ class ServerThread(threading.Thread):
                     t.daemon=True
                     t.start()
 
-                for t in threadList:
-                    self.resPredict += t.join()
                 #TODO: a lock for Synchronizing the query string...?
+                for t in threadList:
+                    self.predMsg += t.join()
+                print >> sys.stderr, self.name+': predMsg = '+self.predMsg
 
-                print >> sys.stderr, self.name+': resPredict = '+self.resPredict
-                conn.sendall(self.resPredict)
-                conn.close()
+                ## Send to predict.php
+                predictorConn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                predictorConn.connect( (self.host,self.port) )
 
-                self.resPredict = ""
-                message = ""
-                dataTemp = ""
+                predictorConn.sendall(self.predMsg)
+                predictorConn.close()
+
+                self.predMsg = ""

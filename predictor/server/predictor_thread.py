@@ -33,7 +33,7 @@ class PredictorThread(threading.Thread):
         startTime = time.time()
         self.predictionStr = ""
         for i,query in enumerate(self.queryList):
-            print >> sys.stderr, self.name+' predicting pair= '+str(i+1)+' of '+str(nQuery)
+            print >> sys.stderr, self.name+': predicting query= '+str(i+1)+' of '+str(nQuery)
             if (i>0):
                 self.predictionStr += ","
 

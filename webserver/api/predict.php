@@ -16,6 +16,7 @@
     if ($result === false){
       echo "socket_connect() failed.\nReason:($result) ".socket_strerror(socket_last_error($socket))."\n";
     }
+
     // Send messages to predictor server
     $msgTo = "";
     $counter = 0;
@@ -28,6 +29,7 @@
     }
     $msgTo .= "|end";
     socket_write($socket, $msgTo, strlen($msgTo));
+
     // Receive Data from the predictor server
     // The predictor_load_balancer will return a string which is the
     // port number of predictor_server that execute the query
@@ -37,6 +39,7 @@
       $portStr .= $msgFrom;
     }
     socket_close($socket);
+
     /*------------------Socket to predictor_server------------------*/
     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
     if ($socket === false){
@@ -46,6 +49,7 @@
     if ($result2 === false){
       echo "socket_connect() failed.\nReason:($result2) ".socket_strerror(socket_last_error($socket))."\n";
     }
+
     // Receive Data from the predictor server
     // The predictor_server in Python will return string in
     // format=source|target|weight|source|time_stamp comma seperated each pair
@@ -55,6 +59,7 @@
     }
     socket_close($socket);
 
+    // Process predictionStr
     if ($predictionStr!==null) {
       $predictionStrPairList = explode(",",$predictionStr);
       foreach ($predictionStrPairList as $perPairStr) {
