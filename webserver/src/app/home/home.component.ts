@@ -661,10 +661,10 @@ export class Home implements OnInit {
 
 
             // metadata text output ////////////////////////////////////////
-            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',plaSet,plaMeta);
-            this.comMetaTxtOutput = this.makeMetaTextOutput('com',comSet,comMeta);
-            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',proSet,proMeta);
-            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',disSet,disMeta);
+            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',iplaSet,plaMeta);
+            this.comMetaTxtOutput = this.makeMetaTextOutput('com',icomSet,comMeta);
+            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',iproSet,proMeta);
+            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',idisSet,disMeta);
 
             // connectivity graph output ///////////////////////////////////////
             let nNodeMax = 20;
@@ -762,6 +762,10 @@ export class Home implements OnInit {
   }
 
   makeMetaTextOutput(type,idList,meta) {
+    if (idList.length===0) {
+      return 'No Metadata';
+    }
+
     let keys = this.getPropKeys(type);
     let txt = '#0 '+this.getHeader(type)+'\n';
     for (let i=0; i<idList.length;i++) {
@@ -774,58 +778,68 @@ export class Home implements OnInit {
   }
 
   makeConnectivityTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
-    let indent = '  ';
+    if (interaction.length===0) {
+      return 'No Connectivity';
+    }
+
+    let conn = this.groupBy(srcType,destType,interaction);
+
     let text = this.getHeader(srcType+'_vs_'+destType)+'\n';
     let srcPropKeys = this.getPropKeys(srcType);
     let destPropKeys = this.getPropKeys(destType);
+    let indent = '  ';
 
     let nUnique = 0;
     let nUniquePerConnSrc = 0;
     let pos = -1;// in which, we will insert nUniquePerConnSrc
     let prevSrc = '';
     let prevConnSource = '';
-    for(let i=0;i<interaction.length;i++) {
-      let src = interaction[i][srcType+'_id'];
-      let dest = interaction[i][destType+'_id'];
-      let source = interaction[i]['source'];
-      let weight = interaction[i]['weight'];
 
-      if (prevSrc!==src) {
-        if (i>0) {
-          text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
+    for (let i=0;i<conn.length;i++) {
+      for (let j=0;j<conn[i].length;j++) {
+        let comps = conn[i][j].split(",");
+        let source = comps[0];
+        let weight = comps[1];
+        let src = comps[2];
+        let dest = comps[3];
+
+        if (source==='null') {
+          continue;
         }
 
-        nUnique = nUnique + 1;
-        text = text+'#'+nUnique.toString()+' ';
+        if (prevSrc!==src) {
+          nUnique = nUnique + 1;
+          text = text+'#'+nUnique.toString()+' ';
 
-        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-        text += this.concatProps(srcProps,srcPropKeys,true,true)
-        text +=':\n';
+          let srcProps = this.getProps(src,srcPropKeys,srcMeta);
+          text += this.concatProps(srcProps,srcPropKeys,true,true)
+          text +=':\n';
 
-        prevSrc = src;
-        prevConnSource = '';
+          prevSrc = src;
+          prevConnSource = '';
+        }
+
+        if (prevConnSource!==source) {
+          if (nUniquePerConnSrc>0) {
+            text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
+          }
+
+          text += indent+'['+source+':]\n';
+          pos = text.length - 2;
+          prevConnSource = source;
+          nUniquePerConnSrc = 1;
+        }
+        else {
+          nUniquePerConnSrc += 1;
+        }
+
+        let destProps = this.getProps(dest,destPropKeys,destMeta);
+        text += indent+indent+'['+weight+'] ';
+        text += this.concatProps(destProps,destPropKeys,true,true)
+        text += '\n';
       }
-
-      if (prevConnSource!==source) {
-        text += indent+'['+source+':]\n';
-        pos = text.length - 2;
-        prevConnSource = source;
-        nUniquePerConnSrc = 1;
-      }
-      else {
-        nUniquePerConnSrc += 1;
-      }
-
-      let destProps = this.getProps(dest,destPropKeys,destMeta);
-      text += indent+'['+weight+'] ';
-      text += this.concatProps(destProps,destPropKeys,true,true)
-      text += '\n';
     }
     text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
-
-    if (text==='') {
-      text = 'No Connectivity';
-    }
 
     return text;
   }
@@ -932,6 +946,44 @@ export class Home implements OnInit {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
+  private find(k,arr) {
+    let idx = -1;
+    for (let i=0;i<arr.length;i++) {
+      if (arr[i]===k) {
+        idx = i;
+        break;
+      }
+    }
+    return idx;
+  }
+
+  private groupBy(srcT,destT,iconn) {
+    let srcSet = new Array();
+    let connSet = new Array();
+    for (let i=0;i<iconn.length;i++) {
+      let srcV = iconn[i][srcT+'_id'];
+      let destV = iconn[i][destT+'_id'];
+
+      let idx = this.find(srcV,srcSet);
+      if (idx === -1) {
+        idx = srcSet.length;
+        srcSet.push(srcV);
+        connSet.push( new Array() );
+      }
+
+      let w = iconn[i]['weight'];
+      let s = iconn[i]['source'];
+      let str = s+","+w+","+srcV+","+destV;
+      connSet[idx].push(str);
+    }
+
+    for (let i=0;i<connSet.length;i++) {
+      connSet[i] = connSet[i].sort();
+    }
+
+    return connSet;
+  }
+
   toggleConnectivitySwap(type) {
     if (type==='plaVScom') {
       this.plaVScomSwapped = !this.plaVScomSwapped;
