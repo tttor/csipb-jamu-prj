@@ -2,15 +2,18 @@
 import numpy as np
 
 class RNDLy:
-    def __init__():
-        pass
+    def __init__(self):
+    	self.name = 'rndly'
 
-    def predict(queryList):
+    def predict(self,query):
+    	com,pro = query.split(":")
+    	timestamp = '000'
+
         lo = 0.0
         hi = 1.0
-        n = len(queryList)
+        pred = np.random.uniform(lo,hi,1)[0]
 
-        predictionList = np.random.uniform(lo,hi,n)
-        predictionList = predictionList.tolist()
+        predMsgList = [com,pro,str(pred),self.name,timestamp]
+        predMsg = '|'.join(predMsgList)
 
-        return predictionList
+        return predMsg

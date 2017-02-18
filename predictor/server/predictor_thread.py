@@ -7,26 +7,26 @@ import sys
 sys.path.append('../rndly')
 from rndly import RNDLy
 
-class PredictorMachineThread(threading.Thread):
+class PredictorThread(threading.Thread):
     def __init__ (self,iid,iname,iqueryList,imethod,imaxtime):
         threading.Thread.__init__(self)
         self.id = iid
         self.name = iname
         self.queryList = iqueryList
-        self.method = method
+        self.method = imethod
         self.maxTime = imaxtime
-
-        connDB = psycopg2.connect(database=db['name'],user=db['user'],password=db['passwd'],
-                                  host=db['host'],port=db['port'])
-        self.cur = connDB.cursor()
 
         self.predictor = None
         if self.method=='rndly':
-            predictor = RNDLy()
+            self.predictor = RNDLy()
         # elif self.method=='blmnii':
-        #     predictor = BLMNII()
+        #     self.predictor = BLMNII()
         else:
             pass
+
+        # connDB = psycopg2.connect(database=db['name'],user=db['user'],password=db['passwd'],
+        #                           host=db['host'],port=db['port'])
+        # self.cur = connDB.cursor()
 
     def run(self):
         nQuery = len(self.queryList)

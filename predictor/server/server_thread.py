@@ -3,10 +3,10 @@ import threading
 import socket
 import sys
 
-from predictor_machine_thread import PredictorMachineThread as PMT
+from predictor_thread import PredictorThread as Predictor
 from config import predictorConfig as pcfg
 
-class PredictorServerThread(threading.Thread):
+class ServerThread(threading.Thread):
     def __init__(self,iid,iname,ihost,iport):
         threading.Thread.__init__(self)
         self.id = iid
@@ -44,8 +44,8 @@ class PredictorServerThread(threading.Thread):
                 print >>sys.stderr, self.name+': Connection from', addr
 
                 queryList = message.split(",")
-                threadList = [PMT(i,'predictorThread_'+self.name+'_'+method,
-                                  queryList,method,pcfg['maxElapsedTime'])
+                threadList = [Predictor(i,'predictorThread_'+self.name+'_'+method,
+                                        queryList,method,pcfg['maxElapsedTime'])
                               for i,method in enumerate(pcfg['methods'])]
 
                 for t in threadList:
@@ -54,7 +54,7 @@ class PredictorServerThread(threading.Thread):
 
                 for t in threadList:
                     self.resPredict += t.join()
-                #a lock for Synchronizing the query string...?
+                #TODO: a lock for Synchronizing the query string...?
 
                 print >> sys.stderr, self.name+': resPredict = '+self.resPredict
                 conn.sendall(self.resPredict)
