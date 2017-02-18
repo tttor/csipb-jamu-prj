@@ -40,7 +40,15 @@
     }
     socket_close($socket);
 
-    $row = array('time_to_wait'=>$timeToWait);
+    // sleep for 10 seconds
+    sleep( (float) $timeToWait );
+
+    $row = array('has_waited_for'=>$timeToWait);
+    $respArr[] = $row;
+  }
+  else {
+    $timeToWait = "0";
+    $row = array('has_waited_for'=>$timeToWait);
     $respArr[] = $row;
   }
 
