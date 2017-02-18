@@ -7,7 +7,7 @@ from datetime import datetime
 from config import loadBalancerConfig as lbcfg
 from config import serverConfig as scfg
 
-conn = None
+connFromPredictorPHP = None
 
 def main():
     if len(sys.argv)!=1:
@@ -26,13 +26,13 @@ def main():
         serverPorts.append(ports)
         serverUsage.append([0]*len(ports))
 
-    global conn
-    conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    conn.bind( (host,port) )
+    global connFromPredictorPHP
+    connFromPredictorPHP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    connFromPredictorPHP.bind( (host,port) )
 
     backlog = 1
-    conn.listen(backlog)
-    message = ""
+    connFromPredictorPHP.listen(backlog)
+
     while True:
         print("###############################################################")
         print("Ijah predictor load-balancer :)")
@@ -44,17 +44,18 @@ def main():
         print("Waiting for any query from 'predict.php' at "+host+":"+str(port))
 
         signal.signal(signal.SIGINT, signalHandler)
-        conn, addr = conn.accept()
+        connToPredictorPHP, connToPredictorAddr = connFromPredictorPHP.accept()
         try:
-            print >>sys.stderr, 'Connection from', addr
+            print >>sys.stderr, 'Connection from', connToPredictorAddr
+
+            message = ""
             while True:
                 bufsize = 1024
-                dataTemp = conn.recv(bufsize)
+                dataTemp = connToPredictorPHP.recv(bufsize)
                 print >>sys.stderr, 'Received "%s"' % dataTemp
                 message += dataTemp
 
                 if message[-3:]=="end":
-                    # sys.stderr.write ("Fetching Data Finished....\n")
                     break
         finally:
             # get server with fewest #servedQuery'
@@ -65,29 +66,23 @@ def main():
             serverUsage[serverIdx][serverThreadIdx] += 1
             nQueries += 1
 
-            #Connecting to serverThread server
-            conn2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            conn2.connect( (host,serverPort) )
-
-            #Forward the message as is (received from predict.php)
-            print 'passing the msg to '+host+': '+str(serverPort)
-            conn2.sendall(message)
-
             #Send serverport to predict.php
-            conn.sendall( str(serverPort) )
+            connToPredictorPHP.sendall( str(serverPort) )
+            connToPredictorPHP.close()
 
-            #close connection
-            conn2.close()
-
-            #Reset Variables
-            message = ""
+            # #Forward the message as is (received from predict.php)
+            # print 'passing the msg to '+host+': '+str(serverPort)
+            # connToServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            # connToServer.connect( (host,serverPort) )
+            # connToServer.sendall(message)
+            # connToServer.close()
 
     print 'load-balancer: shutting down ...'
-    conn.close()
+    connFromPredictorPHP.close()
 
 def signalHandler(signal, frame):
     sys.stderr.write("Closing socket ...\n")
-    conn.close()
+    connFromPredictorPHP.close()
     sys.exit(0)
 
 if __name__ == '__main__':

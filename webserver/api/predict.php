@@ -39,44 +39,45 @@
       $portStr .= $msgFrom;
     }
     socket_close($socket);
+    $respArr[] = $portStr;
 
-    /*------------------Socket to predictor_server------------------*/
-    $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-    if ($socket === false){
-      echo "socket_create() failed: reason:". socket_strerror(socket_last_error())."\n";
-    }
-    $result2 = socket_connect($socket, $predictorChannelHost, intval($portStr));
-    if ($result2 === false){
-      echo "socket_connect() failed.\nReason:($result2) ".socket_strerror(socket_last_error($socket))."\n";
-    }
+    // /*------------------Socket to predictor_server------------------*/
+    // $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+    // if ($socket === false){
+    //   echo "socket_create() failed: reason:". socket_strerror(socket_last_error())."\n";
+    // }
+    // $result2 = socket_connect($socket, $predictorChannelHost, intval($portStr));
+    // if ($result2 === false){
+    //   echo "socket_connect() failed.\nReason:($result2) ".socket_strerror(socket_last_error($socket))."\n";
+    // }
 
-    // Receive Data from the predictor server
-    // The predictor_server in Python will return string in
-    // format=source|target|weight|source|time_stamp comma seperated each pair
-    $predictionStr = "";
-    while($msgFrom = socket_read($socket, 2048)){
-      $predictionStr .= $msgFrom;
-    }
-    socket_close($socket);
+    // // Receive Data from the predictor server
+    // // The predictor_server in Python will return string in
+    // // format=source|target|weight|source|time_stamp comma seperated each pair
+    // $predictionStr = "";
+    // while($msgFrom = socket_read($socket, 2048)){
+    //   $predictionStr .= $msgFrom;
+    // }
+    // socket_close($socket);
 
-    // Process predictionStr
-    if ($predictionStr!==null) {
-      $predictionStrPairList = explode(",",$predictionStr);
-      foreach ($predictionStrPairList as $perPairStr) {
-        $words = explode("|",$perPairStr);
-        $comId = $words[0];
-        $proId = $words[1];
-        $weight = trim($words[2]);
-        $source = $words[3];
-        $timestamp = $words[4];
-        $row = array('com_id'=>$comId,'pro_id'=>$proId,
-                     'weight'=>$weight,'source'=>$source,'timestamp'=>$timestamp);
-        $respArr[] = $row;
-      }
-    }
-    else {
-      echo '_ERROR_: predictionStr is empty';
-    }
+    // // Process predictionStr
+    // if ($predictionStr!==null) {
+    //   $predictionStrPairList = explode(",",$predictionStr);
+    //   foreach ($predictionStrPairList as $perPairStr) {
+    //     $words = explode("|",$perPairStr);
+    //     $comId = $words[0];
+    //     $proId = $words[1];
+    //     $weight = trim($words[2]);
+    //     $source = $words[3];
+    //     $timestamp = $words[4];
+    //     $row = array('com_id'=>$comId,'pro_id'=>$proId,
+    //                  'weight'=>$weight,'source'=>$source,'timestamp'=>$timestamp);
+    //     $respArr[] = $row;
+    //   }
+    // }
+    // else {
+    //   echo '_ERROR_: predictionStr is empty';
+    // }
   }
 
   header('Content-type: application/json');
