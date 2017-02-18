@@ -17,26 +17,28 @@ class ServerThread(threading.Thread):
 
     def run(self):
         while True:
-            LBConn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            LBConn.bind( (self.host,self.port) )
-            LBConn.listen(1)
-            print >>sys.stderr,self.name+": Waiting for any query at "+self.host+":"+str(self.port)
+            connFromLB = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            connFromLB.bind( (self.host,self.port) )
+            connFromLB.listen(1)
 
-            LBConnAccept, LBConnAcceptAddr = LBConn.accept()
+            print >>sys.stderr,self.name+": Waiting for any query at "+self.host+":"+str(self.port)
+            connToLB, connToLBAddr = connFromLB.accept()
+
             try:
-                print >>sys.stderr, self.name+': Connection from', LBConnAcceptAddr
+                print >>sys.stderr, self.name+': Connection from', connToLBAddr
 
                 dataTemp = ""
                 message = ""
                 while True:
-                    dataTemp = LBConnAccept.recv(1024)
+                    dataTemp = connToLB.recv(1024)
                     print >>sys.stderr, self.name+': Received "%s"' % dataTemp
                     message += dataTemp
 
                     if message[-3:]=="end":
                         message = message.split("|")[0]
-                        LBConnAccept.close()
-                        LBConn.close()
+                        connToLB.close()
+                        connFromLB.close()
+                        break
             finally:
                 queryList = message.split(",")
                 threadList = [Predictor(i,self.name+'_'+method,
@@ -53,10 +55,10 @@ class ServerThread(threading.Thread):
                 print >> sys.stderr, self.name+': predMsg = '+self.predMsg
 
                 ## Send to predict.php
-                predictorConn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                predictorConn.connect( (self.host,self.port) )
+                connToPredictorPHP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                connToPredictorPHP.connect( (self.host,self.port) )
 
-                predictorConn.sendall(self.predMsg)
-                predictorConn.close()
+                connToPredictorPHP.sendall(self.predMsg)
+                connToPredictorPHP.close()
 
                 self.predMsg = ""
