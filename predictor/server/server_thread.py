@@ -13,52 +13,73 @@ class ServerThread(threading.Thread):
         self.name = iname
         self.host = ihost
         self.port = iport
-        self.predMsg = ""
+        self.queryNum = -1
 
     def run(self):
-        while True:
-            connFromLB = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            connFromLB.bind( (self.host,self.port) )
-            connFromLB.listen(1)
+        connFromLB = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        connFromLB.bind( (self.host,self.port) )
+        connFromLB.listen(1)
 
-            print >>sys.stderr,self.name+": Waiting for any query at "+self.host+":"+str(self.port)
+        predictorThreads = []
+        for i,mw in enumerate(pcfg['methods']):
+            m = mw[0]
+            name = self.name+'_'+m
+            predictorThreads.append( Predictor(i,name,m,pcfg['maxElapsedTime']) )
+
+        for t in predictorThreads:
+            t.daemon = True
+            t.start()
+
+        while True:
+            print >>sys.stderr,self.name+": Waiting for any query from LoadBalancer at "+self.host+":"+str(self.port)
             connToLB, connToLBAddr = connFromLB.accept()
 
             try:
-                print >>sys.stderr, self.name+': Connection from', connToLBAddr
-
+                # print >>sys.stderr, self.name+': Connection from', connToLBAddr
                 dataTemp = ""
                 message = ""
                 while True:
                     dataTemp = connToLB.recv(1024)
-                    print >>sys.stderr, self.name+': Received "%s"' % dataTemp
+                    # print >>sys.stderr, self.name+': Received "%s"' % dataTemp
                     message += dataTemp
-
                     if message[-3:]=="end":
                         message = message.split("|")[0]
                         connToLB.close()
-                        connFromLB.close()
                         break
             finally:
+                self.queryNum += 1
                 queryList = message.split(",")
-                threadList = [Predictor(i,self.name+'_'+method,
-                                        queryList,method,pcfg['maxElapsedTime'])
-                              for i,method in enumerate(pcfg['methods'])]
+                for t in predictorThreads:
+                    t.setQueryList(queryList)
 
-                for t in threadList:
-                    t.daemon=True
-                    t.start()
+                # Wait for all thread to finish
+                while True:
+                    finished = True
+                    for i,t in enumerate(predictorThreads):
+                        if t.getPredictionNumber()!=self.queryNum:
+                            finished = False
+                            break
 
-                #TODO: a lock for Synchronizing the query string...?
-                for t in threadList:
-                    self.predMsg += t.join()
-                print >> sys.stderr, self.name+': predMsg = '+self.predMsg
+                    if finished:
+                        break
 
-                ## Send to predict.php
-                connToPredictorPHP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                connToPredictorPHP.connect( (self.host,self.port) )
+                # Merge predictionMsg
+                predictionListRaw = [] # 2D: row: method and col: ith query
+                for t in predictorThreads:
+                    predictionListRaw.append( t.getPredictionList() )
 
-                connToPredictorPHP.sendall(self.predMsg)
-                connToPredictorPHP.close()
+                predictionList = []
+                for i in range(len(queryList)):
+                    nMethods = len(pcfg['methods'])
+                    normalizer = 1.0/float(nMethods)
+                    nPred = 0.0
+                    for j in range(nMethods):
+                        w = pcfg['methods'][j][1]
+                        nPred += normalizer * w * predictionListRaw[j][i]
+                    predictionList.append(nPred)
+                # print self.name+': predictionList '+str(predictionList)
 
-                self.predMsg = ""
+                # Push predMsg to DB
+                # connDB = psycopg2.connect(database=db['name'],user=db['user'],password=db['passwd'],
+                #                           host=db['host'],port=db['port'])
+                # self.cur = connDB.cursor()

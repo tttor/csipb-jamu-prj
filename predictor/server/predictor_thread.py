@@ -8,13 +8,16 @@ sys.path.append('../rndly')
 from rndly import RNDLy
 
 class PredictorThread(threading.Thread):
-    def __init__ (self,iid,iname,iqueryList,imethod,imaxtime):
+    def __init__ (self,iid,iname,imethod,imaxtime):
         threading.Thread.__init__(self)
         self.id = iid
         self.name = iname
-        self.queryList = iqueryList
         self.method = imethod
         self.maxTime = imaxtime
+
+        self.predictionList = []
+        self.queryList = []
+        self.predictionNumber = -1
 
         self.predictor = None
         if self.method=='rndly':
@@ -22,45 +25,36 @@ class PredictorThread(threading.Thread):
         # elif self.method=='blmnii':
         #     self.predictor = BLMNII()
         else:
-            pass
-
-        # connDB = psycopg2.connect(database=db['name'],user=db['user'],password=db['passwd'],
-        #                           host=db['host'],port=db['port'])
-        # self.cur = connDB.cursor()
+            assert False, 'FATAL: Unknown prediction method!'
 
     def run(self):
-        nQuery = len(self.queryList)
-        startTime = time.time()
-        self.predictionStr = ""
-        for i,query in enumerate(self.queryList):
-            print >> sys.stderr, self.name+': predicting query= '+str(i+1)+' of '+str(nQuery)
-            if (i>0):
-                self.predictionStr += ","
+        print self.name+': started'
+        while True:
+            if len(self.queryList)==0:
+                continue
 
-            elapsedTime = time.time()-startTime
-            if  elapsedTime <= self.maxTime:
-                self.predictionStr += self._predict(query)
-            else:
-                self.predictionStr += self._predictDummy(query)
+            startTime = time.time()
+            nQuery = len(self.queryList)
+            elapsedTime = 0
+            del self.predictionList[:]
 
-    def join(self):
-        threading.Thread.join(self)
-        return self.predictionStr
+            for i,query in enumerate(self.queryList):
+                elapsedTime += time.time()-startTime
+                prediction = 0
+                if  elapsedTime <= self.maxTime:
+                    print self.name+': predicting query= '+str(i+1)+' of '+str(nQuery)
+                    prediction = self.predictor.predict(query)
+                    self.predictionList.append(prediction)
+                self.predictionList.append(prediction)
 
-    def _predict(self,query):
-        # Run prediction
-        predictionStr = self.predictor.predict(query)
+            self.predictionNumber += 1
+            del self.queryList[:]
 
-        # Insert prediction result to DB
-        # TODO
+    def getPredictionList(self):
+        return self.predictionList[:]
 
-        return predictionStr
+    def setQueryList(self,iqueryList):
+        self.queryList = iqueryList[:]
 
-    def _predictDummy(query):
-        comId,proId = query.split(":")
-        weight = 0
-        source = 'null'
-        timestamp = 'null'
-        predictionStrList = [comId,proId,str(weight),source,timestamp]
-        predictionStr = '|'.join(predictionStrList)
-        return predictionStr
+    def getPredictionNumber(self):
+        return self.predictionNumber

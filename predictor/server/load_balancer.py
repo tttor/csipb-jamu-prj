@@ -6,6 +6,7 @@ from datetime import datetime
 
 from config import loadBalancerConfig as lbcfg
 from config import serverConfig as scfg
+from config import predictorConfig as pcfg
 
 connFromPredictorPHP = None
 
@@ -39,9 +40,7 @@ def main():
         print("[HasDispatched= "+str(nQueries)+" queries]")
         print("[upFrom= "+upAt+"]")
         print("[serverUsage= "+str(serverUsage)+']')
-
-        print('')
-        print("Waiting for any query from 'predict.php' at "+host+":"+str(port))
+        print("NOW: waiting for any query from 'predict.php' at "+host+":"+str(port))
 
         signal.signal(signal.SIGINT, signalHandler)
         connToPredictorPHP, connToPredictorAddr = connFromPredictorPHP.accept()
@@ -66,8 +65,8 @@ def main():
             serverUsage[serverIdx][serverThreadIdx] += 1
             nQueries += 1
 
-            #Send serverport to predict.php
-            connToPredictorPHP.sendall( str(serverPort) )
+            #Send time to wait for prediction to predict.php
+            connToPredictorPHP.sendall( str(pcfg['maxElapsedTime']) )
             connToPredictorPHP.close()
 
             #Forward the message as is (received from predict.php)
