@@ -70,12 +70,12 @@ def main():
             connToPredictorPHP.sendall( str(serverPort) )
             connToPredictorPHP.close()
 
-            # #Forward the message as is (received from predict.php)
-            # print 'passing the msg to '+host+': '+str(serverPort)
-            # connToServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            # connToServer.connect( (host,serverPort) )
-            # connToServer.sendall(message)
-            # connToServer.close()
+            #Forward the message as is (received from predict.php)
+            print 'passing the msg to '+host+': '+str(serverPort)
+            connToServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            connToServer.connect( (host,serverPort) )
+            connToServer.sendall(message)
+            connToServer.close()
 
     print 'load-balancer: shutting down ...'
     connFromPredictorPHP.close()
