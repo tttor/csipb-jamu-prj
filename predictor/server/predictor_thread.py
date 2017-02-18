@@ -1,7 +1,6 @@
 # predictor_machine_thread.py
 import threading
 import time
-import psycopg2
 import sys
 
 sys.path.append('../rndly')
@@ -40,7 +39,7 @@ class PredictorThread(threading.Thread):
 
             for i,query in enumerate(self.queryList):
                 elapsedTime += time.time()-startTime
-                prediction = 0
+                prediction = -1.0 # invalid prediction result
                 if  elapsedTime <= self.maxTime:
                     print self.name+': predicting query= '+str(i+1)+' of '+str(nQuery)
                     prediction = self.predictor.predict(query)
