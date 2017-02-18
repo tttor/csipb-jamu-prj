@@ -774,52 +774,58 @@ export class Home implements OnInit {
   }
 
   makeConnectivityTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
-    let indent = '  ';
+    let conn = this.groupBy(srcType,destType,interaction);
+
     let text = this.getHeader(srcType+'_vs_'+destType)+'\n';
     let srcPropKeys = this.getPropKeys(srcType);
     let destPropKeys = this.getPropKeys(destType);
+    let indent = '  ';
 
     let nUnique = 0;
     let nUniquePerConnSrc = 0;
     let pos = -1;// in which, we will insert nUniquePerConnSrc
     let prevSrc = '';
     let prevConnSource = '';
-    for(let i=0;i<interaction.length;i++) {
-      let src = interaction[i][srcType+'_id'];
-      let dest = interaction[i][destType+'_id'];
-      let source = interaction[i]['source'];
-      let weight = interaction[i]['weight'];
 
-      if (prevSrc!==src) {
-        if (i>0) {
-          text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
+    for (let i=0;i<conn.length;i++) {
+      for (let j=0;j<conn[i].length;j++) {
+        let comps = conn[i][j].split(",");
+        let src = comps[0];
+        let dest = comps[1];
+        let weight = comps[2];
+        let source = comps[3];
+
+        if (prevSrc!==src) {
+          if (i>0) {
+            text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
+          }
+
+          nUnique = nUnique + 1;
+          text = text+'#'+nUnique.toString()+' ';
+
+          let srcProps = this.getProps(src,srcPropKeys,srcMeta);
+          text += this.concatProps(srcProps,srcPropKeys,true,true)
+          text +=':\n';
+
+          prevSrc = src;
+          prevConnSource = '';
         }
 
-        nUnique = nUnique + 1;
-        text = text+'#'+nUnique.toString()+' ';
+        if (prevConnSource!==source) {
+          text += indent+'['+source+':]\n';
+          pos = text.length - 2;
+          prevConnSource = source;
+          nUniquePerConnSrc = 1;
+        }
+        else {
+          nUniquePerConnSrc += 1;
+        }
 
-        let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-        text += this.concatProps(srcProps,srcPropKeys,true,true)
-        text +=':\n';
-
-        prevSrc = src;
-        prevConnSource = '';
+        let destProps = this.getProps(dest,destPropKeys,destMeta);
+        text += indent+'['+weight+'] ';
+        text += this.concatProps(destProps,destPropKeys,true,true)
+        text += '\n';
       }
-
-      if (prevConnSource!==source) {
-        text += indent+'['+source+':]\n';
-        pos = text.length - 2;
-        prevConnSource = source;
-        nUniquePerConnSrc = 1;
-      }
-      else {
-        nUniquePerConnSrc += 1;
-      }
-
-      let destProps = this.getProps(dest,destPropKeys,destMeta);
-      text += indent+'['+weight+'] ';
-      text += this.concatProps(destProps,destPropKeys,true,true)
-      text += '\n';
     }
     text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
 
@@ -932,6 +938,40 @@ export class Home implements OnInit {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
+  private find(k,arr) {
+    let idx = -1;
+    for (let i=0;i<arr.length;i++) {
+      if (arr[i]===k) {
+        idx = i;
+        break;
+      }
+    }
+    return idx;
+  }
+
+  private groupBy(srcT,destT,iconn) {
+    let srcSet = new Array();
+    let connSet = new Array();
+    for (let i=0;i<iconn.length;i++) {
+      let srcV = iconn[i][srcT+'_id'];
+      let destV = iconn[i][destT+'_id'];
+
+      let idx = this.find(srcV,srcSet);
+      if (idx === -1) {
+        idx = srcSet.length;
+        srcSet.push(srcV);
+        connSet.push( new Array() );
+      }
+
+      let w = iconn[i]['weight'];
+      let s = iconn[i]['source'];
+      let str = srcV+","+destV+","+w+","+s;
+      connSet[idx].push(str);
+    }
+
+    return connSet;
+  }
+
   toggleConnectivitySwap(type) {
     if (type==='plaVScom') {
       this.plaVScomSwapped = !this.plaVScomSwapped;
