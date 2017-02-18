@@ -795,6 +795,10 @@ export class Home implements OnInit {
         let weight = comps[2];
         let source = comps[3];
 
+        if (source==='null') {
+          continue;
+        }
+
         if (prevSrc!==src) {
           if (i>0) {
             text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
