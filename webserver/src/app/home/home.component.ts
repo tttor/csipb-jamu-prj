@@ -790,10 +790,10 @@ export class Home implements OnInit {
     for (let i=0;i<conn.length;i++) {
       for (let j=0;j<conn[i].length;j++) {
         let comps = conn[i][j].split(",");
-        let src = comps[0];
-        let dest = comps[1];
-        let weight = comps[2];
-        let source = comps[3];
+        let source = comps[0];
+        let weight = comps[1];
+        let src = comps[2];
+        let dest = comps[3];
 
         if (source==='null') {
           continue;
@@ -969,8 +969,12 @@ export class Home implements OnInit {
 
       let w = iconn[i]['weight'];
       let s = iconn[i]['source'];
-      let str = srcV+","+destV+","+w+","+s;
+      let str = s+","+w+","+srcV+","+destV;
       connSet[idx].push(str);
+    }
+
+    for (let i=0;i<connSet.length;i++) {
+      connSet[i] = connSet[i].sort();
     }
 
     return connSet;
