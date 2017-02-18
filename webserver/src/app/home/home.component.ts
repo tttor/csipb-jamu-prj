@@ -800,10 +800,6 @@ export class Home implements OnInit {
         }
 
         if (prevSrc!==src) {
-          if (i>0) {
-            text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
-          }
-
           nUnique = nUnique + 1;
           text = text+'#'+nUnique.toString()+' ';
 
@@ -816,6 +812,10 @@ export class Home implements OnInit {
         }
 
         if (prevConnSource!==source) {
+          if (nUniquePerConnSrc>0) {
+            text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
+          }
+
           text += indent+'['+source+':]\n';
           pos = text.length - 2;
           prevConnSource = source;
@@ -826,7 +826,7 @@ export class Home implements OnInit {
         }
 
         let destProps = this.getProps(dest,destPropKeys,destMeta);
-        text += indent+'['+weight+'] ';
+        text += indent+indent+'['+weight+'] ';
         text += this.concatProps(destProps,destPropKeys,true,true)
         text += '\n';
       }
