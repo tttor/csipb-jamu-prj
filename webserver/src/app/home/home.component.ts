@@ -581,27 +581,33 @@ export class Home implements OnInit {
           // console.log(comVSproToPredictStr);
 
           this.http.post(this.predictAPI,comVSproToPredictStr).map(resp4 => resp4.json())
-          .subscribe(comVSproPred => {
-            let comVSproMerged = comVSpro;
-            for (let i=0; i<comVSproPred.length; i++) {
-              let idx = idxToPredictArr[i];
-              comVSproMerged[idx]['com_id'] = comVSproPred[i]['com_id'];
-              comVSproMerged[idx]['pro_id'] = comVSproPred[i]['pro_id'];
-              comVSproMerged[idx]['weight'] = comVSproPred[i]['weight'];
-              comVSproMerged[idx]['source'] = comVSproPred[i]['source'];
-              comVSproMerged[idx]['timestamp'] = comVSproPred[i]['timestamp'];
-            }
-            // Get unique items
-            let plaSet = this.getSet(plaVScom,'pla_id');
-            let comSet = this.getSet(comVSproMerged,'com_id');
-            let proSet = this.getSet(comVSproMerged,'pro_id');
-            let disSet = this.getSet(proVSdis,'dis_id');
+          .subscribe(hasWaitedForMsg => {
+            let hasWaitedFor = parseFloat( hasWaitedForMsg[0]['has_waited_for'] );
+            console.log('hasWaitedFor= '+hasWaitedFor.toString());
 
-            let t1 = performance.now();
-            this.elapsedTime += (t1-t0);
+            this.http.post(this.interactionQueryAPI,comVSproToPredictStr).map(resp5 => resp5.json())
+              .subscribe(comVSproPred => {
+                let comVSproMerged = comVSpro;
+                for (let i=0; i<comVSproPred.length; i++) {
+                  let idx = idxToPredictArr[i];
+                  comVSproMerged[idx]['com_id'] = comVSproPred[i]['com_id'];
+                  comVSproMerged[idx]['pro_id'] = comVSproPred[i]['pro_id'];
+                  comVSproMerged[idx]['weight'] = comVSproPred[i]['weight'];
+                  comVSproMerged[idx]['source'] = comVSproPred[i]['source'];
+                  comVSproMerged[idx]['timestamp'] = comVSproPred[i]['timestamp'];
+                }
+                // Get unique items
+                let plaSet = this.getSet(plaVScom,'pla_id');
+                let comSet = this.getSet(comVSproMerged,'com_id');
+                let proSet = this.getSet(comVSproMerged,'pro_id');
+                let disSet = this.getSet(proVSdis,'dis_id');
 
-            this.makeOutput(plaSet,comSet,proSet,disSet,
-                            plaVScom,comVSproMerged,proVSdis);
+                let t1 = performance.now();
+                this.elapsedTime += (t1-t0);
+
+                this.makeOutput(plaSet,comSet,proSet,disSet,
+                                plaVScom,comVSproMerged,proVSdis);
+            })
           })
         })
       })

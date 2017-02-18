@@ -2,7 +2,7 @@
 import sys
 from datetime import datetime
 
-from predictor_server_thread import PredictorServerThread as PST
+from server_thread import ServerThread as Server
 from config import serverConfig as scfg
 
 def main():
@@ -25,7 +25,7 @@ def main():
     print >> sys.stderr,"[ports= "+str(portLo)+" to "+str(portHi)+"]"
     print >> sys.stderr,"[upFrom= "+upAt+"]"
 
-    threadList = [PST(i,"serverThread_"+str(serverId)+"_"+str(i),host,port)
+    threadList = [Server(i,"serverThread_"+str(serverId)+"_"+str(i),host,port)
                   for i,port in enumerate(range(portLo, portHi+1))]
 
     for t in threadList:

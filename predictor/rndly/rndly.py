@@ -2,15 +2,11 @@
 import numpy as np
 
 class RNDLy:
-    def __init__():
-        pass
+    def __init__(self):
+    	self.name = 'rndly'
 
-    def predict(queryList):
+    def predict(self,query):
         lo = 0.0
         hi = 1.0
-        n = len(queryList)
-
-        predictionList = np.random.uniform(lo,hi,n)
-        predictionList = predictionList.tolist()
-
-        return predictionList
+        pred = np.random.uniform(lo,hi,1)[0]
+        return pred
