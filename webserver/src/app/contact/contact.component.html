@@ -1,21 +1,23 @@
 <div class="col-md-8 col-md-offset-2">
 <h1 class="text-center">Contact Us</h1><br />
 
+<b>Contact:</b><br />
+vektor.dewanto@gmail.com<br />
+<br />
+
 <form #f="ngForm"
       (ngSubmit)="onSubmit(f.value)"
       class="ui form">
 
   <div class="field">
-    <label for="skuInput">SKU</label>
+    <label for="nameInput">Your Name: </label>
     <input type="text"
-           id="skuInput"
-           placeholder="SKU"
-           name="sku" ngModel>
+           id="nameInput"
+           placeholder="FirstName LastName"
+           name="name" ngModel>
   </div>
 
   <button type="submit" class="ui button">Submit</button>
 </form>
 
-  <b>Contact:</b><br />
-  vektor.dewanto@gmail.com<br />
 </div>
