@@ -1,1 +1,21 @@
-Contact Us
+<div class="col-md-8 col-md-offset-2">
+<h1 class="text-center">Contact Us</h1><br />
+
+<form #f="ngForm"
+      (ngSubmit)="onSubmit(f.value)"
+      class="ui form">
+
+  <div class="field">
+    <label for="skuInput">SKU</label>
+    <input type="text"
+           id="skuInput"
+           placeholder="SKU"
+           name="sku" ngModel>
+  </div>
+
+  <button type="submit" class="ui button">Submit</button>
+</form>
+
+  <b>Contact:</b><br />
+  vektor.dewanto@gmail.com<br />
+</div>

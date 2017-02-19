@@ -1,29 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, Inject, ElementRef, ViewChild
+} from '@angular/core';
+
+import { FormControl, FormGroup
+} from '@angular/forms';
 
 @Component({
   selector: 'contact',
-
-  template: `
-  <div class="ui raised segment">
-    <h2 class="ui header">Demo Form: Sku</h2>
-    <form #f="ngForm"
-          (ngSubmit)="onSubmit(f.value)"
-          class="ui form">
-
-      <div class="field">
-        <label for="skuInput">SKU</label>
-        <input type="text"
-               id="skuInput"
-               placeholder="SKU"
-               name="sku" ngModel>
-      </div>
-
-      <button type="submit" class="ui button">Submit</button>
-    </form>
-  </div>
-  `
+  templateUrl: './contact.component.html',
+  styleUrls: [ './contact.component.css' ]
 })
-export class Contact {
+export class Contact implements OnInit {
+  public ngOnInit() {
+    // Do nothing
+  }
+
   onSubmit(form: any): void {
     console.log('you submitted value:', form);
   }
