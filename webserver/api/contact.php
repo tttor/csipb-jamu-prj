@@ -13,7 +13,6 @@
   $query1 = "INSERT INTO user_msg (name,email,affiliation,subject,msg) VALUES ";
   $query2 = "(".$name.",".$email.",".$aff.",".$sbj.",".$msg.");";
   $query = $query1.$query2;
-  echo $query;
 
   $resp = pg_query($link, $query);
   $respLen = pg_num_rows($resp);
