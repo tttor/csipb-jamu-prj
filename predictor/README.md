@@ -12,17 +12,15 @@
 * compound-protein link prediction
 
 ## Challenges
-* small number of positive samples; unbalance ratio between #positive vs #negative samples
-* validated negative-samples are not available
+* small number of positive samples (known interactions); imbalanced data
+* validated negative samples are not available, so negative samples can be either trully negative or unknown
 * prediction of interaction for new drugs / novel target proteins, (new: having no existing/known interaction)
-* use of local model (local training data) is computationally demanding
-* accomodate 4 scenarios:
+* use of local model (local training data) is computationally demanding, moreover in production
+* accomodating 4 scenarios:
     * Known drug, known target
     * New drug, known target
     * Known drug, new target
     * New drug, new target
-*  there are very few known interactions, i.e. many interactions are ‘‘missing’’ in the database
-* aims for high-throughput (fast) methods
 
 # ML-based
 * supervised
