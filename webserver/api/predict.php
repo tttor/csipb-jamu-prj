@@ -40,8 +40,8 @@
     }
     socket_close($socket);
 
-    // sleep for 10 seconds
-    sleep( (float) $timeToWait );
+    // sleep for some integer seconds, waiting for DB update by predictors
+    sleep( (int) $timeToWait );
 
     $row = array('has_waited_for'=>$timeToWait);
     $respArr[] = $row;
