@@ -22,7 +22,11 @@ export class Contact implements OnInit {
   private msg;
   private subject;
 
-  constructor(public route: ActivatedRoute) {
+  // private baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+  private baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
+
+
+  constructor(public route: ActivatedRoute, private http: Http) {
     // Do nothing
   }
 
@@ -30,13 +34,18 @@ export class Contact implements OnInit {
     // Do nothing
   }
 
+  private onSubmit(): void {
+    // capture data
+    let data = {name:this.name, email:this.email, affiliation:this.affiliation,
+                message:this.msg, subject:this.subject};
+    let dataStr = JSON.stringify(data);
+    console.log(dataStr);
 
-  onSubmit(): void {
-    let data = JSON.stringify({name: this.name, email: this.email, affiliation: this.affiliation,
-                                message: this.msg, subject: this.subject});
+    // Send data to DB
+    // contactAPI = this.baseAPI+'contact.php';
+    // this.http.post(contactAPI,)
 
-    console.log(data);
-
+    // clear fields
     this.name = '';
     this.email = '';
     this.affiliation = '';
