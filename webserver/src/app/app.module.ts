@@ -28,6 +28,7 @@ import { Download } from './download';
 import { Help } from './help';
 import { Disclaimer } from './disclaimer';
 import { V1 } from './v1';
+import { Contact } from './contact';
 import { About } from './about';
 
 import '../styles/styles.scss';
@@ -49,12 +50,12 @@ type StoreType = {
   declarations: [
     AppComponent,
     Home,
-    About,
     Manual,
     Help,
     Download,
     Disclaimer,
     V1,
+    Contact,
     About
   ],
   imports: [
