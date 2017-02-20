@@ -42,8 +42,10 @@ export class Contact implements OnInit {
     console.log(dataStr);
 
     // Send data to DB
-    // contactAPI = this.baseAPI+'contact.php';
-    // this.http.post(contactAPI,)
+    let contactAPI = this.baseAPI+'contact.php';
+    this.http.post(contactAPI,data).map(res=>res.json()).subscribe(reply => {
+      // todo
+    })
 
     // clear fields
     this.name = '';
