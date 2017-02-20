@@ -39,8 +39,7 @@ export class Contact implements OnInit {
     let data = {name:this.name, email:this.email, affiliation:this.affiliation,
                 message:this.msg, subject:this.subject};
     let dataStr = JSON.stringify(data);
-    console.log(data);
-    console.log(dataStr);
+    // console.log(dataStr);
 
     // Send data to DB
     let contactAPI = this.baseAPI+'contact.php';
