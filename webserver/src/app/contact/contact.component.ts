@@ -39,12 +39,13 @@ export class Contact implements OnInit {
     let data = {name:this.name, email:this.email, affiliation:this.affiliation,
                 message:this.msg, subject:this.subject};
     let dataStr = JSON.stringify(data);
+    console.log(data);
     console.log(dataStr);
 
     // Send data to DB
     let contactAPI = this.baseAPI+'contact.php';
-    this.http.post(contactAPI,data).map(res=>res.json()).subscribe(reply => {
-      // todo
+    this.http.post(contactAPI,dataStr).map(res=>res.json()).subscribe(reply => {
+      // TODO: acknowledgement and thank you
     })
 
     // clear fields
