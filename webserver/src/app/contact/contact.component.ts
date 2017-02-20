@@ -16,17 +16,32 @@ import { ActivatedRoute
   styleUrls: [ './contact.component.css' ]
 })
 export class Contact implements OnInit {
-
-  public ngOnInit() {
-    // Do nothing
-  }
+  private name;
+  private email;
+  private affiliation;
+  private msg;
+  private subject;
 
   constructor(public route: ActivatedRoute) {
     // Do nothing
   }
 
-  onSubmit(value: string): void {
-    console.log('you submitted value: ', value);
+  public ngOnInit() {
+    // Do nothing
+  }
+
+
+  onSubmit(): void {
+    let data = JSON.stringify({name: this.name, email: this.email, affiliation: this.affiliation,
+                                message: this.msg, subject: this.subject});
+
+    console.log(data);
+
+    this.name = '';
+    this.email = '';
+    this.affiliation = '';
+    this.msg = '';
+    this.subject = '';
   }
 
 }
