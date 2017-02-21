@@ -54,7 +54,7 @@ class ServerThread(threading.Thread):
                         break
             finally:
                 self.queryNum += 1
-                queryList = message.split(",")
+                queryList = [tuple(m.split(":")) for m in message.split(",")]
                 for t in predictorThreads:
                     t.setQueryList(queryList)
 
