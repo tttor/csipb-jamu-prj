@@ -22,9 +22,8 @@ export class Contact implements OnInit {
   private msg;
   private subject;
 
-  // private baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  private baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
-
+  private baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+  // private baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
 
   constructor(public route: ActivatedRoute, private http: Http) {
     // Do nothing
@@ -39,12 +38,12 @@ export class Contact implements OnInit {
     let data = {name:this.name, email:this.email, affiliation:this.affiliation,
                 message:this.msg, subject:this.subject};
     let dataStr = JSON.stringify(data);
-    console.log(dataStr);
+    // console.log(dataStr);
 
     // Send data to DB
     let contactAPI = this.baseAPI+'contact.php';
-    this.http.post(contactAPI,data).map(res=>res.json()).subscribe(reply => {
-      // todo
+    this.http.post(contactAPI,dataStr).map(res=>res.json()).subscribe(reply => {
+      // TODO: acknowledgement and thank you
     })
 
     // clear fields

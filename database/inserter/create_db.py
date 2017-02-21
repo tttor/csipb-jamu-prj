@@ -84,6 +84,18 @@ def main(argv):
                 );
                 ''')
 
+    cur.execute('DROP TABLE IF EXISTS user_msg;')
+    cur.execute('''CREATE TABLE user_msg (
+                id SERIAL PRIMARY KEY,
+                name varchar(32),
+                email varchar(32),
+                affiliation varchar(128),
+                subject varchar(16),
+                msg text,
+                time_stamp timestamp DEFAULT now()
+                );
+                ''')
+
     cur.execute('DROP VIEW IF EXISTS total_view;')
     curr.execute('''create view total_view as select
                 (select count (*) from plant) as plant_total,

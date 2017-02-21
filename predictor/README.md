@@ -13,15 +13,19 @@
 
 ## Challenges
 * imbalanced data, highly skewed datasets: small number of positive samples (known interactions)
-    * validated negative samples are not available, so negative samples can be either trully negative or unknown
     * current solution: use of local training data to help reduce irrelevant data,
-      so each compound-protein has its own model/classifiser, this is surely computationally expensive
-* accomodating 4 scenarios: (new: having no existing/known interaction)
+      so each compound-protein has its own model/classifier, this is surely computationally expensive
+* negative samples can be either trully negative or simply unknown (not yet clinically/chemical tested)
+    * validated negative samples are not available;
+      people never report negative results after clinical/chemical experiment
+    * this may fool the machine during learning in that
+      _almost_ positive interactions but _unknown_ are considered the same as _truly_ negative ones
+* handle 4 scenarios: (new: having no existing/known interaction)
     * Known drug, known target
     * New drug, known target
     * Known drug, new target
     * New drug, new target (hardest)
-* features of compound-protein interaction (on chemical, genomic and pharmacological spaces)
+* features of compound-protein interactions (on chemical, genomic and pharmacological spaces)
     * which features are mostly relevant, sufficient, ...
     * feature extraction
 * similarity (kernel) functions (on chemical, genomic and pharmacological spaces)
@@ -34,7 +38,7 @@
             * Bleakley (2009)
             * Yamanishi (2010)
         * BLM–NII or Globalized BLM or bipartite local model with neighbor-based inferring (BLMN)
-           *  Mei (2012)
+            * Mei (2012)
             * Mei (2013)
     * Kernel
         * Gaussian Interaction Profile Kernel+ Kronecker regularized least squares approach (KronRLS)
@@ -58,5 +62,5 @@
     * protein/biological/genomic features
     * compound/chemical features
     * network features
-* skewed/unbalanced dataset
+* skewed/imbalaced dataset
     * Liu (2015):  building up highly credible negative samples
