@@ -15,7 +15,7 @@
 * imbalanced data, highly skewed datasets: small number of positive samples (known interactions)
     * current solution: use of local training data to help reduce irrelevant data,
       so each compound-protein has its own model/classifier, this is surely computationally expensive
-* negative samples can be either trully negative or simply unknown (not yet clinically/chemical tested)
+* deceptive negative samples as they can be either trully negative or simply unknown (not yet clinically/chemical tested)
     * validated negative samples are not available;
       people never report negative results after clinical/chemical experiment
     * this may fool the machine during learning in that
