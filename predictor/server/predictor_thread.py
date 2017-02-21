@@ -21,8 +21,10 @@ class PredictorThread(threading.Thread):
         self.predictor = None
         if self.method=='rndly':
             self.predictor = RNDLy()
+            self.batchLength = 3
         # elif self.method=='blmnii':
         #     self.predictor = BLMNII()
+        #     self.batchLength = 1
         else:
             assert False, 'FATAL: Unknown prediction method!'
 
@@ -37,16 +39,19 @@ class PredictorThread(threading.Thread):
             elapsedTime = 0
             del self.predictionList[:]
 
-            for i,query in enumerate(self.queryList):
+            queryBatch = [queryList[i:i+self.batchLength]
+                          for i in range(0,nQuery,self.batchLength)]
+                          
+            for i,query in enumerate(queryBatch):
                 elapsedTime += time.time()-startTime
-                prediction = -1.0 # invalid prediction result
+                prediction = [-1.0]*batchLength # invalid prediction result
                 if  elapsedTime <= self.maxTime:
                     print self.name+': predicting query= '+str(i+1)+' of '+str(nQuery)
                     prediction = self.predictor.predict(query)
                     self.predictionList.append(prediction)
                 self.predictionList.append(prediction)
 
-            self.predictionNumber += 1
+            self.predictionNumber += batchLength
             del self.queryList[:]
 
     def getPredictionList(self):
