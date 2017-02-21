@@ -1,79 +1,111 @@
-import { NgModule, ApplicationRef } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { RouterModule } from '@angular/router';
-import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
-import { TypeaheadModule } from 'ng2-bootstrap/ng2-bootstrap';
+import { TypeaheadModule } from 'ng2-bootstrap/typeahead';
+import { Ng2PageScrollModule } from 'ng2-page-scroll';
+import {
+  NgModule,
+  ApplicationRef
+} from '@angular/core';
+import {
+  removeNgStyles,
+  createNewHosts,
+  createInputTransfer
+} from '@angularclass/hmr';
+import {
+  RouterModule,
+  PreloadAllModules
+} from '@angular/router';
 
 import { ENV_PROVIDERS } from './environment';
 import { ROUTES } from './app.routes';
-// App is our top level component
-import { App } from './app.component';
+import { AppComponent } from './app.component';
 import { APP_RESOLVER_PROVIDERS } from './app.resolver';
-import { AppState } from './app.service';
-
+import { AppState, InternalStateType } from './app.service';
 import { Home } from './home';
 import { Manual } from './manual';
 import { Download } from './download';
 import { Help } from './help';
 import { Disclaimer } from './disclaimer';
 import { V1 } from './v1';
+import { Contact } from './contact';
 import { About } from './about';
 
-// Application wide providers
+import '../styles/styles.scss';
+import '../styles/headings.css';
+
 const APP_PROVIDERS = [
   ...APP_RESOLVER_PROVIDERS,
   AppState
 ];
 
-/**
- * `AppModule` is the main entry point into Angular2's bootstraping process
- */
+type StoreType = {
+  state: InternalStateType,
+  restoreInputValues: () => void,
+  disposeOldHosts: () => void
+};
+
 @NgModule({
-  bootstrap: [ App ],
+  bootstrap: [ AppComponent ],
   declarations: [
-    App,
+    AppComponent,
     Home,
     Manual,
     Help,
     Download,
     Disclaimer,
     V1,
-    About,
+    Contact,
+    About
   ],
-  imports: [ // import Angular's modules
+  imports: [
     BrowserModule,
     FormsModule,
     HttpModule,
-    TypeaheadModule,
-    RouterModule.forRoot(ROUTES, { useHash: true })
+    Ng2PageScrollModule.forRoot(),
+    TypeaheadModule.forRoot(),
+    RouterModule.forRoot(ROUTES, { useHash: true, preloadingStrategy: PreloadAllModules })
   ],
-  providers: [ // expose our Services and Providers into Angular's dependency injection
+  providers: [
     ENV_PROVIDERS,
     APP_PROVIDERS
   ]
 })
 export class AppModule {
-  constructor(public appRef: ApplicationRef, public appState: AppState) {}
-  hmrOnInit(store) {
-    if (!store || !store.state) return;
+
+  constructor(
+    public appRef: ApplicationRef,
+    public appState: AppState
+  ) {}
+
+  public hmrOnInit(store: StoreType) {
+    if (!store || !store.state) {
+      return;
+    }
+    console.log('HMR store', JSON.stringify(store, null, 2));
     this.appState._state = store.state;
+    if ('restoreInputValues' in store) {
+      let restoreInputValues = store.restoreInputValues;
+      setTimeout(restoreInputValues);
+    }
+
     this.appRef.tick();
     delete store.state;
+    delete store.restoreInputValues;
   }
-  hmrOnDestroy(store) {
-    const cmpLocation = this.appRef.components.map(cmp => cmp.location.nativeElement);
-    // recreate elements
+
+  public hmrOnDestroy(store: StoreType) {
+    const cmpLocation = this.appRef.components.map((cmp) => cmp.location.nativeElement);
     const state = this.appState._state;
     store.state = state;
     store.disposeOldHosts = createNewHosts(cmpLocation);
-    // remove styles
+    store.restoreInputValues  = createInputTransfer();
     removeNgStyles();
   }
-  hmrAfterDestroy(store) {
-    // display new elements
+
+  public hmrAfterDestroy(store: StoreType) {
     store.disposeOldHosts();
     delete store.disposeOldHosts;
   }
+
 }

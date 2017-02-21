@@ -14,7 +14,7 @@ export class Download {
   baseAPI;
   constructor(public route: ActivatedRoute, private http: Http) {
     this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-    // this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
+    this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
   }
 
   ngOnInit() {
@@ -105,8 +105,6 @@ export class Download {
   }
 
   getFilename(type) {
-    // This method actually duplicates the one in apps.home class
-    // TODO merge them
     let prefix = 'ijah_all_'
     let suffix = '';
     let ext = '.txt';
@@ -139,8 +137,30 @@ export class Download {
       body = 'protein_vs_disease';
       suffix = '_connectivity';
     }
-    let filename = prefix+body+suffix+ext;
+
+    const dateTime = +new Date();
+    const unixTS = Math.floor(dateTime/1000);
+    let date = new Date(unixTS*1000);
+    let y = date.getFullYear();
+    let m = this.makeTwoDigitStr(date.getMonth()+1);
+    let d = this.makeTwoDigitStr(date.getDate());
+    let hh = this.makeTwoDigitStr(date.getHours());
+    let mm = this.makeTwoDigitStr(date.getMinutes());
+    let ss = this.makeTwoDigitStr(date.getSeconds());
+    let timestamp = '_'+y+m+d+'-'+hh+mm+ss;
+
+    let filename = prefix+body+suffix+timestamp+ext;
     return filename;
+  }
+
+  makeTwoDigitStr(str) {
+    str = str.toString();
+    if (str.length===2) {
+      return str;
+    }
+    else {
+      return '0'+str;
+    }
   }
 
   download(type) {
