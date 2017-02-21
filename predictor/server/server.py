@@ -3,20 +3,15 @@ import sys
 from datetime import datetime
 
 from server_thread import ServerThread as Server
-from config import serverConfig as scfg
 
-def main():
-    if len(sys.argv)!=2:
-        print 'USAGE: phyton prediction_server.py [serverId]'
+def main(argv):
+    if len(sys.argv)!=4:
+        print 'USAGE: phyton prediction_server.py [serverId] [portLo] [portHi]'
         return
 
-    serverId = sys.argv[1]
-    if serverId not in scfg['ports']:
-        print 'FATAL: serverId unknown'
-        return
-
-    host = scfg['host']
-    portLo,portHi = scfg['ports'][serverId]
+    host = '127.0.0.1'
+    serverId = argv[1]
+    portLo,portHi = int(argv[2]),int(argv[3])
     upAt = datetime.now().strftime("%Y:%m:%d %H:%M:%S")
 
     print >> sys.stderr, '******************************************************'
@@ -36,4 +31,4 @@ def main():
         pass
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
