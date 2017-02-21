@@ -22,9 +22,8 @@ export class Contact implements OnInit {
   private msg;
   private subject;
 
-  // private baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  private baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
-
+  private baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+  // private baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
 
   constructor(public route: ActivatedRoute, private http: Http) {
     // Do nothing
