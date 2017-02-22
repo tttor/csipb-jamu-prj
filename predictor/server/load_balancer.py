@@ -5,27 +5,34 @@ import signal
 from datetime import datetime
 
 from config import loadBalancerConfig as lbcfg
-from config import serverConfig as scfg
 from config import predictorConfig as pcfg
 
 connFromPredictorPHP = None
 
-def main():
-    if len(sys.argv)!=1:
-        print 'USAGE: phyton prediction_load_balancer.py'
+def main(argv):
+    if len(sys.argv)!=4:
+        print 'USAGE: phyton load_balancer.py [phpApiPort] [serverPortLo] [serverPortHi]'
         return
 
-    host = lbcfg['host']
-    port = lbcfg['port']
+    host = '127.0.0.1'
+    port = int(argv[1])
     upAt = datetime.now().strftime("%Y:%m:%d %H:%M:%S")
     nQueries = 0
 
+    # TODO Check which serverPorts are listening
+    # http://stackoverflow.com/questions/7436801/identifying-listening-ports-using-python
+    serverPortLo = int(argv[2])
+    serverPortHi = int(argv[3])
+
     serverUsage = []
     serverPorts = []
-    for k,v in scfg['ports'].iteritems():
-        ports = range(v[0],v[1]+1)
-        serverPorts.append(ports)
-        serverUsage.append([0]*len(ports))
+    for p in range(serverPortLo,serverPortHi+1):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        r = s.connect_ex((host,p))
+        if r==0:
+            serverPorts.append(p)
+            serverUsage.append(0)
+        s.close()
 
     global connFromPredictorPHP
     connFromPredictorPHP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -35,11 +42,15 @@ def main():
     connFromPredictorPHP.listen(backlog)
 
     while True:
+        serverUsageDict = dict()
+        for i,ii in enumerate(serverPorts):
+            serverUsageDict[ii] = serverUsage[i]
+
         print("###############################################################")
         print("Ijah predictor load-balancer :)")
-        print("[HasDispatched= "+str(nQueries)+" queries]")
-        print("[upFrom= "+upAt+"]")
-        print("[serverUsage= "+str(serverUsage)+']')
+        print(">> HasDispatched= "+str(nQueries)+" queries")
+        print(">> upFrom= "+upAt)
+        print(">> serverUsage= "+str(serverUsageDict))
         print("NOW: waiting for any query from 'predict.php' at "+host+":"+str(port))
 
         signal.signal(signal.SIGINT, signalHandler)
@@ -59,10 +70,9 @@ def main():
         finally:
             # get server with fewest #servedQuery'
             serverIdx = serverUsage.index( min(serverUsage) )
-            serverThreadIdx = serverUsage[serverIdx].index( min(serverUsage[serverIdx]) )
-            serverPort = serverPorts[serverIdx][serverThreadIdx]
+            serverPort = serverPorts[serverIdx]
 
-            serverUsage[serverIdx][serverThreadIdx] += 1
+            serverUsage[serverIdx] += 1
             nQueries += 1
 
             #Send time to wait for prediction to predict.php
@@ -85,4 +95,4 @@ def signalHandler(signal, frame):
     sys.exit(0)
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

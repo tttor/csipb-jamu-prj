@@ -41,7 +41,7 @@ class ServerThread(threading.Thread):
             connToLB, connToLBAddr = connFromLB.accept()
 
             try:
-                # print >>sys.stderr, self.name+': Connection from', connToLBAddr
+                print >>sys.stderr,self.name+': Connection from',connToLBAddr
                 dataTemp = ""
                 message = ""
                 while True:
@@ -58,7 +58,8 @@ class ServerThread(threading.Thread):
                 for t in predictorThreads:
                     t.setQueryList(queryList)
 
-                # Wait for all thread to finish
+                # Wait for all predictor threads to finish
+                print >>sys.stderr,self.name+': Wait for all predictor threads to finish'
                 while True:
                     finished = True
                     for i,t in enumerate(predictorThreads):
@@ -70,7 +71,8 @@ class ServerThread(threading.Thread):
                     if finished:
                         break
 
-                # Merge predictionMsg
+                # Merge prediction results from predictor threads
+                print >>sys.stderr,self.name+': Merge prediction results'
                 predictionListRaw = [] # 2D: row: method and col: ith query
                 for t in predictorThreads:
                     predictionListRaw.append( t.getPredictionList() )
@@ -86,7 +88,8 @@ class ServerThread(threading.Thread):
                     predictionList.append(nPred)
                 # print self.name+': predictionList '+str(predictionList)
 
-                # Push predMsg to DB
+                # Push the prediction result to database
+                print >>sys.stderr,self.name+': Push the prediction result to database'
                 for i,p in enumerate(predictionList):
                     if p<0.0:# invalid
                         continue

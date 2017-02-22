@@ -7,7 +7,7 @@
   $respArr = array();
   $reqListLen = count($requestList);
   if ($reqListLen>0) {
-    /*------------------Socket To Load Balancer------------------*/
+    // Socket To predictor load balancer
     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
     if ($socket === false){
       echo "socket_create() failed: reason:". socket_strerror(socket_last_error())."\n";
@@ -17,7 +17,7 @@
       echo "socket_connect() failed.\nReason:($result) ".socket_strerror(socket_last_error($socket))."\n";
     }
 
-    // Send messages to predictor server
+    // Send messages to predictor load balancer
     $msgTo = "";
     $counter = 0;
     foreach ($requestList as $req) {
@@ -30,9 +30,8 @@
     $msgTo .= "|end";
     socket_write($socket, $msgTo, strlen($msgTo));
 
-    // Receive Data from the predictor server
-    // The predictor_load_balancer will return a string which is the
-    // port number of predictor_server that execute the query
+    // Receive Data (i.e timeToWait) from the predictor load balancer
+    // timeToWait for the predictor server to update the DB
     $msgFrom = "";
     $timeToWait = "";
     while($msgFrom = socket_read($socket, 8)){
@@ -43,6 +42,7 @@
     // sleep for some integer seconds, waiting for DB update by predictors
     sleep( (int) $timeToWait );
 
+    //
     $row = array('has_waited_for'=>$timeToWait);
     $respArr[] = $row;
   }

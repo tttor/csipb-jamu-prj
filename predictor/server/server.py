@@ -6,7 +6,7 @@ from server_thread import ServerThread as Server
 
 def main(argv):
     if len(sys.argv)!=4:
-        print 'USAGE: phyton prediction_server.py [serverId] [portLo] [portHi]'
+        print 'USAGE: phyton server.py [serverId] [portLo] [portHi]'
         return
 
     host = '127.0.0.1'
