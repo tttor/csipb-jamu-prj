@@ -1,0 +1,34 @@
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Pixel-wise semantic segmentation of\nobreakspace {}\citet {Shotton:2009}\relax }}{1}{figure.caption.11}
+\contentsline {figure}{\numberline {1.2}{\ignorespaces Ilustrasi \textit {under segmentation}, \textit {over segmentation}, dan \textit {multiple segmentation}\relax }}{2}{figure.caption.12}
+\contentsline {figure}{\numberline {1.3}{\ignorespaces Perbandingan hasil segmentasi semantik, (a) adalah citra asli, (b) groundtruth, (c) \textit {unary potential}, (d) \textit {pairwise potential}, (e) contoh segmentasi, (f)hasil $robust P^n$\relax }}{3}{figure.caption.13}
+\contentsline {figure}{\numberline {1.4}{\ignorespaces Perbandingan Groundtruth pada dataset yang digunakan\relax }}{5}{figure.caption.14}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Model grafis dari CRF, di mana $x_v$ adalah variable terobservasi, dan $y_v$ adalah label untuk $x_v$\relax }}{8}{figure.caption.15}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Perbandingan hasil segmentasi menggunakan slic, quickshift, dan felzenswalb\relax }}{10}{figure.caption.16}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces model grafis dari LDA menggunakan notasi plate, di mana di setiap kotak menyatakan perulangan\relax }}{12}{figure.caption.17}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Ilustrasi \textit {crossover} menggunakan 1 titik\relax }}{14}{figure.caption.18}
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Ilustrasi \textit {crossover} menggunakan 2 titik\relax }}{15}{figure.caption.19}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces \textit {Pipeline} metode yang diajukan: Pemilihan segmen untuk segmentasi semantik\relax }}{17}{figure.caption.20}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Hasil beberapa segmentasi dengan memvariasikan parameter, baris pertama menggunakan quickshift, baris kedua menggunakan slic, dan baris ketiga menggunakan felzenwalbs. (a) \textit {max distance} = 10, (b) \textit {max distance} = 15, (c) \textit {max distance} = 25, (d) jumlah segmen = 3, (e) jumlah segmen = 8, (f) jumlah segmen = 20, (g) \textit {scale} = 100, (h) \textit {scale} = 352 (i) \textit {scale} = 731\relax }}{19}{figure.caption.21}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces (a) dan (c) merupakan citra asli, (b) dan (d) merupakan visualisasi hasil deteksi \textit {Harriss affine region}\relax }}{20}{figure.caption.22}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Ilustrasi pemberian kata setelah proses kuantisasi ``kata visual''\relax }}{21}{figure.caption.23}
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Diagram inferensi terhadap LDA model\relax }}{23}{figure.caption.24}
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Diagram perubahan besar penalti dari higher order dengan perubahan $N_i(\mathbf {x}_c)$, yaitu jumlah variable yang tidak konsisten, gambar ini diambil dari Robust Higher Order Potentials for Enforcing Label Consistency, \citep {KohliRobustPn}\relax }}{27}{figure.caption.28}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Perbandingan groundtruth yang digunakan pada fase testing \citep {KraehenbuehlK13} dengan \textit {standard grountruth}. kolom pertama: citra asli, kolom kedua: standard groundtruth, third column: groundtruth \citep {KraehenbuehlK13}\relax }}{28}{figure.caption.29}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Distribusi kata pada topik 4\relax }}{31}{figure.caption.34}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Distribusi kata pada topik 6\relax }}{32}{figure.caption.35}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Distribusi kata pada topik 13\relax }}{32}{figure.caption.36}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces 25 Segment teratas pada topik 4 berdasarkan \textit {trained} LDA Model, tidak dapat terinterpretasi dengan baik sebagai salah satu objek kelas\relax }}{33}{figure.caption.37}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces 25 Segment teratas pada topik 6 berdasarkan \textit {trained} LDA Model, yang dapat diinterpretasikan sebagai objek kelas bunga\relax }}{33}{figure.caption.38}
+\contentsline {figure}{\numberline {4.7}{\ignorespaces 25 Segment teratas pada topik 13 berdasarkan \textit {trained} LDA Model, yang dapat diintrepretasikan sebagai objek kelas pohon\relax }}{34}{figure.caption.39}
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Perbandingan nilai probabiltas segmen dari beberapa segmentasi pada topik 6 menggunakan algoritme SLIC dengan memvariasikan jumlah segmen. Nilai lebih terang menunjukan bahwa probabilitas terhadap topik ini besar. Subgambar di pojok kanan atas adalah gambar asli.\relax }}{35}{figure.caption.40}
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Perbandingan nilai probabiltas segmen dari beberapa segmentasi untuk topik 12 menggunakan algoritme SLIC dengan memvariasikan jumlah segmen. Nilai lebih terang menunjukan bahwa probabilitas terhadap topik ini besar. Subgambar di pojok kanan atas adalah gambar asli.\relax }}{35}{figure.caption.41}
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Distribusi jumlah seluruh segmen pada 93 gambar data uji. \relax }}{36}{figure.caption.42}
+\contentsline {figure}{\numberline {4.11}{\ignorespaces Distribusi jumlah segmen terpilih pada 93 gambar data uji menggunakan LDA dan GA. Rata-rata dari jumlah segmen terpilih adalah 83. Eksperimen dilakukan sebanyak 4 kali. \relax }}{36}{figure.caption.43}
+\contentsline {figure}{\numberline {4.12}{\ignorespaces Salah satu segmen buruk yang terpilih sebagai solusi dari algoritme genetika, Warna biru merupakan \textit {background}.\relax }}{37}{figure.caption.44}
+\contentsline {figure}{\numberline {4.13}{\ignorespaces \relax \fontsize {10.95}{13.6}\selectfont \abovedisplayskip 11\p@ plus3\p@ minus6\p@ \abovedisplayshortskip \z@ plus3\p@ \belowdisplayshortskip 6.5\p@ plus3.5\p@ minus3\p@ \def \leftmargin \leftmargini \parsep 5\p@ plus2.5\p@ minus\p@ \topsep 10\p@ plus4\p@ minus6\p@ \itemsep 5\p@ plus2.5\p@ minus\p@ {\leftmargin \leftmargini \topsep 9\p@ plus3\p@ minus5\p@ \parsep 4.5\p@ plus2\p@ minus\p@ \itemsep \parsep }\belowdisplayskip \abovedisplayskip {Waktu seleksi segmen via \textit {genetic algorithm} dalam detik menggunakan multiproses 8 \textit {core}}\relax }}{39}{figure.caption.48}
+\contentsline {figure}{\numberline {4.14}{\ignorespaces kolom pertama: citra asli, kolom kedua: groundtruth, third column: robust pn (all segment), fourth column: Genetic Algorithm\relax }}{41}{figure.caption.50}
+\addvspace {10\p@ }

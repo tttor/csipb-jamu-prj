@@ -1,0 +1,58 @@
+%% This is an example first chapter.  You should put chapter/appendix that you
+%% write into a separate file, and add a line \include{yourfilename} to
+%% main.tex, where `yourfilename.tex' is the name of the chapter/appendix file.
+%% You can process specific files by typing their names in at the 
+%% \files=
+%% prompt when you run the file main.tex through LaTeX.
+\chapter{Rumusan Masalah}
+% Rumusan masalah mencakup :
+%  Penjelasan mengenai masalah yang menjadi topik penelitian
+%  Cakupan dan batasan penelitian
+%  Esensi penelitian yang dilakukan
+
+\section{Penjelasan masalah}
+Masalah-masalah yang akan dipecahkan dalam penelitian ini meliputi:
+
+\begin{enumerate} [topsep=0mm]
+\itemsep0mm
+\item bagaimana mengukur kesamaan dalam bentuk kernel dari dua data dalam ruang kimia, genomik atau farmakologi?
+\item bagaimana menggabungkan informasi dari tiga ruang: kimia, genomik dan farmakologi?
+\item bagaimana merumuskan metode prediksi berbasis kernel untuk estimasi interaksi senyawa-protein yang akurat, 
+(dengan akurasi lebih besar dari 95\%)?
+\item bagaimana memilah dan mengunduh secara otomatis informasi dari banyak database yang relevan?
+\item bagaimana desain antar-muka yang user-friendly untuk aplikasi-web yang melayani estimasi interaksi senyawa-protein?
+\item bagaimana desain web-server sehingga memiliki tingkat utility, maintainability dan scalability yang tinggi?
+\end{enumerate}
+
+\section{Cakupan dan batasan penelitian}
+Cakupan dan batasan dari penelitian ini adalah sebagai berikut:
+
+\begin{enumerate} [topsep=0mm]
+\itemsep0mm
+\item metode prediksi berbasis kernel
+\item menggunakan kernel dari tiga ruang: kimia, genomik dan farmakologi
+\item web-server menerima input berikut: 
+	\begin{itemize} [topsep=0mm]
+	\itemsep0mm
+	\item dari aspek obat: nama tanaman atau nama senyawa
+	\item dari aspek penyakit: nama penyakit atau nama protein
+	\end{itemize}
+\item informasi untuk prediksi berasal dari database publik yang tersedia
+\item prediksi mencakup senyawa organik dari tanaman herbal dan senyawa sintetik dari obat sintetik
+\end{enumerate}
+
+\section{Esensi penelitian}
+Esensi dari penelitian ini meliputi:
+
+\begin{enumerate} [topsep=0mm]
+\itemsep0mm
+\item
+Prediksi yang akurat terhadap interaksi senyawa bioaktif dengan protein merupakan informasi yang krusial untuk pengembangan obat dan suplemen makanan, baik herbal maupun sintetis.
+Dengan informasi ini sebagai penapis in-silico, uji klinis yang mahal dan lama hanya dilakukan pada kandidat senyawa yang berpotensi tinggi.
+
+\item
+Web-server publik yang handal berfungsi sebagai pusat informasi tentang (prediksi) khasiat tanaman obat.
+Selain itu, kode web-server akan disediakan dalam bentuk open-source library dengan dokumentasi yang rapi dan lengkap sehingga dapat dimanfaatkan oleh peneliti.
+Hal ini akan mendukung kesinambungan pengembangan dan perawatan sistem.
+Kode tersebut meliputi fungsi-fungsi perhitungan kernel gabungan, proses prediksi, serta penjelajahan (crawling) database terkait.
+\end{enumerate}
