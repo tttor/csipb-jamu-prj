@@ -4,26 +4,24 @@ import socket
 import signal
 from datetime import datetime
 
-from config import loadBalancerConfig as lbcfg
-from config import predictorConfig as pcfg
-
 connFromPredictorPHP = None
 
 def main(argv):
-    if len(sys.argv)!=4:
-        print 'USAGE: phyton load_balancer.py [phpApiPort] [serverPortLo] [serverPortHi]'
+    if len(sys.argv)!=5:
+        print 'USAGE: phyton load_balancer.py [phpApiPort] [serverPortLo] [serverPortHi] [waitingTimeStr]'
         return
 
-    host = '127.0.0.1'
     port = int(argv[1])
+    serverPortLo = int(argv[2])
+    serverPortHi = int(argv[3])
+    waitingTimeStr = argv[4]
+
+    host = '127.0.0.1'
     upAt = datetime.now().strftime("%Y:%m:%d %H:%M:%S")
     nQueries = 0
 
     # TODO Check which serverPorts are listening
     # http://stackoverflow.com/questions/7436801/identifying-listening-ports-using-python
-    serverPortLo = int(argv[2])
-    serverPortHi = int(argv[3])
-
     serverUsage = []
     serverPorts = []
     for p in range(serverPortLo,serverPortHi+1):
@@ -48,8 +46,9 @@ def main(argv):
 
         print("###############################################################")
         print("Ijah predictor load-balancer :)")
-        print(">> HasDispatched= "+str(nQueries)+" queries")
         print(">> upFrom= "+upAt)
+        print(">> waitingTime= "+waitingTimeStr+" seconds")
+        print(">> HasDispatched= "+str(nQueries)+" queries")
         print(">> serverUsage= "+str(serverUsageDict))
         print("NOW: waiting for any query from 'predict.php' at "+host+":"+str(port))
 
@@ -76,7 +75,7 @@ def main(argv):
             nQueries += 1
 
             #Send time to wait for prediction to predict.php
-            connToPredictorPHP.sendall( str(pcfg['maxElapsedTime']) )
+            connToPredictorPHP.sendall(waitingTimeStr)
             connToPredictorPHP.close()
 
             #Forward the message as is (received from predict.php)
