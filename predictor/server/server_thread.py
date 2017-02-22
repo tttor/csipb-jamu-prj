@@ -63,6 +63,7 @@ class ServerThread(threading.Thread):
                     finished = True
                     for i,t in enumerate(predictorThreads):
                         if t.getPredictionNumber()!=self.queryNum:
+                            # print t.getPredictionNumber()
                             finished = False
                             break
 
@@ -73,8 +74,8 @@ class ServerThread(threading.Thread):
                 predictionListRaw = [] # 2D: row: method and col: ith query
                 for t in predictorThreads:
                     predictionListRaw.append( t.getPredictionList() )
-
                 predictionList = []
+                print predictionListRaw
                 for i in range(len(queryList)):
                     nMethods = len(pcfg['methods'])
                     normalizer = 1.0/float(nMethods)
@@ -90,7 +91,7 @@ class ServerThread(threading.Thread):
                     if p<0.0:# invalid
                         continue
 
-                    comId,proId = queryList[i].split(":")
+                    comId,proId = queryList[i]
                     src = ','.join([i[0] for i in pcfg['methods']])
 
                     queryCheck = "SELECT * FROM compound_vs_protein WHERE "

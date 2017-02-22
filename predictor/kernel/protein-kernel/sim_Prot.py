@@ -13,7 +13,8 @@ from multiprocessing import Pool
 
 def alignprot(rowSeqProtein,colSeqProtein,i,j):
     alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
-    sys.stderr.write("Aligning "+str(i)+" "+str(j)+",")
+    sys.stderr.write("\rAligning "+str(i)+" "+str(j)+",")
+    sys.stderr.flush()
     return [alignres, j]
 
 
@@ -27,7 +28,7 @@ if __name__ == '__main__':
     step = int(sys.argv[3])
 
     nProtCol = colEnd-colStart
-    nProtRow = rowEnd-rowStart
+    nProtRow = rowEnd+1-rowStart
 
     simMatProtNorm = np.zeros(nProtCol, dtype=float)
     simMatProt = np.zeros(nProtCol, dtype=float)
@@ -64,7 +65,8 @@ if __name__ == '__main__':
     ###Read file and parse (with library)###
 
     sys.stderr.write("Load fasta file\n")
-    for i in xrange(rowStart,rowEnd):
+    for i in range(rowStart,rowEnd+1):
+        # print i, len(uniprotId)
         fastaDir = fastaFileDir + uniprotId[i] + ".fasta"
         recTemp = SeqIO.read(fastaDir, "fasta")
         rowSeqProtein.append(list(recTemp.seq))
@@ -72,7 +74,7 @@ if __name__ == '__main__':
         recTemp = recTemp.split("|")
         rowMetaProtein.append(recTemp[1])
 
-    for i in xrange(colStart,colEnd):
+    for i in range(colStart,colEnd):
         fastaDir = fastaFileDir + uniprotId[i] + ".fasta"
         recTemp = SeqIO.read(fastaDir, "fasta")
         colSeqProtein.append(list(recTemp.seq))
@@ -98,19 +100,17 @@ if __name__ == '__main__':
     outMatDir = OutDir+"RealProtKernel"+str(rowStart)+"_"+str(rowEnd)+".txt"
     outMetaDir = OutDir+"MetaProtKernel"+str(rowStart)+"_"+str(rowEnd)+".txt"
     listScore = []
-
+    batchCount = 0
     with open(outMatDir, 'w') as matF, open(outMetaDir, 'w') as metaF:
         for i in range(nProtRow):
             ###Preparing data for parallel mapping###
             columnCursor = rowStart+i
             while columnCursor < nProtCol:
-
                 if columnCursor+step > colEnd:
                     batchLen = 3334-columnCursor
                 else:
                     batchLen = step
-
-                for j in xrange(columnCursor,columnCursor+batchLen):
+                for j in range(columnCursor,columnCursor+batchLen):
                     rowProtein.append(rowSeqProtein[i])
                     rowIndex.append(i)
                     colProtein.append(colSeqProtein[j])

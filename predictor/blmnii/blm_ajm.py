@@ -1,39 +1,48 @@
 import numpy as np
 
-import pycopg2
+import psycopg2
 import blmnii
+import sys
 
-class blmnii:
+sys.path.append('../server')
+from config import databaseConfig as dcfg
+sys.path.append('../util')
+import util
+
+class BLMNII:
     def __init__(self):
         self.name = 'blmnii'
+        self.connDB = psycopg2.connect(database=dcfg['name'],user=dcfg['user'],password=dcfg['passwd'],
+                                        host=dcfg['host'],port=dcfg['port'])
+        self.cur = self.connDB.cursor()
 
-    def predict(query):
+    def predict(self,query):
         nQuery = len(query)
         # sys.stderr.write ("Processing Query.... \n")
         pairIdList = util.randData(query,1000)
 
         # sys.stderr.write ("Making kernel....\n")
         compList = [i[0] for i in pairIdList]
-        compMeta, compSimMat = makeKernel(compList,"com")
+        compMeta, compSimMat = self.makeKernel(compList,"com")
         protList = [i[1] for i in pairIdList]
-        protMeta, protSimMat = makeKernel(protList,"pro")
+        protMeta, protSimMat = self.makeKernel(protList,"pro")
 
         # sys.stderr.write ("Building connectivity data...\n")
-        adjMat = makeAdjMat(compMeta,protMeta)
+        adjMat = self.makeAdjMat(compMeta,protMeta)
 
         pairIndexList = [[compMeta[i[0]],protMeta[i[1]]] for i in pairIdList]
         # sys.stderr.write ("Running BLM-NII...\n")
         # Running Batch
-        resPred = np.zeros((len(pairIndexList)),dtype=float)
+        resPred = []
         for i,pair in enumerate(pairIndexList):
             if i == nQuery:
                 break
-            resPred[i] = blmnii.predict(adjMat,compSimMat,protSimMat,
-                        pair[0],pair[0])
+            resPred.append(blmnii.predict(adjMat,compSimMat,protSimMat,
+                        pair[0],pair[1]))
         return resPred
 
-    def makeAdjMat(compList,protList):
-        adjMat = np.zeros((len(compMeta), len(protMeta)), dtype=int)
+    def makeAdjMat(self,compList,protList):
+        adjMat = np.zeros((len(compList), len(protList)), dtype=int)
 
         query = "SELECT com_id, pro_id, weight FROM compound_vs_protein"
         queryC = " WHERE ("
@@ -50,13 +59,13 @@ class blmnii:
         queryP += ")"
 
         query += queryC + queryP
-        cur.execute(query)
-
-        rows = cur.fetchall()
+        self.cur.execute(query)
+        rows = self.cur.fetchall()
         for row in rows:
-            adjMat[compMeta[row[0]]][protMeta[row[1]]]=(row[2])
+            adjMat[compList[row[0]]][protList[row[1]]]=(row[2])
+        return adjMat
 
-    def makeKernel(dataList,mode):
+    def makeKernel(self,dataList,mode):
         dataList = list(set(dataList))
         dataDict = {e:i for i,e in enumerate(dataList)}#for Index
         simMat = np.zeros((len(dataList),len(dataList)), dtype=float)
@@ -73,8 +82,8 @@ class blmnii:
                 queryC += " OR "
             queryC += (qParam[0] + " = " + "'" + d + "'")
         query += queryC
-        cur.execute(query)
-        dataRows = cur.fetchall()
+        self.cur.execute(query)
+        dataRows = self.cur.fetchall()
         for i,row in enumerate(dataRows):
             if row[1] != None:
                 temp = row[1].split(',')
