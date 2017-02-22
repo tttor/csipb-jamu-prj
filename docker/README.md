@@ -4,7 +4,13 @@
   * exec -it <imageName> bash
 
 * task manager
-	* docker ps -a
+  * docker ps -a
 
 * check log
-	* docker logs <imageName>
+  * docker logs <imageName>
+
+* see port status
+  * netstat -ntlp
+
+* build
+  * docker build -t <imageTag> -f <Dockerfile> <Path>
