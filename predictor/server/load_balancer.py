@@ -8,7 +8,7 @@ connFromPredictorPHP = None
 
 def main(argv):
     if len(sys.argv)!=6:
-        print 'USAGE: phyton load_balancer.py [host] [phpApiPort] [serverPortLo] [serverPortHi] [waitingTimeStr]'
+        print 'USAGE: phyton load_balancer.py [hostToConnect] [phpApiPort] [serverPortLo] [serverPortHi] [waitingTimeStr]'
         return
 
     host = argv[1]
@@ -32,9 +32,13 @@ def main(argv):
             serverUsage.append(0)
         s.close()
 
+    if len(serverPorts)==0:
+        print 'FATAL: no server is up, LB is shutting down...'
+        return
+
     global connFromPredictorPHP
     connFromPredictorPHP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    connFromPredictorPHP.bind( (host,port) )
+    connFromPredictorPHP.bind( ('0.0.0.0',port) )
 
     backlog = 1
     connFromPredictorPHP.listen(backlog)
