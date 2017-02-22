@@ -7,16 +7,16 @@ from datetime import datetime
 connFromPredictorPHP = None
 
 def main(argv):
-    if len(sys.argv)!=5:
-        print 'USAGE: phyton load_balancer.py [phpApiPort] [serverPortLo] [serverPortHi] [waitingTimeStr]'
+    if len(sys.argv)!=6:
+        print 'USAGE: phyton load_balancer.py [host] [phpApiPort] [serverPortLo] [serverPortHi] [waitingTimeStr]'
         return
 
-    port = int(argv[1])
-    serverPortLo = int(argv[2])
-    serverPortHi = int(argv[3])
-    waitingTimeStr = argv[4]
+    host = argv[1]
+    port = int(argv[2])
+    serverPortLo = int(argv[3])
+    serverPortHi = int(argv[4])
+    waitingTimeStr = argv[5]
 
-    host = '127.0.0.1'
     upAt = datetime.now().strftime("%Y:%m:%d %H:%M:%S")
     nQueries = 0
 
@@ -78,12 +78,12 @@ def main(argv):
             connToPredictorPHP.sendall(waitingTimeStr)
             connToPredictorPHP.close()
 
-            #Forward the message as is (received from predict.php)
-            print 'passing the msg to '+host+': '+str(serverPort)
-            connToServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            connToServer.connect( (host,serverPort) )
-            connToServer.sendall(message)
-            connToServer.close()
+            # #Forward the message as is (received from predict.php)
+            # print 'passing the msg to '+host+': '+str(serverPort)
+            # connToServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            # connToServer.connect( (host,serverPort) )
+            # connToServer.sendall(message)
+            # connToServer.close()
 
     print 'load-balancer: shutting down ...'
     connFromPredictorPHP.close()

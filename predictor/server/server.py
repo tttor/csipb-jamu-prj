@@ -5,13 +5,13 @@ from datetime import datetime
 from server_thread import ServerThread as Server
 
 def main(argv):
-    if len(sys.argv)!=4:
-        print 'USAGE: phyton server.py [serverId] [portLo] [portHi]'
+    if len(sys.argv)!=5:
+        print 'USAGE: phyton server.py [serverId] [host] [portLo] [portHi]'
         return
 
-    host = '127.0.0.1'
     serverId = argv[1]
-    portLo,portHi = int(argv[2]),int(argv[3])
+    host = argv[2]
+    portLo,portHi = int(argv[3]),int(argv[4])
     upAt = datetime.now().strftime("%Y:%m:%d %H:%M:%S")
 
     print >> sys.stderr, '******************************************************'
