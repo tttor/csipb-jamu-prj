@@ -7,16 +7,16 @@ from datetime import datetime
 connFromPredictorPHP = None
 
 def main(argv):
-    if len(sys.argv)!=6:
-        print 'USAGE: phyton load_balancer.py [hostToConnect] [phpApiPort] [serverPortLo] [serverPortHi] [waitingTimeStr]'
+    if len(sys.argv)!=7:
+        print 'USAGE: python load_balancer.py [phpApiHost] [phpApiPort] [serverHost] [serverPortLo] [serverPortHi] [waitingTimeStr]'
         return
 
-    host = argv[1]
-    port = int(argv[2])
-    serverPortLo = int(argv[3])
-    serverPortHi = int(argv[4])
-    waitingTimeStr = argv[5]
-
+    phpApiHost = argv[1]
+    phpApiPort = int(argv[2])
+    serverHost = argv[3]
+    serverPortLo = int(argv[4])
+    serverPortHi = int(argv[5])
+    waitingTimeStr = argv[6]
     upAt = datetime.now().strftime("%Y:%m:%d %H:%M:%S")
     nQueries = 0
 
@@ -26,7 +26,7 @@ def main(argv):
     serverPorts = []
     for p in range(serverPortLo,serverPortHi+1):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        r = s.connect_ex((host,p))
+        r = s.connect_ex((serverHost,p))
         if r==0:
             serverPorts.append(p)
             serverUsage.append(0)
@@ -38,7 +38,7 @@ def main(argv):
 
     global connFromPredictorPHP
     connFromPredictorPHP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    connFromPredictorPHP.bind( ('0.0.0.0',port) )
+    connFromPredictorPHP.bind( (phpApiHost,phpApiPort) )
 
     backlog = 1
     connFromPredictorPHP.listen(backlog)
@@ -54,7 +54,7 @@ def main(argv):
         print(">> waitingTime= "+waitingTimeStr+" seconds")
         print(">> HasDispatched= "+str(nQueries)+" queries")
         print(">> serverUsage= "+str(serverUsageDict))
-        print("NOW: waiting for any query from 'predict.php' at "+host+":"+str(port))
+        print("NOW: waiting for any query from 'predict.php' at "+phpApiHost+":"+str(phpApiPort))
 
         signal.signal(signal.SIGINT, signalHandler)
         connToPredictorPHP, connToPredictorAddr = connFromPredictorPHP.accept()
@@ -83,9 +83,9 @@ def main(argv):
             connToPredictorPHP.close()
 
             # #Forward the message as is (received from predict.php)
-            # print 'passing the msg to '+host+': '+str(serverPort)
+            # print 'passing the msg to '+serverHost+': '+str(serverPort)
             # connToServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            # connToServer.connect( (host,serverPort) )
+            # connToServer.connect( (serverHost,serverPort) )
             # connToServer.sendall(message)
             # connToServer.close()
 
