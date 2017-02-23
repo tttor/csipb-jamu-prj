@@ -80,12 +80,12 @@ class ServerThread(threading.Thread):
                         if (pred>=0)and(pred<=1):# valid
                             w = pcfg['methods'][j][1]
                             normPred +=  (w * pred)
-                            nValid += 1
+                            nValidPred += 1
 
                     normalizer = 1.0/float(nValidPred)
                     normPred = normPred/normalizer
 
-                    predictionList.append(nPred)
+                    predictionList.append(normPred)
                 # print self.name+': predictionList '+str(predictionList)
 
                 # Push the prediction result to database
