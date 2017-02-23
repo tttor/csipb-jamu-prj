@@ -31,29 +31,8 @@
     socket_write($socketToLB, $msgTo, strlen($msgTo));
     socket_close($socketToLB);
 
-    // Socker for listening from LB
-    $socketFromLB = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-    if ($socketFromLB === false){
-      echo "socket_create() failed: reason:". socket_strerror(socket_last_error())."\n";
-    }
-    $result = socket_connect($socketFromLB,'0.0.0.0',$predictorChannelPort);
-    if ($result === false){
-      echo "socket_connect() failed.\nReason:($result) ".socket_strerror(socket_last_error($socketFromLB))."\n";
-    }
-
-    // Receive Data (i.e timeToWait) from the predictor load balancer
-    // timeToWait for the predictor server to update the DB
-    $msgFrom = "";
-    $timeToWait = "";
-    while($msgFrom = socket_read($socketFromLB, 8)){
-      $timeToWait .= $msgFrom;
-    }
-    socket_close($socketFromLB);
-
     // sleep for some integer seconds, waiting for DB update by predictors
     sleep( (int) $timeToWait );
-
-    //
     $row = array('has_waited_for'=>$timeToWait);
     $respArr[] = $row;
   }
