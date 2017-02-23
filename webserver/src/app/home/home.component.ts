@@ -144,7 +144,7 @@ export class Home implements OnInit {
 
   constructor(public appState: AppState, private http: Http) {
     this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-    this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
+    // this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
 
     this.interactionQueryAPI = this.baseAPI+'connectivity.php';
     this.metaQueryAPI = this.baseAPI+'metadata.php';
@@ -1012,7 +1012,11 @@ export class Home implements OnInit {
   private getConnectivityScore(connectivity) {
     let score = 0.0;
     for (let i=0;i<connectivity.length;i++) {
-      score += parseFloat(connectivity[i]['weight'])
+      let src = connectivity[i]['source'];
+      if (src!=='null') {
+        let wStr = connectivity[i]['weight'];
+        score += parseFloat(wStr);
+      }
     }
     return score;
   }
