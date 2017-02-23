@@ -78,7 +78,7 @@ class ServerThread(threading.Thread):
                     for j in range(nMethods):
                         pred = predictionListRaw[j][i]
                         if (pred>=0)and(pred<=1):# valid
-                            w = predictorConfig['methods'][j][1]
+                            w = pcfg['methods'][j][1]
                             normPred +=  (w * pred)
                             nValid += 1
 
