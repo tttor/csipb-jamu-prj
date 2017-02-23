@@ -60,31 +60,31 @@ class ServerThread(threading.Thread):
 
                 # Wait for all predictor threads to finish
                 print >>sys.stderr,self.name+': Wait for all predictor threads to finish'
-                while True:
-                    finished = True
-                    for i,t in enumerate(predictorThreads):
-                        if t.getPredictionNumber()!=self.queryNum:
-                            # print t.getPredictionNumber()
-                            finished = False
-                            break
-
-                    if finished:
-                        break
+                for p in predictorThreads:
+                    while p.getPredictionNumber()!=self.queryNum:
+                        pass
 
                 # Merge prediction results from predictor threads
                 print >>sys.stderr,self.name+': Merge prediction results'
-                predictionListRaw = [] # 2D: row: method and col: ith query
+                predictionListRaw = [] # [2D] row: method and col: ith query
                 for t in predictorThreads:
                     predictionListRaw.append( t.getPredictionList() )
+
                 predictionList = []
-                print predictionListRaw
+                nMethods = len(pcfg['methods'])
                 for i in range(len(queryList)):
-                    nMethods = len(pcfg['methods'])
-                    normalizer = 1.0/float(nMethods)
-                    nPred = 0.0
+                    normPred = 0.0
+                    nValidPred = 0
                     for j in range(nMethods):
-                        w = pcfg['methods'][j][1]
-                        nPred += normalizer * w * predictionListRaw[j][i]
+                        pred = predictionListRaw[j][i]
+                        if (pred>=0)and(pred<=1):# valid
+                            w = predictorConfig['methods'][j][1]
+                            normPred +=  (w * pred)
+                            nValid += 1
+
+                    normalizer = 1.0/float(nValidPred)
+                    normPred = normPred/normalizer
+
                     predictionList.append(nPred)
                 # print self.name+': predictionList '+str(predictionList)
 
