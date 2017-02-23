@@ -3,6 +3,7 @@ import threading
 import socket
 import sys
 import psycopg2
+import math
 
 from predictor_thread import PredictorThread as Predictor
 from config import predictorConfig as pcfg
@@ -73,27 +74,30 @@ class ServerThread(threading.Thread):
                 predictionList = []
                 nMethods = len(pcfg['methods'])
                 for i in range(len(queryList)):
-                    normPred = 0.0
                     nValidPred = 0
+                    totalPred = 0.0
                     for j in range(nMethods):
                         pred = predictionListRaw[j][i]
-                        if (pred>=0)and(pred<=1):# valid
+                        if not(math.isnan(pred)): # valid
                             w = pcfg['methods'][j][1]
-                            normPred +=  (w * pred)
+                            totalPred +=  (w * pred)
                             nValidPred += 1
 
-                    normalizer = 1.0/float(nValidPred)
-                    normPred = normPred/normalizer
+                    normPred = float('NaN')
+                    if nValidPred>0:
+                        normalizer = 1.0/float(nValidPred)
+                        normPred = totalPred/normalizer
 
                     predictionList.append(normPred)
                 # print self.name+': predictionList '+str(predictionList)
 
                 # Push the prediction result to database
-                print >>sys.stderr,self.name+': Push the prediction result to database'
+                nPush = 0
                 for i,p in enumerate(predictionList):
-                    if p<0.0:# invalid
+                    if math.isnan(p):# invalid
                         continue
 
+                    nPush += 1
                     comId,proId = queryList[i]
                     src = ','.join([i[0] for i in pcfg['methods']])
 
@@ -122,4 +126,5 @@ class ServerThread(threading.Thread):
                     query = query1+query2+query3
                     self.cur.execute(query)
                     self.connDB.commit()
+                print >>sys.stderr,self.name+': Have pushed '+str(nPush)+' prediction results to database'
         self.connDB.close()
