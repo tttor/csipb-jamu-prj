@@ -7,8 +7,8 @@ from datetime import datetime
 connFromPredictorPHP = None
 
 def main(argv):
-    if len(sys.argv)!=7:
-        print 'USAGE: python load_balancer.py [phpApiHost] [phpApiPort] [serverHost] [serverPortLo] [serverPortHi] [waitingTimeStr]'
+    if len(sys.argv)!=6:
+        print 'USAGE: python load_balancer.py [phpApiHost] [phpApiPort] [serverHost] [serverPortLo] [serverPortHi]'
         return
 
     phpApiHost = argv[1]
@@ -16,7 +16,6 @@ def main(argv):
     serverHost = argv[3]
     serverPortLo = int(argv[4])
     serverPortHi = int(argv[5])
-    waitingTimeStr = argv[6]
     upAt = datetime.now().strftime("%Y:%m:%d %H:%M:%S")
     nQueries = 0
 
@@ -51,7 +50,6 @@ def main(argv):
         print("###############################################################")
         print("Ijah predictor load-balancer :)")
         print(">> upFrom= "+upAt)
-        print(">> waitingTime= "+waitingTimeStr+" seconds")
         print(">> HasDispatched= "+str(nQueries)+" queries")
         print(">> serverUsage= "+str(serverUsageDict))
         print("NOW: waiting for any query from 'predict.php' at "+phpApiHost+":"+str(phpApiPort))
@@ -69,6 +67,7 @@ def main(argv):
                 message += dataTemp
 
                 if message[-3:]=="end":
+                    connToPredictorPHP.close()
                     break
         finally:
             # get server with fewest #servedQuery'
@@ -77,10 +76,6 @@ def main(argv):
 
             serverUsage[serverIdx] += 1
             nQueries += 1
-
-            #Send time to wait for prediction to predict.php
-            connToPredictorPHP.sendall(waitingTimeStr)
-            connToPredictorPHP.close()
 
             # #Forward the message as is (received from predict.php)
             # print 'passing the msg to '+serverHost+': '+str(serverPort)
