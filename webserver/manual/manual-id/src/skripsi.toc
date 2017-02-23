@@ -1,0 +1,65 @@
+\contentsline {chapter}{HALAMAN JUDUL}{i}{section*.2}
+\contentsline {chapter}{LEMBAR PERSETUJUAN}{ii}{section*.4}
+\contentsline {chapter}{LEMBAR PERNYATAAN ORISINALITAS}{iii}{section*.5}
+\contentsline {chapter}{LEMBAR PENGESAHAN}{iv}{section*.6}
+\contentsline {chapter}{\uppercase {Kata Pengantar}}{v}{section*.7}
+\contentsline {chapter}{LEMBAR PERSETUJUAN PUBLIKASI ILMIAH}{vii}{section*.8}
+\contentsline {chapter}{ABSTRAK}{viii}{section*.9}
+\contentsline {chapter}{ABSTRACT}{ix}{section*.10}
+\contentsline {chapter}{Daftar Isi}{x}{section*.10}
+\contentsline {chapter}{Daftar Gambar}{xii}{section*.10}
+\contentsline {chapter}{\numberline {1}\uppercase {Pendahuluan}}{1}{chapter.1}
+\contentsline {section}{\numberline {1.1}Latar Belakang}{1}{section.1.1}
+\contentsline {section}{\numberline {1.2}Perumusan Masalah}{4}{section.1.2}
+\contentsline {section}{\numberline {1.3}Tujuan Penelitian}{4}{section.1.3}
+\contentsline {section}{\numberline {1.4}Tahapan Penelitian Umum}{4}{section.1.4}
+\contentsline {subsection}{\numberline {1.4.1}Studi literatur}{4}{subsection.1.4.1}
+\contentsline {subsection}{\numberline {1.4.2}Pengumpulan data}{5}{subsection.1.4.2}
+\contentsline {subsection}{\numberline {1.4.3}Implementasi sistem}{5}{subsection.1.4.3}
+\contentsline {subsection}{\numberline {1.4.4}Eksperimen dan evaluasi}{5}{subsection.1.4.4}
+\contentsline {section}{\numberline {1.5}Posisi Penelitan}{5}{section.1.5}
+\contentsline {section}{\numberline {1.6}Ruang Lingkup Penelitian}{6}{section.1.6}
+\contentsline {section}{\numberline {1.7}Sistematika Penulisan}{6}{section.1.7}
+\contentsline {chapter}{\numberline {2}\uppercase {Landasan Teori}}{7}{chapter.2}
+\contentsline {section}{\numberline {2.1}Segmentasi Semantik}{7}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}Conditional Random Field (CRF) }{7}{subsection.2.1.1}
+\contentsline {subsection}{\numberline {2.1.2}Maximum a Posteriori (MAP)}{9}{subsection.2.1.2}
+\contentsline {section}{\numberline {2.2}Segmentasi Citra}{9}{section.2.2}
+\contentsline {section}{\numberline {2.3}Latent Dirichlet Allocation}{10}{section.2.3}
+\contentsline {section}{\numberline {2.4}Algoritme Genetika}{12}{section.2.4}
+\contentsline {section}{\numberline {2.5}Penelitian Terkait}{15}{section.2.5}
+\contentsline {chapter}{\numberline {3}\uppercase {Metode Usulan}}{17}{chapter.3}
+\contentsline {section}{\numberline {3.1}Produksi \textit {Multiple Segmentation}}{18}{section.3.1}
+\contentsline {section}{\numberline {3.2}Ekstraksi ``kata'' dari citra}{19}{section.3.2}
+\contentsline {section}{\numberline {3.3}Kuantisasi ``kata visual''}{20}{section.3.3}
+\contentsline {section}{\numberline {3.4}Pembuatan korpus}{21}{section.3.4}
+\contentsline {section}{\numberline {3.5}Membangun model LDA}{22}{section.3.5}
+\contentsline {section}{\numberline {3.6}Pengukuran ``kebaikan'' segmen}{22}{section.3.6}
+\contentsline {section}{\numberline {3.7}Pemilihan segmen menggunakan algoritme genetika}{23}{section.3.7}
+\contentsline {section}{\numberline {3.8}Robust $P^n$}{25}{section.3.8}
+\contentsline {paragraph}{\textit {Unary potential}}{26}{section*.25}
+\contentsline {paragraph}{\textit {Pairwise potential}}{26}{section*.26}
+\contentsline {paragraph}{\textit {Higher Order Potential}}{27}{section*.27}
+\contentsline {chapter}{\numberline {4}\uppercase {Hasil Eksperimen dan Analisis}}{28}{chapter.4}
+\contentsline {section}{\numberline {4.1}Persiapan Eksperimen}{28}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}Dataset}{28}{subsection.4.1.1}
+\contentsline {subsection}{\numberline {4.1.2}Metrik pengukuran}{29}{subsection.4.1.2}
+\contentsline {subsection}{\numberline {4.1.3}Piranti Eksperimen}{29}{subsection.4.1.3}
+\contentsline {paragraph}{Robust $P^n$ Framework, Ladicky 2009}{29}{section*.30}
+\contentsline {paragraph}{Textonboost}{29}{section*.31}
+\contentsline {paragraph}{Scikit-image}{30}{section*.32}
+\contentsline {paragraph}{GibbsLDA++}{30}{section*.33}
+\contentsline {subsection}{\numberline {4.1.4}Pengesetan Parameter}{30}{subsection.4.1.4}
+\contentsline {section}{\numberline {4.2}Hasil Eksperimen}{30}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}Hasil Pencarian Topik Melalui Model LDA}{30}{subsection.4.2.1}
+\contentsline {subsection}{\numberline {4.2.2}Hasil Penilaian Segmen menggunakan Latent Dirichlet Allocation}{34}{subsection.4.2.2}
+\contentsline {subsection}{\numberline {4.2.3}Hasil Pemilihan Segmen menggunakan Algoritme Genetika}{36}{subsection.4.2.3}
+\contentsline {subsection}{\numberline {4.2.4}Skenario 1}{37}{subsection.4.2.4}
+\contentsline {subsubsection}{\numberline {4.2.4.1}Hasil kuantitatif Eksperimen}{37}{subsubsection.4.2.4.1}
+\contentsline {subsection}{\numberline {4.2.5}Skenario 2}{38}{subsection.4.2.5}
+\contentsline {subsubsection}{\numberline {4.2.5.1}Hasil kuantitatif Eksperimen}{39}{subsubsection.4.2.5.1}
+\contentsline {subsubsection}{\numberline {4.2.5.2}Hasil kualitatif Eksperimen}{40}{subsubsection.4.2.5.2}
+\contentsline {chapter}{\numberline {5}\uppercase {Kesimpulan}}{42}{chapter.5}
+\contentsline {section}{\numberline {5.1}Kesimpulan}{42}{section.5.1}
+\contentsline {section}{\numberline {5.2}Pengembangan Selanjutnya}{43}{section.5.2}
+\contentsline {chapter}{Daftar Referensi}{44}{Item.27}

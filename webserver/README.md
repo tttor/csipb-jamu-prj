@@ -1,5 +1,10 @@
 # Ijah Werbserver
 
+## build
+1. $ npm install
+2 $ npm run start:hmr
+3. $ npm run build:prod
+
 ## env-setting
 * install install nodejs
 curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -

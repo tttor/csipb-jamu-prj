@@ -1,0 +1,103 @@
+%% This is an example first chapter.  You should put chapter/appendix that you
+%% write into a separate file, and add a line \include{yourfilename} to
+%% main.tex, where `yourfilename.tex' is the name of the chapter/appendix file.
+%% You can process specific files by typing their names in at the 
+%% \files=
+%% prompt when you run the file main.tex through LaTeX.
+\chapter{Metode Penelitian}
+% Metode penelitian dibuat mencakup bahan dan instrumen yang dibutuhkan, deksripsi subjek
+% penelitian, cara pengambilan contoh/ sampel, cara pengumpulan data, dan gambaran jelas pengolahan
+% dan analisis data yang akan dilakukan. Metode penelitian dipaparkan dengan kerangka sistematis
+% untuk menjawab rumusan masalah dan mencapai tujuan dari penelitian.
+
+Metode penelitian ini digolongkan menjadi dua jenis berdasarkan luarannya, yaitu metode prediksi dan web-server.
+Penjelasan rinci tentang keduanya adalah sebagai berikut.
+
+\section{Metode prediksi}
+Pada penelitian ini, kami berkonsentrasi pada metode prediksi berbasis kernel yang telah terbukti sukses~\cite{Scholkopf:2001,2546}, 
+khususnya untuk data masukan yang dapat dideskripsikan dengan banyak sekali fitur, sebagaimana data senyawa, protein dan jejaring farmakologi.
+Pada metode berbasis kernel, data masukan (observasi) dipetakan secara implisit ke sebuah ruang fitur melalui 
+fungsi mapping $\Phi: \mathcal{X} \mapsto \mathcal{H}$, di mana $\mathcal{H}$ adalah sebuah reproducing kernel hilbert space (RKHS) dengan kernel yang mereproduksi $ K: \mathcal{X} \times \mathcal{X} \mapsto \mathbb{R}$.
+Sebuah fungsi $K(x,x')$ adalah sebuah fungsi kernel yang valid jika dan hanya jika untuk sembarang himpunan berhingga, fungsi itu menghasilkan matrik Gram yang simetris dan positive-definite. 
+
+\subsection{Kernel gabungan (composite kernel)} 
+Kami mengusulkan sebuah kernel gabungan yang mengintegrasikan informasi kesamaan dari ruang kimia, genomik dan farmakologi.
+Hal tersebut karena kita yakin dapat merumuskan beberapa kernel independen dari tiga ruang tersebut.
+Di ruang kimia terdapat ukuran kesamaan dari dua buah senyawa bioaktif~\cite{Ralaivola20051093}, 
+sedangkan di ruang genomik diperoleh kesamaan dari dua buah protein~\cite{Borgwardt:2005}.
+Sementara itu, di ruang farmakologi dapat diperoleh kesamaan antara jejaring farmakologi yang terbentuk dari interaksi senyawa (obat) dan protein.
+
+Berdasarkan karakteristik matematik dari matrik Gram yang positive-definite, dapat diturunkan sebuah preposisi sebagai berikut~\cite{Cristianini:1999}.
+Misal $K_1$ dan $K_2$ adalah kernel-kernel untuk $\mathcal{X} \times \mathcal{X}$, $\mathcal{X} \subseteq \mathbb{R}^n$, $a \in \mathbb{R}^+$, $0 \le \lambda \le 1$, $f(\cdot)$ adalah sebuah fungsi bernilai real di $\mathcal{X}$, $\phi: \boldsymbol{\mathcal{X}} \mapsto \mathbb{R}^m$, dan $\boldsymbol{K}$ adalah sebuah matrik $n \times n$ yang simetris dan positive semi-definite.
+Maka fungsi-fungsi berikut adalah kernel yang valid:
+$K(x,x') = K_1(x,x') K_2(x,x')$, $K(x,x') = aK_1(x,x')$ dan 
+$K(x,x') = \lambda K_1(x,x') + (1-\lambda)K_2(x,x')$.
+Terlihat bahwa kombinasi konvek dari kernel menghasilkan kernel yang valid. 
+Menurut~\cite{Joachims01compositekernels}, kombinasi dua kernel yang secara terpisah berkinerja baik akan juga berkinerja baik sepanjang kernel-kernel tersebut independen (tidak mengekstrak fitur yang sama).
+% Hal ini hampir mirip dengan prinsip kerja metode ensemble boosting yang menggabungkan hipotesis-hipotesis yang independen untuk menghasilkan hipotesis yang lebih baik.
+
+\subsection{Metode prediksi berbasis kernel} 
+Mula-mula, kami akan menggunakan metode kernel yang telah teruji, ``mature'', seperti support vector machine (SVM)~\cite{Scholkopf:2001}.
+Di penelitian ini, SVM yang termasuk metode supervised-learning menghasilkan sebuah fungsi pemetaan $f: X \mapsto \{0,1\}$, 
+di mana $x \in X$ adalah sebuah sampel data yang mengandung informasi tentang sebuah senyawa, sebuah protein dan jejaring farmakologi antar keduanya, 
+sedangkan $y \in \{0,1\}$ mengindikasikan ada tidaknya interaksi antara senyawa dan protein tersebut.
+Formulasi prediksi ini dapat juga dimodelkan sebagai supervised bipartite graph learning.
+
+Dalam tahap mendesain prediktor, kami menggunakan data set publik yang disediakan oleh Yamanishi~\cite{BleakleyY09}.
+Untuk melakukan evaluasi, kami mengikuti penelitian sebelumnya, yaitu dengan menghitung nilai area under curve (AUC) pada kurva ROC.
+Selain itu, juga dihitung metrik-metrik performa standar dari confusion matrix, seperti akurasi, recall, precision.
+Beberapa jamu (tanaman-tanaman) yang berpotensi tinggi juga akan diuji dengan metode docking dan secara kimia (wet-lab tests).
+
+\section{Web-server}
+\subsection{Antarmuka pengguna (front-end)}
+Antarmuka web akan dibuat sedemikian rupa sehingga bersifat minimalis dan sederhana untuk mendukung fungsi utamanya yaitu 
+memproses dan menampilkan prediksi interaksi antara senyawa bioaktif dan protein.
+Pada halaman pertama (homepage) terdapat visualisasi bipartite graph dengan empat set (himpunan), yaitu (dari kiri ke kanan): tanaman (jamu), senyawa bioaktif, protein dan penyakit, serta sebuah tombol ``Search'' untuk memulai proses prediksi atau pencarian jika informasi interaksi sudah ada.
+% Ilustrasi homepage ditampilkan pada gambar~\ref{fig:homepage}.
+
+Setelah proses prediksi berakhir, halaman luaran akan muncul yang menampilkan gambar bipartite graph serupa dengan yang di homepage, 
+tetapi dengan hasil prediksi interaksi (konektifitas) antara simpul-simpul dari himpunan senyawa dan protein.
+Hubungan antara simpul-simpul pada himpunan tanaman dan senyawa didapatkan dari database terkait, misal 
+KNApSAcK\footnote{http://kanaya.naist.jp/KNApSAcK/} dan Dr. Duke's Phytochemical and Ethnobotanical Databases\footnote{https://phytochem.nal.usda.gov/phytochem/search}. 
+Begitu pula dengan hubungan antara simpul-simpul pada set protein dan penyakit, misal dari Uniprot\footnote{http://www.uniprot.org/}.
+
+Evaluasi antarmuka pengguna dilakukan melalui uji publik atau survei.
+Peserta survei adalah peneliti terkait dengan beragam latar-belakang pendidikan, misal biologi, kimia, ilmu komputer (bioinformatik), dan farmasi.
+Selain itu, ada peserta yang tergolong educated-user, di mana akan diberikan beberapa tugas untuk diselesaikan dengan memanfaatkan web-server tersebut. \\
+Saran dan keluhan dari peserta evaluasi akan digunakan sebagai dasar perbaikan sistem.
+
+\subsection{Kode proses inti (back-end)}
+Hasil prediksi antara simpul-simpul senyawa dan protein berupa garis koneksi (edge) yang berbobot (weights).
+Bobot tersebut didapatkan melalui voting berbobot (weighted voting), yaitu sebuah bobot $w_e= \frac{1}{n} \sum_{i}^{n} \hat{e_i}$, dimana
+$n$ adalah jumlah metode prediksi yang digunakan dan $\hat{e_i} \in \{0,1\}$ adalah hasil prediksi sebuah edge~$e$ oleh prediktor ke-$i$.
+Kami berpendapat bahwa beberapa metode prediksi mempunyai kinerja yang berimbang, sebagaimana ditunjukkan oleh~\cite{Chen17082015}.
+Oleh karena itu, beberapa metode prediksi akan digunakan secara bersamaan sehingga didapatkan nilai bobot untuk tiap koneksi yang dapat diterjemahkan sebagai skor kepercayaan hasil prediksi.
+
+Hal lain yang kami usulkan adalah sebuah database yang komprehensif untuk keperluan prediksi interaksi senyawa dan protein.
+Pada dasarnya, database tersebut merupakan database mirror (kopian) dari beberapa database yang terkait dengan tingkat kedalaman data tertentu;
+data yang kami anggap detil atau jarang digunakan tidak dikopi, tetapi dirujuk ke database asal.
+Terdapat juga fitur untuk memperbaharui database mirror secara otomatis.
+Kami akan mengembangkan mesin penjelajah (crawler) database untuk mencari dan mengunduh data di database terkait.
+
+% doxygen for documentation
+Semua kode yang membentuk web-server kami ini, baik front- maupun back-end, akan dipublikasikan ke khalayak umum, sebagai kode open-source.
+Dengan begitu, utilitas dari kode akan dapat ditingkatkan, terlebih dengan dukungan dari dokumentasi (manual) yang lengkap.
+Untuk itu, dokumentasi kode akan dilakukan dengan Doxygen.%\footnote{http://www.stack.nl/~dimitri/doxygen/}.
+
+% Hipotesis yang diajukan dalam penelitian ini adalah sebagai berikut:
+% \begin{enumerate} [topsep=-10mm]
+% \itemsep0mm
+% \item 
+% Kernel, sebagai ukuran kesamaan dua entitas, merupakan metrik yang paling sesuai 
+% untuk mengintegrasikan informasi dari ruang kimia, genomik dan farmakologi
+
+% \item
+% Metode prediksi berbasis kernel dapat memberikan akurasi yang tinggi, di samping membutuhkan sumber daya komputasi yang rendah dan tidak bergantung pada ukuran informasi untuk menyimpulkan kesamaan dua sampel
+
+% \item 
+% Voting berbobot dari beberapa metode prediksi yang digunakan mengindikasikan skor kepercayaan terhadap hasil prediksi 
+
+% \item 
+% Web-server yang menyediakan layanan prediksi memiliki daya-guna tinggi melalui desain antarmuka yang user-friendly, visualisasi yang informatif dan interaksi yang responsif,
+% serta kode yang open-source dan terdokumentasi dengan baik
+% \end{enumerate}

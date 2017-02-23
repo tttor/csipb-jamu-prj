@@ -1,0 +1,81 @@
+%% This is an example first chapter.  You should put chapter/appendix that you
+%% write into a separate file, and add a line \include{yourfilename} to
+%% main.tex, where `yourfilename.tex' is the name of the chapter/appendix file.
+%% You can process specific files by typing their names in at the 
+%% \files=
+%% prompt when you run the file main.tex through LaTeX.
+\chapter{Pendahuluan}
+% Pendahuluan mencakup :
+%  Latar belakang topik penelitian, didukung oleh perkembangan penelitian serupa yang telah
+% ada sebelumnya
+%  Posisi penting dan hasil yang diharapkan dari penelitian
+%  Kontribusi aplikatif yang diharapkan bagi ilmu pengetahuan/ dunia praktis
+
+\section{Latar belakang}
+Penderita penyakit diabetes di Indonesia semakin meningkat dari tahun ke tahun, 
+yaitu 7.2~juta (2011), 8.5~juta (2013) dan 9.1~juta (2015).
+Oleh karena itu, dibutuhkan usaha-usaha pencegahan maupun penanganan diabetes.
+
+Keanekaragaman hayati nusantara merupakan sumber daya luar biasa untuk mendukung usaha tersebut.
+Ada dua cara untuk memanfaatkan keanekaragaman hayati nusantara, yaitu:
+\begin{itemize} [topsep=0mm]
+\itemsep0mm
+\item mengarahkannya menjadi suplemen makanan sehat, sebagai usaha preventif
+\item menjadikannya obat herbal tradisional dengan kaidah pengobatan modern, sebagai usaha pengobatan.
+\end{itemize}
+Pengembangan keduanya memerlukan informasi tentang interaksi \emph{antara} senyawa bioaktif yang terkandung dalam tanaman \emph{dengan} protein yang merupakan biomarker untuk suatu penyakit, misal diabetes.
+
+Proses penemuan obat konvensional memerlukan waktu dan biaya yang relatif besar.
+Hal tersebut karena penentuan tingkat interaksi antara senyawa dalam obat dan protein terkait penyakit melibatkan banyak sekali kandidat obat.
+Setiap kandidat memerlukan uji klinis yang mahal dan lama.
+Dengan demikian, untuk menghemat biaya, tenaga dan waktu, dibutuhkan \emph{prediksi} terhadap interaksi tersebut yang kemudian bertindak sebagai penapis massal \emph{in-silico} untuk menyeleksi kandidat senyawa obat baik alami ataupun sintetik.
+
+Lebih lanjut, saat ini telah tersedia beberapa database publik yang berisi informasi-informasi krusial dalam menentukan tingkat interaksi senyawa-protein.
+Beberapa database yang relevan antara lain, KNApSAcK, PubChem, BioAssay, dan ChemmineTools.
+Informasi dari database tersebut dapat membantu merumuskan model prediksi interaksi yang akurat.
+
+\section{Posisi penting dan hasil yang diharapkan}
+Penelitian ini berkontribusi dalam proses penemuan obat baik herbal maupun sintetik, khususnya untuk penyakit diabetes.
+Kesuksesannya akan mengurangi sumber daya yang diperlukan untuk menemukan suatu obat karena hanya kandidat yang berpotensi tinggi yang diuji secara klinis; dengan kata lain, ruang pencarian kandidat obat dipersempit.
+Di samping itu, manifestasi hasil penelitian yang berupa aplikasi-web dapat digunakan oleh peneliti obat ataupun masyarakat umum.
+Mereka dapat memperoleh informasi interaksi senyawa-protein, bahkan dengan masukan jenis tanaman dan penyakit.
+
+Hasil yang diharapkan dari penelitian ini dapat digolongkan menjadi dua, yaitu: metode prediksi dan web-server.
+\begin{enumerate} [topsep=0mm]
+\itemsep0mm
+\item Metode prediksi \\
+Prediksi yang dimaksud adalah estimasi interaksi antara senyawa dan protein.
+Penelitian ini mengajukan metode prediksi menggunakan kernel gabungan (composite kernel).
+Kernel tersebut dirumuskan berdasarkan pengetahuan tentang tiga ruang sekaligus, 
+yaitu ruang kimia, genomik dan farmakologi.
+Selain itu, akan dikembangkan metode prediksi berbasis kernel yang akurat.
+
+\item Web-server \\
+Web-server sebagai manifestasi penelitian ini memiliki, paling tidak, dua kebaruan yaitu:
+\begin{itemize} [topsep=0mm]
+\itemsep0mm
+\item data masukan berupa nama tanaman dan nama penyakit (sebagai tambahan untuk nama senyawa dan protein) dan 
+\item skor kepercayaan terhadap hasil prediksi melalui voting beberapa metode prediksi
+\end{itemize}
+Web-server sejenis, misal DINIES~\cite{YamanishiKMSKG14}, SuperPred~\cite{NickelGEBRGDP14} dan SwissTargetPrediction~\cite{GfellerGWDMZ14}, berfokus pada obat sintentik sehingga wajar jika masukannya berupa nama senyawa dan protein.
+Selain itu, prediksi yang dilakukan hanya menggunakan sebuah metode sehingga tidak bisa memberikan gambaran tentang skor kepercayaan prediksi.
+\end{enumerate}
+
+\section{Kontribusi aplikatif}
+Kontribusi aplikatif dari penelitian ini meliputi:
+
+\begin{enumerate} [topsep=0mm]
+\itemsep0mm
+\item
+Prediksi yang akurat terhadap interaksi senyawa bioaktif dengan protein merupakan informasi yang krusial untuk pengembangan obat dan suplemen makanan, baik herbal maupun sintetis.
+Dengan informasi ini sebagai penapis in-silico, uji klinis yang mahal dan lama hanya dilakukan pada kandidat senyawa yang berpotensi tinggi.
+
+\item
+Web-server publik yang handal berfungsi sebagai pusat informasi tentang (prediksi) khasiat tanaman obat.
+Selain itu, kode web-server akan disediakan dalam bentuk open-source library dengan dokumentasi yang rapi dan lengkap sehingga dapat dimanfaatkan oleh peneliti.
+Hal ini akan mendukung kesinambungan pengembangan dan perawatan sistem.
+Kode tersebut meliputi fungsi-fungsi perhitungan kernel gabungan, proses prediksi, serta penjelajahan (crawling) database terkait.
+\end{enumerate}
+
+
+

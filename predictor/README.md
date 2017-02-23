@@ -25,10 +25,10 @@
     * New drug, known target
     * Known drug, new target
     * New drug, new target (hardest)
-* features of compound-protein interactions (on chemical, genomic and pharmacological spaces)
-    * which features are mostly relevant, sufficient, ...
-    * feature extraction
-* similarity (kernel) functions (on chemical, genomic and pharmacological spaces)
+* features _and_ similarity (kernel) functions of compounds, proteins and their interactions
+    * compound/chemical features/kernels
+    * protein/biological/genomic features/kernels
+    * compound-protein interaction/network/pharmacological features/kernels
 
 # ML-based computational approaches
 * supervised
@@ -58,9 +58,7 @@
         * RBM
 * semi-supervised
     * TODO
-* feature/representation
-    * protein/biological/genomic features
-    * compound/chemical features
-    * network features
 * skewed/imbalaced dataset
     * Liu (2015):  building up highly credible negative samples
+* feature/representation
+    * TODO

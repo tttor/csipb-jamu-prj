@@ -3,6 +3,7 @@ import threading
 import socket
 import sys
 import psycopg2
+import math
 
 from predictor_thread import PredictorThread as Predictor
 from config import predictorConfig as pcfg
@@ -41,7 +42,7 @@ class ServerThread(threading.Thread):
             connToLB, connToLBAddr = connFromLB.accept()
 
             try:
-                # print >>sys.stderr, self.name+': Connection from', connToLBAddr
+                print >>sys.stderr,self.name+': Connection from',connToLBAddr
                 dataTemp = ""
                 message = ""
                 while True:
@@ -58,39 +59,45 @@ class ServerThread(threading.Thread):
                 for t in predictorThreads:
                     t.setQueryList(queryList)
 
-                # Wait for all thread to finish
-                while True:
-                    finished = True
-                    for i,t in enumerate(predictorThreads):
-                        if t.getPredictionNumber()!=self.queryNum:
-                            # print t.getPredictionNumber()
-                            finished = False
-                            break
+                # Wait for all predictor threads to finish
+                print >>sys.stderr,self.name+': Wait for all predictor threads to finish'
+                for p in predictorThreads:
+                    while p.getPredictionNumber()!=self.queryNum:
+                        pass
 
-                    if finished:
-                        break
-
-                # Merge predictionMsg
-                predictionListRaw = [] # 2D: row: method and col: ith query
+                # Merge prediction results from predictor threads
+                print >>sys.stderr,self.name+': Merge prediction results'
+                predictionListRaw = [] # [2D] row: method and col: ith query
                 for t in predictorThreads:
                     predictionListRaw.append( t.getPredictionList() )
+
                 predictionList = []
-                print predictionListRaw
+                nMethods = len(pcfg['methods'])
                 for i in range(len(queryList)):
-                    nMethods = len(pcfg['methods'])
-                    normalizer = 1.0/float(nMethods)
-                    nPred = 0.0
+                    nValidPred = 0
+                    totalPred = 0.0
                     for j in range(nMethods):
-                        w = pcfg['methods'][j][1]
-                        nPred += normalizer * w * predictionListRaw[j][i]
-                    predictionList.append(nPred)
+                        pred = predictionListRaw[j][i]
+                        if not(math.isnan(pred)): # valid
+                            w = pcfg['methods'][j][1]
+                            totalPred +=  (w * pred)
+                            nValidPred += 1
+
+                    normPred = float('NaN')
+                    if nValidPred>0:
+                        normalizer = 1.0/float(nValidPred)
+                        normPred = totalPred/normalizer
+
+                    predictionList.append(normPred)
                 # print self.name+': predictionList '+str(predictionList)
 
-                # Push predMsg to DB
+                # Push the prediction result to database
+                nPush = 0
                 for i,p in enumerate(predictionList):
-                    if p<0.0:# invalid
+                    if math.isnan(p):# invalid
                         continue
 
+                    nPush += 1
                     comId,proId = queryList[i]
                     src = ','.join([i[0] for i in pcfg['methods']])
 
@@ -119,4 +126,5 @@ class ServerThread(threading.Thread):
                     query = query1+query2+query3
                     self.cur.execute(query)
                     self.connDB.commit()
+                print >>sys.stderr,self.name+': Have pushed '+str(nPush)+' prediction results to database'
         self.connDB.close()
