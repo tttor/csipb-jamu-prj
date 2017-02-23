@@ -7,7 +7,7 @@
   * docker ps -a
 
 * check log
-  * docker logs <imageName>
+  * docker logs -f -t <imageName>
 
 * see port status
   * netstat -ntlp
