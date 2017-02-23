@@ -38,20 +38,26 @@ class PredictorThread(threading.Thread):
             if nQuery==0:
                 continue
 
+            ##
             startTime = time.time()
             elapsedTime = 0.0
             del self.predictionList[:]
 
+            ##
             queryBatch = [self.queryList[i:i+self.batchLength]
                           for i in range(0,nQuery,self.batchLength)]
-            for i,query in enumerate(queryBatch):
-                elapsedTime += time.time()-startTime
-                prediction = [float('NaN')]*self.batchLength # invalid prediction result
-                if  elapsedTime <= self.maxTime:
-                    prediction = self.predictor.predict(query)
-                    print self.name+': predicting query '+str(i+1)+'/'+str(nQuery)+'= '+str(prediction)
-                self.predictionList.append(prediction)
 
+            ##
+            for i,queries in enumerate(queryBatch):
+                elapsedTime += time.time()-startTime
+                predictions = [float('NaN')]*self.batchLength # invalid prediction result
+
+                if  elapsedTime <= self.maxTime:
+                    predictions = self.predictor.predict(queries)
+
+                self.predictionList += predictions
+
+            ##
             self.predictionNumber += 1
             del self.queryList[:]
 

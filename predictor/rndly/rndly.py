@@ -5,8 +5,12 @@ class RNDLy:
     def __init__(self):
     	self.name = 'rndly'
 
-    def predict(self,query):
-        lo = 0.0
+    def predict(self,queryList):
+    	lo = 0.0
         hi = 1.0
-        pred = np.random.uniform(lo,hi,1)[0]
-        return pred
+    	n = len(queryList)
+
+        preds = np.random.uniform(lo,hi,n)
+        preds = preds.tolist()
+
+        return preds
