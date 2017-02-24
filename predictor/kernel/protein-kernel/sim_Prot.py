@@ -12,7 +12,7 @@ from Bio.SubsMat.MatrixInfo import blosum62
 from multiprocessing import Pool
 
 def main():
-    if len(sys.argv):
+    if len(sys.argv)!=5:
         print "python sim_Prot.py [rowStart] [rowEnd] [columnBatch] [poolNum]"
     rowStart = int(sys.argv[1])
     rowEnd = int(sys.argv[2])
@@ -109,9 +109,7 @@ def main():
                     colProtein.append(colSeqProtein[j])
                     colIndex.append(j)
                 ### Calculation ###
-                print len(rowProtein),len(rowIndex), len(colProtein), len(colIndex)
-                listScore = [pool.apply_async(alignprot,(rowProtein[i], colProtein[i], rowIndex[i], colIndex[i],)) for i in range(batchLen)]
-                ###Put into row
+                listScore = [pool.apply_async(alignprot,(rowProtein[j], colProtein[j], rowIndex[j], colIndex[j],)) for j in range(batchLen)] ###Put into row
                 for listS in listScore:
                     simMatProt[listS.get()[1]] = listS.get()[0]
                 #Reset value
@@ -138,7 +136,7 @@ def main():
 
 def alignprot(rowSeqProtein,colSeqProtein,rowIndex,colIndex):
     alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
-    sys.stderr.write("Aligning "+str(rowIndex)+" "+str(colIndex)+",")
+    sys.stderr.write("\rAligning "+str(rowIndex)+" "+str(colIndex)+",")
     sys.stderr.flush()
     return [alignres, colIndex]
 
