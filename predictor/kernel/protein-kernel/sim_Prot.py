@@ -11,21 +11,15 @@ from Bio import pairwise2
 from Bio.SubsMat.MatrixInfo import blosum62
 from multiprocessing import Pool
 
-def alignprot(rowSeqProtein,colSeqProtein,i,j):
-    alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
-    sys.stderr.write("\rAligning "+str(i)+" "+str(j)+",")
-    sys.stderr.flush()
-    return [alignres, j]
-
-
-if __name__ == '__main__':
-    start = time.time()
-
+def main():
+    if len(sys.argv):
+        print "python sim_Prot.py [rowStart] [rowEnd] [columnBatch] [poolNum]"
     rowStart = int(sys.argv[1])
     rowEnd = int(sys.argv[2])
+    step = int(sys.argv[3])
+    poolNum = int(sys.argv[4])
     colStart = 0
     colEnd = 3334
-    step = int(sys.argv[3])
 
     nProtCol = colEnd-colStart
     nProtRow = rowEnd+1-rowStart
@@ -48,7 +42,7 @@ if __name__ == '__main__':
 
     it = 0
     ### MultiProcessing ###
-    pool = Pool(processes=4)
+    pool = Pool(processes=poolNum)
     ###################
 
     ###Parse uniprot ID from csv###
@@ -100,7 +94,6 @@ if __name__ == '__main__':
     outMatDir = OutDir+"RealProtKernel"+str(rowStart)+"_"+str(rowEnd)+".txt"
     outMetaDir = OutDir+"MetaProtKernel"+str(rowStart)+"_"+str(rowEnd)+".txt"
     listScore = []
-    batchCount = 0
     with open(outMatDir, 'w') as matF, open(outMetaDir, 'w') as metaF:
         for i in range(nProtRow):
             ###Preparing data for parallel mapping###
@@ -116,6 +109,7 @@ if __name__ == '__main__':
                     colProtein.append(colSeqProtein[j])
                     colIndex.append(j)
                 ### Calculation ###
+                print len(rowProtein),len(rowIndex), len(colProtein), len(colIndex)
                 listScore = [pool.apply_async(alignprot,(rowProtein[i], colProtein[i], rowIndex[i], colIndex[i],)) for i in range(batchLen)]
                 ###Put into row
                 for listS in listScore:
@@ -142,6 +136,16 @@ if __name__ == '__main__':
 
     ##################
 
+def alignprot(rowSeqProtein,colSeqProtein,rowIndex,colIndex):
+    alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
+    sys.stderr.write("Aligning "+str(rowIndex)+" "+str(colIndex)+",")
+    sys.stderr.flush()
+    return [alignres, colIndex]
+
+
+if __name__ == '__main__':
+    start = time.time()
+    main()
     #############Debugging section#############
     print "Runtime :"+ str(time.time()-start)
     ###########################################
