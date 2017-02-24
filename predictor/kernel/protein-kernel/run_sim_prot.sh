@@ -8,7 +8,7 @@ START_INDEX=$1
 END_INDEX=$2
 STEP=$3
 COLUMN_STEP=$4
-POOL = $5
+POOL=$5
 EXE="sim_Prot.py"
 
 for (( i=$START_INDEX; i<$END_INDEX ;i+=$STEP))
