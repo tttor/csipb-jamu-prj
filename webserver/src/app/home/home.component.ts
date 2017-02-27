@@ -678,7 +678,6 @@ export class Home implements OnInit {
                                                          proMeta,disMeta,
                                                          'pro','dis',
                                                          proSet,disSet)];
-
             let graphData = [];
             for (let ii=0;ii<graphDataArr.length;ii++) {
               for(let jj=0;jj<graphDataArr[ii].length;jj++) {
@@ -686,8 +685,31 @@ export class Home implements OnInit {
                   graphData.push(datum);
               }
             }
-
             localStorage.setItem('connectivityGraphData', JSON.stringify(graphData));
+
+            let comProFiltered = this.filterForGraph(plaVScom,comVSpro,proVSdis);
+            let comSetF = comProFiltered[0];
+            let proSetF = comProFiltered[1];
+            let graphDataArrF = [this.makeGraphDataOutput(plaVScom,
+                                             plaMeta,comMeta,
+                                             'pla','com',
+                                             plaSet,comSetF),
+                                this.makeGraphDataOutput(comVSpro,
+                                                         comMeta,proMeta,
+                                                         'com','pro',
+                                                         comSetF,proSetF),
+                                this.makeGraphDataOutput(proVSdis,
+                                                         proMeta,disMeta,
+                                                         'pro','dis',
+                                                         proSetF,disSet)];
+            let graphDataF = [];
+            for (let ii=0;ii<graphDataArrF.length;ii++) {
+              for(let jj=0;jj<graphDataArrF[ii].length;jj++) {
+                  let datum = graphDataArrF[ii][jj];
+                  graphDataF.push(datum);
+              }
+            }
+            localStorage.setItem('connectivityGraphDataFiltered', JSON.stringify(graphDataF));
 
             // summary text output /////////////////////////////////////////////
             let plaComConnScore = this.getConnectivityScore(plaVScom);
@@ -941,6 +963,52 @@ export class Home implements OnInit {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
+  private filterForGraph(plaVScom,comVSpro,proVSdis) {
+    let comWithPla = [];
+    for (let i=0; i<plaVScom.length;i++) {
+      let com = plaVScom[i]['com_id'];
+      comWithPla.push(com);
+    }
+
+    let comWithPro = [];
+    let proWithCom = [];
+    for (let i=0; i<comVSpro.length;i++) {
+      let source = comVSpro['source'];
+      if (source==='null') {
+        continue;
+      }
+
+      let com = comVSpro[i]['com_id'];
+      let pro = comVSpro[i]['pro_id'];
+      comWithPro.push(com);
+      proWithCom.push(pro)
+    }
+
+    let proWithDis = [];
+    for (let i=0; i<proVSdis.length;i++) {
+      let pro = proVSdis[i]['pro_id'];
+      proWithDis.push(pro);
+    }
+
+    let comWithPlaPro = [comWithPla,comWithPro];
+    let commComArr = comWithPlaPro.shift().reduce(function(res, v) {
+        if (res.indexOf(v) === -1 && comWithPlaPro.every(function(a) {
+            return a.indexOf(v) !== -1;
+        })) res.push(v);
+        return res;
+    }, []);
+
+    let proWithDisCom = [proWithDis,proWithCom];
+    let commProArr = proWithDisCom.shift().reduce(function(res, v) {
+        if (res.indexOf(v) === -1 && proWithDisCom.every(function(a) {
+            return a.indexOf(v) !== -1;
+        })) res.push(v);
+        return res;
+    }, []);
+
+    return [commComArr,commProArr];
+  }
+
   private find(k,arr) {
     let idx = -1;
     for (let i=0;i<arr.length;i++) {

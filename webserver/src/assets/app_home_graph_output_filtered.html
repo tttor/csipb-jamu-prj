@@ -73,7 +73,7 @@
       data.addColumn('string', 'From');
       data.addColumn('string', 'To');
       data.addColumn('number', 'Weight');
-      data.addRows(JSON.parse(localStorage.getItem('connectivityGraphData')) );
+      data.addRows(JSON.parse(localStorage.getItem('connectivityGraphDataFiltered')) );
 
       var options = {
         width: 1170,
