@@ -9,7 +9,7 @@ sys.path.append('../blmnii')
 from blm_ajm import BLMNII
 
 class PredictorThread(threading.Thread):
-    def __init__ (self,iid,iname,imethod,imaxtime):
+    def __init__ (self,iid,iname,imethod,imaxtime,ibatchlen):
         threading.Thread.__init__(self)
         self.id = iid
         self.name = iname
@@ -23,10 +23,10 @@ class PredictorThread(threading.Thread):
         self.predictor = None
         if self.method=='rndly':
             self.predictor = RNDLy()
-            self.batchLength = 1
+            self.batchLength = ibatchlen
         elif self.method=='blmnii':
             self.predictor = BLMNII()
-            self.batchLength = 2
+            self.batchLength = ibatchlen
         else:
             assert False, 'FATAL: Unknown prediction method!'
 

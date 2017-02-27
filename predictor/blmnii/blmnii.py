@@ -18,16 +18,14 @@ def BLM_NII(adjMatrix,sourceSim,targetSim,sourceIndex,targetIndex,mode):
     gramTrain = np.zeros((nTarget-1,nTarget-1))
     gramTest = np.zeros(nTarget-1)
 
-    #Make Kernel For Testing
     gramTest = targetSim[targetIndex]
     gramTest = np.delete(gramTest, targetIndex, 0)
-    #Make Kernel for Training
+
     gramTrain = targetSim
     gramTrain = np.delete(gramTrain,targetIndex, 0)
     gramTrain = np.delete(gramTrain,targetIndex, 1)
 
     if (mode == 1):
-        #transpose adjacency Matrix
         adjMatrix = [[row[i] for row in adjMatrix] for i in range(len(adjMatrix[0]))]
 
     for row in range(len(adjMatrix[0])):
@@ -39,7 +37,7 @@ def BLM_NII(adjMatrix,sourceSim,targetSim,sourceIndex,targetIndex,mode):
                     intProfile[j-boo] += sourceSim [sourceIndex][i] * adjMatrix[i][j]
                 else:
                     boo = 1
-        
+
         scale = MinMaxScaler((0,1))
         intProfile = intProfile.reshape(-1,1)
         intProfile = scale.fit_transform(intProfile)

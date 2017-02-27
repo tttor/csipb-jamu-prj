@@ -2,9 +2,8 @@
 import os
 import numpy as np
 
-def loadComProConn(mode):
+def loadComProConn(mode,dPath):
     print 'loading yamanishi connectivity...'
-    dpath = '../../dataset/connectivity/compound_vs_protein/yamanishi/ground-truth'
     fpath = os.path.join(dpath,'bind_orfhsa_drug_'+mode+'.txt')
 
     data = []
@@ -19,9 +18,8 @@ def loadComProConn(mode):
 
     return data
 
-def loadComProConnMat(mode):
+def loadComProConnMat(mode,dpath):
     print 'loading yamanishi conn matrix...'
-    dpath = '../../dataset/connectivity/compound_vs_protein/yamanishi/ground-truth'
     fpath = os.path.join(dpath,'admat_dgc_'+mode+'.txt')
 
     comList = []
@@ -47,9 +45,8 @@ def loadComProConnMat(mode):
 
     return (mat,comList,proList)
 
-def loadKernel(mode):
+def loadKernel(mode,dpath):
     print 'loading yamanishi kernel...'
-    dpath = '../../dataset/connectivity/compound_vs_protein/yamanishi/similarity-mat'
     fnames = ['compound/simmat_dc_'+mode+'.txt','protein/simmat_dg_'+mode+'.txt']
 
     kernel = dict()

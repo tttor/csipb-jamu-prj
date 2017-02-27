@@ -31,7 +31,7 @@ class ServerThread(threading.Thread):
         for i,mw in enumerate(pcfg['methods']):
             m = mw[0]
             name = self.name+'_'+m
-            predictorThreads.append( Predictor(i,name,m,pcfg['maxElapsedTime']) )
+            predictorThreads.append( Predictor(i,name,m,pcfg['maxElapsedTime'],mw[2]) )
 
         for t in predictorThreads:
             t.daemon = True

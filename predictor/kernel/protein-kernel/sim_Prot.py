@@ -22,7 +22,7 @@ def main():
     colEnd = 3334
 
     nProtCol = colEnd-colStart
-    nProtRow = rowEnd+1-rowStart
+    nProtRow = rowEnd-rowStart
 
     simMatProtNorm = np.zeros(nProtCol, dtype=float)
     simMatProt = np.zeros(nProtCol, dtype=float)
@@ -54,27 +54,25 @@ def main():
                 uniprotId.append(row[2])
             else:
                 it = 1
+    f.close()
     ###############################
 
     ###Read file and parse (with library)###
 
     sys.stderr.write("Load fasta file\n")
-    for i in range(rowStart,rowEnd+1):
-        # print i, len(uniprotId)
+    for i in range(len(uniprotId)):
         fastaDir = fastaFileDir + uniprotId[i] + ".fasta"
-        recTemp = SeqIO.read(fastaDir, "fasta")
-        rowSeqProtein.append(list(recTemp.seq))
-        recTemp = str(recTemp.id)
-        recTemp = recTemp.split("|")
-        rowMetaProtein.append(recTemp[1])
-
-    for i in range(colStart,colEnd):
-        fastaDir = fastaFileDir + uniprotId[i] + ".fasta"
-        recTemp = SeqIO.read(fastaDir, "fasta")
-        colSeqProtein.append(list(recTemp.seq))
-        recTemp = str(recTemp.id)
-        recTemp = recTemp.split("|")
-        colMetaProtein.append(recTemp[1])
+        with open (fastaDir) as handle:
+            recTemp = SeqIO.read(handle, "fasta")
+        handle.close()
+        recTempMeta = str(recTemp.id)
+        recTempMeta = recTempMeta.split("|")
+        if i in range(colStart, colEnd):
+            colSeqProtein.append(list(recTemp.seq))
+            colMetaProtein.append(recTempMeta[1])
+        if i in range(rowStart,rowEnd):
+            rowSeqProtein.append(list(recTemp.seq))
+            rowMetaProtein.append(recTempMeta[1])
 
     ###Cleanning sequance###
     sys.stderr.write("Cleaning Sequance\n")
@@ -135,9 +133,9 @@ def main():
     ##################
 
 def alignprot(rowSeqProtein,colSeqProtein,rowIndex,colIndex):
-    alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
     sys.stderr.write("\rAligning "+str(rowIndex)+" "+str(colIndex)+",")
     sys.stderr.flush()
+    alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
     return [alignres, colIndex]
 
 
