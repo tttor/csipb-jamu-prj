@@ -78,6 +78,9 @@ export class Home implements OnInit {
   proMetaTxtOutput;
   disMetaTxtOutput;
 
+  // Used in graph output
+  connGraphFiltered = false;
+
   // Used in summary text output
   summaryTxtOutput;
   summaryTxtOutput2;
@@ -986,6 +989,10 @@ export class Home implements OnInit {
     }
   }
 
+  toggleConnectivityGraph() {
+    this.connGraphFiltered = !this.connGraphFiltered;
+  }
+
   floatToStrTruncated(f,nDecimalDigits) {
     let raw = f.toString();
     let radixPos = raw.indexOf('.');
@@ -1255,6 +1262,7 @@ export class Home implements OnInit {
     this.plaVScomSwapped = false;
     this.comVSproSwapped = false;
     this.proVSdisSwapped = false;
+    this.connGraphFiltered = false;
 
     this.nPlaInputHolders = 0;
     this.nComInputHolders = 0;

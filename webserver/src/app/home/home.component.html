@@ -227,10 +227,19 @@
       <div class="row text-center">
         <font color="#696969">_____________________________________________________________________________________________________________________________________</font>
       </div>
-      <div class="text-center col-md-12" id="connectivityGraph"><h2><strong>Connectivity Graph</strong></h2></div>
-      <iframe id="graph" class="text-center" *ngIf="show" src="assets/app_home_graph_output.html" height="850px" width="100%" frameBorder="0"></iframe>
+      <div class="text-center col-md-12" id="connectivityGraph">
+        <h2><strong>Connectivity Graph</strong>
+        <button style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer; color: blue"
+          (click)="toggleConnectivityGraph()">
+          <span *ngIf="!connGraphFiltered">[ Filter! ]</span>
+          <span *ngIf="connGraphFiltered">[ Unfilter! ]</span>
+        </button>
+        </h2>
+      </div>
+      <iframe id="graph" class="text-center" *ngIf="!connGraphFiltered" src="assets/app_home_graph_output.html" height="850px" width="100%" frameBorder="0"></iframe>
+      <iframe id="graph" class="text-center" *ngIf="connGraphFiltered" src="assets/app_home_graph_output_filtered.html" height="850px" width="100%" frameBorder="0"></iframe>
 
-      <!-- Connectivity Text Output ///////////////////////////////////////////////////////// -->
+      <!-- Connectivity Text Output //////////////////////////////////////// -->
       <div class="row text-center">
         <font color="#696969">_____________________________________________________________________________________________________________________________________</font>
       </div>
