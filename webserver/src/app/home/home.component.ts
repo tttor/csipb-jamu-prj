@@ -16,8 +16,8 @@ declare var saveAs: any;
 })
 export class Home implements OnInit {
   // API URL addresses
-  baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  // baseAPI ='http://localhost/ijah-api/';
+  // baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+  baseAPI ='http://localhost/ijah-api/';
 
   interactionQueryAPI;
   metaQueryAPI;
@@ -614,13 +614,8 @@ export class Home implements OnInit {
   }
 
   // OUTPUT MAKING METHODS /////////////////////////////////////////////////////
-  makeOutput(iplaSet,icomSet,iproSet,idisSet,plaVScom,comVSpro,proVSdis) {
+  makeOutput(plaSet,comSet,proSet,disSet,plaVScom,comVSpro,proVSdis) {
     let t0 = performance.now();
-
-    let plaSet = this.handleIfEmptySet(iplaSet,'pla');
-    let comSet = this.handleIfEmptySet(icomSet,'com');
-    let proSet = this.handleIfEmptySet(iproSet,'pro');
-    let disSet = this.handleIfEmptySet(idisSet,'dis');
 
     let minComProWeight = 0.950;
     let comProFiltered = this.filterCompoundProteinItems(minComProWeight,
@@ -634,7 +629,6 @@ export class Home implements OnInit {
     let proMetaPost = this.makeJSONFormat(proSet,'id');
     let disMetaPost = this.makeJSONFormat(disSet,'id');
 
-    // console.log('getting meta ...');
     this.http.post(this.metaQueryAPI,plaMetaPost).map(resp4 => resp4.json())
     .subscribe(plaMeta => {
       this.http.post(this.metaQueryAPI,comMetaPost).map(resp5=>resp5.json())
@@ -707,10 +701,10 @@ export class Home implements OnInit {
             localStorage.setItem('connectivityGraphDataFiltered', JSON.stringify(graphDataF));
 
             // metadata text output ////////////////////////////////////////
-            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',iplaSet,plaMeta);
-            this.comMetaTxtOutput = this.makeMetaTextOutput('com',icomSet,comMeta);
-            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',iproSet,proMeta);
-            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',idisSet,disMeta);
+            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',plaSet,plaMeta);
+            this.comMetaTxtOutput = this.makeMetaTextOutput('com',comSet,comMeta);
+            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',proSet,proMeta);
+            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',disSet,disMeta);
 
             // summary text output /////////////////////////////////////////////
             let plaComConnScore = this.getConnectivityScore(plaVScom);
@@ -740,7 +734,7 @@ export class Home implements OnInit {
             }
 
             if (this.mode==='search_only') {
-              nUnknownComProConn = (icomSet.length*iproSet.length)-(nKnownByPredictionComProConn+nKnownByExperimentComProConn);
+              nUnknownComProConn = (comSet.length*proSet.length)-(nKnownByPredictionComProConn+nKnownByExperimentComProConn);
             }
 
             this.summaryTxtOutput = 'Connectivity Score:\n';
@@ -750,10 +744,10 @@ export class Home implements OnInit {
             this.summaryTxtOutput += '   Protein-Disease : '+proDisConnScore.toString()+'\n';
 
             this.summaryTxtOutput2 = 'Number of unique items:\n';
-            this.summaryTxtOutput2 += '   #Plants   : '+iplaSet.length.toString()+this.getInputMark('plant')+'\n';
-            this.summaryTxtOutput2 += '   #Compounds: '+icomSet.length.toString()+this.getInputMark('compound')+'\n';
-            this.summaryTxtOutput2 += '   #Proteins : '+iproSet.length.toString()+this.getInputMark('protein')+'\n';
-            this.summaryTxtOutput2 += '   #Diseases : '+idisSet.length.toString()+this.getInputMark('disease')+'\n';
+            this.summaryTxtOutput2 += '   #Plants   : '+plaSet.length.toString()+this.getInputMark('plant')+'\n';
+            this.summaryTxtOutput2 += '   #Compounds: '+comSet.length.toString()+this.getInputMark('compound')+'\n';
+            this.summaryTxtOutput2 += '   #Proteins : '+proSet.length.toString()+this.getInputMark('protein')+'\n';
+            this.summaryTxtOutput2 += '   #Diseases : '+disSet.length.toString()+this.getInputMark('disease')+'\n';
             this.summaryTxtOutput2 += 'Compound-Protein Connectivity:\n';
             this.summaryTxtOutput2 += '   #known_by_experiment: '+nKnownByExperimentComProConn.toString()+'\n';
             this.summaryTxtOutput2 += '   #known_by_prediction: '+nKnownByPredictionComProConn.toString()+'\n';
@@ -1112,14 +1106,6 @@ export class Home implements OnInit {
     }
     str = '['+str+']';
     return str;
-  }
-
-  private handleIfEmptySet(set,type) {
-    if (set.length>0) {
-      return set;
-    }
-    let newSet = [type.toUpperCase()+'_NONE_DUMMY'];
-    return newSet;
   }
 
   private getSet(interaction,id) {
