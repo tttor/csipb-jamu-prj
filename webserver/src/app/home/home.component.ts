@@ -79,7 +79,7 @@ export class Home implements OnInit {
   disMetaTxtOutput;
 
   // Used in graph output
-  connGraphFiltered = false;
+  filter = false;
 
   // Used in summary text output
   summaryTxtOutput;
@@ -1057,8 +1057,8 @@ export class Home implements OnInit {
     }
   }
 
-  toggleConnectivityGraph() {
-    this.connGraphFiltered = !this.connGraphFiltered;
+  toggleFilter() {
+    this.filter = !this.filter;
   }
 
   floatToStrTruncated(f,nDecimalDigits) {
@@ -1330,7 +1330,7 @@ export class Home implements OnInit {
     this.plaVScomSwapped = false;
     this.comVSproSwapped = false;
     this.proVSdisSwapped = false;
-    this.connGraphFiltered = false;
+    this.filter = false;
 
     this.nPlaInputHolders = 0;
     this.nComInputHolders = 0;

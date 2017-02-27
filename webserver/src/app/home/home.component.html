@@ -14,11 +14,21 @@
 
   <div *ngIf="(this.mode.indexOf('predict')!==-1)">
     <button class="btn btn-danger fab2"(click)="predictMore()">Predict More</button>
+    <button class="btn btn-danger fab2a"(click)="toggleFilter()">
+      <span *ngIf="!filter">Filter</span>
+      <span *ngIf="filter">Unfilter</span>
+    </button>
     <button class="btn btn-danger fab"(click)="reset()">Reset</button>
   </div>
   <div *ngIf="(this.mode.indexOf('predict')===-1)">
+    <button class="btn btn-danger fab2a"(click)="toggleFilter()">
+      <span *ngIf="!filter">Filter</span>
+      <span *ngIf="filter">Unfilter</span>
+    </button>
     <button class="btn btn-danger fab2"(click)="reset()">Reset</button>
   </div>
+
+
 </div>
 
 <div>
@@ -228,16 +238,10 @@
         <font color="#696969">_____________________________________________________________________________________________________________________________________</font>
       </div>
       <div class="text-center col-md-12" id="connectivityGraph">
-        <h2><strong>Connectivity Graph</strong>
-        <button style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer; color: blue"
-          (click)="toggleConnectivityGraph()">
-          <span *ngIf="!connGraphFiltered">[ Filter! ]</span>
-          <span *ngIf="connGraphFiltered">[ Unfilter! ]</span>
-        </button>
-        </h2>
+        <h2><strong>Connectivity Graph</strong></h2>
       </div>
-      <iframe id="graph" class="text-center" *ngIf="!connGraphFiltered" src="assets/app_home_graph_output.html" height="850px" width="100%" frameBorder="0"></iframe>
-      <iframe id="graph" class="text-center" *ngIf="connGraphFiltered" src="assets/app_home_graph_output_filtered.html" height="850px" width="100%" frameBorder="0"></iframe>
+      <iframe id="graph" class="text-center" *ngIf="!filter" src="assets/app_home_graph_output.html" height="850px" width="100%" frameBorder="0"></iframe>
+      <iframe id="graph" class="text-center" *ngIf="filter" src="assets/app_home_graph_output_filtered.html" height="850px" width="100%" frameBorder="0"></iframe>
 
       <!-- Connectivity Text Output //////////////////////////////////////// -->
       <div class="row text-center">
