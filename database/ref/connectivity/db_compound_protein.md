@@ -1,31 +1,29 @@
-db_compound_protein
-db_drug_target
+# db_compound_protein (db_drug_target)
 
-===
-DATABASE WEBSERVER
+## DATABASE WEBSERVER
 
-[x] DRUGBANK
-http://www.drugbank.ca/
+[x] DRUGBANK <br />
+http://www.drugbank.ca/ <br />
 contains UniprotID
 
-SUPERTARGET + MATADOR
+[ ] SUPERTARGET + MATADOR <br />
 http://insilico.charite.de/supertarget/
 http://insilico.charite.de/supertarget/index.php?site=drug_target&id=4594-CP2D6_HUMAN
 http://insilico.charite.de/supertarget/index.php?site=drug_target&id=5103-SERC_HUMAN
 http://insilico.charite.de/supertarget/index.php?site=drug_target&id=5103-S5A2_HUMAN
 http://insilico.charite.de/supertarget/index.php?site=drug_target&id=5103-AUTS2_HUMAN
 
-TRANSFORMER
+[ ] TRANSFORMER <br />
 http://bioinformatics.charite.de/transformer/
 http://bioinformatics.charite.de/supercyp/
 
-Antibioticome
+[ ] Antibioticome <br />
 http://magarveylab.ca/antibioticome
 
-Therapeutic Target Database
+[ ] Therapeutic Target Database <br />
 http://bidd.nus.edu.sg/group/cjttd/
 
-BindingDB
+[ ] BindingDB <br />
 http://www.bindingdb.org/bind/index.jsp
 
 [ ] STITCH
@@ -44,6 +42,9 @@ then look for "Target"
 
 [ ] GLIDA
 http://pharminfo.pharm.kyoto-u.ac.jp/services/glida/
+
+[ ] HPO <br />
+http://human-phenotype-ontology.github.io/
 
 KEGG
 KEGG BRITE
@@ -68,8 +69,7 @@ https://www.bindingdb.org
 PDTD
 http://www.dddc.ac.cn/pdtd/
 
-===
-PREDICTING WEBSERVER
+## PREDICTING WEBSERVER
 
 SuperPred
 http://prediction.charite.de
