@@ -663,24 +663,18 @@ export class Home implements OnInit {
             this.disMetaTxtOutput = this.makeMetaTextOutput('dis',idisSet,disMeta);
 
             // connectivity graph output ///////////////////////////////////////
-            let nNodeMax = 20;
-            let plaForGraph = plaSet;//plaSet.slice(0,nNodeMax);
-            let comForGraph = comSet;//comSet.slice(0,nNodeMax);
-            let proForGraph = proSet;//proSet.slice(0,nNodeMax);
-            let disForGraph = disSet;//disSet.slice(0,nNodeMax);
-
             let graphDataArr = [this.makeGraphDataOutput(plaVScom,
                                                          plaMeta,comMeta,
                                                          'pla','com',
-                                                         plaForGraph,comForGraph),
+                                                         plaSet,comSet),
                                 this.makeGraphDataOutput(comVSpro,
                                                          comMeta,proMeta,
                                                          'com','pro',
-                                                         comForGraph,proForGraph),
+                                                         comSet,proSet),
                                 this.makeGraphDataOutput(proVSdis,
                                                          proMeta,disMeta,
                                                          'pro','dis',
-                                                         proForGraph,disForGraph)];
+                                                         proSet,disSet)];
 
             let graphData = [];
             for (let ii=0;ii<graphDataArr.length;ii++) {
