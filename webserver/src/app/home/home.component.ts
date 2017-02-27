@@ -78,6 +78,9 @@ export class Home implements OnInit {
   proMetaTxtOutput;
   disMetaTxtOutput;
 
+  // Used in graph output
+  filter = false;
+
   // Used in summary text output
   summaryTxtOutput;
   summaryTxtOutput2;
@@ -619,6 +622,12 @@ export class Home implements OnInit {
     let proSet = this.handleIfEmptySet(iproSet,'pro');
     let disSet = this.handleIfEmptySet(idisSet,'dis');
 
+    let minComProWeight = 0.950;
+    let comProFiltered = this.filterCompoundProteinItems(minComProWeight,
+                                                         plaVScom,comVSpro,proVSdis);
+    let comSetF = comProFiltered[0];
+    let proSetF = comProFiltered[1];
+
     // Get metadata of each unique item
     let plaMetaPost = this.makeJSONFormat(plaSet,'id');
     let comMetaPost = this.makeJSONFormat(comSet,'id');
@@ -644,7 +653,6 @@ export class Home implements OnInit {
             this.proVSdisTxtOutput = this.makeConnectivityTextOutput(proVSdis,
                                                                      proMeta,disMeta,
                                                                      'pro','dis');
-
             this.comVSplaTxtOutput = this.makeConnectivityTextOutput(plaVScom,
                                                                      comMeta,plaMeta,
                                                                      'com','pla');
@@ -655,33 +663,19 @@ export class Home implements OnInit {
                                                                      disMeta,proMeta,
                                                                      'dis','pro');
 
-
-            // metadata text output ////////////////////////////////////////
-            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',iplaSet,plaMeta);
-            this.comMetaTxtOutput = this.makeMetaTextOutput('com',icomSet,comMeta);
-            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',iproSet,proMeta);
-            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',idisSet,disMeta);
-
             // connectivity graph output ///////////////////////////////////////
-            let nNodeMax = 20;
-            let plaForGraph = plaSet;//plaSet.slice(0,nNodeMax);
-            let comForGraph = comSet;//comSet.slice(0,nNodeMax);
-            let proForGraph = proSet;//proSet.slice(0,nNodeMax);
-            let disForGraph = disSet;//disSet.slice(0,nNodeMax);
-
             let graphDataArr = [this.makeGraphDataOutput(plaVScom,
                                                          plaMeta,comMeta,
                                                          'pla','com',
-                                                         plaForGraph,comForGraph),
+                                                         plaSet,comSet),
                                 this.makeGraphDataOutput(comVSpro,
                                                          comMeta,proMeta,
                                                          'com','pro',
-                                                         comForGraph,proForGraph),
+                                                         comSet,proSet),
                                 this.makeGraphDataOutput(proVSdis,
                                                          proMeta,disMeta,
                                                          'pro','dis',
-                                                         proForGraph,disForGraph)];
-
+                                                         proSet,disSet)];
             let graphData = [];
             for (let ii=0;ii<graphDataArr.length;ii++) {
               for(let jj=0;jj<graphDataArr[ii].length;jj++) {
@@ -689,9 +683,34 @@ export class Home implements OnInit {
                   graphData.push(datum);
               }
             }
-
             localStorage.setItem('connectivityGraphData', JSON.stringify(graphData));
-            this.show = true;
+
+            let graphDataArrF = [this.makeGraphDataOutput(plaVScom,
+                                             plaMeta,comMeta,
+                                             'pla','com',
+                                             plaSet,comSetF),
+                                this.makeGraphDataOutput(comVSpro,
+                                                         comMeta,proMeta,
+                                                         'com','pro',
+                                                         comSetF,proSetF),
+                                this.makeGraphDataOutput(proVSdis,
+                                                         proMeta,disMeta,
+                                                         'pro','dis',
+                                                         proSetF,disSet)];
+            let graphDataF = [];
+            for (let ii=0;ii<graphDataArrF.length;ii++) {
+              for(let jj=0;jj<graphDataArrF[ii].length;jj++) {
+                  let datum = graphDataArrF[ii][jj];
+                  graphDataF.push(datum);
+              }
+            }
+            localStorage.setItem('connectivityGraphDataFiltered', JSON.stringify(graphDataF));
+
+            // metadata text output ////////////////////////////////////////
+            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',iplaSet,plaMeta);
+            this.comMetaTxtOutput = this.makeMetaTextOutput('com',icomSet,comMeta);
+            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',iproSet,proMeta);
+            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',idisSet,disMeta);
 
             // summary text output /////////////////////////////////////////////
             let plaComConnScore = this.getConnectivityScore(plaVScom);
@@ -751,6 +770,9 @@ export class Home implements OnInit {
             this.summaryTxtOutput3 += '   '+this.mode+'\n';
             this.summaryTxtOutput3 += 'Elapsed Time: \n';
             this.summaryTxtOutput3 += '   '+this.floatToStrTruncated(this.elapsedTime,nDecimalDigits)+' seconds\n';
+
+            // Show the output page
+            this.show = true;
           }) // disMeta
         }) // proMeta
       }) // comMeta
@@ -942,6 +964,57 @@ export class Home implements OnInit {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
+  private filterCompoundProteinItems(threshold,plaVScom,comVSpro,proVSdis) {
+    let comWithPla = [];
+    for (let i=0; i<plaVScom.length;i++) {
+      let com = plaVScom[i]['com_id'];
+      comWithPla.push(com);
+    }
+
+    let comWithPro = [];
+    let proWithCom = [];
+    for (let i=0; i<comVSpro.length;i++) {
+      let source = comVSpro['source'];
+      if (source==='null') {
+        continue;
+      }
+
+      let w = parseFloat(comVSpro[i]['weight']);
+      if (w < threshold) {
+        continue;
+      }
+
+      let com = comVSpro[i]['com_id'];
+      let pro = comVSpro[i]['pro_id'];
+      comWithPro.push(com);
+      proWithCom.push(pro)
+    }
+
+    let proWithDis = [];
+    for (let i=0; i<proVSdis.length;i++) {
+      let pro = proVSdis[i]['pro_id'];
+      proWithDis.push(pro);
+    }
+
+    let comWithPlaPro = [comWithPla,comWithPro];
+    let commComArr = comWithPlaPro.shift().reduce(function(res, v) {
+        if (res.indexOf(v) === -1 && comWithPlaPro.every(function(a) {
+            return a.indexOf(v) !== -1;
+        })) res.push(v);
+        return res;
+    }, []);
+
+    let proWithDisCom = [proWithDis,proWithCom];
+    let commProArr = proWithDisCom.shift().reduce(function(res, v) {
+        if (res.indexOf(v) === -1 && proWithDisCom.every(function(a) {
+            return a.indexOf(v) !== -1;
+        })) res.push(v);
+        return res;
+    }, []);
+
+    return [commComArr,commProArr];
+  }
+
   private find(k,arr) {
     let idx = -1;
     for (let i=0;i<arr.length;i++) {
@@ -990,6 +1063,10 @@ export class Home implements OnInit {
     if (type==='proVSdis') {
       this.proVSdisSwapped = !this.proVSdisSwapped;
     }
+  }
+
+  toggleFilter() {
+    this.filter = !this.filter;
   }
 
   floatToStrTruncated(f,nDecimalDigits) {
@@ -1261,6 +1338,7 @@ export class Home implements OnInit {
     this.plaVScomSwapped = false;
     this.comVSproSwapped = false;
     this.proVSdisSwapped = false;
+    this.filter = false;
 
     this.nPlaInputHolders = 0;
     this.nComInputHolders = 0;
