@@ -647,7 +647,6 @@ export class Home implements OnInit {
             this.proVSdisTxtOutput = this.makeConnectivityTextOutput(proVSdis,
                                                                      proMeta,disMeta,
                                                                      'pro','dis');
-
             this.comVSplaTxtOutput = this.makeConnectivityTextOutput(plaVScom,
                                                                      comMeta,plaMeta,
                                                                      'com','pla');
@@ -657,13 +656,6 @@ export class Home implements OnInit {
             this.disVSproTxtOutput = this.makeConnectivityTextOutput(proVSdis,
                                                                      disMeta,proMeta,
                                                                      'dis','pro');
-
-
-            // metadata text output ////////////////////////////////////////
-            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',iplaSet,plaMeta);
-            this.comMetaTxtOutput = this.makeMetaTextOutput('com',icomSet,comMeta);
-            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',iproSet,proMeta);
-            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',idisSet,disMeta);
 
             // connectivity graph output ///////////////////////////////////////
             let graphDataArr = [this.makeGraphDataOutput(plaVScom,
@@ -710,6 +702,12 @@ export class Home implements OnInit {
               }
             }
             localStorage.setItem('connectivityGraphDataFiltered', JSON.stringify(graphDataF));
+
+            // metadata text output ////////////////////////////////////////
+            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',iplaSet,plaMeta);
+            this.comMetaTxtOutput = this.makeMetaTextOutput('com',icomSet,comMeta);
+            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',iproSet,proMeta);
+            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',idisSet,disMeta);
 
             // summary text output /////////////////////////////////////////////
             let plaComConnScore = this.getConnectivityScore(plaVScom);
