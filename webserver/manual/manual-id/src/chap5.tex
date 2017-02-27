@@ -4,100 +4,197 @@
 %% You can process specific files by typing their names in at the 
 %% \files=
 %% prompt when you run the file main.tex through LaTeX.
-\chapter{Metode Penelitian}
-% Metode penelitian dibuat mencakup bahan dan instrumen yang dibutuhkan, deksripsi subjek
-% penelitian, cara pengambilan contoh/ sampel, cara pengumpulan data, dan gambaran jelas pengolahan
-% dan analisis data yang akan dilakukan. Metode penelitian dipaparkan dengan kerangka sistematis
-% untuk menjawab rumusan masalah dan mencapai tujuan dari penelitian.
+\chapter{Menu} \label{Menu}
 
-Metode penelitian ini digolongkan menjadi dua jenis berdasarkan luarannya, yaitu metode prediksi dan web-server.
-Penjelasan rinci tentang keduanya adalah sebagai berikut.
+Bab ini akan membahas deretan menu yang ada di bagian atas halaman Ijah Webserver.
 
-\section{Metode prediksi}
-Pada penelitian ini, kami berkonsentrasi pada metode prediksi berbasis kernel yang telah terbukti sukses~\cite{Scholkopf:2001,2546}, 
-khususnya untuk data masukan yang dapat dideskripsikan dengan banyak sekali fitur, sebagaimana data senyawa, protein dan jejaring farmakologi.
-Pada metode berbasis kernel, data masukan (observasi) dipetakan secara implisit ke sebuah ruang fitur melalui 
-fungsi mapping $\Phi: \mathcal{X} \mapsto \mathcal{H}$, di mana $\mathcal{H}$ adalah sebuah reproducing kernel hilbert space (RKHS) dengan kernel yang mereproduksi $ K: \mathcal{X} \times \mathcal{X} \mapsto \mathbb{R}$.
-Sebuah fungsi $K(x,x')$ adalah sebuah fungsi kernel yang valid jika dan hanya jika untuk sembarang himpunan berhingga, fungsi itu menghasilkan matrik Gram yang simetris dan positive-definite. 
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{ijah_menu_top.png}
+	\caption{Deretan Menu pada Ijah Webserver}
+	\label{fig:ijah_menu_top}
+\end{figure}
 
-\subsection{Kernel gabungan (composite kernel)} 
-Kami mengusulkan sebuah kernel gabungan yang mengintegrasikan informasi kesamaan dari ruang kimia, genomik dan farmakologi.
-Hal tersebut karena kita yakin dapat merumuskan beberapa kernel independen dari tiga ruang tersebut.
-Di ruang kimia terdapat ukuran kesamaan dari dua buah senyawa bioaktif~\cite{Ralaivola20051093}, 
-sedangkan di ruang genomik diperoleh kesamaan dari dua buah protein~\cite{Borgwardt:2005}.
-Sementara itu, di ruang farmakologi dapat diperoleh kesamaan antara jejaring farmakologi yang terbentuk dari interaksi senyawa (obat) dan protein.
+\section{Manual}
 
-Berdasarkan karakteristik matematik dari matrik Gram yang positive-definite, dapat diturunkan sebuah preposisi sebagai berikut~\cite{Cristianini:1999}.
-Misal $K_1$ dan $K_2$ adalah kernel-kernel untuk $\mathcal{X} \times \mathcal{X}$, $\mathcal{X} \subseteq \mathbb{R}^n$, $a \in \mathbb{R}^+$, $0 \le \lambda \le 1$, $f(\cdot)$ adalah sebuah fungsi bernilai real di $\mathcal{X}$, $\phi: \boldsymbol{\mathcal{X}} \mapsto \mathbb{R}^m$, dan $\boldsymbol{K}$ adalah sebuah matrik $n \times n$ yang simetris dan positive semi-definite.
-Maka fungsi-fungsi berikut adalah kernel yang valid:
-$K(x,x') = K_1(x,x') K_2(x,x')$, $K(x,x') = aK_1(x,x')$ dan 
-$K(x,x') = \lambda K_1(x,x') + (1-\lambda)K_2(x,x')$.
-Terlihat bahwa kombinasi konvek dari kernel menghasilkan kernel yang valid. 
-Menurut~\cite{Joachims01compositekernels}, kombinasi dua kernel yang secara terpisah berkinerja baik akan juga berkinerja baik sepanjang kernel-kernel tersebut independen (tidak mengekstrak fitur yang sama).
-% Hal ini hampir mirip dengan prinsip kerja metode ensemble boosting yang menggabungkan hipotesis-hipotesis yang independen untuk menghasilkan hipotesis yang lebih baik.
+Menu \emph{Manual} berisi \emph{link} untuk mendownload file Manual penggunaan Ijah Webserver. Kedepannya, isi file Manual juga akan ditampilkan di halaman ini.
 
-\subsection{Metode prediksi berbasis kernel} 
-Mula-mula, kami akan menggunakan metode kernel yang telah teruji, ``mature'', seperti support vector machine (SVM)~\cite{Scholkopf:2001}.
-Di penelitian ini, SVM yang termasuk metode supervised-learning menghasilkan sebuah fungsi pemetaan $f: X \mapsto \{0,1\}$, 
-di mana $x \in X$ adalah sebuah sampel data yang mengandung informasi tentang sebuah senyawa, sebuah protein dan jejaring farmakologi antar keduanya, 
-sedangkan $y \in \{0,1\}$ mengindikasikan ada tidaknya interaksi antara senyawa dan protein tersebut.
-Formulasi prediksi ini dapat juga dimodelkan sebagai supervised bipartite graph learning.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{ijah_manual_page.png}
+	\caption{Halaman Manual}
+	\label{fig:ijah_manual_page}
+\end{figure}
 
-Dalam tahap mendesain prediktor, kami menggunakan data set publik yang disediakan oleh Yamanishi~\cite{BleakleyY09}.
-Untuk melakukan evaluasi, kami mengikuti penelitian sebelumnya, yaitu dengan menghitung nilai area under curve (AUC) pada kurva ROC.
-Selain itu, juga dihitung metrik-metrik performa standar dari confusion matrix, seperti akurasi, recall, precision.
-Beberapa jamu (tanaman-tanaman) yang berpotensi tinggi juga akan diuji dengan metode docking dan secara kimia (wet-lab tests).
+\section{Downloads} \label{Downloads}
 
-\section{Web-server}
-\subsection{Antarmuka pengguna (front-end)}
-Antarmuka web akan dibuat sedemikian rupa sehingga bersifat minimalis dan sederhana untuk mendukung fungsi utamanya yaitu 
-memproses dan menampilkan prediksi interaksi antara senyawa bioaktif dan protein.
-Pada halaman pertama (homepage) terdapat visualisasi bipartite graph dengan empat set (himpunan), yaitu (dari kiri ke kanan): tanaman (jamu), senyawa bioaktif, protein dan penyakit, serta sebuah tombol ``Search'' untuk memulai proses prediksi atau pencarian jika informasi interaksi sudah ada.
-% Ilustrasi homepage ditampilkan pada gambar~\ref{fig:homepage}.
+Menu \emph{Downloads} menyediakan link untuk mengunduh Metadata seluruh item (tanaman, senyawa, protein, dan penyakit) yang ada dalam database Ijah Webserver. Juga disediakan data seluruh konektivitas (keterhubungan) antar item dan data lainnya seperti similarity data, data sekuens protein, dan lain lain.
 
-Setelah proses prediksi berakhir, halaman luaran akan muncul yang menampilkan gambar bipartite graph serupa dengan yang di homepage, 
-tetapi dengan hasil prediksi interaksi (konektifitas) antara simpul-simpul dari himpunan senyawa dan protein.
-Hubungan antara simpul-simpul pada himpunan tanaman dan senyawa didapatkan dari database terkait, misal 
-KNApSAcK\footnote{http://kanaya.naist.jp/KNApSAcK/} dan Dr. Duke's Phytochemical and Ethnobotanical Databases\footnote{https://phytochem.nal.usda.gov/phytochem/search}. 
-Begitu pula dengan hubungan antara simpul-simpul pada set protein dan penyakit, misal dari Uniprot\footnote{http://www.uniprot.org/}.
+Untuk mengunduh file pada halaman ini cukup klik nama file yang ingin diunduh
 
-Evaluasi antarmuka pengguna dilakukan melalui uji publik atau survei.
-Peserta survei adalah peneliti terkait dengan beragam latar-belakang pendidikan, misal biologi, kimia, ilmu komputer (bioinformatik), dan farmasi.
-Selain itu, ada peserta yang tergolong educated-user, di mana akan diberikan beberapa tugas untuk diselesaikan dengan memanfaatkan web-server tersebut. \\
-Saran dan keluhan dari peserta evaluasi akan digunakan sebagai dasar perbaikan sistem.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{ijah_downloadpage.png}
+	\caption{Daftar file yang dapat di\-download}
+	\label{fig:ijah_downloadpage}
+\end{figure}
 
-\subsection{Kode proses inti (back-end)}
-Hasil prediksi antara simpul-simpul senyawa dan protein berupa garis koneksi (edge) yang berbobot (weights).
-Bobot tersebut didapatkan melalui voting berbobot (weighted voting), yaitu sebuah bobot $w_e= \frac{1}{n} \sum_{i}^{n} \hat{e_i}$, dimana
-$n$ adalah jumlah metode prediksi yang digunakan dan $\hat{e_i} \in \{0,1\}$ adalah hasil prediksi sebuah edge~$e$ oleh prediktor ke-$i$.
-Kami berpendapat bahwa beberapa metode prediksi mempunyai kinerja yang berimbang, sebagaimana ditunjukkan oleh~\cite{Chen17082015}.
-Oleh karena itu, beberapa metode prediksi akan digunakan secara bersamaan sehingga didapatkan nilai bobot untuk tiap koneksi yang dapat diterjemahkan sebagai skor kepercayaan hasil prediksi.
+\subsection{Metadata}
+File yang dapat didownload pada kategori Metadata yaitu:
 
-Hal lain yang kami usulkan adalah sebuah database yang komprehensif untuk keperluan prediksi interaksi senyawa dan protein.
-Pada dasarnya, database tersebut merupakan database mirror (kopian) dari beberapa database yang terkait dengan tingkat kedalaman data tertentu;
-data yang kami anggap detil atau jarang digunakan tidak dikopi, tetapi dirujuk ke database asal.
-Terdapat juga fitur untuk memperbaharui database mirror secara otomatis.
-Kami akan mengembangkan mesin penjelajah (crawler) database untuk mencari dan mengunduh data di database terkait.
+\begin{itemize}
+\item \textbf{plant\_metadata.txt} -- Berisi metadata seluruh tanaman pada \emph{database} Ijah Webserver. 
+\item \textbf{compound\_metadata.txt} -- Berisi metadata seluruh senyawa (\emph{compound}) pada \emph{database} Ijah Webserver.
+\item \textbf{protein\_metadata.txt} -- Berisi metadata seluruh bioprotein pada \emph{database} Ijah Webserver.
+\item \textbf{disease\_metadata.txt} -- Berisi metadata seluruh penyakit pada \emph{database} Ijah Webserver.
+\end{itemize}
 
-% doxygen for documentation
-Semua kode yang membentuk web-server kami ini, baik front- maupun back-end, akan dipublikasikan ke khalayak umum, sebagai kode open-source.
-Dengan begitu, utilitas dari kode akan dapat ditingkatkan, terlebih dengan dukungan dari dokumentasi (manual) yang lengkap.
-Untuk itu, dokumentasi kode akan dilakukan dengan Doxygen.%\footnote{http://www.stack.nl/~dimitri/doxygen/}.
+\subsection{Connectivity Data}
+File yang dapat didownload pada kategori Connectivity Data yaitu:
 
-% Hipotesis yang diajukan dalam penelitian ini adalah sebagai berikut:
-% \begin{enumerate} [topsep=-10mm]
-% \itemsep0mm
-% \item 
-% Kernel, sebagai ukuran kesamaan dua entitas, merupakan metrik yang paling sesuai 
-% untuk mengintegrasikan informasi dari ruang kimia, genomik dan farmakologi
+\begin{itemize}
+\item \textbf{plant\_vs\_compound\_connectivity.txt} -- Berisi data konektivitas tanaman dengan senyawa beserta skor konektivitasnya pada \emph{database} Ijah Webserver.
+\item \textbf{compound\_vs\_protein\_connectivity.txt} -- Berisi data konektivitas senyawa dengan protein beserta skor konektivitasnya pada \emph{database} Ijah Webserver.
+\item \textbf{protein\_vs\_disease\_connectivity.txt} -- Berisi data konektivitas protein dengan penyakit beserta skor konektivitasnya pada \emph{database} Ijah Webserver.
+\end{itemize}
 
-% \item
-% Metode prediksi berbasis kernel dapat memberikan akurasi yang tinggi, di samping membutuhkan sumber daya komputasi yang rendah dan tidak bergantung pada ukuran informasi untuk menyimpulkan kesamaan dua sampel
+\subsection{Similarity (kernels) data}
+\begin{itemize}
+\item compound\_similarity\_simcomp.txt  
+\item protein\_similarity\_smithwatermann.txt  
+\end{itemize}
 
-% \item 
-% Voting berbobot dari beberapa metode prediksi yang digunakan mengindikasikan skor kepercayaan terhadap hasil prediksi 
+\subsection{Feature data}
+\begin{itemize}
+\item compound\_feature\_smiles.txt  
+\item protein\_feature\_sequence.txt  
+\end{itemize}
 
-% \item 
-% Web-server yang menyediakan layanan prediksi memiliki daya-guna tinggi melalui desain antarmuka yang user-friendly, visualisasi yang informatif dan interaksi yang responsif,
-% serta kode yang open-source dan terdokumentasi dengan baik
-% \end{enumerate}
+\subsection{Documents}
+Dokumentasi Ijah Webserver
+\begin{itemize}
+\item \textbf{ijah\_webserver\_manual.pdf} -- Manual penggunaan Ijah Webserver
+\item \textbf{ijah\_webserver\_paper.pdf} -- Paper penelitian Ijah Webserver
+\end{itemize}
+
+\section{Help/FAQ}
+Menu \emph{Help/FAQ} berisikan beberapa pertanyaan umum \emph{(Frequently Asked Questions)} beserta jawabannya. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{ijah_faq.png}
+	\caption{Halaman Help/FAQ}
+	\label{fig:ijah_faq}
+\end{figure}
+
+Pertanyaan pertanyaan tersebut yaitu:
+
+\textbf{Q:} Bagaimana cara mengunduh semua data yang tersedia pada Ijah?
+
+A: Silakan lihat pada menu \nameref{Downloads}.
+
+\textbf{Q:} Bagaimana cara melaporkan isu atau galat?
+
+A: Silakan laporkan pada menu \nameref{Contact Us} atau pada \href{https://github.com/tttor/csipb-jamu-prj}{\emph{repository} publik kami}.
+
+\textbf{Q:} Bagaimana cara mendapatkan SQL dump dari database Ijah?
+
+A: Silakan kontak kami melalui menu \nameref{Contact Us}.
+
+\textbf{Q:} Apakah \emph{source code} Ijah tersedia secara publik?
+
+A: Ya, ada pada \href{https://github.com/tttor/csipb-jamu-prj}{\emph{repository} publik kami}.
+
+\textbf{Q:} Bagaimana cara mengutip dari paper Ijah Webserver?
+
+A: Silakan merujuk ke \href{http://ijah.apps.cs.ipb.ac.id/api/ijah_webserver_online.bib}{ijah\_webserver\_online.bib}.
+
+\textbf{Q:} Berapa banyak kunjungan ke Ijah Webserver?
+
+A: Silakan lihat \emph{visitor log} pada Footer kanan bawah, penghitungan log dimulai sejak 13 Januari 2017 pukul 18:00. Untuk lebih detail anda bisa mengklik area \emph{visitor log} tersebut.
+
+\textbf{Q:} Jika pertanyaan saya tidak ada pada daftar ini, dimana kami harus bertanya?
+
+A: Silakan kontak kami melalui menu \nameref{Contact Us}.
+
+\section{Ijah v1}
+
+Menu \emph{Ijah v1} berisi link menuju versi awal Ijah (Ijah versi 1, atau Ijah v1)
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{ijah_v1.png}
+	\caption{Isi halaman menu Ijah v1}
+	\label{fig:ijah_v1}
+\end{figure}
+
+Jika anda ingin mengakses Ijah v1 silakan mengunjungi \url{http://ijah.apps.cs.ipb.ac.id/ijahv1/}
+
+\section{Disclaimer}
+
+Menu \emph{Disclaimer} berisikan pernyataan batasan responsibility pihak Ijah Webserver atas penggunaan hasil \emph{output} dari Ijah Webserver.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{ijah_disclaimer.png}
+	\caption{Isi halaman Disclaimer}
+	\label{fig:ijah_disclaimer}
+\end{figure}
+
+Di halaman ini kami menyatakan bahwa penggunaan Ijah Webserver ini gratis, dengan harapan dapat membantu banyak pihak. Namun kami tidak menjamin akibat dari penggunaan informasi dari Webserver ini. Dan kami tidak bertanggungjawab atas insiden atau kerusakan baik langsung maupun tidak langsung yang diakibatkan oleh penggunaan data atau informasi yang kami sediakan di Webserver ini.
+
+\section{Contact Us} \label{Contact Us}
+
+Menu \emph{Contact Us} merupakan sarana komunikasi antara pengguna dengan tim pengembang Ijah Webserver. Dengan mengisikan tanggapan/keluhan/saran pada form Contact Us, tanggapan anda akan terkirim ke E-mail kami.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{ijah_contact_page.png}
+	\caption{Halaman Contact Us pada Ijah Webserver}
+	\label{fig:ijah_contact_page}
+\end{figure}
+
+\subsection{Subject}
+Pada bagian \emph{Subject} anda akan memilih jenis tanggapan anda, yaitu pertanyaan (Question), memberitahukan adanya kesalahan (Error/Bugs), menyampaikan saran fitur apa yang diinginkan pada versi selanjutnya (Wishlist), menyampaikan keluhan (Complaint), saran (Suggestion), memberikan testimoni tentang Ijah Webserver (Testimony), atau menyampaikan hal lain yang tidak termasuk dalam kategori diatas, dapat dikategorikan pada Other.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{ijah_contact_subject.png}
+	\caption{Bagian \emph{Subject} pada menu Contact Us}
+	\label{fig:ijah_contact_subject}
+\end{figure}
+
+\subsection{Message}
+Isikan pesan anda pada bagian \emph{Message}. Jumlah karakter tidak dibatasi, jadi mohon untuk tidak menggunakan singkatan jika tidak diperlukan demi memudahkan tim kami dalam membaca tanggapan anda. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{ijah_contact_message.png}
+	\caption{Bagian \emph{Message} pada menu Contact Us}
+	\label{fig:ijah_contact_message}
+\end{figure}
+
+\subsection{Memasukkan Data Diri Anda}
+Setelah menuliskan tanggapan, silakan isi data diri anda, nama pada bagian \emph{Name}, alamat E\-mail anda pada bagian \emph{E\-mail}, dan afiliasi anda (organisasi, universitas, atau perusahaan) pada bagian \emph{Affiliation}.
+
+\textbf{Penting:} Nama dan alamat E-mail \emph{wajib} diisi. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{ijah_contact_nameinput.png}
+	\caption{Form pengisian nama, E-mail, dan afiliasi}
+	\label{fig:ijah_contact_nameinput}
+\end{figure}
+
+Setelah terisi, tekan \textbf{Submit} dan tanggapan anda akan terkirim.
+
+\subsection{About Us}
+
+Menu \emph{About Us} berisi info tentang tim pengembang Ijah Webserver
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{ijah_about.png}
+	\caption{Isi halaman About Us}
+	\label{fig:ijah_about}
+\end{figure}

@@ -19,5 +19,5 @@ pdflatex $root_tex_name.tex
 bibtex $root_tex_name.aux
 pdflatex $root_tex_name.tex
 pdflatex $root_tex_name.tex
-cp $root_tex_name.pdf $out_dir
+cp $root_tex_name.pdf $out_dir/ijah_webserver_manual_id.pdf
 rm -rf $build_dir/*
