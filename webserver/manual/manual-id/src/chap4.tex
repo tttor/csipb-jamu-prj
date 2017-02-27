@@ -4,52 +4,56 @@
 %% You can process specific files by typing their names in at the 
 %% \files=
 %% prompt when you run the file main.tex through LaTeX.
-\chapter{Tinjauan Pustaka}
-% Tinjauan pustaka mencakup penulisan literatur secara jelas, singkat, sistematis, dan relevan dengan
-% topik penelitian. Literatur dapat berupa paparan hasil penelitian mutakhir lainnya yang sudah ada dan
-% berhubungan dengan penelitian yang akan dilakukan.
+\chapter{Use Case 3 - Target-Side Only Input}
 
-Literatur yang terkait dapat dikelompokkan menjadi dua, yaitu metode prediksi dan web-server.
+\emph{Use case} ini melibatkan hanya satu sisi yaitu \emph{Target-side} saja. pada \emph{use case} ini, input dari salah satu \emph{Target-side} (Protein atau Disease) harus ada.
 
-\section{Metode prediksi}
-Berdasarkan~\cite{Chen17082015}, metode-metode prediksi yang telah dikembangkan terbagi menjadi dua kelompok besar, yaitu berbasis nerwork dan berbasis machine-learning.
-Metode yang kami usulkan tergolong ke metode yang berdasarkan machine-learning.
-Kami berargumen bahwa metode tersebut dapat meningkatkan akurasi prediksi drug-target, yaitu interaksi senyawa-protein.
-Hal ini mungkin karena metode yang kami usulkan memanfaatkan informasi dari tiga ruang sekaligus, yaitu ruang kimia, genomik dan farmakologi.
+\section{Protein Search Only}
 
-\subsection{Metode prediksi berbasis network}
-Yang~et~al.~\cite{yang} mengembangkan algoritma komputasi untuk mengambil kesimpulan target obat yang potensial dengan menganalisis secara sistematik perubahan diantara ``disease state'' dan ``desire state'' dalam jaringan penyakit. 
-Metode ini sikenal dnegan MTOI atau multiple target optimal intervention. 
-Sementara itu, Campillos~et~al.~\cite{campillos} mengusulkan metode dengan  menggunakan efek similarity obat untuk mengidentifikasi apakah ada interaksi antara dua obat pada target yang sama.  
-Campillos mengusulkan fungsi sigmoid dimana memodelkan peluang dari berbagi target yang sama berdasarkan kesamaan informasi kimia dan fungsi linier yang memodelkan peluang berbagi target yang sama berdasarkan kesamaan efek samping yang diukur. 
+Pada contoh ini, input dari \emph{Target-side} berupa protein. Contoh ini mencari dari protein yang diinputkan, apa saja senyawa dan penyakit yang terkait dengan protein itu, dan tanaman apa yang dapat menarget protein itu dengan senyawa terkait yang dikandungnya.
 
-Chen~et~al.~\cite{chen} membangun sebuah model berdasarkan Network-based Random Walk with Restart on the Heterogeneous network (NRWRH).
-Secara garis besar, model itu menggunakan random-walk pada jaringan heterogenous untuk memprediksi pontensi interaksi senyawa-protein.
-Cheng~et~al.~\cite{cheng} mengajukan tiga model prediksi supervised, yaitu 
-drug-based similarity inference (DBSI), target-based similarity inference (TBSI), dan network-based inference (NBI).
+\subsection{Input}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{example_3a.png}
+	\caption{Contoh \emph{use case} input Protein Search Only}
+	\label{fig:example_3a}
+\end{figure}
+
+Seperti yang telah dibahas pada bab Use Case 1, untuk jenis \emph{use case} ini tombol hanya bertuliskan \textbf{Search}, bukan Search and Predict seperti \emph{use case} pertama.
+
+\subsection{Output}
+Output pada contoh \emph{search} dari 2 jenis protein ini adalah sebagai berikut, dimulai dari \emph{Connectivity Graph Output}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{ijah_example_3a_graph.png}
+	\caption{Connectivity Graph Output pada use case Protein Search Only}
+	\label{fig:ijah_example_3a_output}
+\end{figure}
+
+Graf yang dihasilkan kali ini lebih besar lagi karena menampilkan semua senyawa yang terkait dengan protein yang diinputkan, dan dalam contoh ini sangat banyak senyawa yang dapat menarget protein ini. Karena contoh ini menampilkan semua yang terkait dengan protein yang diinputkan.
+
+Hasil \emph{Connectivity Text Output} untuk contoh ini:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{ijah_example_3a_text.png}
+	\caption{Connectivity Text Output pada use case Protein Search Only}
+	\label{fig:ijah_example_3a_text}
+\end{figure}
+
+Hasil \emph{Metadata Text Output} untuk contoh ini:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{ijah_example_3a_meta.png}
+	\caption{Metadata Text Output pada use case Protein Search Only}
+	\label{fig:ijah_example_3a_meta}
+\end{figure}
+
+\section{Disease Search Only}
+Contoh lain dari \emph{use case} Target-Side Only yaitu Disease Search Only dimana perbedaannya hanya pada input, yaitu menginputkan penyakit (Disease) untuk mencari semua (Plant, Compound, Protein) yang terkait dengan penyakit yang diinputkan.
 
 
-\subsection{Metode prediksi berbasis machine-learning}
-Saat ini, sejumlah metode pembelajaran berbasis machine learning telah dikembangkan untuk mengidentifikasi hubungan antara obat dan protein target dalam skala besar. 
-Dalam tulisan ini, kami terutama memperkenalkan metode pembelajaran diawasi dan metode pembelajaran semi-diawasi. 
-Dalam sebagian besar pembelajaran berbasis metode, berbagai jenis set data biologis telah terintegrasi, seperti struktur kimia obat, urutan protein target dan dikenal interaksi drug-target.
-
-Bleakey dan Yamanishi~\cite{bleakley_yamanishi} membuat sebuah metode supervised-learning bernama Bipartite Local Model (BLM)
-untuk prediksi interaksi senyawa-protein dengan mentransformasi masalah prediksi edge menjadi masalah klasifikasi biner.
-Mei~et~al.~\cite{mei} menyajikan sebuah metode prediksi yang mengintegrasikan Neighbor-based Interaction-profile Inferring (NII) dengan BLM.
-
-Wang dan Zeng~\cite{wang} mengusulkan sebuah metode yang memprediksi tidak hanya interaksi biner senyawa-protein, tetapi juga tipe interaksi.
-Metode mereka berdasarkan restrited Boltzmann machines yang berdasarkan jaringan drug-target multidimensional.
-Berbasiskan algoritme random forest, Cao~et~al.~\cite{cao} mengajukan metode prediksi skala besar dengan mengintegrasikan karakteristik kimia dan biologi.
-
-\section{Web-server}
-Berdasarkan observasi terhadap sejumlah web-server untuk interaksi senyawa-protein atau drug-target, kami menyimpulkan bahwa keunggulan dari web-server kami adalah adanya fasilitas untuk memasukkan jenis tanaman, sebagai obat herbal, dan jenis penyakit, sebagai target obat.
-Web-server kami juga memiliki mirror database untuk mengintegrasikan informasi-informasi yang relevan sehingga akses lebih cepat.
-Selain itu, kami mengusulkan web-server dengan antar muka yang intuitif serta dokumentasi kode yang lengkap.
-Dengan demikian, tingkat reusability dan scalability web-server kami tinggi.
-
-SwissTargetPrediction~\cite{HeckerAEDMEGBP12} adalah web server untuk menyimpulkan target dari molekul bioaktif berdasarkan kombinasi dari nilai similaritas ligant dalan 2D dan 3D.
-SuperPred~\cite{superpred} adalah web server untuk memprediksi kode Anatomical Theraputic Chemical (ATC) dan target dari molekul.
-Dinies~\cite{YamanishiKMSKG14} adalah web server untuk mengestimasi jaringan interakti senyawa-protein yang potensial.
-Setiap dataset yang masuk akan diubah menjadi similaritas kernel, kemudian diproses dengan sejumlah metode machine-learning.
 
