@@ -17,22 +17,14 @@
     <span class="text-center" style="padding-top:3px">Summary</span></a>
 
   <div *ngIf="(this.mode.indexOf('predict')!==-1)">
-    <button class="btn btn-danger fab2"(click)="predictMore()">Predict More</button>
-    <button class="btn btn-danger fab2a"(click)="toggleFilter()">
-      <span *ngIf="!filter">Filter</span>
-      <span *ngIf="filter">Unfilter</span>
-    </button>
+    <button class="btn btn-danger fab2"(click)="predictMore()">Predict</button>
+    <button class="btn btn-danger fab2a"(click)="filter()">Filter</button>
     <button class="btn btn-danger fab"(click)="reset()">Reset</button>
   </div>
   <div *ngIf="(this.mode.indexOf('predict')===-1)">
-    <button class="btn btn-danger fab2a"(click)="toggleFilter()">
-      <span *ngIf="!filter">Filter</span>
-      <span *ngIf="filter">Unfilter</span>
-    </button>
+    <button class="btn btn-danger fab2a"(click)="filter()">Filter</button>
     <button class="btn btn-danger fab2"(click)="reset()">Reset</button>
   </div>
-
-
 </div>
 
 <div>

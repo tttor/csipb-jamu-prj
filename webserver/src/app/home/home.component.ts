@@ -78,13 +78,21 @@ export class Home implements OnInit {
   proMetaTxtOutput;
   disMetaTxtOutput;
 
-  // Used in graph output
-  filter = false;
-
   // Used in summary text output
   summaryTxtOutput;
   summaryTxtOutput2;
   summaryTxtOutput3;
+
+  //
+  private plaVScom_ = [];
+  private comVSpro_ = [];
+  private proVSdis_ = [];
+  private plaSet_ = [];
+  private comSet_ = [];
+  private proSet_ = [];
+  private disSet_ = [];
+
+  private filterThreshold_ = 0.0;
 
   // Misc.
   // TODO explain the usage
@@ -448,6 +456,8 @@ export class Home implements OnInit {
 
           this.makeOutput(plaSet,comSet,proSet,disSet,
                           plaVScom,comVSpro,proVSdis);
+          this.storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
+                                        plaVScom,comVSpro,proVSdis);
         })
       })
     })
@@ -482,6 +492,8 @@ export class Home implements OnInit {
 
           this.makeOutput(plaSet,comSet,proSet,disSet,
                           plaVScom,comVSpro,proVSdis);
+          this.storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
+                                        plaVScom,comVSpro,proVSdis);
         })
       })
     })
@@ -606,6 +618,8 @@ export class Home implements OnInit {
 
                 this.makeOutput(plaSet,comSet,proSet,disSet,
                                 plaVScom,comVSproMerged,proVSdis);
+                this.storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
+                                              plaVScom,comVSproMerged,proVSdis);
             })
           })
         })
@@ -616,12 +630,6 @@ export class Home implements OnInit {
   // OUTPUT MAKING METHODS /////////////////////////////////////////////////////
   makeOutput(plaSet,comSet,proSet,disSet,plaVScom,comVSpro,proVSdis) {
     let t0 = performance.now();
-
-    let minComProWeight = 0.950;
-    let comProFiltered = this.filterCompoundProteinItems(minComProWeight,
-                                                         plaVScom,comVSpro,proVSdis);
-    let comSetF = comProFiltered[0];
-    let proSetF = comProFiltered[1];
 
     // Get metadata of each unique item
     let plaMetaPost = this.makeJSONFormat(plaSet,'id');
@@ -682,15 +690,15 @@ export class Home implements OnInit {
             let graphDataArrF = [this.makeGraphDataOutput(plaVScom,
                                              plaMeta,comMeta,
                                              'pla','com',
-                                             plaSet,comSetF),
+                                             plaSet,comSet),
                                 this.makeGraphDataOutput(comVSpro,
                                                          comMeta,proMeta,
                                                          'com','pro',
-                                                         comSetF,proSetF),
+                                                         comSet,proSet),
                                 this.makeGraphDataOutput(proVSdis,
                                                          proMeta,disMeta,
                                                          'pro','dis',
-                                                         proSetF,disSet)];
+                                                         proSet,disSet)];
             let graphDataF = [];
             for (let ii=0;ii<graphDataArrF.length;ii++) {
               for(let jj=0;jj<graphDataArrF[ii].length;jj++) {
@@ -958,6 +966,17 @@ export class Home implements OnInit {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
+  private storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
+                                   plaVScom,comVSpro,proVSdis) {
+    this.plaSet_ = plaSet;
+    this.comSet_ = comSet;
+    this.proSet_ = proSet;
+    this.disSet_ = disSet;
+    this.plaVScom_ = plaVScom;
+    this.comVSpro_ = comVSpro;
+    this.proVSdis_ = proVSdis;
+  }
+
   private filterCompoundProteinItems(threshold,plaVScom,comVSpro,proVSdis) {
     let comWithPla = [];
     for (let i=0; i<plaVScom.length;i++) {
@@ -1059,8 +1078,20 @@ export class Home implements OnInit {
     }
   }
 
-  toggleFilter() {
-    this.filter = !this.filter;
+  filter() {
+    let delta = 0.2;
+    let minComProWeight = this.filterThreshold_+delta;
+    if (minComProWeight>1.0) {
+      minComProWeight = 0.0;
+    }
+
+    let comProFiltered = this.filterCompoundProteinItems(minComProWeight,
+                                                         this.plaVScom_,this.comVSpro_,this.proVSdis_);
+    let comSetF = comProFiltered[0];
+    let proSetF = comProFiltered[1];
+
+    this.makeOutput(this.plaSet_,this.comSet_,this.proSet_,this.disSet_,this.
+                    plaVScom_,this.comVSpro_,this.proVSdis_);
   }
 
   floatToStrTruncated(f,nDecimalDigits) {
@@ -1324,7 +1355,6 @@ export class Home implements OnInit {
     this.plaVScomSwapped = false;
     this.comVSproSwapped = false;
     this.proVSdisSwapped = false;
-    this.filter = false;
 
     this.nPlaInputHolders = 0;
     this.nComInputHolders = 0;
@@ -1353,6 +1383,16 @@ export class Home implements OnInit {
     this.noResultCompound = false;
     this.noResultProtein = false;
     this.noResultDisease = false;
+
+    this.plaVScom_ = [];
+    this.comVSpro_ = [];
+    this.proVSdis_ = [];
+    this.plaSet_ = [];
+    this.comSet_ = [];
+    this.proSet_ = [];
+    this.disSet_ = [];
+
+    this.filterThreshold_ = 0.0;
   }
 
   // EXAMPLE-BUTTON METHODS ////////////////////////////////////////////////////
