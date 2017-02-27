@@ -622,6 +622,12 @@ export class Home implements OnInit {
     let proSet = this.handleIfEmptySet(iproSet,'pro');
     let disSet = this.handleIfEmptySet(idisSet,'dis');
 
+    let minComProWeight = 0.950;
+    let comProFiltered = this.filterCompoundProteinItems(minComProWeight,
+                                                         plaVScom,comVSpro,proVSdis);
+    let comSetF = comProFiltered[0];
+    let proSetF = comProFiltered[1];
+
     // Get metadata of each unique item
     let plaMetaPost = this.makeJSONFormat(plaSet,'id');
     let comMetaPost = this.makeJSONFormat(comSet,'id');
@@ -679,9 +685,6 @@ export class Home implements OnInit {
             }
             localStorage.setItem('connectivityGraphData', JSON.stringify(graphData));
 
-            let comProFiltered = this.filterForGraph(plaVScom,comVSpro,proVSdis);
-            let comSetF = comProFiltered[0];
-            let proSetF = comProFiltered[1];
             let graphDataArrF = [this.makeGraphDataOutput(plaVScom,
                                              plaMeta,comMeta,
                                              'pla','com',
@@ -961,7 +964,7 @@ export class Home implements OnInit {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
-  private filterForGraph(plaVScom,comVSpro,proVSdis) {
+  private filterCompoundProteinItems(threshold,plaVScom,comVSpro,proVSdis) {
     let comWithPla = [];
     for (let i=0; i<plaVScom.length;i++) {
       let com = plaVScom[i]['com_id'];
@@ -973,6 +976,11 @@ export class Home implements OnInit {
     for (let i=0; i<comVSpro.length;i++) {
       let source = comVSpro['source'];
       if (source==='null') {
+        continue;
+      }
+
+      let w = parseFloat(comVSpro[i]['weight']);
+      if (w < threshold) {
         continue;
       }
 
