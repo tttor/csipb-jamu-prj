@@ -688,7 +688,6 @@ export class Home implements OnInit {
             }
 
             localStorage.setItem('connectivityGraphData', JSON.stringify(graphData));
-            this.show = true;
 
             // summary text output /////////////////////////////////////////////
             let plaComConnScore = this.getConnectivityScore(plaVScom);
@@ -748,6 +747,9 @@ export class Home implements OnInit {
             this.summaryTxtOutput3 += '   '+this.mode+'\n';
             this.summaryTxtOutput3 += 'Elapsed Time: \n';
             this.summaryTxtOutput3 += '   '+this.floatToStrTruncated(this.elapsedTime,nDecimalDigits)+' seconds\n';
+
+            // Show the output page
+            this.show = true;
           }) // disMeta
         }) // proMeta
       }) // comMeta
