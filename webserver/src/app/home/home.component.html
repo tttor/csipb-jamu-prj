@@ -11,8 +11,14 @@
   <a style="color:white" pageScroll href="#connectivityText" class="btn fab5 text-center"><span class="text-center" style="padding-top:3px">Connectivity Text</span></a>
   <a style="color:white" pageScroll href="#connectivityGraph" class="btn fab4 text-center"><span class="text-center" style="padding-top:3px">Connectivity Graph</span></a>
   <a style="color:white" pageScroll href="#top" class="btn fab3 text-center"><span class="text-center" style="padding-top:3px">Summary</span></a>
-  <button class="btn btn-danger fab2"(click)="predictMore()">Predict More</button>
-  <button class="btn btn-danger fab"(click)="reset()">Reset</button>
+
+  <div *ngIf="(this.mode.indexOf('predict')!==-1)">
+    <button class="btn btn-danger fab2"(click)="predictMore()">Predict More</button>
+    <button class="btn btn-danger fab"(click)="reset()">Reset</button>
+  </div>
+  <div *ngIf="(this.mode.indexOf('predict')===-1)">
+    <button class="btn btn-danger fab2"(click)="reset()">Reset</button>
+  </div>
 </div>
 
 <div>
@@ -216,12 +222,6 @@
         3) <a pageScroll href="#metadataText">Metadata Text</a>
       </div>
       <br /> -->
-
-      <div *ngIf="(this.mode.indexOf('predict')!==-1)&&(this.unknownComProConn>0)">
-        <div class="col-md-2">
-          <button class="form-control btn btn-danger" (click)="predictMore()">Predict more</button>
-        </div>
-      </div>
 
       <!-- The multi-partite graph output ////////////////////////////////// -->
       <div class="row text-center">
