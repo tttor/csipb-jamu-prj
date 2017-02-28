@@ -770,6 +770,8 @@ export class Home implements OnInit {
 
             this.summaryTxtOutput3 = 'Mode: \n';
             this.summaryTxtOutput3 += '   '+this.mode+'\n';
+            this.summaryTxtOutput3 += 'Minimum Connectivity Weight:\n';
+            this.summaryTxtOutput3 += '   '+this.filterThreshold_.toString()+'\n';
             this.summaryTxtOutput3 += 'Elapsed Time: \n';
             this.summaryTxtOutput3 += '   '+this.floatToStrTruncated(this.elapsedTime,nDecimalDigits)+' seconds\n';
 
@@ -1080,12 +1082,12 @@ export class Home implements OnInit {
 
   filter() {
     let delta = 0.2;
-    let minComProWeight = this.filterThreshold_+delta;
-    if (minComProWeight>1.0) {
-      minComProWeight = 0.0;
+    this.filterThreshold_ += delta;
+    if (this.filterThreshold_>1.0) {
+      this.filterThreshold_ = 0.0;
     }
 
-    let comProFiltered = this.filterCompoundProteinItems(minComProWeight,
+    let comProFiltered = this.filterCompoundProteinItems(this.filterThreshold_,
                                                          this.plaVScom_,this.comVSpro_,this.proVSdis_);
     let comSetF = comProFiltered[0];
     let proSetF = comProFiltered[1];
