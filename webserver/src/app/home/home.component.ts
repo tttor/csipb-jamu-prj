@@ -750,7 +750,7 @@ export class Home implements OnInit {
             this.summaryTxtOutput3 = 'Mode: \n';
             this.summaryTxtOutput3 += '   '+this.mode+'\n';
             this.summaryTxtOutput3 += 'Minimum Connectivity Weight:\n';
-            this.summaryTxtOutput3 += '   '+this.filterThreshold_.toString()+'\n';
+            this.summaryTxtOutput3 += '   '+this.floatToStrTruncated(this.filterThreshold_,nDecimalDigits)+'\n';
             this.summaryTxtOutput3 += 'Elapsed Time: \n';
             this.summaryTxtOutput3 += '   '+this.floatToStrTruncated(this.elapsedTime,nDecimalDigits)+' seconds\n';
 
@@ -958,13 +958,15 @@ export class Home implements OnInit {
     this.proVSdis_ = proVSdis;
   }
 
-  private filterCompoundProteinItems(threshold,plaVScom,comVSpro,proVSdis) {
+  private filterOnComProConnWeight(threshold,plaVScom,comVSpro,proVSdis) {
+    //
     let comWithPla = [];
     for (let i=0; i<plaVScom.length;i++) {
       let com = plaVScom[i]['com_id'];
       comWithPla.push(com);
     }
 
+    //
     let comWithPro = [];
     let proWithCom = [];
     for (let i=0; i<comVSpro.length;i++) {
@@ -984,12 +986,14 @@ export class Home implements OnInit {
       proWithCom.push(pro)
     }
 
+    //
     let proWithDis = [];
     for (let i=0; i<proVSdis.length;i++) {
       let pro = proVSdis[i]['pro_id'];
       proWithDis.push(pro);
     }
 
+    // Find common items
     let comWithPlaPro = [comWithPla,comWithPro];
     let commComArr = comWithPlaPro.shift().reduce(function(res, v) {
         if (res.indexOf(v) === -1 && comWithPlaPro.every(function(a) {
@@ -1006,7 +1010,33 @@ export class Home implements OnInit {
         return res;
     }, []);
 
-    return [commComArr,commProArr];
+    // Remake the VS
+    let plaVsComF = [];
+    for (let i=0;i<plaVScom.length;i++) {
+      let com = plaVScom[i]['com_id'];
+      if (commComArr.indexOf(com) !== -1) {
+        plaVsComF.push(plaVScom[i]);
+      }
+    }
+
+    let comVSproF = [];
+    for (let i=0;i<comVSpro.length;i++) {
+      let com = comVSpro[i]['com_id'];
+      let pro = comVSpro[i]['pro_id'];
+      if ((commComArr.indexOf(com)!==-1) && (commProArr.indexOf(pro)!==-1)) {
+        comVSproF.push(comVSpro[i]);
+      }
+    }
+
+    let proVSdisF = [];
+    for (let i=0;i<proVSdis.length;i++) {
+      let pro = proVSdis[i]['pro_id'];
+      if (commProArr.indexOf(pro) !== -1) {
+        proVSdisF.push(proVSdis[i]);
+      }
+    }
+
+    return [plaVsComF,comVSproF,proVSdisF];
   }
 
   private find(k,arr) {
@@ -1066,13 +1096,29 @@ export class Home implements OnInit {
       this.filterThreshold_ = 0.0;
     }
 
-    let comProFiltered = this.filterCompoundProteinItems(this.filterThreshold_,
-                                                         this.plaVScom_,this.comVSpro_,this.proVSdis_);
-    let comSetF = comProFiltered[0];
-    let proSetF = comProFiltered[1];
+    let filtered = this.filterOnComProConnWeight(this.filterThreshold_,
+                                                 this.plaVScom_,this.comVSpro_,this.proVSdis_);
+    let plaVScomF = filtered[0];
+    let comVSproF = filtered[1];
+    let proVSdisF = filtered[2];
 
-    this.makeOutput(this.plaSet_,comSetF,proSetF,this.disSet_,
-                    this.plaVScom_,this.comVSpro_,this.proVSdis_);
+    let plaSetF = this.getSet(plaVScomF,'pla_id');
+    let comSetF = this.getSet(comVSproF,'com_id');
+    let proSetF = this.getSet(comVSproF,'pro_id');
+    let disSetF = this.getSet(proVSdisF,'dis_id');
+
+    console.log(this.filterThreshold_);
+    console.log(plaVScomF.length);
+    console.log(comVSproF.length);
+    console.log(proVSdisF.length);
+    // console.log(disSetF.length);
+    // console.log(plaSetF.length);
+    // console.log(comSetF.length);
+    // console.log(proSetF.length);
+    // console.log(disSetF.length);
+
+    this.makeOutput(plaSetF,comSetF,proSetF,disSetF,
+                    plaVScomF,comVSproF,proVSdisF);
   }
 
   floatToStrTruncated(f,nDecimalDigits) {
