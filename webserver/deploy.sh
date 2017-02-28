@@ -65,7 +65,7 @@ if [ $8 -ne 0 ]; then
   fi
 fi
 
-if [ $10 -ne 0 ]; then
+if [ ${10} -ne 0 ]; then
   echo "#######################################################################"
   echo "deploying docker files ..."
   scp ../docker/start.sh ../docker/stop.sh ijah@ijahserver:/home/ijah/
