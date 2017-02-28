@@ -97,6 +97,7 @@ export class Home implements OnInit {
   // Misc.
   // TODO explain the usage
   show = false;// whether to show the output in home.page
+  showGraph = false;
   click = false;// whether searchAndPredictButton was clicked
   elapsedTime = 0;
   mode = 'unknown';
@@ -756,6 +757,7 @@ export class Home implements OnInit {
 
             // Show the output page
             this.show = true;
+            this.showGraph = true;
           }) // disMeta
         }) // proMeta
       }) // comMeta
@@ -1048,6 +1050,8 @@ export class Home implements OnInit {
   }
 
   filter() {
+    this.showGraph = false;
+
     let delta = 0.2;
     this.filterThreshold_ += delta;
     if (this.filterThreshold_>1.0) {
@@ -1337,6 +1341,7 @@ export class Home implements OnInit {
     this.inputType = 'unknown';
     this.elapsedTime = 0;
     this.show = false;
+    this.showGraph = false;
     localStorage.clear();
     this.dataLocal = [];
 
