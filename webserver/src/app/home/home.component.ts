@@ -1053,6 +1053,7 @@ export class Home implements OnInit {
     if (this.filterThreshold_>1.0) {
       this.filterThreshold_ = 0.0;
     }
+    this.filterThreshold_ = parseFloat( this.filterThreshold_.toFixed(1) );
 
     let filtered = this.filterOnComProConnWeight(this.filterThreshold_,
                                                  this.plaVScom_,this.comVSpro_,this.proVSdis_);
