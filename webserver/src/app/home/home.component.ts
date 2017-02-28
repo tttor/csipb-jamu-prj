@@ -16,8 +16,8 @@ declare var saveAs: any;
 })
 export class Home implements OnInit {
   // API URL addresses
-  // baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  baseAPI ='http://localhost/ijah-api/';
+  baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+  // baseAPI ='http://localhost/ijah-api/';
 
   interactionQueryAPI;
   metaQueryAPI;
@@ -687,27 +687,6 @@ export class Home implements OnInit {
             }
             localStorage.setItem('connectivityGraphData', JSON.stringify(graphData));
 
-            let graphDataArrF = [this.makeGraphDataOutput(plaVScom,
-                                             plaMeta,comMeta,
-                                             'pla','com',
-                                             plaSet,comSet),
-                                this.makeGraphDataOutput(comVSpro,
-                                                         comMeta,proMeta,
-                                                         'com','pro',
-                                                         comSet,proSet),
-                                this.makeGraphDataOutput(proVSdis,
-                                                         proMeta,disMeta,
-                                                         'pro','dis',
-                                                         proSet,disSet)];
-            let graphDataF = [];
-            for (let ii=0;ii<graphDataArrF.length;ii++) {
-              for(let jj=0;jj<graphDataArrF[ii].length;jj++) {
-                  let datum = graphDataArrF[ii][jj];
-                  graphDataF.push(datum);
-              }
-            }
-            localStorage.setItem('connectivityGraphDataFiltered', JSON.stringify(graphDataF));
-
             // metadata text output ////////////////////////////////////////
             this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',plaSet,plaMeta);
             this.comMetaTxtOutput = this.makeMetaTextOutput('com',comSet,comMeta);
@@ -1092,8 +1071,8 @@ export class Home implements OnInit {
     let comSetF = comProFiltered[0];
     let proSetF = comProFiltered[1];
 
-    this.makeOutput(this.plaSet_,this.comSet_,this.proSet_,this.disSet_,this.
-                    plaVScom_,this.comVSpro_,this.proVSdis_);
+    this.makeOutput(this.plaSet_,comSetF,proSetF,this.disSet_,
+                    this.plaVScom_,this.comVSpro_,this.proVSdis_);
   }
 
   floatToStrTruncated(f,nDecimalDigits) {
