@@ -4,56 +4,81 @@
 %% You can process specific files by typing their names in at the 
 %% \files=
 %% prompt when you run the file main.tex through LaTeX.
-\chapter{Use Case 3 - Target-Side Only Input}
+\chapter{Pangkalan Data \emph{(Database)} Rujukan}
 
-\emph{Use case} ini melibatkan hanya satu sisi yaitu \emph{Target-side} saja. pada \emph{use case} ini, input dari salah satu \emph{Target-side} (Protein atau Disease) harus ada.
+\section{\emph{Compound-Protein connectivity}}
+	\subsection{DrugBank} \label{drugbank}
+	DrugBank adalah pangkalan data yang berisi informasi obat dan target obat.Sebagai sumber informasi untuk bioinformatika dan \emph{cheminformatics} (informatika kimia), DrugBank menggabungkan rincian data obat (sifat kimia, farmakologi, dan data farmasi) dengan informasi dari target obat (sekuens, struktur, dan \emph{pathway}). DrugBank memiliki cakupan yang luas, referensi yang komprehensif dan deskripsi data yang sangat rinci. DrugBank sendiri banyak digunakan oleh industri obat, ahli kimia obat, apoteker, dokter, mahasiswa, dan masyarakat umum. DrugBank dapat diakses di alamat URL \href{http://www.drugbank.ca/}{\textbf{http://www.drugbank.ca/}}.
 
-\section{Protein Search Only}
+	\subsection{Supertarget + Matador} \label{supertarget}
+	Supertarget adalah pangkalan data yang berisi informasi hubungan target obat \emph{(drug-target relations)}. Terdiri dari tiga entitas berbeda yaitu \textbf{\emph{Drugs, Proteins,}} dan \textbf{\emph{Side Effects}} (Obat, Protein, dan Efek Samping). Supertarget dapat diakses di alamat URL \href{http://insilico.charite.de/supertarget/}{\textbf{http://insilico.charite.de/supertarget/}}.
 
-Pada contoh ini, input dari \emph{Target-side} berupa protein. Contoh ini mencari dari protein yang diinputkan, apa saja senyawa dan penyakit yang terkait dengan protein itu, dan tanaman apa yang dapat menarget protein itu dengan senyawa terkait yang dikandungnya.
+	\subsection{Transformer} \label{transformer}
+	Transformer adalah pangkalan data yang berisi informasi transformasi dan transportasi xenobiotik dalam tubuh manusia. Terdapat pula informasi interaksi enzim fase I dan II dan transporter obat, juga memiliki data obat tradisional Tiongkok. Transformer dapat diakses di alamat URL \href{http://bioinformatics.charite.de/transformer/}{\textbf{http://bioinformatics.charite.de/transformer/}}.
 
-\subsection{Input}
-\begin{figure}[H]
-	\centering
-	\includegraphics[scale=0.3]{example_3a.png}
-	\caption{Contoh \emph{use case} input Protein Search Only}
-	\label{fig:example_3a}
-\end{figure}
+	\subsection{Antibiotic'ome} \label{antibioticome}
+	Antibiotic'ome adalah pangkalan data yang menyediakan informasi hubungan retrobiosintesis dari struktur produk alami yang dicocokkan dengan antibiotik yang telah diketahui targetnya, dengan tujuan memprediksi target dari molekul yang diinputkan pengguna. Antibiotic'ome dapat diakses di alamat URL \href{https://magarveylab.ca/antibioticome/}{\textbf{https://magarveylab.ca/antibioticome/}}.
 
-Seperti yang telah dibahas pada bab Use Case 1, untuk jenis \emph{use case} ini tombol hanya bertuliskan \textbf{Search}, bukan Search and Predict seperti \emph{use case} pertama.
+	\subsection{Therapeutic Target Database (TTD)} \label{ttd}
+	Therapeutic Target Database (TTD) adalah pangkalan data yang menyediakan informasi protein therapeutic dan target asam nukleat yang telah dipelajari dan diteliti, penyakit yang ditarget, informasi pathway dan obat-obatan terkait yang diarahkan ke target tersebut. Dalam pangkalan data ini juga terdapat data fungsi target, sekuens protein, struktur kimia 3D, sifat ikatan ligan, penamaan enzim dan struktur obat, kelas terapi, dan status pengembangan klinis. TTD dapat diakses di alamat URL \href{http://bidd.nus.edu.sg/group/cjttd/}{\textbf{http://bidd.nus.edu.sg/group/cjttd/}}.
 
-\subsection{Output}
-Output pada contoh \emph{search} dari 2 jenis protein ini adalah sebagai berikut, dimulai dari \emph{Connectivity Graph Output}
+	\subsection{BindingDB} \label{binding_db}
+	BindingDB adalah pangkalan data yang menyediakan informasi afinitas ikatan dan interaksi protein yang diperhitungkan sebagai target obat. BindingDB memiliki 1,314,279 binding data untuk 6,799 target protein dan 582,607 molekul. BindingDB dapat diakses di alamat URL href{http://www.bindingdb.org/bind/index.jsp}{\textbf{http://www.bindingdb.org/bind/index.jsp}}.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[scale=0.3]{ijah_example_3a_graph.png}
-	\caption{Connectivity Graph Output pada use case Protein Search Only}
-	\label{fig:ijah_example_3a_output}
-\end{figure}
+	\subsection{PubChem} \label{pubchem}
+	PubChem adalah pangkalan data molekul kimia dan aktivitasnya terhadap penelitian biologi. Sistem ini dipelihara oleh National Center for Biotechnology Information (NCBI), suatu komponen pada National Library of Medicine, yang merupakan bagian dari National Institutes of Health (NIH) Amerika Serikat. PubChem dapat diakses secara gratis melalui suatu web user interface. Jutaan struktur senyawa dan dataset pemeriannya dapat didownload secara gratis melalui FTP. PubChem memuat pemerian bahan-bahan dan molekul kecil yang terbentuk kurang dari 1000 atom dan 1000 ikatan. Lebih dari 80 vendor database berkontribusi pada database PubChem yang terus bertumbuh. PubChem dapat diakses di alamat URL href{https://pubchem.ncbi.nlm.nih.gov/}{\textbf{https://pubchem.ncbi.nlm.nih.gov/}}.
 
-Graf yang dihasilkan kali ini lebih besar lagi karena menampilkan semua senyawa yang terkait dengan protein yang diinputkan, dan dalam contoh ini sangat banyak senyawa yang dapat menarget protein ini. Karena contoh ini menampilkan semua yang terkait dengan protein yang diinputkan.
+	\subsection{GLIDA: GPCR-Ligand Database} \label{glida}
+	GPCR-Ligand Database (GLIDA) adalah pangkalan data GPCR dan ligan yang terkait. GPCR memiliki fitur sistem informasi kompleks yang mencakup informasi biologis GPCR dan informasi kimiawi dari ligannya, juga fitur pencarian silang antara GPCR dan ligannya. GLIDA dapat diakses di alamat URL href{http://pharminfo.pharm.kyoto-u.ac.jp/services/glida/}{\textbf{http://pharminfo.pharm.kyoto-u.ac.jp/services/glida/}}.
 
-Hasil \emph{Connectivity Text Output} untuk contoh ini:
+	\subsection{PDTD: Potential Drug Target Database} \label{pdtd}
+	PDTD adalah pangkalan data yang bersifat informatif sekaligus struktural dari target obat baik yang telah diketahui maupun yang masih berupa potensi. PDTD memiliki 1,207 entri yang mencakup 841 target obat potensial dari Protein Data Bank (PDB). PDTD dapat diakses di alamat URL href{http://www.dddc.ac.cn/pdtd/}{\textbf{http://www.dddc.ac.cn/pdtd/}}.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[scale=0.3]{ijah_example_3a_text.png}
-	\caption{Connectivity Text Output pada use case Protein Search Only}
-	\label{fig:ijah_example_3a_text}
-\end{figure}
+	\subsection{PolySearch} \label{polysearch}
+	PolySearch adalah pangkalan data yang dapat mencari hubungan antar gen, jaringan, penyakit, nama gen/protein, kompartemen sel, mutasi, obat, dan metabolit. PolySearch dapat diakses di alamat URL href{http://wishart.biology.ualberta.ca/polysearch/index.htm}{\textbf{http://wishart.biology.ualberta.ca/polysearch/index.htm}}.
 
-Hasil \emph{Metadata Text Output} untuk contoh ini:
+\section{\emph{Plant-Compound connectivity}}
+	\subsection{Knapsack} \label{knapsack}
+	KNApSAcK adalah pangkalan data yang berisi informasi hubungan antara spesies tanaman dengan metabolit, yang sangat berguna untuk membantu riset metabolomik. Inti pangkalan data KNApSAcK saat ini telah berisi 101,500 data hubungan spesies-metabolit yang mencakup 20,741 spesies tanaman dan 50,048 metabolit. KNApSAcK dapat diakses di alamat URL \href{http://kanaya.naist.jp/KNApSAcK_Family/}{\textbf{http://kanaya.naist.jp/KNApSAcK\_Family/}}.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[scale=0.3]{ijah_example_3a_meta.png}
-	\caption{Metadata Text Output pada use case Protein Search Only}
-	\label{fig:ijah_example_3a_meta}
-\end{figure}
+	\subsection{StreptomeDB} \label{streptome_db}
+	StreptomeDB adalah pangkalan data bioinformatika farmasi yang memiliki fitur sebagai berikut:
+	\begin{itemize}
+	\item 1,600 produk alami
+	\item 600 organisme produsen
+	\item 1,000 referensi literatur
+	\item 350 aktivitas
+	\item 1,800 konektivitas senyawa-aktivitas
+	\item 400 konektivitas senyawa-rute sintetis 
+	\item sistem klasifikasi filogenetik untuk ratusan spesies
+	\end{itemize}
+	StreptomeDB dapat diakses di alamat URL href{http://www.pharmaceutical-bioinformatics.de/streptomedb/}{\textbf{http://www.pharmaceutical-bioinformatics.de/streptomedb/}}.
 
-\section{Disease Search Only}
-Contoh lain dari \emph{use case} Target-Side Only yaitu Disease Search Only dimana perbedaannya hanya pada input, yaitu menginputkan penyakit (Disease) untuk mencari semua (Plant, Compound, Protein) yang terkait dengan penyakit yang diinputkan.
+	\subsection{Dr. Duke's Phytochemical and Ethnobotanical Databases} \label{pedb}
+	Pangkalan data ini berisi informasi tanaman etnobotani, penggunaan secara etnobotanikal, senyawa kimia, dan data aktivitas biologi. Disini terdapat 49,788 entri. Dr. Duke's Phytochemical and Ethnobotanical Databases dapat diakses di alamat URL href{https://phytochem.nal.usda.gov/phytochem/search}{\textbf{https://phytochem.nal.usda.gov/phytochem/search}}.
 
+\section{\emph{Protein-Disease connectivity}}
+	\subsection{Uniprot} \label{uniprot}
+	UniProt (Universal Protein Resource) adalah pangkalan data yang berisi informasi sekuens protein dan data anotasinya. UniProt adalah hasil kolaborasi antara \emph{European Bioinformatics Institute (EMBL-EBI)}, \emph{Swiss Institute of Bioinformatics (SIB)}, dan \emph{Protein Information Research (PIR)}. Pangkalan data UniProt sendiri terbagi menjadi beberapa bagian, yaitu \textbf{UniProtKB} (Knowledge Base), \textbf{UniRef} (Reference Cluster), dan \textbf{UniParc} (UniProt Archive). UniProt dapat diakses di alamat URL \href{http://www.uniprot.org/}{\textbf{http://www.uniprot.org/}}.
 
+	\subsection{KEGG} \label{kegg}
+	KEGG (Kyoto Encyclopedia of Genes and Genomes) adalah pangkalan data yang mengintegrasikan berbagai data terkait pathway, genom organisme, gen protein, similaritas sekuens gen, glycans, reaksi biokimia, penamaan enzim, obat-obatan, penyakit, ortologi fungsional, dan zat-zat terkait kesehatan \emph{(health-related substances)}. KEGG dapat diakses di alamat URL href{http://www.kegg.jp/kegg/}{\textbf{http://www.kegg.jp/kegg/}}.
 
+%dapat diakses di alamat URL href{}{\textbf{}}.
+
+\section{Plant Metadata}
+	Metadata tanaman diambil dari \textbf{\nameref{knapsack}} dan beberapa sumber lain seperti \href{http://www.herbalisnusantara.com/obatherbal/}{\textbf{http://www.herbalisnusantara.com/obatherbal/}}.
+
+\section{Compound Metadata}
+	Metadata senyawa diambil dari \textbf{\nameref{kegg}} dan \textbf{\nameref{drugbank}} yang telah dijelaska sebelumnya, dan beberapa sumber lain.
+
+\section{Protein Metadata}
+	\subsection{Uniprot}
+	Metadata Protein untuk Ijah Webserver diambil dari \textbf{\nameref{uniprot}} yang telah dijelaskan sebelumnya.
+
+\section{Disease Metadata}
+	\subsection{OMIM} \label{omim}
+	Metadata penyakit pada Ijah Webserver diambil dari OMIM. OMIM (Online Mendelian Inheritance in Man) adalah pangkalan data yang berisi informasi gen manusia, kelainan genetik, dan ciri fenotipe genetik. OMIM berfokus pada hubungan antara gen dengan fenotipe. Dari 23,000 entri pada OMIM, 8,425 diantaranya merepresentasikan fenotipe sedangkan sisanya merepresentasikan gen. OMIM dapat diakses pada alamat URL \href{http://www.omim.org/}{\textbf{http://www.omim.org/}}.
+
+\section{Kode Sumber} \label{db_source}
+Kode sumber untuk basis data Ijah dapat diakses di \href{https://github.com/tttor/csipb-jamu-prj/tree/master/database}{\textbf{https://github.com/tttor/csipb-jamu-prj/tree/master/database}}.

@@ -14,7 +14,7 @@
       * Use case 2: (drug inputs)
       * Use case 3: (target inputs)
     * menus (brief definition, for more, see ch...)
-  * Tampilan Awal (Home) Ijah Webserver
+  * Tampilan Awal (Home page)
     * Overview
       * URL
       * View Home beserta penunjuk bagian

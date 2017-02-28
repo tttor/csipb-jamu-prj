@@ -52,6 +52,12 @@
 \usepackage[shortlabels]{enumitem}
 \usepackage{lipsum}
 \usepackage{titlesec}
+\usepackage[us,12hr]{datetime}
+
+\titleformat{\paragraph}
+{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
 
 %\usepackage[backend=bibtex]{biblatex}
 %\addbibresource{bib.bib}
@@ -74,6 +80,7 @@
 %
 % setelah bagian ini, halaman dihitung sebagai halaman ke 2
 \setcounter{page}{2}
+%\setcounter{secnumdepth}{4}
 
 % sementara ga usah
 % load halaman pengesahan
