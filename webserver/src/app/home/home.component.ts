@@ -959,16 +959,7 @@ export class Home implements OnInit {
   }
 
   private filterOnComProConnWeight(threshold,plaVScom,comVSpro,proVSdis) {
-    //
-    let comWithPla = [];
-    for (let i=0; i<plaVScom.length;i++) {
-      let com = plaVScom[i]['com_id'];
-      comWithPla.push(com);
-    }
-
-    //
-    let comWithPro = [];
-    let proWithCom = [];
+    let comVSproF = [];
     for (let i=0; i<comVSpro.length;i++) {
       let source = comVSpro['source'];
       if (source==='null') {
@@ -980,58 +971,25 @@ export class Home implements OnInit {
         continue;
       }
 
-      let com = comVSpro[i]['com_id'];
-      let pro = comVSpro[i]['pro_id'];
-      comWithPro.push(com);
-      proWithCom.push(pro)
+      comVSproF.push(comVSpro[i]);
     }
 
-    //
-    let proWithDis = [];
-    for (let i=0; i<proVSdis.length;i++) {
-      let pro = proVSdis[i]['pro_id'];
-      proWithDis.push(pro);
-    }
+    let comSet = this.getSet(comVSproF,'com_id');
+    let proSet = this.getSet(comVSproF,'pro_id');
 
-    // Find common items
-    let comWithPlaPro = [comWithPla,comWithPro];
-    let commComArr = comWithPlaPro.shift().reduce(function(res, v) {
-        if (res.indexOf(v) === -1 && comWithPlaPro.every(function(a) {
-            return a.indexOf(v) !== -1;
-        })) res.push(v);
-        return res;
-    }, []);
-
-    let proWithDisCom = [proWithDis,proWithCom];
-    let commProArr = proWithDisCom.shift().reduce(function(res, v) {
-        if (res.indexOf(v) === -1 && proWithDisCom.every(function(a) {
-            return a.indexOf(v) !== -1;
-        })) res.push(v);
-        return res;
-    }, []);
-
-    // Remake the VS
+    // Remake the conn
     let plaVsComF = [];
     for (let i=0;i<plaVScom.length;i++) {
       let com = plaVScom[i]['com_id'];
-      if (commComArr.indexOf(com) !== -1) {
+      if (comSet.indexOf(com) !== -1) {
         plaVsComF.push(plaVScom[i]);
-      }
-    }
-
-    let comVSproF = [];
-    for (let i=0;i<comVSpro.length;i++) {
-      let com = comVSpro[i]['com_id'];
-      let pro = comVSpro[i]['pro_id'];
-      if ((commComArr.indexOf(com)!==-1) && (commProArr.indexOf(pro)!==-1)) {
-        comVSproF.push(comVSpro[i]);
       }
     }
 
     let proVSdisF = [];
     for (let i=0;i<proVSdis.length;i++) {
       let pro = proVSdis[i]['pro_id'];
-      if (commProArr.indexOf(pro) !== -1) {
+      if (proSet.indexOf(pro) !== -1) {
         proVSdisF.push(proVSdis[i]);
       }
     }
@@ -1106,16 +1064,6 @@ export class Home implements OnInit {
     let comSetF = this.getSet(comVSproF,'com_id');
     let proSetF = this.getSet(comVSproF,'pro_id');
     let disSetF = this.getSet(proVSdisF,'dis_id');
-
-    console.log(this.filterThreshold_);
-    console.log(plaVScomF.length);
-    console.log(comVSproF.length);
-    console.log(proVSdisF.length);
-    // console.log(disSetF.length);
-    // console.log(plaSetF.length);
-    // console.log(comSetF.length);
-    // console.log(proSetF.length);
-    // console.log(disSetF.length);
 
     this.makeOutput(plaSetF,comSetF,proSetF,disSetF,
                     plaVScomF,comVSproF,proVSdisF);
