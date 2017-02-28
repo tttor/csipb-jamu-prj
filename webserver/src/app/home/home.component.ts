@@ -724,7 +724,9 @@ export class Home implements OnInit {
               nUnknownComProConn = (comSet.length*proSet.length)-(nKnownByPredictionComProConn+nKnownByExperimentComProConn);
             }
 
-            this.summaryTxtOutput = 'Connectivity Score:\n';
+            this.summaryTxtOutput = 'Minimum Connectivity Weight To Process:\n';
+            this.summaryTxtOutput += '   '+this.filterThreshold_.toFixed(nDecimalDigits)+'\n';
+            this.summaryTxtOutput += 'Connectivity Score:\n';
             this.summaryTxtOutput += '   Total: '+totConnScore.toFixed(nDecimalDigits)+'\n';
             this.summaryTxtOutput += '   Plant-Compound  : '+plaComConnScore.toString()+'\n';
             this.summaryTxtOutput += '   Compound-Protein: '+comProConnScore.toFixed(nDecimalDigits)+'\n';
@@ -749,8 +751,6 @@ export class Home implements OnInit {
 
             this.summaryTxtOutput3 = 'Mode: \n';
             this.summaryTxtOutput3 += '   '+this.mode+'\n';
-            this.summaryTxtOutput3 += 'Minimum Connectivity Weight:\n';
-            this.summaryTxtOutput3 += '   '+this.filterThreshold_.toFixed(nDecimalDigits)+'\n';
             this.summaryTxtOutput3 += 'Elapsed Time: \n';
             this.summaryTxtOutput3 += '   '+this.elapsedTime.toFixed(nDecimalDigits)+' seconds\n';
 
