@@ -1,9 +1,13 @@
 <?php
-  include 'config.php';
 
-  $postdata = file_get_contents("php://input");
-  $requestList = json_decode($postdata, true);
+include 'config.php';
 
+$postdata = file_get_contents("php://input");
+$requestList = json_decode($postdata, true);
+
+$respArr = array();
+$reqListLen = count($requestList);
+if ($reqListLen>0) {
   $cond = '';
   $table = 'ERROR_UNKNOWN_TABLE_PLEASE_FIX';
   $col = 'ERROR_UNKNOWN_COL_PLEASE_FIX';
@@ -21,7 +25,8 @@
       elseif (strpos($val, 'COM') !== false) {
         $id = 'com_id';
         $table = 'compound';
-        $col = 'com_id,com_cas_id,com_drugbank_id,com_knapsack_id,com_kegg_id,com_pubchem_id,com_inchikey,com_smiles';
+        $col = 'com_id,com_cas_id,com_drugbank_id,com_knapsack_id,com_kegg_id,
+                com_pubchem_id,com_inchikey,com_smiles';
       }
       elseif (strpos($val, 'PRO') !== false) {
         $id = 'pro_id';
@@ -49,11 +54,12 @@
   }
 
   $resp = pg_query($link, $query);
-  $respArr = array();
   while($row = pg_fetch_assoc($resp)){
     $respArr[] = $row;
   }
+}
 
-  header('Content-type: application/json');
-  echo json_encode($respArr);
+header('Content-type: application/json');
+echo json_encode($respArr);
+
 ?>

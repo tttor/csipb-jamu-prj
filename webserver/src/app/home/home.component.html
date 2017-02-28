@@ -2,33 +2,28 @@
   <div class="col-sm-12 col-md-12" id="top">
     <h1>Ijah Webserver</h1>
     <h3>Search for (Plant - Compound) - (Protein - Disease) Connectivity</h3>
-    <h3>(Apologize. Ijah is currently under heavy development. Be aware of unstable operations. Thank you.)</h3>
   </div>
 </div>
 
 <div *ngIf="show">
-  <a style="color:white" pageScroll href="#metadataText" class="btn fab6 text-center"><span class="text-center" style="padding-top:3px">Metadata Text</span></a>
-  <a style="color:white" pageScroll href="#connectivityText" class="btn fab5 text-center"><span class="text-center" style="padding-top:3px">Connectivity Text</span></a>
-  <a style="color:white" pageScroll href="#connectivityGraph" class="btn fab4 text-center"><span class="text-center" style="padding-top:3px">Connectivity Graph</span></a>
-  <a style="color:white" pageScroll href="#top" class="btn fab3 text-center"><span class="text-center" style="padding-top:3px">Summary</span></a>
+  <a style="color:white" pageScroll href="#metadataText" class="btn fab6 text-center">
+    <span class="text-center" style="padding-top:3px">MetaText</span></a>
+  <a style="color:white" pageScroll href="#connectivityText" class="btn fab5 text-center">
+    <span class="text-center" style="padding-top:3px">ConnText</span></a>
+  <a style="color:white" pageScroll href="#connectivityGraph" class="btn fab4 text-center">
+    <span class="text-center" style="padding-top:3px">ConnGraph</span></a>
+  <a style="color:white" pageScroll href="#top" class="btn fab3 text-center">
+    <span class="text-center" style="padding-top:3px">Summary</span></a>
 
   <div *ngIf="(this.mode.indexOf('predict')!==-1)">
-    <button class="btn btn-danger fab2"(click)="predictMore()">Predict More</button>
-    <button class="btn btn-danger fab2a"(click)="toggleFilter()">
-      <span *ngIf="!filter">Filter</span>
-      <span *ngIf="filter">Unfilter</span>
-    </button>
+    <button class="btn btn-danger fab2"(click)="predictMore()">Predict</button>
+    <button class="btn btn-danger fab2a"(click)="filter()">Filter {{filterThreshold_}}</button>
     <button class="btn btn-danger fab"(click)="reset()">Reset</button>
   </div>
   <div *ngIf="(this.mode.indexOf('predict')===-1)">
-    <button class="btn btn-danger fab2a"(click)="toggleFilter()">
-      <span *ngIf="!filter">Filter</span>
-      <span *ngIf="filter">Unfilter</span>
-    </button>
+    <button class="btn btn-danger fab2a"(click)="filter()">Filter {{filterThreshold_}}</button>
     <button class="btn btn-danger fab2"(click)="reset()">Reset</button>
   </div>
-
-
 </div>
 
 <div>
@@ -240,8 +235,7 @@
       <div class="text-center col-md-12" id="connectivityGraph">
         <h2><strong>Connectivity Graph</strong></h2>
       </div>
-      <iframe id="graph" class="text-center" *ngIf="!filter" src="assets/app_home_graph_output.html" height="850px" width="100%" frameBorder="0"></iframe>
-      <iframe id="graph" class="text-center" *ngIf="filter" src="assets/app_home_graph_output_filtered.html" height="850px" width="100%" frameBorder="0"></iframe>
+      <iframe id="graph" *ngIf="showGraph" class="text-center" src="assets/app_home_graph_output.html" height="850px" width="100%" frameBorder="0"></iframe>
 
       <!-- Connectivity Text Output //////////////////////////////////////// -->
       <div class="row text-center">

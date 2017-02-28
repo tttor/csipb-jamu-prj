@@ -78,17 +78,26 @@ export class Home implements OnInit {
   proMetaTxtOutput;
   disMetaTxtOutput;
 
-  // Used in graph output
-  filter = false;
-
   // Used in summary text output
   summaryTxtOutput;
   summaryTxtOutput2;
   summaryTxtOutput3;
 
+  //
+  private plaVScom_ = [];
+  private comVSpro_ = [];
+  private proVSdis_ = [];
+  private plaSet_ = [];
+  private comSet_ = [];
+  private proSet_ = [];
+  private disSet_ = [];
+
+  private filterThreshold_ = 0.0;
+
   // Misc.
   // TODO explain the usage
   show = false;// whether to show the output in home.page
+  showGraph = false;
   click = false;// whether searchAndPredictButton was clicked
   elapsedTime = 0;
   mode = 'unknown';
@@ -448,6 +457,8 @@ export class Home implements OnInit {
 
           this.makeOutput(plaSet,comSet,proSet,disSet,
                           plaVScom,comVSpro,proVSdis);
+          this.storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
+                                        plaVScom,comVSpro,proVSdis);
         })
       })
     })
@@ -482,6 +493,8 @@ export class Home implements OnInit {
 
           this.makeOutput(plaSet,comSet,proSet,disSet,
                           plaVScom,comVSpro,proVSdis);
+          this.storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
+                                        plaVScom,comVSpro,proVSdis);
         })
       })
     })
@@ -606,6 +619,8 @@ export class Home implements OnInit {
 
                 this.makeOutput(plaSet,comSet,proSet,disSet,
                                 plaVScom,comVSproMerged,proVSdis);
+                this.storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
+                                              plaVScom,comVSproMerged,proVSdis);
             })
           })
         })
@@ -614,19 +629,8 @@ export class Home implements OnInit {
   }
 
   // OUTPUT MAKING METHODS /////////////////////////////////////////////////////
-  makeOutput(iplaSet,icomSet,iproSet,idisSet,plaVScom,comVSpro,proVSdis) {
+  makeOutput(plaSet,comSet,proSet,disSet,plaVScom,comVSpro,proVSdis) {
     let t0 = performance.now();
-
-    let plaSet = this.handleIfEmptySet(iplaSet,'pla');
-    let comSet = this.handleIfEmptySet(icomSet,'com');
-    let proSet = this.handleIfEmptySet(iproSet,'pro');
-    let disSet = this.handleIfEmptySet(idisSet,'dis');
-
-    let minComProWeight = 0.950;
-    let comProFiltered = this.filterCompoundProteinItems(minComProWeight,
-                                                         plaVScom,comVSpro,proVSdis);
-    let comSetF = comProFiltered[0];
-    let proSetF = comProFiltered[1];
 
     // Get metadata of each unique item
     let plaMetaPost = this.makeJSONFormat(plaSet,'id');
@@ -634,7 +638,6 @@ export class Home implements OnInit {
     let proMetaPost = this.makeJSONFormat(proSet,'id');
     let disMetaPost = this.makeJSONFormat(disSet,'id');
 
-    // console.log('getting meta ...');
     this.http.post(this.metaQueryAPI,plaMetaPost).map(resp4 => resp4.json())
     .subscribe(plaMeta => {
       this.http.post(this.metaQueryAPI,comMetaPost).map(resp5=>resp5.json())
@@ -685,32 +688,11 @@ export class Home implements OnInit {
             }
             localStorage.setItem('connectivityGraphData', JSON.stringify(graphData));
 
-            let graphDataArrF = [this.makeGraphDataOutput(plaVScom,
-                                             plaMeta,comMeta,
-                                             'pla','com',
-                                             plaSet,comSetF),
-                                this.makeGraphDataOutput(comVSpro,
-                                                         comMeta,proMeta,
-                                                         'com','pro',
-                                                         comSetF,proSetF),
-                                this.makeGraphDataOutput(proVSdis,
-                                                         proMeta,disMeta,
-                                                         'pro','dis',
-                                                         proSetF,disSet)];
-            let graphDataF = [];
-            for (let ii=0;ii<graphDataArrF.length;ii++) {
-              for(let jj=0;jj<graphDataArrF[ii].length;jj++) {
-                  let datum = graphDataArrF[ii][jj];
-                  graphDataF.push(datum);
-              }
-            }
-            localStorage.setItem('connectivityGraphDataFiltered', JSON.stringify(graphDataF));
-
             // metadata text output ////////////////////////////////////////
-            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',iplaSet,plaMeta);
-            this.comMetaTxtOutput = this.makeMetaTextOutput('com',icomSet,comMeta);
-            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',iproSet,proMeta);
-            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',idisSet,disMeta);
+            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',plaSet,plaMeta);
+            this.comMetaTxtOutput = this.makeMetaTextOutput('com',comSet,comMeta);
+            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',proSet,proMeta);
+            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',disSet,disMeta);
 
             // summary text output /////////////////////////////////////////////
             let plaComConnScore = this.getConnectivityScore(plaVScom);
@@ -740,20 +722,22 @@ export class Home implements OnInit {
             }
 
             if (this.mode==='search_only') {
-              nUnknownComProConn = (icomSet.length*iproSet.length)-(nKnownByPredictionComProConn+nKnownByExperimentComProConn);
+              nUnknownComProConn = (comSet.length*proSet.length)-(nKnownByPredictionComProConn+nKnownByExperimentComProConn);
             }
 
-            this.summaryTxtOutput = 'Connectivity Score:\n';
-            this.summaryTxtOutput += '   Total: '+this.floatToStrTruncated(totConnScore,nDecimalDigits)+'\n';
+            this.summaryTxtOutput = 'Minimum Connectivity Weight To Process:\n';
+            this.summaryTxtOutput += '   '+this.filterThreshold_.toFixed(nDecimalDigits)+'\n';
+            this.summaryTxtOutput += 'Connectivity Score:\n';
+            this.summaryTxtOutput += '   Total: '+totConnScore.toFixed(nDecimalDigits)+'\n';
             this.summaryTxtOutput += '   Plant-Compound  : '+plaComConnScore.toString()+'\n';
-            this.summaryTxtOutput += '   Compound-Protein: '+this.floatToStrTruncated(comProConnScore,nDecimalDigits)+'\n';
+            this.summaryTxtOutput += '   Compound-Protein: '+comProConnScore.toFixed(nDecimalDigits)+'\n';
             this.summaryTxtOutput += '   Protein-Disease : '+proDisConnScore.toString()+'\n';
 
             this.summaryTxtOutput2 = 'Number of unique items:\n';
-            this.summaryTxtOutput2 += '   #Plants   : '+iplaSet.length.toString()+this.getInputMark('plant')+'\n';
-            this.summaryTxtOutput2 += '   #Compounds: '+icomSet.length.toString()+this.getInputMark('compound')+'\n';
-            this.summaryTxtOutput2 += '   #Proteins : '+iproSet.length.toString()+this.getInputMark('protein')+'\n';
-            this.summaryTxtOutput2 += '   #Diseases : '+idisSet.length.toString()+this.getInputMark('disease')+'\n';
+            this.summaryTxtOutput2 += '   #Plants   : '+plaSet.length.toString()+this.getInputMark('plant')+'\n';
+            this.summaryTxtOutput2 += '   #Compounds: '+comSet.length.toString()+this.getInputMark('compound')+'\n';
+            this.summaryTxtOutput2 += '   #Proteins : '+proSet.length.toString()+this.getInputMark('protein')+'\n';
+            this.summaryTxtOutput2 += '   #Diseases : '+disSet.length.toString()+this.getInputMark('disease')+'\n';
             this.summaryTxtOutput2 += 'Compound-Protein Connectivity:\n';
             this.summaryTxtOutput2 += '   #known_by_experiment: '+nKnownByExperimentComProConn.toString()+'\n';
             this.summaryTxtOutput2 += '   #known_by_prediction: '+nKnownByPredictionComProConn.toString()+'\n';
@@ -769,10 +753,11 @@ export class Home implements OnInit {
             this.summaryTxtOutput3 = 'Mode: \n';
             this.summaryTxtOutput3 += '   '+this.mode+'\n';
             this.summaryTxtOutput3 += 'Elapsed Time: \n';
-            this.summaryTxtOutput3 += '   '+this.floatToStrTruncated(this.elapsedTime,nDecimalDigits)+' seconds\n';
+            this.summaryTxtOutput3 += '   '+this.elapsedTime.toFixed(nDecimalDigits)+' seconds\n';
 
             // Show the output page
             this.show = true;
+            this.showGraph = true;
           }) // disMeta
         }) // proMeta
       }) // comMeta
@@ -964,15 +949,19 @@ export class Home implements OnInit {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
-  private filterCompoundProteinItems(threshold,plaVScom,comVSpro,proVSdis) {
-    let comWithPla = [];
-    for (let i=0; i<plaVScom.length;i++) {
-      let com = plaVScom[i]['com_id'];
-      comWithPla.push(com);
-    }
+  private storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
+                                   plaVScom,comVSpro,proVSdis) {
+    this.plaSet_ = plaSet;
+    this.comSet_ = comSet;
+    this.proSet_ = proSet;
+    this.disSet_ = disSet;
+    this.plaVScom_ = plaVScom;
+    this.comVSpro_ = comVSpro;
+    this.proVSdis_ = proVSdis;
+  }
 
-    let comWithPro = [];
-    let proWithCom = [];
+  private filterOnComProConnWeight(threshold,plaVScom,comVSpro,proVSdis) {
+    let comVSproF = [];
     for (let i=0; i<comVSpro.length;i++) {
       let source = comVSpro['source'];
       if (source==='null') {
@@ -984,35 +973,30 @@ export class Home implements OnInit {
         continue;
       }
 
-      let com = comVSpro[i]['com_id'];
-      let pro = comVSpro[i]['pro_id'];
-      comWithPro.push(com);
-      proWithCom.push(pro)
+      comVSproF.push(comVSpro[i]);
     }
 
-    let proWithDis = [];
-    for (let i=0; i<proVSdis.length;i++) {
+    let comSet = this.getSet(comVSproF,'com_id');
+    let proSet = this.getSet(comVSproF,'pro_id');
+
+    // Remake the conn
+    let plaVsComF = [];
+    for (let i=0;i<plaVScom.length;i++) {
+      let com = plaVScom[i]['com_id'];
+      if (comSet.indexOf(com) !== -1) {
+        plaVsComF.push(plaVScom[i]);
+      }
+    }
+
+    let proVSdisF = [];
+    for (let i=0;i<proVSdis.length;i++) {
       let pro = proVSdis[i]['pro_id'];
-      proWithDis.push(pro);
+      if (proSet.indexOf(pro) !== -1) {
+        proVSdisF.push(proVSdis[i]);
+      }
     }
 
-    let comWithPlaPro = [comWithPla,comWithPro];
-    let commComArr = comWithPlaPro.shift().reduce(function(res, v) {
-        if (res.indexOf(v) === -1 && comWithPlaPro.every(function(a) {
-            return a.indexOf(v) !== -1;
-        })) res.push(v);
-        return res;
-    }, []);
-
-    let proWithDisCom = [proWithDis,proWithCom];
-    let commProArr = proWithDisCom.shift().reduce(function(res, v) {
-        if (res.indexOf(v) === -1 && proWithDisCom.every(function(a) {
-            return a.indexOf(v) !== -1;
-        })) res.push(v);
-        return res;
-    }, []);
-
-    return [commComArr,commProArr];
+    return [plaVsComF,comVSproF,proVSdisF];
   }
 
   private find(k,arr) {
@@ -1065,21 +1049,29 @@ export class Home implements OnInit {
     }
   }
 
-  toggleFilter() {
-    this.filter = !this.filter;
-  }
+  filter() {
+    this.showGraph = false;
 
-  floatToStrTruncated(f,nDecimalDigits) {
-    let raw = f.toString();
-    let radixPos = raw.indexOf('.');
-    if (radixPos===-1) {
-      return raw;
+    let delta = 0.2;
+    this.filterThreshold_ += delta;
+    if (this.filterThreshold_>1.0) {
+      this.filterThreshold_ = 0.0;
     }
-    else {
-      let intStr = raw.slice(0,radixPos);
-      let decStr = raw.slice(radixPos+1,radixPos+nDecimalDigits+1);
-      return intStr+'.'+decStr;
-    }
+    this.filterThreshold_ = parseFloat( this.filterThreshold_.toFixed(1) );
+
+    let filtered = this.filterOnComProConnWeight(this.filterThreshold_,
+                                                 this.plaVScom_,this.comVSpro_,this.proVSdis_);
+    let plaVScomF = filtered[0];
+    let comVSproF = filtered[1];
+    let proVSdisF = filtered[2];
+
+    let plaSetF = this.getSet(plaVScomF,'pla_id');
+    let comSetF = this.getSet(comVSproF,'com_id');
+    let proSetF = this.getSet(comVSproF,'pro_id');
+    let disSetF = this.getSet(proVSdisF,'dis_id');
+
+    this.makeOutput(plaSetF,comSetF,proSetF,disSetF,
+                    plaVScomF,comVSproF,proVSdisF);
   }
 
   private getConnectivityScore(connectivity) {
@@ -1112,14 +1104,6 @@ export class Home implements OnInit {
     }
     str = '['+str+']';
     return str;
-  }
-
-  private handleIfEmptySet(set,type) {
-    if (set.length>0) {
-      return set;
-    }
-    let newSet = [type.toUpperCase()+'_NONE_DUMMY'];
-    return newSet;
   }
 
   private getSet(interaction,id) {
@@ -1338,7 +1322,6 @@ export class Home implements OnInit {
     this.plaVScomSwapped = false;
     this.comVSproSwapped = false;
     this.proVSdisSwapped = false;
-    this.filter = false;
 
     this.nPlaInputHolders = 0;
     this.nComInputHolders = 0;
@@ -1358,6 +1341,7 @@ export class Home implements OnInit {
     this.inputType = 'unknown';
     this.elapsedTime = 0;
     this.show = false;
+    this.showGraph = false;
     localStorage.clear();
     this.dataLocal = [];
 
@@ -1367,6 +1351,16 @@ export class Home implements OnInit {
     this.noResultCompound = false;
     this.noResultProtein = false;
     this.noResultDisease = false;
+
+    this.plaVScom_ = [];
+    this.comVSpro_ = [];
+    this.proVSdis_ = [];
+    this.plaSet_ = [];
+    this.comSet_ = [];
+    this.proSet_ = [];
+    this.disSet_ = [];
+
+    this.filterThreshold_ = 0.0;
   }
 
   // EXAMPLE-BUTTON METHODS ////////////////////////////////////////////////////
