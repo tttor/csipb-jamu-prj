@@ -725,9 +725,9 @@ export class Home implements OnInit {
             }
 
             this.summaryTxtOutput = 'Connectivity Score:\n';
-            this.summaryTxtOutput += '   Total: '+this.floatToStrTruncated(totConnScore,nDecimalDigits)+'\n';
+            this.summaryTxtOutput += '   Total: '+totConnScore.toFixed(nDecimalDigits)+'\n';
             this.summaryTxtOutput += '   Plant-Compound  : '+plaComConnScore.toString()+'\n';
-            this.summaryTxtOutput += '   Compound-Protein: '+this.floatToStrTruncated(comProConnScore,nDecimalDigits)+'\n';
+            this.summaryTxtOutput += '   Compound-Protein: '+comProConnScore.toFixed(nDecimalDigits)+'\n';
             this.summaryTxtOutput += '   Protein-Disease : '+proDisConnScore.toString()+'\n';
 
             this.summaryTxtOutput2 = 'Number of unique items:\n';
@@ -750,9 +750,9 @@ export class Home implements OnInit {
             this.summaryTxtOutput3 = 'Mode: \n';
             this.summaryTxtOutput3 += '   '+this.mode+'\n';
             this.summaryTxtOutput3 += 'Minimum Connectivity Weight:\n';
-            this.summaryTxtOutput3 += '   '+this.floatToStrTruncated(this.filterThreshold_,nDecimalDigits)+'\n';
+            this.summaryTxtOutput3 += '   '+this.filterThreshold_.toFixed(nDecimalDigits)+'\n';
             this.summaryTxtOutput3 += 'Elapsed Time: \n';
-            this.summaryTxtOutput3 += '   '+this.floatToStrTruncated(this.elapsedTime,nDecimalDigits)+' seconds\n';
+            this.summaryTxtOutput3 += '   '+this.elapsedTime.toFixed(nDecimalDigits)+' seconds\n';
 
             // Show the output page
             this.show = true;
@@ -1067,19 +1067,6 @@ export class Home implements OnInit {
 
     this.makeOutput(plaSetF,comSetF,proSetF,disSetF,
                     plaVScomF,comVSproF,proVSdisF);
-  }
-
-  floatToStrTruncated(f,nDecimalDigits) {
-    let raw = f.toString();
-    let radixPos = raw.indexOf('.');
-    if (radixPos===-1) {
-      return raw;
-    }
-    else {
-      let intStr = raw.slice(0,radixPos);
-      let decStr = raw.slice(radixPos+1,radixPos+nDecimalDigits+1);
-      return intStr+'.'+decStr;
-    }
   }
 
   private getConnectivityScore(connectivity) {
