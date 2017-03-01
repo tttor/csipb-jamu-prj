@@ -13,8 +13,12 @@ def main():
     csr = conn.cursor()
 
     ##
-    dirpath = '../../dataset/metadata/compound/pubchem/pubchem_prop_20170301-1545'
-    insertPubchemProps(dirpath)
+    # dirpath = '../../dataset/metadata/compound/pubchem/pubchem_prop_20170301-1545'
+    # insertPubchemProps(dirpath)
+
+    ##
+    dirpath = '../../dataset/metadata/compound/pubchem/pubchem_synonyms_20170301-1545'
+    insertPubchemSynonyms(dirpath)
 
     ##
     conn.commit()
@@ -35,10 +39,7 @@ def insertPubchemProps(dirpath):
         break
 
     ##
-    propList = ['CID','InChIKey','IUPACName','IsomericSMILES','CanonicalSMILES']
     for cas,prop in cas2prop.iteritems():
-        print cas
-
         qf = 'UPDATE compound SET '
         qm  = 'com_pubchem_id='+quote(str(prop['CID']))+','
         qm += 'com_inchikey='+quote(prop['InChIKey'])+','
@@ -50,8 +51,32 @@ def insertPubchemProps(dirpath):
         print q
         # csr.execute(q)
 
-def insertPubchemSynonyms():
-    pass
+def insertPubchemSynonyms(dirpath):
+    ##
+    sep = '|'
+    cas2syn = {}
+    for fname in os.listdir(dirpath):
+        cas = fname.split('_')[1]
+        if fname.endswith(".json"):
+            fpath = os.path.join(dirpath,fname)
+            syn = None
+            with open(fpath,'r') as f:
+                syn = yaml.load(f)
+                syn = syn['InformationList']['Information'][0]
+                syn = syn['Synonym']
+                _ = ''.join(syn); assert not(sep in _)
+                syn = sep.join(syn)
+            cas2syn[cas] = syn
+        break
+
+    ##
+    for cas,syn in cas2syn.iteritems():
+        qf = 'UPDATE compound SET '
+        qm  = 'com_pubchem_synonym='+quote(syn)
+        qr = ' WHERE com_cas_id='+quote(cas)
+        q = qf+qm+qr
+        print q
+        # csr.execute(q)
 
 if __name__ == '__main__':
     main()
