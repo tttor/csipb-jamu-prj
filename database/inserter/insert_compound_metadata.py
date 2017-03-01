@@ -39,7 +39,12 @@ def insertPubchemProps(dirpath):
         break
 
     ##
+    idx = 0
+    n = len(cas2prop)
     for cas,prop in cas2prop.iteritems():
+        idx += 1
+        print 'updating prop on cas= '+cas+' => '+str(idx)+'/'+str(n)
+
         qf = 'UPDATE compound SET '
         qm  = 'com_pubchem_id='+quote(str(prop['CID']))+','
         qm += 'com_inchikey='+quote(prop['InChIKey'])+','
@@ -70,9 +75,14 @@ def insertPubchemSynonyms(dirpath):
         break
 
     ##
+    idx = 0
+    n = len(cas2syn)
     for cas,syn in cas2syn.iteritems():
+        idx += 1
+        print 'updating syn on cas= '+cas+' => '+str(idx)+'/'+str(n)
+
         qf = 'UPDATE compound SET '
-        qm  = 'com_pubchem_synonym='+quote(syn)
+        qm = 'com_pubchem_synonym='+quote(syn)
         qr = ' WHERE com_cas_id='+quote(cas)
         q = qf+qm+qr
         print q
