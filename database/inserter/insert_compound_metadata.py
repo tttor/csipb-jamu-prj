@@ -14,17 +14,17 @@ def main():
 
     ##
     # dirpath = '../../dataset/metadata/compound/pubchem/pubchem_prop_20170301-1545'
-    # insertPubchemProps(dirpath)
+    # insertPubchemProps(csr,dirpath)
 
     ##
     dirpath = '../../dataset/metadata/compound/pubchem/pubchem_synonyms_20170301-1545'
-    insertPubchemSynonyms(dirpath)
+    insertPubchemSynonyms(csr,dirpath)
 
     ##
     conn.commit()
     conn.close()
 
-def insertPubchemProps(dirpath):
+def insertPubchemProps(csr,dirpath):
     ##
     cas2prop = {}
     for fname in os.listdir(dirpath):
@@ -36,7 +36,6 @@ def insertPubchemProps(dirpath):
                 prop = yaml.load(f)
                 prop = prop['PropertyTable']['Properties'][0]
             cas2prop[cas] = prop
-        break
 
     ##
     idx = 0
@@ -53,12 +52,11 @@ def insertPubchemProps(dirpath):
         qm += 'com_smiles_canonical='+quote(prop['CanonicalSMILES'])
         qr = ' WHERE com_cas_id='+quote(cas)
         q = qf+qm+qr
-        print q
-        # csr.execute(q)
+        csr.execute(q)
 
-def insertPubchemSynonyms(dirpath):
+def insertPubchemSynonyms(csr,dirpath):
     ##
-    sep = '|'
+    sep = '~'
     cas2syn = {}
     for fname in os.listdir(dirpath):
         cas = fname.split('_')[1]
@@ -72,7 +70,6 @@ def insertPubchemSynonyms(dirpath):
                 _ = ''.join(syn); assert not(sep in _)
                 syn = sep.join(syn)
             cas2syn[cas] = syn
-        break
 
     ##
     idx = 0
@@ -81,12 +78,15 @@ def insertPubchemSynonyms(dirpath):
         idx += 1
         print 'updating syn on cas= '+cas+' => '+str(idx)+'/'+str(n)
 
+        ## escape any single quote
+        syn = syn.replace("'","''")
+
+        ##
         qf = 'UPDATE compound SET '
         qm = 'com_pubchem_synonym='+quote(syn)
         qr = ' WHERE com_cas_id='+quote(cas)
         q = qf+qm+qr
-        print q
-        # csr.execute(q)
+        csr.execute(q)
 
 if __name__ == '__main__':
     main()
