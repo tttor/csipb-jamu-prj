@@ -30,8 +30,8 @@ def main(argv):
                 com_cas_id varchar(128) UNIQUE,
                 com_inchikey varchar(1024) UNIQUE,
                 com_iupac_name varchar(16384) UNIQUE,
-                com_smiles_canonical varchar(16384) UNIQUE,
-                com_smiles_isomeric varchar(16384) UNIQUE,
+                com_smiles_canonical varchar(32768) UNIQUE,
+                com_smiles_isomeric varchar(32768) UNIQUE,
                 com_pubchem_synonym text,
                 com_similarity_simcomp text
                 );
