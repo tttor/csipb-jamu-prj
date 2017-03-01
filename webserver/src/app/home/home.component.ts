@@ -802,7 +802,7 @@ export class Home implements OnInit {
       for (let j=0;j<conn[i].length;j++) {
         let comps = conn[i][j].split(",");
         let source = comps[0];
-        let weight = comps[1];
+        let weight = comps[1]; weight = parseFloat(weight).toFixed(3);
         let src = comps[2];
         let dest = comps[3];
 
