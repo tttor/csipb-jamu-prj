@@ -24,6 +24,7 @@ def getCompoundProp():
 
     logs = []
     for i,cas in enumerate(casList):
+        print 'crawling cas= '+cas+' => '+str(i+1)+'/'+str(len(casList))
         url = baseURL+cas+'/property/'+props+'/'+outFormat
 
         out = None
