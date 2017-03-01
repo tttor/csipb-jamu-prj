@@ -13,11 +13,11 @@
 
 	\subsection{Kasus-penggunaan \emph{(use-case)}}
 	Ada beberapa kasus-penggunaan \emph{(use-case)} dalam pencarian saat menggunakan Ijah Webserver.
-		\subsubsection{Use-case 1 (Both drug-target inputs)} \label{end to end}
+		\subsubsection{Use-case 1 (Both drug-and-target inputs)} \label{end to end}
 		\emph{Use-case} ini melibatkan kedua sisi input yaitu \emph{Drug-side} dan \emph{Target-side}. pada \emph{use case} ini, input dari kedua sisi harus ada. Pencarian ini bersifat end-to-end, misalkan Plant to Disease, dimana kita memasukkan beberapa jenis tanaman dari sisi Drug-side dan beberapa jenis penyakit dari Target-side, lalu hasilnya akan menunjukkan senyawa apa dalam tanaman tersebut yang dapat menarget protein yang ada dalam penyakit tersebut, sehingga berkhasiat menyembuhkan. Variasi input pada \emph{use-case} ini meliputi \textbf{Plant-Protein}, \textbf{Plant-Disease}, \textbf{Compound-Protein}, dan \textbf{Compound-Disease}.
-		\subsubsection{Use-case 2 (Drug inputs only)} \label{drug only}
+		\subsubsection{Use-case 2 (Drug-side inputs only)} \label{drug only}
 		\emph{Use-case} ini melibatkan hanya satu sisi yaitu \emph{Drug-side} saja. pada \emph{use-case} ini, input dari salah satu \emph{drug-side} (Plant atau Compound) harus ada. Sifat pencarian ini, misal kita memasukkan tanaman saja (Plant Search Only), maka semua senyawa yang terkandung dalam tanaman itu akan muncul, lalu protein yang terkait dengan senyawa tersebut, dan penyakit yang terkait dengan protein tersebut. Sederhananya semua yang terkait dengan tanaman yang diinputkan. Variasi input pada \emph{use-case} ini meliputi \textbf{Plant Search Only} dan \textbf{Compound Search Only} yang pada dasarnya sama dengan Plant Search.
-		\subsubsection{Use-case 3 (Target inputs only)} \label{target only}
+		\subsubsection{Use-case 3 (Target-side inputs only)} \label{target only}
 		\emph{Use case} ini melibatkan hanya satu sisi yaitu \emph{Target-side} saja. pada \emph{use case} ini, input dari salah satu \emph{Target-side} (Protein atau Disease) harus ada. Sifat pencarian ini mirip dengan Drug inputs only, namun bedanya dari sisi Target. Misal pada pencarian dari penyakit (Disease Search Only) akan muncul semua yang berkaitan dengan penyakit itu, termasuk tanaman yang berhubungan. Variasi input pada \emph{use-case} ini meliputi \textbf{Protein Search Only} dan \textbf{Disease Search Only}.
 
 
@@ -114,5 +114,16 @@
 	\label{fig:ijah_flagcount}
 	\end{figure}
 
-\section{Kode Sumber} \label{ws_source}
-Kode sumber untuk Ijah Webserver dapat diakses di \href{https://github.com/tttor/csipb-jamu-prj/tree/master/webserver}{\textbf{https://github.com/tttor/csipb-jamu-prj/tree/master/webserver}}.
+\section{Repositori \emph{Source Code}} \label{ws_source}
+\emph{Source Code} untuk Ijah Webserver dapat diakses di repositori GitHub di alamat URL \href{https://github.com/tttor/csipb-jamu-prj}{\textbf{https://github.com/tttor/csipb-jamu-prj}}.
+
+Pada repositori ini terdapat beberapa folder untuk setiap \emph{source code}
+
+\begin{itemize}
+\item \textbf{Webserver}\\
+\href{https://github.com/tttor/csipb-jamu-prj/tree/master/webserver}{\textbf{https://github.com/tttor/csipb-jamu-prj/tree/master/webserver}}.
+\item \textbf{Predictor}\\
+\href{https://github.com/tttor/csipb-jamu-prj/tree/master/predictor}{\textbf{https://github.com/tttor/csipb-jamu-prj/tree/master/predictor}}.
+\item \textbf{Database} (lihat bab \ref{db chapter} )\\
+\href{https://github.com/tttor/csipb-jamu-prj/tree/master/database}{\textbf{https://github.com/tttor/csipb-jamu-prj/tree/master/database}}.
+\end{itemize}
