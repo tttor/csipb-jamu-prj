@@ -34,14 +34,17 @@ def getCompoundProp():
             success = True
         except urllib.HTTPError, e:
             s = str(i)+': '+cas+' => HTTPError= '+str(e.code)
-            log.append(s)
+            logs.append(s)
         except urllib.URLError, e:
             s = str(i)+': '+cas+' => URLError= '+str(e.reason)
+            logs.append(s)
         except httplib.HTTPException, e:
             s = str(i)+': '+cas+' => HTTPException'
+            logs.append(s)
         except Exception:
             import traceback
             s = str(i)+': '+cas+' => GenericException: '+traceback.format_exc()
+            logs.append(s)
 
         if success:
             txt = bs(out, 'html.parser')
