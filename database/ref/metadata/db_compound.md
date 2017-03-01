@@ -1,7 +1,10 @@
 db_compound
 db_drug
 
-DRUGBANK
+[ ] Pubchem
+https://pubchemblog.ncbi.nlm.nih.gov/2014/06/19/what-is-the-difference-between-a-substance-and-a-compound-in-pubchem/
+
+[ ] DRUGBANK
 http://www.drugbank.ca/drugs/DB00114
 
 KEGG compound
