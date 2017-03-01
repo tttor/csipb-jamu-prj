@@ -2,6 +2,9 @@
 import sys
 import psycopg2
 
+def quote(s):
+    return "'"+s+"'"
+
 def getMax(csr,col,table):
     csr.execute("SELECT MAX("+col+") FROM "+table)
     _ = csr.fetchall(); assert len(_)==1
