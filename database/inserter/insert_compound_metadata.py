@@ -31,11 +31,10 @@ def insertPubchemProps(csr,dirpath):
         cas = fname.split('_')[1]
         if fname.endswith(".json"):
             fpath = os.path.join(dirpath,fname)
-            prop = None
             with open(fpath,'r') as f:
                 prop = yaml.load(f)
                 prop = prop['PropertyTable']['Properties'][0]
-            cas2prop[cas] = prop
+                cas2prop[cas] = prop
 
     ##
     idx = 0
@@ -58,18 +57,23 @@ def insertPubchemSynonyms(csr,dirpath):
     ##
     sep = '~'
     cas2syn = {}
+    cas2name = {}
     for fname in os.listdir(dirpath):
         cas = fname.split('_')[1]
         if fname.endswith(".json"):
             fpath = os.path.join(dirpath,fname)
-            syn = None
             with open(fpath,'r') as f:
                 syn = yaml.load(f)
                 syn = syn['InformationList']['Information'][0]
                 syn = syn['Synonym']
+
+                name = syn[0]
+                name = name.capitalize()
+                cas2name[cas] = name
+
                 _ = ''.join(syn); assert not(sep in _)
                 syn = sep.join(syn)
-            cas2syn[cas] = syn
+                cas2syn[cas] = syn
 
     ##
     idx = 0
@@ -83,7 +87,8 @@ def insertPubchemSynonyms(csr,dirpath):
 
         ##
         qf = 'UPDATE compound SET '
-        qm = 'com_pubchem_synonym='+quote(syn)
+        qm  = 'com_pubchem_synonym='+quote(syn)+','
+        qm += 'com_pubchem_name='+quote( cas2name[cas] )
         qr = ' WHERE com_cas_id='+quote(cas)
         q = qf+qm+qr
         csr.execute(q)
