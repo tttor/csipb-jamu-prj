@@ -94,7 +94,7 @@
           <div *ngIf="compoundSearch.length>0">
             <div *ngFor="let c of comInputHolders">
               <template #customCompound let-model="item" let-index="index">
-                <h5>{{model.com_cas_id}} <span *ngIf="model.com_knapsack_id">|</span> {{model.com_knapsack_id}} <span *ngIf="model.com_drugbank_id">|</span> {{model.com_drugbank_id}}</h5>
+                <h5>{{model.com_cas_id}} <span *ngIf="model.com_pubchem_name">|</span> {{model.com_pubchem_name}} <span *ngIf="model.com_iupac_name">|</span> {{model.com_iupac_name}}</h5>
               </template>
               <input [(ngModel)]="c.value"
                      [typeahead]="compoundSearch"
@@ -104,7 +104,7 @@
                      (typeaheadOnSelect)="selectCompound($event, c.index)"
                      (typeaheadNoResults)="changeTypeaheadNoResults($event, 2)"
                      class="form-control verticalLine2"
-                     placeholder="CAS | KnapSack ID | DrugBank ID"
+                     placeholder="CAS | Pubchem Name | IUPAC Name"
                      (focus)="focusCompound(c.index)">
                <div *ngIf="noResultCompound===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
