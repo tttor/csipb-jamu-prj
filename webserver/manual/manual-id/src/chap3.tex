@@ -4,7 +4,7 @@
 %% You can process specific files by typing their names in at the 
 %% \files=
 %% prompt when you run the file main.tex through LaTeX.
-\chapter{Menu-menu}  \label{Menu}
+\chapter{Menu-menu}  \label{chap:Menu}
 
 \section{Manual}
 Menu \emph{Manual} berisi \emph{link} untuk mendownload file Manual penggunaan Ijah Webserver. Kedepannya, isi file Manual juga akan ditampilkan di halaman ini.
@@ -67,7 +67,7 @@ Untuk mengunduh file pada halaman ini cukup klik nama file yang ingin diunduh
 	\end{itemize}
 
 \section{Help/FAQ}
-Menu \emph{Help/FAQ} berisikan beberapa pertanyaan umum \emph{(Frequently Asked Questions)} beserta jawabannya. Secara \emph{default} bahasa yang tersedia adalah bahasa Inggris namun dapat diubah ke bahasa Indonesia dengan mengklik tombol <todo>
+Menu \emph{Help/FAQ} berisikan beberapa pertanyaan umum \emph{(Frequently Asked Questions)} beserta jawabannya.
 
 \begin{figure}[H]
 	\centering
@@ -76,19 +76,38 @@ Menu \emph{Help/FAQ} berisikan beberapa pertanyaan umum \emph{(Frequently Asked 
 	\label{fig:ijah_faq}
 \end{figure}
 
-Anda dapat menambahkan pertanyaan melalui menu \textbf{\nameref{Contact Us}}.
+Menu FAQ ini tersedia dalam bahasa Inggris, berikut terjemahan dari pertanyaan pada menu FAQ menurut Ijah Webserver versi ini:
 
-\section{IjahV1}
-Menu \emph{IjahV1} berisi link menuju versi awal Ijah (Ijah versi 1, atau IjahV1)
+\begin{itemize}
+\item {\textbf{Q:}} Bagaimana cara mengunduh semua data yang ada pada Ijah?\\
+A: Silakan menuju menu \textbf{\nameref{Downloads}}.
+\item {\textbf{Q:}} Bagaimana cara melaporkan isu dan masalah?\\
+A: Cara termudah yaitu dengan mengontak kami di menu \textbf{\nameref{ContactUs}}. Anda bisa juga menyampaikannya di repositori \emph{code} kami. (Menuju repositori -- lihat bab \ref{sec:ws_source}).
+\item {\textbf{Q:}} Bagaimana cara mendapatkan \emph{SQL dump} dari \emph{database} Ijah?\\
+A: Silakan kontak tim kami di menu \textbf{\nameref{ContactUs}}.
+\item {\textbf{Q:}} Apakah \emph{source code} Ijah tersedia secara publik?\\
+A: Ya, silakan lihat repositori publik kami disini (Menuju repositori -- silakan lihat bab \ref{sec:ws_source}).
+\item {\textbf{Q:}} Bagaimana cara mengutip karya Ijah Webserver?\\
+A: Untuk saat ini silakan lihat di \href{http://ijah.apps.cs.ipb.ac.id/api/ijah_webserver_online.bib}{\textbf{ijah\_webserver\_online.bib}}
+\item {\textbf{Q:}} Berapa kali Ijah Webserver telah dikunjungi?\\
+A: Silakan lihat \emph{visitor log} pada bagian kanan-bawah halaman Ijah Webserver. \emph{Log} ini telah berjalan sejak 13 Januari 2017 pukul 18:00 (zona waktu GMT+7:00). Untuk statistik detail silakan klik pada area \emph{visitor log}. (\emph{Visitor log} ada pada bab \ref{ssec:visitor log})
+\item {\textbf{Q:}} Mengapa tata halaman terlihat berantakan? Bagaimana solusinya?\\
+A: Kami sedang berusaha mengerjakan tata halaman yang adaptif dan bisa menyesuaikan dengan resolusi monitor. Untuk sementara waktu, mohon gunakan \emph{zoom out/in} pada \emph{browser} anda.
+\item {\textbf{Q:}} Pertanyaan saya tidak ada pada halaman ini, dimana kami bisa mengajukan pertanyaan?\\
+A: Silakan kontak kami di menu \textbf{\nameref{ContactUs}}.
+\end{itemize}
+
+\section{Ijahv1}
+Menu \emph{Ijahv1} berisi link menuju versi awal Ijah (Ijah versi 1, atau Ijahv1)
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.3]{ijah_v1.png}
-	\caption{Isi halaman menu IjahV1}
+	\caption{Isi halaman menu Ijahv1}
 	\label{fig:ijah_v1}
 \end{figure}
 
-Jika anda ingin mengakses IjahV1 silakan mengunjungi \href{http://ijah.apps.cs.ipb.ac.id/ijahv1/}{\textbf{http://ijah.apps.cs.ipb.ac.id/ijahv1/}}
+Jika anda ingin mengakses Ijahv1 silakan mengunjungi \href{http://ijah.apps.cs.ipb.ac.id/ijahv1/}{\textbf{http://ijah.apps.cs.ipb.ac.id/ijahv1/}}
 
 \section{Disclaimer}
 
@@ -106,14 +125,14 @@ Terjemahan dari isi halaman Disclaimer yaitu:
 \textit{``Ijah Webserver ini gratis, dengan harapan dapat membantu banyak pihak. Namun kami tidak menjamin akibat dari penggunaan informasi dari Webserver ini. Dan kami tidak bertanggungjawab atas insiden atau kerusakan baik langsung maupun tidak langsung yang diakibatkan oleh penggunaan data atau informasi yang kami sediakan di Webserver ini.''}
 
 
-\section{ContactUs} \label{Contact Us}
+\section{ContactUs} \label{ContactUs}
 
 Menu \emph{ContactUs} merupakan sarana komunikasi antara pengguna dengan tim pengembang Ijah Webserver. Dengan mengisikan tanggapan/keluhan/saran pada form Contact Us, tanggapan anda akan terkirim ke E-mail kami.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.3]{ijah_contact_page.png}
-	\caption{Halaman Contact Us pada Ijah Webserver:
+	\caption{Halaman ContactUs pada Ijah Webserver:
 	(1) \hyperref[subject]{Pemilihan Subject};
 	(2) \hyperref[message]{Message box};
 	(3) \hyperref[personal data]{Name box};
@@ -124,8 +143,8 @@ Menu \emph{ContactUs} merupakan sarana komunikasi antara pengguna dengan tim pen
 	\label{fig:ijah_contact_page}
 \end{figure}
 
-	\subsection{Subject} \label{subject}
-	Pada bagian \emph{Subject} anda akan memilih jenis tanggapan anda 
+	\subsection{Topik} \label{subject}
+	Pada bagian \emph{Subject} anda akan memilih topik tanggapan anda 
 	\begin{itemize}
 	\item \textbf{Question:} mengajukan pertanyaan.
 	\item \textbf{Error/Bugs:} memberitahukan adanya kesalahan.
@@ -136,16 +155,16 @@ Menu \emph{ContactUs} merupakan sarana komunikasi antara pengguna dengan tim pen
 	\item \textbf{Other:} untuk menyampaikan hal lain yang tidak termasuk dalam kategori diatas.
 	\end{itemize}
 
-	\subsection{Message} \label{message}
+	\subsection{Isi Pesan} \label{message}
 	Isikan pesan anda pada bagian \emph{Message}. Jumlah karakter tidak dibatasi, jadi mohon untuk tidak menggunakan singkatan jika tidak diperlukan demi memudahkan tim kami dalam membaca tanggapan anda. 
 
 
-	\subsection{Memasukkan Data Diri Anda} \label{personal data}
+	\subsection{Isi Data Diri Anda} \label{personal data}
 	Setelah menuliskan tanggapan, silakan isi data diri anda, nama pada bagian \emph{Name}, alamat E\-mail anda pada bagian \emph{E\-mail}, dan afiliasi anda (organisasi, universitas, atau perusahaan) pada bagian \emph{Affiliation}.
 
 	\textbf{Penting:} Nama dan alamat E-mail \emph{wajib} diisi. 
 
-	\subsection{Mengirim Tanggapan} \label{submit}
+	\subsection{Kirim Tanggapan} \label{submit}
 	Setelah semua data terisi lengkap, tekan \textbf{Submit} dan tanggapan anda akan terkirim.
 
 \section{AboutUs}
