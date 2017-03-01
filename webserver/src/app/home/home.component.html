@@ -73,7 +73,7 @@
                      (typeaheadOnSelect)="selectPlant($event, p.index)"
                      (typeaheadNoResults)="changeTypeaheadNoResults($event, 1)"
                      class="form-control verticalLine1"
-                     placeholder="Latin Name | Indonesian Name"
+                     placeholder="LatinName IndonesianName"
                      (focus)="focusPlant(p.index)">
                <div *ngIf="noResultPlant===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
@@ -104,7 +104,7 @@
                      (typeaheadOnSelect)="selectCompound($event, c.index)"
                      (typeaheadNoResults)="changeTypeaheadNoResults($event, 2)"
                      class="form-control verticalLine2"
-                     placeholder="CAS | Pubchem Name | IUPAC Name"
+                     placeholder="CAS PubchemName IUPACName"
                      (focus)="focusCompound(c.index)">
                <div *ngIf="noResultCompound===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
@@ -143,7 +143,7 @@
                      (typeaheadOnSelect)="selectProtein($event, p.index)"
                      (typeaheadNoResults)="changeTypeaheadNoResults($event, 3)"
                      class="form-control verticalLine3"
-                     placeholder="Uniprot ID | Uniprot Name"
+                     placeholder="UniprotID UniprotName"
                      (focus)="focusProtein(p.index)">
                <div *ngIf="noResultProtein===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
@@ -174,7 +174,7 @@
                      (typeaheadOnSelect)="selectDisease($event, d.index)"
                      (typeaheadNoResults)="changeTypeaheadNoResults($event, 4)"
                      class="form-control verticalLine4"
-                     placeholder="OMIM ID | OMIM Name"
+                     placeholder="OmimID OmimName"
                      (focus)="focusDisease(d.index)">
                <div *ngIf="noResultDisease===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
