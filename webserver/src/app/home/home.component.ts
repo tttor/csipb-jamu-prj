@@ -1216,7 +1216,7 @@ export class Home implements OnInit {
     let indent = '  ';
     let headerArr = new Array();
     headerArr['pla'] = 'LatinName|IndonesianName';
-    headerArr['com'] = 'CAS|DrugbankID|KnapsackID|KeggID';
+    headerArr['com'] = 'CAS|PubchemName|IUPACName';
     headerArr['pro'] = 'UniprotID|UniprotName|PDBId(s)';
     headerArr['dis'] = 'OmimID|OmimName';
 
