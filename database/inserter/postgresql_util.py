@@ -3,7 +3,9 @@ import sys
 import psycopg2
 
 def quote(s):
-    return "'"+s+"'"
+    s = s.replace("'","''") # escape any single quote
+    s = "'"+s+"'"
+    return s
 
 def getMax(csr,col,table):
     csr.execute("SELECT MAX("+col+") FROM "+table)
