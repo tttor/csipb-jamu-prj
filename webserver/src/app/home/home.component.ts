@@ -766,12 +766,25 @@ export class Home implements OnInit {
       return 'No Metadata';
     }
 
+    let indent = '   ';
+    let txt = '';
     let keys = this.getPropKeys(type,true);
-    let txt = '0) '+this.getConnHeader(type,'   ')+'\n';
     for (let i=0; i<idList.length;i++) {
-      txt += (i+1).toString()+') ';
       let props = this.getProps(idList[i],keys,meta);
-      txt += this.concatProps(props,keys,true,true)
+
+      txt += (i+1).toString()+') ';
+      for (let j=0;j<props.length;j++) {
+        let key = keys[j];
+        let prop = props[j];
+        if (prop) {
+          prop = this.getHyperlinkStr(key,prop);
+          key = key.substring(4);
+          if (j>0) {
+            txt += indent;
+          }
+          txt += key+': '+prop+'\n';
+        }
+      }
       txt += '\n';
     }
     return txt;
