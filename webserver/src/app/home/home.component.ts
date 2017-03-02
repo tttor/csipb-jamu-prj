@@ -785,7 +785,6 @@ export class Home implements OnInit {
           txt += key+': '+prop+'\n';
         }
       }
-      txt += '\n';
     }
     return txt;
   }
