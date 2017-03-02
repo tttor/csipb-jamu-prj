@@ -767,9 +767,9 @@ export class Home implements OnInit {
     }
 
     let keys = this.getConnPropKeys(type);
-    let txt = '#0 '+this.getConnHeader(type)+'\n';
+    let txt = '0) '+this.getConnHeader(type,'   ')+'\n';
     for (let i=0; i<idList.length;i++) {
-      txt += '#'+(i+1).toString()+' ';
+      txt += (i+1).toString()+') ';
       let props = this.getProps(idList[i],keys,meta);
       txt += this.concatProps(props,keys,true,true)
       txt += '\n';
@@ -784,10 +784,10 @@ export class Home implements OnInit {
 
     let conn = this.groupBy(srcType,destType,interaction);
 
-    let text = this.getConnHeader(srcType+'_vs_'+destType)+'\n';
+    let indent = '   ';
+    let text = this.getConnHeader(srcType+'_vs_'+destType,indent)+'\n';
     let srcPropKeys = this.getConnPropKeys(srcType);
     let destPropKeys = this.getConnPropKeys(destType);
-    let indent = '  ';
 
     let nUnique = 0;
     let nUniquePerConnSrc = 0;
@@ -809,7 +809,7 @@ export class Home implements OnInit {
 
         if (prevSrc!==src) {
           nUnique = nUnique + 1;
-          text = text+'#'+nUnique.toString()+' ';
+          text = text+nUnique.toString()+') ';
 
           let srcProps = this.getProps(src,srcPropKeys,srcMeta);
           text += this.concatProps(srcProps,srcPropKeys,true,true)
@@ -1213,33 +1213,32 @@ export class Home implements OnInit {
     return props;
   }
 
-  private getConnHeader(type) {
-    let indent = '  ';
+  private getConnHeader(type,indent) {
     let headerArr = new Array();
     headerArr['pla'] = 'LatinName|IndonesianName';
     headerArr['com'] = 'CAS|PubchemName|IUPACName';
     headerArr['pro'] = 'UniprotID|UniprotName|PDBId(s)';
     headerArr['dis'] = 'OmimID|OmimName';
 
-    headerArr['pla_vs_com'] ='#0 '+headerArr['pla']+':\n'+
+    headerArr['pla_vs_com'] ='0) '+headerArr['pla']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['com'];
-    headerArr['com_vs_pro'] = '#0 '+headerArr['com']+':\n'+
+                              indent+indent+'[weight] '+headerArr['com'];
+    headerArr['com_vs_pro'] = '0) '+headerArr['com']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['pro'];
-    headerArr['pro_vs_dis'] = '#0 '+headerArr['pro']+':\n'+
+                              indent+indent+'[weight] '+headerArr['pro'];
+    headerArr['pro_vs_dis'] = '0) '+headerArr['pro']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['dis'];
+                              indent+indent+'[weight] '+headerArr['dis'];
 
-    headerArr['com_vs_pla'] = '#0 '+headerArr['com']+':\n'+
+    headerArr['com_vs_pla'] = '0) '+headerArr['com']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['pla'];
-    headerArr['pro_vs_com'] = '#0 '+headerArr['pro']+':\n'+
+                              indent+indent+'[weight] '+headerArr['pla'];
+    headerArr['pro_vs_com'] = '0) '+headerArr['pro']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['com'];
-    headerArr['dis_vs_pro'] = '#0 '+headerArr['dis']+':\n'+
+                              indent+indent+'[weight] '+headerArr['com'];
+    headerArr['dis_vs_pro'] = '0) '+headerArr['dis']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['pro'];
+                              indent+indent+'[weight] '+headerArr['pro'];
 
     return headerArr[type];
   }
