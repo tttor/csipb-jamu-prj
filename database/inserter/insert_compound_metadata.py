@@ -27,7 +27,10 @@ def main():
 def insertPubchemProps(csr,dirpath):
     ##
     cas2prop = {}
+    idx = 0
     for fname in os.listdir(dirpath):
+        idx += 1
+        print 'opening prop file i= '+str(idx)
         cas = fname.split('_')[1]
         if fname.endswith(".json"):
             fpath = os.path.join(dirpath,fname)
@@ -43,12 +46,25 @@ def insertPubchemProps(csr,dirpath):
         idx += 1
         print 'updating prop on cas= '+cas+' => '+str(idx)+'/'+str(n)
 
+        valList = []
+        if 'CID' in prop:
+            s = 'com_pubchem_id='+quote(str(prop['CID']))
+            valList.append(s)
+        if 'InChIKey' in prop:
+            s = 'com_inchikey='+quote(prop['InChIKey'])
+            valList.append(s)
+        if 'IUPACName' in prop:
+            s = 'com_iupac_name='+quote(prop['IUPACName'])
+            valList.append(s)
+        if 'IsomericSMILES' in prop:
+            s = 'com_smiles_isomeric='+quote(prop['IsomericSMILES'])
+            valList.append(s)
+        if 'CanonicalSMILES' in prop:
+            s = 'com_smiles_canonical='+quote(prop['CanonicalSMILES'])
+            valList.append(s)
+
         qf = 'UPDATE compound SET '
-        qm  = 'com_pubchem_id='+quote(str(prop['CID']))+','
-        qm += 'com_inchikey='+quote(prop['InChIKey'])+','
-        qm += 'com_iupac_name='+quote(prop['IUPACName'])+','
-        qm += 'com_smiles_isomeric='+quote(prop['IsomericSMILES'])+','
-        qm += 'com_smiles_canonical='+quote(prop['CanonicalSMILES'])
+        qm  = ','.join(valList)
         qr = ' WHERE com_cas_id='+quote(cas)
         q = qf+qm+qr
         csr.execute(q)
@@ -81,9 +97,6 @@ def insertPubchemSynonyms(csr,dirpath):
     for cas,syn in cas2syn.iteritems():
         idx += 1
         print 'updating syn on cas= '+cas+' => '+str(idx)+'/'+str(n)
-
-        ## escape any single quote
-        syn = syn.replace("'","''")
 
         ##
         qf = 'UPDATE compound SET '

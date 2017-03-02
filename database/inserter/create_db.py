@@ -26,12 +26,13 @@ def main(argv):
                 com_drugbank_id varchar(128) UNIQUE,
                 com_knapsack_id varchar(128) UNIQUE,
                 com_kegg_id varchar(128) UNIQUE,
-                com_pubchem_id varchar(128) UNIQUE,
                 com_cas_id varchar(128) UNIQUE,
-                com_inchikey varchar(1024) UNIQUE,
-                com_iupac_name varchar(16384) UNIQUE,
-                com_smiles_canonical varchar(32768) UNIQUE,
-                com_smiles_isomeric varchar(32768) UNIQUE,
+                com_pubchem_name varchar(512),
+                com_iupac_name varchar(16384),
+                com_inchikey varchar(2048),
+                com_pubchem_id varchar(128),
+                com_smiles_canonical varchar(32768),
+                com_smiles_isomeric varchar(32768),
                 com_pubchem_synonym text,
                 com_similarity_simcomp text
                 );

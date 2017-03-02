@@ -33,6 +33,13 @@ ALTER SEQUENCE user_msg_id_seq RESTART WITH 1;
 ALTER TABLE compound DROP COLUMN com_simcomp;
 ALTER TABLE plant ADD COLUMN pla_idr_name varchar(256);
 ALTER TABLE protein ADD COLUMN pro_pdb_id text;
+ALTER TABLE compound ADD COLUMN com_iupac_name varchar(16384);
+ALTER TABLE compound ADD COLUMN com_pubchem_name varchar(512);
+ALTER TABLE compound ADD COLUMN com_smiles_canonical varchar(32768);
+ALTER TABLE compound ADD COLUMN com_smiles_isomeric varchar(32768);
+ALTER TABLE compound ADD COLUMN com_pubchem_synonym text;
+ALTER TABLE compound ADD COLUMN com_pubchem_id varchar(128);
+ALTER TABLE compound ADD COLUMN com_inchikey varchar(2048)
 
 SELECT COUNT(DISTINCT (c.com_id)) from compound as c ,plant_vs_compound as pc where c.com_id=pc.com_id;
 
