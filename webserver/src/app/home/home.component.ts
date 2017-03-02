@@ -16,8 +16,8 @@ declare var saveAs: any;
 })
 export class Home implements OnInit {
   // API URL addresses
-  baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  // baseAPI ='http://localhost/ijah-api/';
+  // baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+  baseAPI ='http://localhost/ijah-api/';
 
   interactionQueryAPI;
   metaQueryAPI;
@@ -228,14 +228,11 @@ export class Home implements OnInit {
           if (data[i]['com_cas_id']) {
             valid.push(data[i]['com_cas_id']);
           }
-          if (data[i]['com_drugbank_id']) {
-            valid.push(data[i]['com_drugbank_id']);
+          if (data[i]['com_pubchem_name']) {
+            valid.push(data[i]['com_pubchem_name']);
           }
-          if (data[i]['com_knapsack_id']) {
-            valid.push(data[i]['com_knapsack_id']);
-          }
-          if (data[i]['com_kegg_id']) {
-            valid.push(data[i]['com_kegg_id']);
+          if (data[i]['com_iupac_name']) {
+            valid.push(data[i]['com_iupac_name']);
           }
 
           let str = '';
