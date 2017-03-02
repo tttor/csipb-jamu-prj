@@ -71,10 +71,14 @@ def insertPubchemProps(csr,dirpath):
 
 def insertPubchemSynonyms(csr,dirpath):
     ##
-    sep = '~'
+    sep = '~$~'
     cas2syn = {}
     cas2name = {}
+    idx = 0
     for fname in os.listdir(dirpath):
+        idx += 1
+        print 'opening i= '+str(idx)+' => '+fname
+
         cas = fname.split('_')[1]
         if fname.endswith(".json"):
             fpath = os.path.join(dirpath,fname)
