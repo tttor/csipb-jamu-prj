@@ -82,14 +82,14 @@ Setelah proses selesai, maka luaran \emph{(output)} yang dihasilkan sudah dapat 
 	\end{figure}
 	
 	Output Summary adalah ringkasan dari proses output, yang meliputi:
-	\begin{itemize}
+	\begin{enumerate}
 	\item \textbf{Minimum Connectivity Weight to Process} -- nilai minimum skor yang diproses, dapat diubah melalui filter yang akan dijelaskan di bagian \hyperref[nav]{Filter pada Navigasi}.
 	\item \textbf{Connectivity Score} -- jumlah total dari nilai seluruh konektivitas (1 artinya 100\% terhubung, 0 tidak terhubung, di antara 1 dan 0 berarti hasil prediksi yang nilainya belum 100\%, seluruh keterhubungan dijumlah untuk mendapat nilai total).
 	\item \textbf{Number of Unique Items} -- jumlah entitas unik (tidak termasuk pengulangan) yang terlibat dalam proses.
 	\item \textbf{Compound-Protein Connectivity} -- jumlah konektivitas senyawa dan protein. \textbf{Known by experiment} artinya data sudah valid 100\%, berasal dari pangkalan data, sedangkan \textbf{Known by prediction} berarti konektivitas hasil prediksi algoritme, \textbf{Unknown} artinya konektivitas yang tidak diketahui baik dari pangkalan data maupun hasil prediksi algoritme.
 	\item \textbf{Mode} -- mode proses, apakah Search saja atau Search and Predict.
 	\item \textbf{Elapsed Time} -- waktu yang dihabiskan untuk menyelesaikan proses.
-	\end{itemize}
+	\end{enumerate}
 	
 	\subsection{Connectivity Graph} \label{graph}
 	Connectivity Graph merupakan model output yang berupa \emph{multi-partite graph}, yaitu graf yang verteksnya terbagi menjadi beberapa partisi.
