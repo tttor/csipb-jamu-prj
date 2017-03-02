@@ -7,18 +7,20 @@ from postgresql_util import quote
 
 def main():
     ##
+    print 'Connecting to DB ...'
+    print dcfg
     conn = psycopg2.connect(database=dcfg['name'],
                             user=dcfg['user'],password=dcfg['passwd'],
                             host=dcfg['host'],port=dcfg['port'])
     csr = conn.cursor()
 
     ##
-    # dirpath = '../../dataset/metadata/compound/pubchem/pubchem_prop_20170301-1545'
-    # insertPubchemProps(csr,dirpath)
+    dirpath = '../../dataset/metadata/compound/pubchem/pubchem_prop_20170301-1545'
+    insertPubchemProps(csr,dirpath)
 
     ##
-    dirpath = '../../dataset/metadata/compound/pubchem/pubchem_synonyms_20170301-1545'
-    insertPubchemSynonyms(csr,dirpath)
+    # dirpath = '../../dataset/metadata/compound/pubchem/pubchem_synonyms_20170301-1545'
+    # insertPubchemSynonyms(csr,dirpath)
 
     ##
     conn.commit()
@@ -30,7 +32,7 @@ def insertPubchemProps(csr,dirpath):
     idx = 0
     for fname in os.listdir(dirpath):
         idx += 1
-        print 'opening prop file i= '+str(idx)
+        print 'opening i= '+str(idx)+' => '+fname
         cas = fname.split('_')[1]
         if fname.endswith(".json"):
             fpath = os.path.join(dirpath,fname)
