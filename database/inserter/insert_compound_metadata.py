@@ -33,7 +33,7 @@ def insertPubchemProps(csr,dirpath):
             fpath = os.path.join(dirpath,fname)
             with open(fpath,'r') as f:
                 prop = yaml.load(f)
-                prop = prop['PropertyTable']['Properties'][0]
+                prop = prop['PropertyTable']['Properties'][0] # take only the first!
                 cas2prop[cas] = prop
 
     ##
