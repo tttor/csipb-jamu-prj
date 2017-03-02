@@ -16,8 +16,8 @@ declare var saveAs: any;
 })
 export class Home implements OnInit {
   // API URL addresses
-  baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  // baseAPI ='http://localhost/ijah-api/';
+  // baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+  baseAPI ='http://localhost/ijah-api/';
 
   interactionQueryAPI;
   metaQueryAPI;
@@ -228,14 +228,11 @@ export class Home implements OnInit {
           if (data[i]['com_cas_id']) {
             valid.push(data[i]['com_cas_id']);
           }
-          if (data[i]['com_drugbank_id']) {
-            valid.push(data[i]['com_drugbank_id']);
+          if (data[i]['com_pubchem_name']) {
+            valid.push(data[i]['com_pubchem_name']);
           }
-          if (data[i]['com_knapsack_id']) {
-            valid.push(data[i]['com_knapsack_id']);
-          }
-          if (data[i]['com_kegg_id']) {
-            valid.push(data[i]['com_kegg_id']);
+          if (data[i]['com_iupac_name']) {
+            valid.push(data[i]['com_iupac_name']);
           }
 
           let str = '';
@@ -769,10 +766,10 @@ export class Home implements OnInit {
       return 'No Metadata';
     }
 
-    let keys = this.getPropKeys(type);
-    let txt = '#0 '+this.getHeader(type)+'\n';
+    let keys = this.getConnPropKeys(type);
+    let txt = '0) '+this.getConnHeader(type,'   ')+'\n';
     for (let i=0; i<idList.length;i++) {
-      txt += '#'+(i+1).toString()+' ';
+      txt += (i+1).toString()+') ';
       let props = this.getProps(idList[i],keys,meta);
       txt += this.concatProps(props,keys,true,true)
       txt += '\n';
@@ -787,10 +784,10 @@ export class Home implements OnInit {
 
     let conn = this.groupBy(srcType,destType,interaction);
 
-    let text = this.getHeader(srcType+'_vs_'+destType)+'\n';
-    let srcPropKeys = this.getPropKeys(srcType);
-    let destPropKeys = this.getPropKeys(destType);
-    let indent = '  ';
+    let indent = '   ';
+    let text = this.getConnHeader(srcType+'_vs_'+destType,indent)+'\n';
+    let srcPropKeys = this.getConnPropKeys(srcType);
+    let destPropKeys = this.getConnPropKeys(destType);
 
     let nUnique = 0;
     let nUniquePerConnSrc = 0;
@@ -812,7 +809,7 @@ export class Home implements OnInit {
 
         if (prevSrc!==src) {
           nUnique = nUnique + 1;
-          text = text+'#'+nUnique.toString()+' ';
+          text = text+nUnique.toString()+') ';
 
           let srcProps = this.getProps(src,srcPropKeys,srcMeta);
           text += this.concatProps(srcProps,srcPropKeys,true,true)
@@ -848,8 +845,8 @@ export class Home implements OnInit {
   }
 
   makeGraphDataOutput(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
-    let srcPropKeys = this.getPropKeys(srcType);
-    let destPropKeys = this.getPropKeys(destType);
+    let srcPropKeys = this.getConnPropKeys(srcType);
+    let destPropKeys = this.getConnPropKeys(destType);
     let data = [];
 
     let srcHasDestArr = [];
@@ -1117,7 +1114,7 @@ export class Home implements OnInit {
     return set;
   }
 
-  private getPropKeys(type) {
+  private getConnPropKeys(type) {
     let keys: string[] = [];
     if (type==='pla') {
       keys.push('pla_name');
@@ -1125,13 +1122,11 @@ export class Home implements OnInit {
     }
     if (type==='com') {
       keys.push('com_cas_id');
-      keys.push('com_drugbank_id');
-      keys.push('com_kegg_id');
-      keys.push('com_knapsack_id');
+      keys.push('com_pubchem_name');
+      keys.push('com_iupac_name');
     }
     if (type==='pro') {
       keys.push('pro_uniprot_id');
-      // keys.push('pro_uniprot_abbrv');
       keys.push('pro_name');
       keys.push('pro_pdb_id');
     }
@@ -1155,6 +1150,9 @@ export class Home implements OnInit {
     }
     else if (type==='com_kegg_id') {
       baseUrl = 'http://www.genome.jp/dbget-bin/www_bget?cpd:';
+    }
+    else if (type==='com_pubchem_name') {
+      baseUrl = 'https://pubchem.ncbi.nlm.nih.gov/compound/'
     }
     else if (type==='pro_uniprot_id') {
       baseUrl = 'http://www.uniprot.org/uniprot/';
@@ -1215,33 +1213,32 @@ export class Home implements OnInit {
     return props;
   }
 
-  private getHeader(type) {
-    let indent = '  ';
+  private getConnHeader(type,indent) {
     let headerArr = new Array();
     headerArr['pla'] = 'LatinName|IndonesianName';
-    headerArr['com'] = 'CAS|DrugbankID|KnapsackID|KeggID';
+    headerArr['com'] = 'CAS|PubchemName|IUPACName';
     headerArr['pro'] = 'UniprotID|UniprotName|PDBId(s)';
     headerArr['dis'] = 'OmimID|OmimName';
 
-    headerArr['pla_vs_com'] ='#0 '+headerArr['pla']+':\n'+
+    headerArr['pla_vs_com'] ='0) '+headerArr['pla']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['com'];
-    headerArr['com_vs_pro'] = '#0 '+headerArr['com']+':\n'+
+                              indent+indent+'[weight] '+headerArr['com'];
+    headerArr['com_vs_pro'] = '0) '+headerArr['com']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['pro'];
-    headerArr['pro_vs_dis'] = '#0 '+headerArr['pro']+':\n'+
+                              indent+indent+'[weight] '+headerArr['pro'];
+    headerArr['pro_vs_dis'] = '0) '+headerArr['pro']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['dis'];
+                              indent+indent+'[weight] '+headerArr['dis'];
 
-    headerArr['com_vs_pla'] = '#0 '+headerArr['com']+':\n'+
+    headerArr['com_vs_pla'] = '0) '+headerArr['com']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['pla'];
-    headerArr['pro_vs_com'] = '#0 '+headerArr['pro']+':\n'+
+                              indent+indent+'[weight] '+headerArr['pla'];
+    headerArr['pro_vs_com'] = '0) '+headerArr['pro']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['com'];
-    headerArr['dis_vs_pro'] = '#0 '+headerArr['dis']+':\n'+
+                              indent+indent+'[weight] '+headerArr['com'];
+    headerArr['dis_vs_pro'] = '0) '+headerArr['dis']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['pro'];
+                              indent+indent+'[weight] '+headerArr['pro'];
 
     return headerArr[type];
   }

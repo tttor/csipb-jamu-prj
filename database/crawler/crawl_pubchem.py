@@ -28,6 +28,8 @@ def getCompoundProp(casList,outdir):
     props = 'InChIKey,IUPACName,InChI,CanonicalSMILES,IsomericSMILES'
 
     logs = []
+    logFpath = outdir+'pubchem_prop_crawling.log'
+
     for i,cas in enumerate(casList):
         print 'crawling pubchem property: cas= '+cas+' => '+str(i+1)+'/'+str(len(casList))
 
@@ -59,12 +61,12 @@ def getCompoundProp(casList,outdir):
             with open(fpath,'w') as f:
                 f.write(str(txt))
 
+        if (i%100==0) or (i==len(casList)-1):
+            with open(logFpath,'w') as f:
+                for l in logs: f.write(l+'\n')
+
         # to not make more than 5 requests per second
         sleep(0.3)
-
-    logFpath = outdir+'pubchem_prop_crawling.log'
-    with open(logFpath,'w') as f:
-        for l in logs: f.write(l)
 
 def getCompoundSynonyms(casList,outdir):
     # https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/50-78-2/synonyms/JSON
@@ -107,7 +109,7 @@ def getCompoundSynonyms(casList,outdir):
 
         if (i%100==0) or (i==len(casList)-1):
             with open(logFpath,'w') as f:
-                for l in logs: f.write(l)
+                for l in logs: f.write(l+'\n')
 
         # to not make more than 5 requests per second
         sleep(0.3)

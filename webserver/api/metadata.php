@@ -26,7 +26,7 @@ if ($reqListLen>0) {
         $id = 'com_id';
         $table = 'compound';
         $col = 'com_id,com_cas_id,com_drugbank_id,com_knapsack_id,com_kegg_id,
-                com_pubchem_id,com_inchikey,com_smiles';
+                com_pubchem_id,com_inchikey,com_smiles,com_pubchem_name,com_iupac_name';
       }
       elseif (strpos($val, 'PRO') !== false) {
         $id = 'pro_id';
