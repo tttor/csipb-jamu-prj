@@ -133,7 +133,7 @@
           <div *ngIf="proteinSearch.length>0">
             <div *ngFor="let p of proInputHolders">
               <template #customProtein let-model="item" let-index="index">
-                <h5>{{model.pro_uniprot_id}} | {{model.pro_name}}</h5>
+                <h5>{{model.pro_uniprot_id}} <span *ngIf="model.pro_uniprot_abbrv">|</span> {{model.pro_uniprot_abbrv}} <span *ngIf="model.pro_name">|</span> {{model.pro_name}}</h5>
               </template>
               <input [(ngModel)]="p.value"
                      [typeahead]="proteinSearch"
@@ -143,7 +143,7 @@
                      (typeaheadOnSelect)="selectProtein($event, p.index)"
                      (typeaheadNoResults)="changeTypeaheadNoResults($event, 3)"
                      class="form-control verticalLine3"
-                     placeholder="UniprotID UniprotName"
+                     placeholder="UniprotID UniprotAbbrv UniprotName"
                      (focus)="focusProtein(p.index)">
                <div *ngIf="noResultProtein===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>

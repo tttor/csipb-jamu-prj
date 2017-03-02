@@ -202,7 +202,7 @@ export class Home implements OnInit {
     this.http.post(this.metaQueryAPI,proPostMsgJSON).map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
-          let temp = data[i]['pro_uniprot_id']+' | '+data[i]['pro_name'];
+          let temp = data[i]['pro_uniprot_id']+' | '+data[i]['pro_uniprot_abbrv']+' | '+data[i]['pro_name'];
           data[i]['search'] = temp;
         }
         this.proteinSearch = data;
@@ -1127,6 +1127,7 @@ export class Home implements OnInit {
     }
     if (type==='pro') {
       keys.push('pro_uniprot_id');
+      keys.push('pro_uniprot_abbrv');
       keys.push('pro_name');
       keys.push('pro_pdb_id');
     }
