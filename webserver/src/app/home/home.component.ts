@@ -1173,7 +1173,7 @@ export class Home implements OnInit {
     else if (type==='com_pubchem_name' || type==='com_pubchem_id') {
       baseUrl = 'https://pubchem.ncbi.nlm.nih.gov/compound/'
     }
-    else if (type==='pro_uniprot_id') {
+    else if (type==='pro_uniprot_id' || type==='pro_uniprot_abbrv') {
       baseUrl = 'http://www.uniprot.org/uniprot/';
     }
     else if (type==='pro_pdb_id') {
