@@ -766,7 +766,7 @@ export class Home implements OnInit {
       return 'No Metadata';
     }
 
-    let keys = this.getConnPropKeys(type);
+    let keys = this.getPropKeys(type,true);
     let txt = '0) '+this.getConnHeader(type,'   ')+'\n';
     for (let i=0; i<idList.length;i++) {
       txt += (i+1).toString()+') ';
@@ -786,8 +786,8 @@ export class Home implements OnInit {
 
     let indent = '   ';
     let text = this.getConnHeader(srcType+'_vs_'+destType,indent)+'\n';
-    let srcPropKeys = this.getConnPropKeys(srcType);
-    let destPropKeys = this.getConnPropKeys(destType);
+    let srcPropKeys = this.getPropKeys(srcType,false);
+    let destPropKeys = this.getPropKeys(destType,false);
 
     let nUnique = 0;
     let nUniquePerConnSrc = 0;
@@ -845,8 +845,8 @@ export class Home implements OnInit {
   }
 
   makeGraphDataOutput(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
-    let srcPropKeys = this.getConnPropKeys(srcType);
-    let destPropKeys = this.getConnPropKeys(destType);
+    let srcPropKeys = this.getPropKeys(srcType,false);
+    let destPropKeys = this.getPropKeys(destType,false);
     let data = [];
 
     let srcHasDestArr = [];
@@ -1114,7 +1114,7 @@ export class Home implements OnInit {
     return set;
   }
 
-  private getConnPropKeys(type) {
+  private getPropKeys(type,extra) {
     let keys: string[] = [];
     if (type==='pla') {
       keys.push('pla_name');
@@ -1124,6 +1124,12 @@ export class Home implements OnInit {
       keys.push('com_cas_id');
       keys.push('com_pubchem_name');
       keys.push('com_iupac_name');
+      if (extra) {
+        keys.push('com_drugbank_id');
+        keys.push('com_knapsack_id');
+        keys.push('com_kegg_id');
+        keys.push('com_pubchem_id');
+      }
     }
     if (type==='pro') {
       keys.push('pro_uniprot_id');
