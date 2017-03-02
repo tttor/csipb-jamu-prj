@@ -16,8 +16,8 @@ declare var saveAs: any;
 })
 export class Home implements OnInit {
   // API URL addresses
-  // baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  baseAPI ='http://localhost/ijah-api/';
+  baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+  // baseAPI ='http://localhost/ijah-api/';
 
   interactionQueryAPI;
   metaQueryAPI;
