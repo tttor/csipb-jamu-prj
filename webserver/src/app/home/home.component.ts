@@ -1151,6 +1151,9 @@ export class Home implements OnInit {
     else if (type==='com_kegg_id') {
       baseUrl = 'http://www.genome.jp/dbget-bin/www_bget?cpd:';
     }
+    else if (type==='com_pubchem_name') {
+      baseUrl = 'https://pubchem.ncbi.nlm.nih.gov/compound/'
+    }
     else if (type==='pro_uniprot_id') {
       baseUrl = 'http://www.uniprot.org/uniprot/';
     }
