@@ -766,8 +766,8 @@ export class Home implements OnInit {
       return 'No Metadata';
     }
 
-    let keys = this.getPropKeys(type);
-    let txt = '#0 '+this.getHeader(type)+'\n';
+    let keys = this.getConnPropKeys(type);
+    let txt = '#0 '+this.getConnHeader(type)+'\n';
     for (let i=0; i<idList.length;i++) {
       txt += '#'+(i+1).toString()+' ';
       let props = this.getProps(idList[i],keys,meta);
@@ -784,9 +784,9 @@ export class Home implements OnInit {
 
     let conn = this.groupBy(srcType,destType,interaction);
 
-    let text = this.getHeader(srcType+'_vs_'+destType)+'\n';
-    let srcPropKeys = this.getPropKeys(srcType);
-    let destPropKeys = this.getPropKeys(destType);
+    let text = this.getConnHeader(srcType+'_vs_'+destType)+'\n';
+    let srcPropKeys = this.getConnPropKeys(srcType);
+    let destPropKeys = this.getConnPropKeys(destType);
     let indent = '  ';
 
     let nUnique = 0;
@@ -845,8 +845,8 @@ export class Home implements OnInit {
   }
 
   makeGraphDataOutput(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
-    let srcPropKeys = this.getPropKeys(srcType);
-    let destPropKeys = this.getPropKeys(destType);
+    let srcPropKeys = this.getConnPropKeys(srcType);
+    let destPropKeys = this.getConnPropKeys(destType);
     let data = [];
 
     let srcHasDestArr = [];
@@ -1114,7 +1114,7 @@ export class Home implements OnInit {
     return set;
   }
 
-  private getPropKeys(type) {
+  private getConnPropKeys(type) {
     let keys: string[] = [];
     if (type==='pla') {
       keys.push('pla_name');
@@ -1122,13 +1122,11 @@ export class Home implements OnInit {
     }
     if (type==='com') {
       keys.push('com_cas_id');
-      keys.push('com_drugbank_id');
-      keys.push('com_kegg_id');
-      keys.push('com_knapsack_id');
+      keys.push('com_pubchem_name');
+      keys.push('com_iupac_name');
     }
     if (type==='pro') {
       keys.push('pro_uniprot_id');
-      // keys.push('pro_uniprot_abbrv');
       keys.push('pro_name');
       keys.push('pro_pdb_id');
     }
@@ -1212,7 +1210,7 @@ export class Home implements OnInit {
     return props;
   }
 
-  private getHeader(type) {
+  private getConnHeader(type) {
     let indent = '  ';
     let headerArr = new Array();
     headerArr['pla'] = 'LatinName|IndonesianName';
