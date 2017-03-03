@@ -72,7 +72,8 @@ def main(argv):
 
         # test
         gamma = 1.0
-        yPred = kronrls.predict(xTest,gamma)
+        threshold = 0.5
+        yPred = kronrls.predict(xTest,gamma,threshold)
 
         yTestList += yTest
         yPredList += yPred

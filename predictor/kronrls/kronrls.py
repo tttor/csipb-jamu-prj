@@ -26,7 +26,7 @@ class KronRLS:
         self._trComKernelMat = self._makeKernelMat(self._trComList,self._trComList)
         self._trProKernelMat = self._makeKernelMat(self._trProList,self._trProList)
 
-    def predict(self,xTest,gamma):
+    def predict(self,xTest,gamma,threshold):
         ##
         connMat = self._trConnMat
         xIdxTest = []
@@ -47,7 +47,7 @@ class KronRLS:
         yPred = []
         for cIdx,pIdx in xIdxTest:
             y = connMatPred[cIdx][pIdx]
-            y = int(y>=0.5)
+            y = int(y>=threshold)
             yPred.append(y)
 
         return yPred
