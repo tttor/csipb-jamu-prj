@@ -34,10 +34,10 @@
             * Mei (2012)
             * Mei (2013)
     * Kernel-based
-        * Kronecker regularized least squares approach (KronRLS)
-            * Laarhoven (2011): GIP+KronRLS
-            * Laarhoven (2013): WNN-GIP (for handling new drugs/new targets
-            * Nascimento (2016): KronRLS+Multiple Kernel Learning
+        * Kronecker regularized least squares (KronRLS)
+            * Laarhoven (2011): KronRLS+GIP (_not_ handle new drugs/targets)
+            * Laarhoven (2013): KronRLS+WNNGIP (for handling new drugs/targets)
+            * Nascimento (2016): KronRLS+MKL (Multiple Kernel Learning)
         * Enhanced similarity measures and super-target clustering
             * Shi (2015)
         * Collaborative Matrix Factorization with Multiple Similarities (MSCMF)
