@@ -33,7 +33,7 @@ class KronRLS:
         for c,p in xTest:
             cIdx = self._trComList.index(c)
             pIdx = self._trProList.index(p)
-            connMat[cIdx][pIdx] = 0
+            connMat[cIdx][pIdx] = 0 # yes, setting to zero for test samples
             xIdxTest.append((cIdx,pIdx))
 
         ##
