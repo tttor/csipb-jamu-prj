@@ -11,25 +11,26 @@ sys.path.append('../kronrls')
 from kronrls import KronRLS
 
 class PredictorThread(threading.Thread):
-    def __init__ (self,iid,iname,imethod,imaxtime,ibatchlen):
+    def __init__ (self,iid,iname,imaxtime,ipredictorParams):
         threading.Thread.__init__(self)
         self.id = iid
         self.name = iname
-        self.method = imethod
         self.maxTime = imaxtime
+        self.predictorParams = ipredictorParams
 
         self.predictionList = []
         self.queryList = []
         self.predictionNumber = -1
-        self.batchLength = ibatchlen
 
         self.predictor = None
-        if self.method=='rndly':
+        self.batchSize = ipredictorParams['batchSize']
+        predictorMethod = ipredictorParams['name']
+        if predictorMethod=='rndly':
             self.predictor = RNDLy()
-        elif self.method=='blmnii':
+        elif predictorMethod=='blmnii':
             self.predictor = BLMNII()
-        elif self.method=='kronrls':
-            self.predictor = KronRLS()
+        elif predictorMethod=='kronrls':
+            self.predictor = KronRLS(ipredictorParams)
         else:
             assert False, 'FATAL: Unknown prediction method!'
 
@@ -47,17 +48,21 @@ class PredictorThread(threading.Thread):
             del self.predictionList[:]
 
             ##
-            queryBatch = [self.queryList[i:i+self.batchLength]
-                          for i in range(0,nQuery,self.batchLength)]
+            queryBatch = [self.queryList[i:i+self.batchSize]
+                          for i in range(0,nQuery,self.batchSize)]
 
             ##
             for i,queries in enumerate(queryBatch):
                 elapsedTime += time.time()-startTime
-                predictions = [float('NaN')]*self.batchLength # invalid prediction result
 
+                # init with invalid prediction result, i.e. NaN values
+                predictions = [float('NaN')]*self.batchSize
+
+                # check time limit
                 if  elapsedTime <= self.maxTime:
                     predictions = self.predictor.predict(queries)
 
+                # merge
                 self.predictionList += predictions
 
             ##
@@ -69,5 +74,6 @@ class PredictorThread(threading.Thread):
 
     def setQueryList(self,iqueryList):
         self.queryList = iqueryList[:]
+
     def getPredictionNumber(self):
         return self.predictionNumber

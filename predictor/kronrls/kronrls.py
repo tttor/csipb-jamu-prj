@@ -6,31 +6,27 @@ from scipy import sparse
 from collections import defaultdict
 
 class KronRLS:
-    # these vars hold _all_ available training data
-    _trComList = None
-    _trProList = None
-    _trConnMat = None
-    _kernelDict = None
-
-    def __init__(self,iTrConnMat=None,iTrComList=None,iTrProList=None,iKernelDict=None):
+    def __init__(self,iparam,
+                 iTrConnMat=None,iTrComList=None,iTrProList=None,iKernelDict=None):
+        self._param = iparam
         self._trConnMat = iTrConnMat
         self._trComList = iTrComList
         self._trProList = iTrProList
         self._kernelDict = iKernelDict
 
-    def predict(self,xTest,gamma,threshold):
+    def predict(self,xTest):
         ## train
         model = self._train(xTest)
         connMat,comKernelMat,proKernelMat,xIdxTest = model
 
         ## make prediction
-        connMatPred = self._predict(comKernelMat,proKernelMat,connMat,gamma)
+        connMatPred = self._predict(comKernelMat,proKernelMat,connMat,self._param['gamma'])
 
         ##
         yPred = []
         for cIdx,pIdx in xIdxTest:
             y = connMatPred[cIdx][pIdx]
-            y = int(y>=threshold)
+            y = int(y>=self._param['threshold'])
             yPred.append(y)
 
         return yPred
@@ -73,7 +69,7 @@ class KronRLS:
 
         return model
 
-    def _predict(self,k1,k2,y,gamma=1.0):
+    def _predict(self,k1,k2,y,gamma):
         la,Qa = LA.eig(k1)
         lb,Qb = LA.eig(k2)
 

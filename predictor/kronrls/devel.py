@@ -12,6 +12,8 @@ from sklearn.metrics import average_precision_score
 
 sys.path.append('../util')
 import yamanishi_data_util as yam
+sys.path.append('../../config')
+from predictor_config import kronRLSConfig as cfg
 
 outDir = '../../xprmt/kronrls/'
 
@@ -42,7 +44,7 @@ def main(argv):
     print 'nData= '+str(nData)
 
     ## instantiate a KronRLS predictor
-    kronrls = KronRLS(connMat,comList,proList,kernel)
+    kronrls = KronRLS(cfg,connMat,comList,proList,kernel)
 
     ##
     nFolds = None
@@ -71,9 +73,7 @@ def main(argv):
         # yTr = [dataY[i] for i in trIdxList]
 
         # test
-        gamma = 1.0
-        threshold = 0.5
-        yPred = kronrls.predict(xTest,gamma,threshold)
+        yPred = kronrls.predict(xTest)
 
         yTestList += yTest
         yPredList += yPred
