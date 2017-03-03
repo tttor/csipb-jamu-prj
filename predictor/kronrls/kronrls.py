@@ -6,39 +6,22 @@ from scipy import sparse
 from collections import defaultdict
 
 class KronRLS:
-    '''
-    in kronRLS, the (learned) model is the kernel
-    '''
-    _trConnMat = None
+    # these vars hold _all_ available training data
     _trComList = None
     _trProList = None
-    _trComKernelMat = None
-    _trProKernelMat = None
-
+    _trConnMat = None
     _kernelDict = None
 
-    def __init__(self,iTrConnMat,iTrComList,iTrProList,iKernelDict):
+    def __init__(self,iTrConnMat=None,iTrComList=None,iTrProList=None,iKernelDict=None):
         self._trConnMat = iTrConnMat
         self._trComList = iTrComList
         self._trProList = iTrProList
         self._kernelDict = iKernelDict
 
-        self._trComKernelMat = self._makeKernelMat(self._trComList,self._trComList)
-        self._trProKernelMat = self._makeKernelMat(self._trProList,self._trProList)
-
     def predict(self,xTest,gamma,threshold):
-        ##
-        connMat = self._trConnMat
-        xIdxTest = []
-        for c,p in xTest:
-            cIdx = self._trComList.index(c)
-            pIdx = self._trProList.index(p)
-            connMat[cIdx][pIdx] = 0 # yes, setting to zero for test samples
-            xIdxTest.append((cIdx,pIdx))
-
-        ##
-        comKernelMat = self._trComKernelMat
-        proKernelMat = self._trProKernelMat
+        ## train
+        model = self._train(xTest)
+        connMat,comKernelMat,proKernelMat,xIdxTest = model
 
         ## make prediction
         connMatPred = self._predict(comKernelMat,proKernelMat,connMat,gamma)
@@ -51,6 +34,44 @@ class KronRLS:
             yPred.append(y)
 
         return yPred
+
+    def _train(self,xTest):
+        '''
+        in kronRLS, the (learned) model refers to the connMat and  the kernel
+        '''
+        ## take a subset of training data
+        # now: all
+        comList = self._trComList
+        proList = self._trProList
+        connMat = self._trConnMat
+
+        ## clear any element of conn mat that is in testing
+        xIdxTest = []
+        for c,p in xTest:
+            cIdx = -1
+            if c in comList:
+                cIdx = comList.index(c)
+            else:
+                assert False,'new compound'
+
+            pIdx = -1
+            if p in proList:
+                pIdx = proList.index(p)
+            else:
+                assert False,'new protein'
+
+            if cIdx!=-1 and pIdx!=-1:
+                connMat[cIdx][pIdx] = 0 # yes, setting to zero for test samples
+                xIdxTest.append( (cIdx,pIdx) )
+
+        ##
+        comKernelMat = self._makeKernelMat(comList,comList)
+        proKernelMat = self._makeKernelMat(proList,proList)
+
+        ##
+        model = (connMat,comKernelMat,proKernelMat,xIdxTest)
+
+        return model
 
     def _predict(self,k1,k2,y,gamma=1.0):
         la,Qa = LA.eig(k1)

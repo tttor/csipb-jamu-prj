@@ -7,6 +7,8 @@ sys.path.append('../rndly')
 from rndly import RNDLy
 sys.path.append('../blmnii')
 from blm_ajm import BLMNII
+sys.path.append('../kronrls')
+from kronrls import KronRLS
 
 class PredictorThread(threading.Thread):
     def __init__ (self,iid,iname,imethod,imaxtime,ibatchlen):
@@ -19,14 +21,15 @@ class PredictorThread(threading.Thread):
         self.predictionList = []
         self.queryList = []
         self.predictionNumber = -1
+        self.batchLength = ibatchlen
 
         self.predictor = None
         if self.method=='rndly':
             self.predictor = RNDLy()
-            self.batchLength = ibatchlen
         elif self.method=='blmnii':
             self.predictor = BLMNII()
-            self.batchLength = ibatchlen
+        elif self.method=='kronrls':
+            self.predictor = KronRLS()
         else:
             assert False, 'FATAL: Unknown prediction method!'
 
