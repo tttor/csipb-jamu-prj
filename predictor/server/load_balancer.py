@@ -8,7 +8,8 @@ connFromPredictorPHP = None
 
 def main(argv):
     if len(sys.argv)!=6:
-        print 'USAGE: python load_balancer.py [phpApiHost] [phpApiPort] [serverHost] [serverPortLo] [serverPortHi]'
+        print 'USAGE: '
+        print 'python load_balancer.py [phpApiHost] [phpApiPort] [serverHost] [serverPortLo] [serverPortHi]'
         return
 
     phpApiHost = argv[1]

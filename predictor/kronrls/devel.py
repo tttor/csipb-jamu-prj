@@ -78,7 +78,6 @@ def main(argv):
         yTestList += yTest
         yPredList += yPred
 
-
     ##
     print 'calculating aupr...'
     precision, recall, _ = precision_recall_curve(yTestList, yPredList)

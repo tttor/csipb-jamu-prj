@@ -6,7 +6,8 @@ from server_thread import ServerThread as Server
 
 def main(argv):
     if len(sys.argv)!=5:
-        print 'USAGE: phyton server.py [serverId] [hostToListenFrom] [portToListenFromLo] [portToListenFromHi]'
+        print 'USAGE: '
+        print 'python server.py [serverId] [hostToListenFrom] [portToListenFromLo] [portToListenFromHi]'
         return
 
     serverId = argv[1]
