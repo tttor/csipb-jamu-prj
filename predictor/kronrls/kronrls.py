@@ -1,6 +1,5 @@
 # kronrls.py
 import numpy as np
-import util
 
 from numpy import linalg as LA
 from scipy import sparse
