@@ -6,7 +6,7 @@
 %% prompt when you run the file main.tex through LaTeX.
 %\chapter{Use Case 1 - Both Drug and Target Side} \label{Use Case}
 \chapter{Langkah-langkah Penggunaan}
-Pada bagian ini akan dijelaskan secara rinci langkah-langkah penggunaan Ijah Webserver. Langkah-langkah ini mengacu pada Use-case 1 (Plant-Disease).
+Pada bagian ini akan dijelaskan secara rinci langkah-langkah penggunaan Ijah Webserver. Langkah-langkah ini mengacu pada Use-case 1 (Plant-Disease). Untuk use-case lainnya mirip, hanya berbeda pada masukan yang diisikan.
 
 \section{Memberikan Masukan \emph{(inputs)}}
 
@@ -60,7 +60,7 @@ Pada bagian ini akan dijelaskan secara rinci langkah-langkah penggunaan Ijah Web
 		\end{figure}
 
 
-\section{Memproses} \label{process}
+\section{Memproses Input} \label{process}
 Setelah memasukkan input, langkah berikutnya yaitu input dapat diproses. Setelah tombol eksekusi diklik, maka proses Search and Predict akan berjalan. Selama proses berjalan, akan muncul animasi seperti pada gambar \ref{fig:ijah_process_bounce}
 
 \begin{figure}[H]
@@ -71,6 +71,8 @@ Setelah memasukkan input, langkah berikutnya yaitu input dapat diproses. Setelah
 	\end{figure}
 
 \section{Membaca luaran \emph{(outputs)}}
+\textbf{Catatan:} jika layout halaman output terlihat saling menumpuk, silakan \emph{zoom out} browser anda hingga terlihat sesuai (bergantung resolusi monitor anda).
+
 Setelah proses selesai, maka luaran \emph{(output)} yang dihasilkan sudah dapat dibaca. Terdapat empat kategori \emph{output} yang dihasilkan, yaitu:
 	
 	\subsection{Summary} \label{summary}
@@ -160,7 +162,7 @@ Setelah proses selesai, maka luaran \emph{(output)} yang dihasilkan sudah dapat 
 	\end{figure}
 	
 	\subsection{Metadata Text} \label{meta}
-	Metadata Text berisi metadata (nama dan ID) dari semua entitas yang terlibat dalam proses ini. Pada bagian bawah, juga terdapat tombol Download untuk mengunduh teks Metadata ini.
+	Metadata Text berisi metadata (nama dan ID) dari semua entitas yang terlibat dalam proses ini. Pada bagian bawah, juga terdapat tombol Download untuk mengunduh teks Metadata ini. Pada metadata ini, jika ada item yang tidak ditampilkan pada salah satu entitas namun ada di entitas lainnya, artinya \emph{value} item tersebut pada entitas tersebut tidak ada. Sebagai contoh, pada metadata Compounds, ada beberapa senyawa yang tidak memiliki nama PubChem sehingga tidak ditampilkan.
 
 	\begin{figure}[H]
 	\centering
@@ -202,10 +204,10 @@ Tombol-tombol pada \emph{floating button} beserta fungsinya:
 	Tombol Filter berfungsi untuk menyaring skor konektivitas yang akan ditampilkan. Filter ini memiliki beberapa level yaitu:
 	\begin{itemize}
 	\item 0 - Menampilkan keseluruhan konektivitas yang ada (minimum skor 0).
-	\item 0.2 - Menampilkan konektivitas dengan skor diatas 0.2
-	\item 0.4 - Menampilkan konektivitas dengan skor diatas 0.4
-	\item 0.6 - Menampilkan konektivitas dengan skor diatas 0.6
-	\item 0.8 - Menampilkan konektivitas dengan skor diatas 0.8
+	\item 0.2 - Menampilkan konektivitas dengan skor minimal 0.2
+	\item 0.4 - Menampilkan konektivitas dengan skor minimal 0.4
+	\item 0.6 - Menampilkan konektivitas dengan skor minimal 0.6
+	\item 0.8 - Menampilkan konektivitas dengan skor minimal 0.8
 	\item 1 - Menampilkan konektivitas yang benar2 terhubung 100\% \emph{known by experiment} (skor 1).
 	\end{itemize}
 
@@ -219,21 +221,21 @@ Tombol-tombol pada \emph{floating button} beserta fungsinya:
 	\begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.3]{ijah_filter_02.png}
-	\caption{Filter 0.2, menampilkan konektivitas diatas 0.2, output mulai berkurang}
+	\caption{Filter 0.2, menampilkan konektivitas minimal 0.2, output mulai berkurang}
 	\label{fig:ijah_filter_02}
 	\end{figure}
 
 	\begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.3]{ijah_filter_04.png}
-	\caption{Filter 0.4, menampilkan konektivitas diatas 0.4, output jauh berkurang karena konektivitas dengan skor diatas 0.4 semakin sedikit}
+	\caption{Filter 0.4, menampilkan konektivitas minimal 0.4, output jauh berkurang karena konektivitas dengan skor minimal 0.4 semakin sedikit}
 	\label{fig:ijah_filter_04}
 	\end{figure}
 
 	\begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.3]{ijah_filter_06.png}
-	\caption{Filter 0.6, menampilkan konektivitas diatas 0.6, hanya ada satu output yang muncul. Dalam kasus ini output yang tersisa hanya yang bernilai 1 (100\% terkoneksi) sehingga filter 0.8 dan filter 1 memunculkan hasil yang sama}
+	\caption{Filter 0.6, menampilkan konektivitas minimal 0.6, hanya ada satu output yang muncul. Dalam kasus ini output yang tersisa hanya yang bernilai 1 (100\% terkoneksi) sehingga filter 0.8 dan filter 1 memunculkan hasil yang sama}
 	\label{fig:ijah_filter_02}
 	\end{figure}
 
