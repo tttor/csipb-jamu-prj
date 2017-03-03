@@ -4,17 +4,21 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 from kronrls import KronRLS
-from sklearn.cross_validation import KFold
-from sklearn.cross_validation import StratifiedKFold
+from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import LeaveOneOut
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import average_precision_score
+
+sys.path.append('../util')
 import yamanishi_data_util as yam
 
 outDir = '../../xprmt'
 
 def main(argv):
     if len(argv)!=3:
-        print 'USAGE: python devel.py [dataMode] [valMode]'
+        print 'USAGE: '
+        print 'python devel.py [dataMode:e/nr/gpcr/ic] [valMode:loocv/kfcv]'
         return
 
     dataMode = argv[1]
