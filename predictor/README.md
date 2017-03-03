@@ -1,25 +1,18 @@
 # Compound-protein connectivity prediction
 
 ## Aliases and Keywords
-* drug-target prediction
-* drug-target interactions (DTI) prediction
-* compound-protein interaction (CPI) prediction
-* drug discovery
-* drug-target network
-* in-silico drug screening
-* virtual drug screening
-* computational screening
-* compound-protein link prediction
+* compound-protein/drug-target interaction/link prediction
+* in-silico/virtual/computational drug screening
 
 ## Challenges
 * imbalanced data, highly skewed datasets: small number of positive samples (known interactions)
     * current solution: use of local training data to help reduce irrelevant data,
       so each compound-protein has its own model/classifier, this is surely computationally expensive
-* deceptive negative samples as they can be either trully negative or simply unknown (not yet clinically/chemical tested)
+* deceptive negative samples as they can be either trully negative or simply unknown (not yet clinically/chemically tested)
     * validated negative samples are not available;
-      people never report negative results after clinical/chemical experiment
-    * this may fool the machine during learning in that
-      _almost_ positive interactions but _unknown_ are considered the same as _truly_ negative ones
+      people never report negative results after clinical/chemical experiments
+    * the learning machine may be confused as negative samples can actually be positive,
+      they are negative because their true interactions are simply unknown/not tested
 * handle 4 scenarios: (new: having no existing/known interaction)
     * Known drug, known target
     * New drug, known target
@@ -37,12 +30,12 @@
             * Yamanishi (2008)
             * Bleakley (2009)
             * Yamanishi (2010)
-        * BLM–NII or Globalized BLM or bipartite local model with neighbor-based inferring (BLMN)
+        * BLM-NII (bipartite local model with neighbor-based inferring) or Globalized BLM
             * Mei (2012)
             * Mei (2013)
-    * Kernel
-        * Gaussian Interaction Profile Kernel+ Kronecker regularized least squares approach (KronRLS)
-            * Laarhoven (2011): GIP
+    * Kernel-based
+        * Kronecker regularized least squares approach (KronRLS) + Gaussian Interaction Profile (GIP) Kernel
+            * Laarhoven (2011): GIP+KronRLS
             * Laarhoven (2013): WNN-GIP (for handling new drugs/new targets
             * Nascimento (2016): KronRLS+Multiple Kernel Learning
         * Enhanced similarity measures and super-target clustering
@@ -60,5 +53,5 @@
     * TODO
 * skewed/imbalaced dataset
     * Liu (2015):  building up highly credible negative samples
-* feature/representation
+* feature/representation/similarity-function/kernel
     * TODO
