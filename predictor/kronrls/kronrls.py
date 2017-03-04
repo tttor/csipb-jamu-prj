@@ -9,18 +9,27 @@ class KronRLS:
     def __init__(self,iparam,
                  iTrConnMat=None,iTrComList=None,iTrProList=None,iKernelDict=None):
         self._param = iparam
-        self._trConnMat = iTrConnMat
-        self._trComList = iTrComList
-        self._trProList = iTrProList
-        self._kernelDict = iKernelDict
+
+        self.connDB = psycopg2.connect(database=dcfg['name'],user=dcfg['user'],password=dcfg['passwd'],
+                                       host=dcfg['host'],port=dcfg['port'])
+        self.cur = self.connDB.cursor()
+
+        if iTrConnMat!=None:
+            self._trConnMat = iTrConnMat
+            self._trComList = iTrComList
+            self._trProList = iTrProList
+            self._kernelDict = iKernelDict
+        else:# draw connMat from DB as the _whole_ training data
+            self._trConnMat,self._trComList,self._trProList = self._drawConnMatFromDB()
 
     def predict(self,xTest):
-        ## train
+        ## train, local training: one for every predict()
         model = self._train(xTest)
         connMat,comKernelMat,proKernelMat,xIdxTest = model
 
         ## make prediction
-        connMatPred = self._predict(comKernelMat,proKernelMat,connMat,self._param['gamma'])
+        gamma = self._param['gamma']
+        connMatPred = self._predict(comKernelMat,proKernelMat,connMat,gamma)
 
         ##
         yPred = []
@@ -30,6 +39,9 @@ class KronRLS:
             yPred.append(y)
 
         return yPred
+
+    def close(self):
+        self.connDB.close()
 
     def _train(self,xTest):
         '''
@@ -109,3 +121,6 @@ class KronRLS:
     def _computeKernel(self,di,dj):
         kernel = self._kernelDict[(di,dj)]
         return kernel
+
+    def _drawConnMatFromDB(self):
+        pass

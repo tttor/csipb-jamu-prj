@@ -69,6 +69,9 @@ class PredictorThread(threading.Thread):
             self.predictionNumber += 1
             del self.queryList[:]
 
+        ##
+        self.predictor.close()
+
     def getPredictionList(self):
         return self.predictionList[:]
 
