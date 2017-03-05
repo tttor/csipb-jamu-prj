@@ -6,5 +6,5 @@ databaseConfigServer = dict(name='ijah',user='ijah',passwd=DB_PASSWD,
 databaseConfigLocal = dict(name='ijah',user='ijah',passwd=DB_PASSWD_LOCAL,
                             host='localhost',port='5432')
 
-databaseConfig = databaseConfigServer
-# databaseConfig = databaseConfigLocal
+# databaseConfig = databaseConfigServer
+databaseConfig = databaseConfigLocal
