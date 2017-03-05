@@ -1,13 +1,44 @@
 # postgresql_util.py
 import sys
 import psycopg2
+import numpy as np
 
 sys.path.append('../config')
 from database_config import databaseConfig as dcfg
 
 dbConn = psycopg2.connect(database=dcfg['name'],user=dcfg['user'],password=dcfg['passwd'],
-                               host=dcfg['host'],port=dcfg['port'])
+                          host=dcfg['host'],port=dcfg['port'])
 dbCsr = dbConn.cursor()
+
+def drawConnMat(nMax,sources):
+    # TODO select by more thoughtful criteria
+    query = "SELECT * FROM compound_vs_protein LIMIT "+str(nMax)
+    dbCsr.execute(query)
+    rows = dbCsr.fetchall()
+
+    comList = []
+    proList = []
+    connDict = {}
+    for row in rows:
+        com = row[0]
+        pro = row[1]
+        s = row[2]
+        w = row[3]
+
+        if (w==1) and (s in sources):
+            comList.append(com)
+            proList.append(pro)
+            connDict[com] = pro
+
+    nCom = len(comList)
+    nPro = len(proList)
+    mat = np.zeros( (nCom,nPro) )
+    for c,p in connDict.iteritems():
+        cIdx = comList.index(c)
+        pIdx = proList.index(p)
+        mat[cIdx][pIdx] = 1
+
+    return mat,comList,proList
 
 def drawKernel(idList):
     prefix = idList[0][0:3]

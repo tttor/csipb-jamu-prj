@@ -1,6 +1,5 @@
 # kronrls.py
 import numpy as np
-import psycopg2
 import sys
 
 sys.path.append('../../config')
@@ -30,10 +29,6 @@ class KronRLS:
             self._trComList = iTrComList
             self._trProList = iTrProList
             self._kernelDict = iKernelDict
-        else:
-            self.dbConn = psycopg2.connect(database=dcfg['name'],user=dcfg['user'],password=dcfg['passwd'],
-                                           host=dcfg['host'],port=dcfg['port'])
-            self.dbCsr = self.dbConn.cursor()
 
     def predict(self,xTest):
         ## train, local training: one for every predict()
@@ -69,7 +64,9 @@ class KronRLS:
             proList = self._trProList
             connMat = self._trConnMat
         else:# draw connMat from DB
-            connMat,comList,proList = self._drawConnMatFromDB(self._param['maxTrainingDataSize'])
+            nMax = self._param['maxTrainingDataSize']
+            sources = pcfg['trainingDataSources']
+            connMat,comList,proList = pgUtil.drawConnMat(nMax,sources)
 
         ## clear any element of connMat that is in testing set
         xIdxTest = []
@@ -152,36 +149,6 @@ class KronRLS:
                 kernel[i][j] = sim
 
         return kernel
-
-    def _drawConnMatFromDB(self,limit):
-        # TODO select by more thoughtful criteria
-        query = "SELECT * FROM compound_vs_protein LIMIT "+str(limit)
-        self.dbCsr.execute(query)
-        rows = self.dbCsr.fetchall()
-
-        comList = []
-        proList = []
-        connDict = {}
-        for row in rows:
-            com = row[0]
-            pro = row[1]
-            s = row[2]
-            w = row[3]
-
-            if (w==1) and (s in pcfg['trainingDataSources']):
-                comList.append(com)
-                proList.append(pro)
-                connDict[com] = pro
-
-        nCom = len(comList)
-        nPro = len(proList)
-        mat = np.zeros( (nCom,nPro) )
-        for c,p in connDict.iteritems():
-            cIdx = comList.index(c)
-            pIdx = proList.index(p)
-            mat[cIdx][pIdx] = 1
-
-        return mat,comList,proList
 
 def test():
     predictor = KronRLS(kronRLSConfig)
