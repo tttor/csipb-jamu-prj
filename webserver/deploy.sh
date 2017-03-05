@@ -11,6 +11,7 @@ IJAH_DIR_STR='/home/ijah/ijah/web'
 PREDICTOR_DIR=/home/ijah/ijah-predictor/python
 BACKUP_DIR_STR='/home/ijah/ijah-backup/ijah-web-backup_'
 
+# backup
 if [ $2 -ne 0 ]; then
   echo "#######################################################################"
   echo "backing up _web_ only ..."
@@ -29,7 +30,7 @@ if [ $2 -ne 0 ]; then
   ssh $IJAH_SERVER $cmd2
 fi
 
-#build the src in production stage
+# web: build the src in production stage
 if [ $4 -ne 0 ]; then
   echo "#########################################################################"
   echo 'Have you set the _version_ at app.component.html? [0/1]'
@@ -44,19 +45,23 @@ if [ $4 -ne 0 ]; then
   fi
 fi
 
+# api
 if [ $6 -ne 0 ]; then
   echo "#######################################################################"
   echo 'Have you set the _DBlink_ at api/config.php? [0/1]'
   read dbLinkSet
   if [ "$dbLinkSet" -ne 0 ]; then
     echo "deploying APIs ..."
+    IJAH_MANUAL_ID=ijah_webserver_manual_id.pdf
+    cp manual/manual-id/out/$IJAH_MANUAL_ID api/$IJAH_MANUAL_ID
     scp -r api/* $IJAH_SERVER:$IJAH_DIR/api
   fi
 fi
 
+# predictor
 if [ $8 -ne 0 ]; then
   echo "#######################################################################"
-  echo 'Have you set the _DBlink_ at predictor/config.py? [0/1]'
+  echo 'Have you set the _DBlink_ at database_config.py? [0/1]'
   read predictorConfigSet
   if [ "$predictorConfigSet" -ne 0 ]; then
     echo "deploying predictors ..."
@@ -65,6 +70,7 @@ if [ $8 -ne 0 ]; then
   fi
 fi
 
+# docker
 if [ ${10} -ne 0 ]; then
   echo "#######################################################################"
   echo "deploying docker files ..."
