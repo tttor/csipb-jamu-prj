@@ -6,8 +6,10 @@ import psycopg2
 import math
 
 from predictor_thread import PredictorThread as Predictor
-from config import predictorConfig as pcfg
-from config import databaseConfig as dcfg
+
+sys.path.append('../../config')
+from predictor_config import predictorConfig as pcfg
+from database_config import databaseConfig as dcfg
 
 class ServerThread(threading.Thread):
     def __init__(self,iid,iname,ihost,iport):
@@ -28,10 +30,10 @@ class ServerThread(threading.Thread):
         connFromLB.listen(1)
 
         predictorThreads = []
-        for i,mw in enumerate(pcfg['methods']):
-            m = mw[0]
-            name = self.name+'_'+m
-            predictorThreads.append( Predictor(i,name,m,pcfg['maxElapsedTime'],mw[2]) )
+        maxT = pcfg['maxElapsedTime']
+        for i,method in enumerate(pcfg['methods']):
+            name = self.name+'_'+method['name']
+            predictorThreads.append( Predictor(i,name,maxT,method) )
 
         for t in predictorThreads:
             t.daemon = True

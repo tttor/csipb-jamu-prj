@@ -4,25 +4,34 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 from kronrls import KronRLS
-from sklearn.cross_validation import KFold
-from sklearn.cross_validation import StratifiedKFold
+from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import LeaveOneOut
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import average_precision_score
-import yamanishi_data_util as yam
 
-outDir = '../../xprmt'
+sys.path.append('../util')
+import yamanishi_data_util as yam
+sys.path.append('../../config')
+from predictor_config import kronRLSConfig as cfg
+
+outDir = '../../xprmt/kronrls/'
 
 def main(argv):
     if len(argv)!=3:
-        print 'USAGE: python devel.py [dataMode] [valMode]'
+        print 'USAGE: '
+        print 'python devel.py [dataMode:e/nr/gpcr/ic] [valMode:loocv/kfcv]'
         return
 
     dataMode = argv[1]
     valMode = argv[2]
 
     # load development dataset, containing com-pro connectivity
-    connMat,comList,proList = yam.loadComProConnMat(dataMode)
-    kernel = yam.loadKernel(dataMode)
+    connMatDpath = '../../dataset/connectivity/compound_vs_protein/yamanishi/ground-truth'
+    connMat,comList,proList = yam.loadComProConnMat(dataMode,connMatDpath)
+
+    kernelDpath = '../../dataset/connectivity/compound_vs_protein/yamanishi/similarity-mat'
+    kernel = yam.loadKernel(dataMode,kernelDpath)
 
     ##
     dataX = []
@@ -32,19 +41,22 @@ def main(argv):
             dataX.append( (ii,jj) )
             dataY.append( connMat[i][j] )
     nData = len(dataY)
+    print 'nData= '+str(nData)
 
     ## instantiate a KronRLS predictor
-    kronrls = KronRLS(connMat,comList,proList,kernel)
+    kronrls = KronRLS(cfg,connMat,comList,proList,kernel)
 
     ##
     nFolds = None
     kfList = None
     if valMode=='loocv':
         nFolds = nData
-        kfList = KFold(nData, n_folds=nFolds, shuffle=True)
+        kf = KFold(n_splits=nFolds)
+        kfList = kf.split(dataX)
     elif valMode=='kfcv':
         nFolds = 10
-        kfList = StratifiedKFold(dataY, n_folds=nFolds, shuffle=True)
+        skf = StratifiedKFold(n_splits=nFolds)
+        kfList = skf.split(dataX,dataY)
     else:
         assert(False)
 
@@ -53,7 +65,7 @@ def main(argv):
     fold = 0
     for trIdxList, testIdxList in kfList:
         fold += 1
-        print 'fold= ',fold,'of',nFolds,'######################################'
+        print 'fold=',fold,'of',nFolds,'######################################'
 
         xTest = [dataX[i] for i in testIdxList]
         yTest = [dataY[i] for i in testIdxList]
@@ -61,18 +73,18 @@ def main(argv):
         # yTr = [dataY[i] for i in trIdxList]
 
         # test
-        gamma = 1.0
-        yPred = kronrls.predict(xTest,gamma)
+        yPred = kronrls.predict(xTest)
 
         yTestList += yTest
         yPredList += yPred
 
-
     ##
+    print 'calculating aupr...'
     precision, recall, _ = precision_recall_curve(yTestList, yPredList)
     aupr = average_precision_score(yTestList, yPredList, average='micro')
 
     ##
+    print 'plotting ...'
     plt.clf()
     plt.figure()
 
@@ -83,10 +95,10 @@ def main(argv):
     plt.xlim([-0.05, 1.05])
     plt.xlabel('Recall')
     plt.ylabel('Precision')
-    plt.title('Precision-Recall Curve')
+    plt.title('Precision-Recall Curve of '+dataMode+' '+valMode)
     plt.legend(loc="lower left")
 
-    fname = '/pr_curve_'+dataMode+'_'+valMode+'.png'
+    fname = 'pr_curve_'+dataMode+'_'+valMode+'.png'
     plt.savefig(outDir+fname, bbox_inches='tight')
 
 if __name__ == '__main__':
