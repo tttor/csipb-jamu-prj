@@ -2,6 +2,12 @@
 import numpy as np
 import time
 import sys
+import math
+
+from numpy import linalg as LA
+from scipy import sparse
+from scipy.spatial.distance import euclidean
+from collections import defaultdict
 
 sys.path.append('../../config')
 from predictor_config import kronRLSConfig
@@ -10,10 +16,7 @@ from database_config import databaseConfig as dcfg
 
 sys.path.append('../../utility')
 import postgresql_util as pgUtil
-
-from numpy import linalg as LA
-from scipy import sparse
-from collections import defaultdict
+import util
 
 class KronRLS:
     def __init__(self,iparam,
@@ -23,13 +26,13 @@ class KronRLS:
         self._trConnMat = None
         self._trComList = None
         self._trProList = None
-        self._kernelDict = None
+        self._nonGIPKernelDict = None
 
         if iTrConnMat!=None:
             self._trConnMat = iTrConnMat
             self._trComList = iTrComList
             self._trProList = iTrProList
-            self._kernelDict = iKernelDict
+            self._nonGIPKernelDict = iKernelDict
 
     def predict(self,xTest):
         ## train, local training: one for every predict()
@@ -98,8 +101,8 @@ class KronRLS:
             xIdxTest.append( (cIdx,pIdx) )
 
         ##
-        comKernelMat = self._makeKernelMat(comList,comList)
-        proKernelMat = self._makeKernelMat(proList,proList)
+        comKernelMat = self._makeKernelMat(comList,comList,connMat)
+        proKernelMat = self._makeKernelMat(proList,proList,connMat)
 
         ##
         model = (connMat,comKernelMat,proKernelMat,xIdxTest)
@@ -132,23 +135,56 @@ class KronRLS:
 
         return ypred
 
-    def _makeKernelMat(self,list1,list2):
-        kernelDict = None
-        if self._kernelDict!=None:
-            kernelDict = self._kernelDict
-        else:
-            kernelDict = pgUtil.drawKernel( list(set(list1+list2)) )
+    def _makeKernelMat(self,list1,list2,connMat):
+        assert len(list1)==len(list2)
 
+        ## get nonGIP kernels
+        nonGIPKernelDict = None
+        if self._nonGIPKernelDict!=None:
+            nonGIPKernelDict = self._nonGIPKernelDict
+        else:
+            nonGIPKernelDict = pgUtil.drawKernel( list(set(list1+list2)) )
+
+        ## get kernel GIP props
+        ## the kernel bandwidth is normalized by dividing it by the average
+        ## number of interactions per drug; to become gamma as below
+        t = util.getType(list1[0])
+        alpha = self._param['alpha'+t.capitalize()+'Kernel']
+        gamma = self._param['kernelBandwidth'] / ( np.sum(connMat)/float(len(list1)) )
+
+        ##
         m = len(list1); n = len(list2)
         kernel = np.zeros((m,n))
         for i,ii in enumerate(list1):
             for j,jj in enumerate(list2):
+                ##
                 key = (ii,jj)
-                sim = 0.0
-                if key in kernelDict:
-                    sim = kernelDict[key]
+                simNonGIP = 0.0
+                if key in nonGIPKernelDict:
+                    simNonGIP = nonGIPKernelDict[key]
+                ##
+                gipii = None; gipjj = None
+                if t.lower()=='compound':
+                    gipii = connMat[i,:]
+                    gipjj = connMat[j,:]
+                elif t.lower()=='protein':
+                    gipii = connMat[:,i]
+                    gipjj = connMat[:,j]
+                else:
+                    assert False,'Unknown type'
+                simGIP = self._computeGIPKernel(gipii,gipjj,gamma)
+
+                ## merge kernel GIP and kernel nonGIP
+                sim = (simNonGIP*alpha) + (simGIP*(1.0-alpha))
                 kernel[i][j] = sim
 
+        return kernel
+
+    def _computeGIPKernel(self,gip1,gip2,gamma):
+        gip1 = np.asarray(gip1)
+        gip2 = np.asarray(gip2)
+        l2norm = LA.norm(gip1-gip2,ord=2)
+        kernel = math.exp( -gamma*(l2norm**2) )
         return kernel
 
 def test():
