@@ -2,6 +2,51 @@
 import sys
 import psycopg2
 
+sys.path.append('../config')
+from database_config import databaseConfig as dcfg
+
+dbConn = psycopg2.connect(database=dcfg['name'],user=dcfg['user'],password=dcfg['passwd'],
+                               host=dcfg['host'],port=dcfg['port'])
+dbCsr = dbConn.cursor()
+
+def drawKernel(idList):
+    prefix = idList[0][0:3]
+    tbl = None; col = None;
+    if prefix=='COM':
+        tbl = 'compound'
+        col = 'com_similarity_simcomp'
+    elif prefix=='PRO':
+        tbl = 'protein'
+        col = 'pro_similarity_smithwaterman'
+    else:
+        assert False, 'Unknown type'
+
+    cond = ''
+    for i,ii in enumerate(idList):
+        if i>0:
+            cond += " OR "
+        cond += prefix.lower()+"_id="+quote(ii)
+
+    q  = "SELECT "+col+" FROM "+tbl
+    q += " WHERE "+cond
+    dbCsr.execute(q)
+    rows = dbCsr.fetchall()
+
+    kernelDict = dict()
+    for i,row in enumerate(rows):
+        id1 = idList[i]
+
+        row = row[0] # row initially is a 1-element tuple: (x,)
+        if row!=None:
+            comps = row.split(',')
+            for comp in comps:
+                subcomps = comp.split('=')
+                id2 = subcomps[0].split(':')[0]
+                sim = subcomps[1]
+                kernelDict[ (id1,id2) ] = sim
+
+    return kernelDict
+
 def quote(s):
     s = s.replace("'","''") # escape any single quote
     s = "'"+s+"'"
