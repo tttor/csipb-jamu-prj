@@ -23,7 +23,7 @@
     * protein/biological/genomic features/kernels
     * compound-protein interaction/network/pharmacological features/kernels
 
-# ML-based computational approaches
+## ML-based computational approaches
 * supervised
     * BLM (Bipartite Local Model)
         * Original
@@ -58,3 +58,8 @@
 * similarity-function/kernel
     * Gaussian Interaction Profile (GIP) Kernel
         * Laarhoven (2011):
+
+## Implementing predictor classes
+* Each predictor class should implement:
+    * predict(xTestList)
+    * close()

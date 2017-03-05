@@ -1,5 +1,6 @@
 # kronrls.py
 import numpy as np
+import time
 import sys
 
 sys.path.append('../../config')
@@ -157,4 +158,6 @@ def test():
     yPreds = predictor.predict(xTest)
 
 if __name__ == '__main__':
+    start_time = time.time()
     test()
+    print("--- %s seconds ---" % (time.time() - start_time))
