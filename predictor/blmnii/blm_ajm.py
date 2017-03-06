@@ -5,56 +5,49 @@ import blmnii
 import sys
 import time
 
-sys.path.append('../server')
-from config import databaseConfig as dcfg
+sys.path.append('../../config')
+from database_config import databaseConfig as dcfg
+from predictor_config import blmniiConfig
 
-sys.path.append('../util')
+sys.path.append('../../utility')
 import util
 
 class BLMNII:
-    def __init__(self,):
-        self._name = 'blmnii'
+    def __init__(self,params):
+        self._name = params['name']
+        self._nPair = params['maxTrainingDataSize']
         self._connDB = psycopg2.connect(database=dcfg['name'],user=dcfg['user'],password=dcfg['passwd'],
                                         host=dcfg['host'],port=dcfg['port'])
-        self._cur = self.connDB.cursor()
+        self._cur = self._connDB.cursor()
 
     def predict(self,query):
         nQuery = len(query)
         # sys.stderr.write ("Processing Query.... \n")
-        pairIdList = util.randData(query,1000)
+        pairIdList = util.randData(query,self._nPair)
 
         # sys.stderr.write ("Making kernel....\n")
         compList = [i[0] for i in pairIdList]
-        compMeta, compSimMat = self.makeKernel(compList,"com")
+        compMeta, compSimMat = self._makeKernel(compList,"com")
         protList = [i[1] for i in pairIdList]
-        protMeta, protSimMat = self.makeKernel(protList,"pro")
+        protMeta, protSimMat = self._makeKernel(protList,"pro")
 
         # sys.stderr.write ("Building connectivity data...\n")
-        adjMat = self.makeAdjMat(compMeta,protMeta)
-
+        adjMat = self._makeAdjMat(compMeta,protMeta)
         pairIndexList = [[compMeta[i[0]],protMeta[i[1]]] for i in pairIdList]
         # sys.stderr.write ("Running BLM-NII...\n")
         # Running Batch
-        resPred = []
-        for i,pair in enumerate(pairIndexList):
-            if i == nQuery:
-                break
-            train = [j for j in len(pairIndexList) if j not i]
-            test = [i]
-            resPred.append(blmnii.BLM_NII_Core(adjMat,compSimMat,protSimMat,
-                        (test,train),(pair[0],pair[1])))
+        comPred = self._predict(adjMat,compSimMat,protSimMat,pairIndexList,
+                                nQuery,0)
+        proPred = self._predict(adjMat,protSimMat,compSimMat,pairIndexList,
+                                nQuery,1)
 
-        for i,pair in enumerate(pairIndexList):
-            if i == nQuery:
-                break
-            train = [j for j in len(pairIndexList) if j not i]
-            test = [i]    
-            resPred.append(blmnii.BLM_NII_Core(adjMat,protSimMat,compSimMat,
-                        (test,train),(pair[1],pair[0])))
-        return resPred
+        mergePred = []
+        for i in range(nQuery):
+            mergePred.append(max(comPred[0][0],proPred[0][0]))
+        return mergePred
 
     def close(self):
-        connDB.close()
+        self._connDB.close()
 
     def _makeAdjMat(self,compList,protList):
         adjMat = np.zeros((len(compList), len(protList)), dtype=int)
@@ -74,11 +67,28 @@ class BLMNII:
         queryP += ")"
 
         query += queryC + queryP
-        self.cur.execute(query)
-        rows = self.cur.fetchall()
+        self._cur.execute(query)
+        rows = self._cur.fetchall()
         for row in rows:
             adjMat[compList[row[0]]][protList[row[1]]]=(row[2])
         return adjMat
+
+    def _predict(self,adjMat,sourceSim,targetSim,pairIndexList,nQuery,mode):
+        resPred = []
+        if mode:
+            adjMat = [[row[i] for row in adjMat] for i in range(len(adjMat[0]))]
+
+        for i,pair in enumerate(pairIndexList):
+            if i == nQuery:
+                break
+            print pair
+            train = [j for j in range(len(targetSim)) if j != i]
+            test = [i]
+
+            resPred.append(blmnii.BLM_NII(adjMat,sourceSim,targetSim,
+                        (test,train),(pair[mode],pair[not(mode)])))
+
+        return resPred
 
     def _makeKernel(self,dataList,mode):
         dataList = list(set(dataList))
@@ -97,8 +107,8 @@ class BLMNII:
                 queryC += " OR "
             queryC += (qParam[0] + " = " + "'" + d + "'")
         query += queryC
-        self.cur.execute(query)
-        dataRows = self.cur.fetchall()
+        self._cur.execute(query)
+        dataRows = self._cur.fetchall()
         for i,row in enumerate(dataRows):
             if row[1] != None:
                 temp = row[1].split(',')
@@ -109,7 +119,9 @@ class BLMNII:
         return dataDict, simMat
 
 def test():
-    pairQuery = 0
+    pairQuery = [('COM00014256','PRO00001554')]
+    predictorTest = BLMNII(blmniiConfig)
+    testRes = predictorTest.predict(pairQuery)
 
 if __name__=='__main__':
     startTime = time.time()

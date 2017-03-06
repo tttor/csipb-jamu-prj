@@ -28,7 +28,7 @@ class PredictorThread(threading.Thread):
         if predictorMethod=='rndly':
             self.predictor = RNDLy()
         elif predictorMethod=='blmnii':
-            self.predictor = BLMNII()
+            self.predictor = BLMNII(ipredictorParams)
         elif predictorMethod=='kronrls':
             self.predictor = KronRLS(ipredictorParams)
         else:
