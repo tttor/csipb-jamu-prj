@@ -65,8 +65,12 @@ if [ $8 -ne 0 ]; then
   read predictorConfigSet
   if [ "$predictorConfigSet" -ne 0 ]; then
     echo "deploying predictors ..."
+
     find ../predictor/ -name "*.pyc" -type f -delete
-    scp -r ../predictor/* $IJAH_SERVER:$PREDICTOR_DIR
+    scp -r ../predictor/ $IJAH_SERVER:$PREDICTOR_DIR
+
+    find ../utility/ -name "*.pyc" -type f -delete
+    scp -r ../utility/ $IJAH_SERVER:$PREDICTOR_DIR
   fi
 fi
 
