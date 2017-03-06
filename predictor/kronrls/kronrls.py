@@ -47,7 +47,7 @@ class KronRLS:
         yPred = []
         for cIdx,pIdx in xIdxTest:
             y = connMatPred[cIdx][pIdx]
-            # y = int(y>=self._param['threshold'])
+            y = int(y>=self._param['threshold'])
             yPred.append(y)
 
         return yPred
