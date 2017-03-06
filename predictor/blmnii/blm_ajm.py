@@ -3,18 +3,20 @@ import numpy as np
 import psycopg2
 import blmnii
 import sys
+import time
 
 sys.path.append('../server')
 from config import databaseConfig as dcfg
+
 sys.path.append('../util')
 import util
 
 class BLMNII:
-    def __init__(self):
-        self.name = 'blmnii'
-        self.connDB = psycopg2.connect(database=dcfg['name'],user=dcfg['user'],password=dcfg['passwd'],
+    def __init__(self,):
+        self._name = 'blmnii'
+        self._connDB = psycopg2.connect(database=dcfg['name'],user=dcfg['user'],password=dcfg['passwd'],
                                         host=dcfg['host'],port=dcfg['port'])
-        self.cur = self.connDB.cursor()
+        self._cur = self.connDB.cursor()
 
     def predict(self,query):
         nQuery = len(query)
@@ -37,11 +39,24 @@ class BLMNII:
         for i,pair in enumerate(pairIndexList):
             if i == nQuery:
                 break
-            resPred.append(blmnii.predict(adjMat,compSimMat,protSimMat,
-                        pair[0],pair[1]))
+            train = [j for j in len(pairIndexList) if j not i]
+            test = [i]
+            resPred.append(blmnii.BLM_NII_Core(adjMat,compSimMat,protSimMat,
+                        (test,train),(pair[0],pair[1])))
+
+        for i,pair in enumerate(pairIndexList):
+            if i == nQuery:
+                break
+            train = [j for j in len(pairIndexList) if j not i]
+            test = [i]    
+            resPred.append(blmnii.BLM_NII_Core(adjMat,protSimMat,compSimMat,
+                        (test,train),(pair[1],pair[0])))
         return resPred
 
-    def makeAdjMat(self,compList,protList):
+    def close(self):
+        connDB.close()
+
+    def _makeAdjMat(self,compList,protList):
         adjMat = np.zeros((len(compList), len(protList)), dtype=int)
 
         query = "SELECT com_id, pro_id, weight FROM compound_vs_protein"
@@ -65,7 +80,7 @@ class BLMNII:
             adjMat[compList[row[0]]][protList[row[1]]]=(row[2])
         return adjMat
 
-    def makeKernel(self,dataList,mode):
+    def _makeKernel(self,dataList,mode):
         dataList = list(set(dataList))
         dataDict = {e:i for i,e in enumerate(dataList)}#for Index
         simMat = np.zeros((len(dataList),len(dataList)), dtype=float)
@@ -92,3 +107,11 @@ class BLMNII:
                     if j[0].split(':')[0] in dataDict:
                         simMat[dataDict[row[0]]][dataDict[j[0].split(':')[0]]]=float(j[1])
         return dataDict, simMat
+
+def test():
+    pairQuery = 0
+
+if __name__=='__main__':
+    startTime = time.time()
+    test()
+    print "Program is running for "+str(time.time()-startTime)+" seconds"
