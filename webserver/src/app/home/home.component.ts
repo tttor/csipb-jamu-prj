@@ -24,7 +24,7 @@ export class Home implements OnInit {
   predictAPI;
 
   // List of sources in the form of a string, each separated by an underscore _
-  comProConnExperimentSrcs = 'drugbank.ca';
+  comProConnExperimentSrcs = ['drugbank.ca'];
   comProConnPredictionSrcs = ['rndly','blmnii','kronrls'];
 
   // count number of input rows
