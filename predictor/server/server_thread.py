@@ -62,7 +62,7 @@ class ServerThread(threading.Thread):
                     t.setQueryList(queryList)
 
                 # Wait for all predictor threads to finish
-                print >>sys.stderr,self.name+': Wait for all predictor threads to finish'
+                print >>sys.stderr,self.name+': Waiting for all predictor threads to finish'
                 for p in predictorThreads:
                     while p.getPredictionNumber()!=self.queryNum:
                         pass
@@ -81,7 +81,7 @@ class ServerThread(threading.Thread):
                     for j in range(nMethods):
                         pred = predictionListRaw[j][i]
                         if not(math.isnan(pred)): # valid
-                            w = pcfg['methods'][j][1]
+                            w = pcfg['methods'][j]['weight']
                             totalPred +=  (w * pred)
                             nValidPred += 1
 
@@ -96,12 +96,12 @@ class ServerThread(threading.Thread):
                 # Push the prediction result to database
                 nPush = 0
                 for i,p in enumerate(predictionList):
-                    if math.isnan(p):# invalid
+                    if (math.isnan(p)) or (p<=0.0):# invalid
                         continue
 
                     nPush += 1
                     comId,proId = queryList[i]
-                    src = ','.join([i[0] for i in pcfg['methods']])
+                    src = ','.join([i['name'] for i in pcfg['methods']])
 
                     queryCheck = "SELECT * FROM compound_vs_protein WHERE "
                     queryCheck += "com_id='"+comId+"' AND pro_id='"+proId+"'"

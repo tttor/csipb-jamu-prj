@@ -3,13 +3,16 @@ import numpy as np
 import sys
 
 def getType(idStr):
-    prefix = idStr[0:3]
-    prefix = prefix.upper()
+    prefix1 = idStr[0:1]
+    prefix1 = prefix1.upper()
+
+    prefix3 = idStr[0:3]
+    prefix3 = prefix3.upper()
 
     name = None
-    if prefix=='COM':
+    if prefix3=='COM' or prefix1=='D':
         name = 'compound'
-    elif prefix=='PRO':
+    elif prefix3=='PRO' or prefix3=='HSA':
         name = 'protein'
     else:
         assert False, 'Unknown idStr'

@@ -16,16 +16,16 @@ declare var saveAs: any;
 })
 export class Home implements OnInit {
   // API URL addresses
-  // baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  baseAPI ='http://localhost/ijah-api/';
+  baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+  // baseAPI ='http://localhost/ijah-api/';
 
   interactionQueryAPI;
   metaQueryAPI;
   predictAPI;
 
   // List of sources in the form of a string, each separated by an underscore _
-  comProConnExperimentSrcs = 'drugbank.ca';
-  comProConnPredictionSrcs = 'blm-nii-svm_rndly';
+  comProConnExperimentSrcs = ['drugbank.ca'];
+  comProConnPredictionSrcs = ['rndly','blmnii','kronrls'];
 
   // count number of input rows
   nPlaInputHolders = 0;
@@ -703,7 +703,8 @@ export class Home implements OnInit {
             let nKnownByExperimentComProConn = 0;
             let nKnownByPredictionComProConn = 0;
             for (let i=0; i<comVSpro.length; i++) {
-              let src = comVSpro[i]['source']
+              let allSrc = comVSpro[i]['source'].split(',');
+              let src = allSrc[0];// TODO should depends on all sources
               if (src==='null') {// unknown
                 nUnknownComProConn += 1;
               }
@@ -809,7 +810,7 @@ export class Home implements OnInit {
 
     for (let i=0;i<conn.length;i++) {
       for (let j=0;j<conn[i].length;j++) {
-        let comps = conn[i][j].split(",");
+        let comps = conn[i][j].split("$");
         let source = comps[0];
         let weight = comps[1]; weight = parseFloat(weight).toFixed(3);
         let src = comps[2];
@@ -1035,7 +1036,7 @@ export class Home implements OnInit {
 
       let w = iconn[i]['weight'];
       let s = iconn[i]['source'];
-      let str = s+","+w+","+srcV+","+destV;
+      let str = s+"$"+w+"$"+srcV+"$"+destV;
       connSet[idx].push(str);
     }
 

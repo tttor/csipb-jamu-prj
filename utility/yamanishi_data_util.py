@@ -69,5 +69,5 @@ def loadKernel(mode,dpath):
 
         for i,r in enumerate(rowNames):
             for j,c in enumerate(colNames):
-                kernel[(r,c)] = rowValues[i][j]
+                kernel[(r,c)] = float(rowValues[i][j])
     return kernel

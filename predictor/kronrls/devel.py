@@ -58,7 +58,7 @@ def main(argv):
         skf = StratifiedKFold(n_splits=nFolds)
         kfList = skf.split(dataX,dataY)
     else:
-        assert(False)
+        assert False,'Unknown valMode'
 
     yTestList = []
     yPredList = []
