@@ -840,6 +840,9 @@ export class Home implements OnInit {
             text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
           }
 
+          if (nUnique>9) {
+            text += ' ';
+          }
           text += indent+'['+source+':]\n';
           pos = text.length - 2;
           prevConnSource = source;
@@ -850,6 +853,9 @@ export class Home implements OnInit {
         }
 
         let destProps = this.getProps(dest,destPropKeys,destMeta);
+        if (nUnique>9) {
+          text += ' ';
+        }
         text += indent+indent+'['+weight+'] ';
         text += this.concatProps(destProps,destPropKeys,true,true)
         text += '\n';
