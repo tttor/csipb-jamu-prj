@@ -22,7 +22,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 from scipy import interp
 
-sys.path.append('../util')
+sys.path.append('../../utility')
 import yamanishi_data_util as yam
 
 import blmnii
@@ -46,6 +46,7 @@ def main():
 
     comListIdx = [i for i,_ in enumerate(comList)]
     proListIdx = [i for i,_ in enumerate(proList)]
+
     nComp = len(comList)
     nProtein = len(proList)
 
@@ -96,7 +97,7 @@ def main():
 
     predictedData = np.zeros((len(comList),len(proList)),dtype=float)
     for i in splitPred:
-        predictedData[i[2]][i[1]] = round(i[0])
+        predictedData[i[2]][i[1]] = i[0]
 
     splitPred = []
     connMat = [[row[i] for row in connMat] for i in range(len(connMat[0]))]
@@ -109,7 +110,7 @@ def main():
                                    [testIdx, trainIdx],(source,target)))
 
     for i in splitPred:
-        predictedData[i[1]][i[2]] = max(predictedData[i[1]][i[2]],round(i[0]))
+        predictedData[i[1]][i[2]] = max(predictedData[i[1]][i[2]],i[0])
 
     testData = []
     predictionRes = []

@@ -34,7 +34,7 @@ def BLM_NII(adjMatrix,sourceSim,targetSim,dataSplit,dataQuery):
         intProfile = intProfile.reshape(-1,1)
         intProfile = scale.fit_transform(intProfile)
         intProfile = [i[0] for i in intProfile.tolist()]
-        threshold = 0.5
+        threshold = 0.5 #Rounding
         intProfile = [int(i>=threshold) for i in intProfile]
 
     else:
@@ -42,10 +42,12 @@ def BLM_NII(adjMatrix,sourceSim,targetSim,dataSplit,dataQuery):
             intProfile[ii] = adjMatrix[sourceIndex][i]
 
     if len(set(intProfile))==1:
-        prediction = 0
+        prediction = [0.0]
     else:
         model = svm.SVC(kernel='precomputed', probability=True)
         model.fit(gramTrain, intProfile)
-        prediction = model.predict_proba(gramTest.reshape(1,-1))
+        # prediction = model.predict_proba(gramTest.reshape(1,-1))
+        prediction = model.predict(gramTest.reshape(1,-1))
 
-    return (prediction[0][1],sourceIndex,targetIndex)
+    # return (prediction[0][1],sourceIndex,targetIndex)
+    return (float(prediction[0]),sourceIndex,targetIndex)
