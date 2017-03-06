@@ -1394,7 +1394,7 @@ export class Home implements OnInit {
 
   private example2() {
   this.reset();
-  this.comInputHolders = [{ 'index': 1, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 4, 'value' : ''}];
+  this.comInputHolders = [{ 'index': 1, 'value' : '117-39-5 | Quercetin | 2-(3,4-dihydroxyphenyl)-3,5,7-trihydroxychromen-4-one'}, { 'index': 2, 'value' : '61-50-7 | N,n-dimethyltryptamine | 2-(1H-indol-3-yl)-N,N-dimethylethanamine'}, { 'index': 3, 'value' : '51-55-8 | L-hyoscyamine | (8-methyl-8-azabicyclo[3.2.1]octan-3-yl) 3-hydroxy-2-phenylpropanoate'}, { 'index': 4, 'value' : ''}];
   this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000058'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000039'}];
 
   this.nComInputHolders = 2;
@@ -1442,7 +1442,7 @@ export class Home implements OnInit {
 
   private example6() {
   this.reset();
-  this.comInputHolders = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '51-34-3 | DB00747 | C00002292 | C01851'}, { 'index': 3, 'value' : '53-86-1 | DB00328 | C00030512 | C01926'}, { 'index': 4, 'value' : ''}];
+  this.comInputHolders = [{ 'index': 1, 'value' : '51-55-8 | L-hyoscyamine | (8-methyl-8-azabicyclo[3.2.1]octan-3-yl) 3-hydroxy-2-phenylpropanoate'}, { 'index': 2, 'value' : '51-34-3 | Hyoscine'}, { 'index': 3, 'value' : '53-86-1 | Indomethacin | 2-[1-(4-chlorobenzoyl)-5-methoxy-2-methylindol-3-yl]acetic acid'}, { 'index': 4, 'value' : ''}];
   this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00001628'}, { 'index': 3, 'value' : 'COM00005599'}];
 
   this.nComInputHolders = 2;
@@ -1473,7 +1473,7 @@ export class Home implements OnInit {
 
   private example8() {
   this.reset();
-  this.comInputHolders = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 4, 'value' : ''}];
+  this.comInputHolders = [{ 'index': 1, 'value' : '51-55-8 | L-hyoscyamine | (8-methyl-8-azabicyclo[3.2.1]octan-3-yl) 3-hydroxy-2-phenylpropanoate'}, { 'index': 2, 'value' : '61-50-7 | N,n-dimethyltryptamine | 2-(1H-indol-3-yl)-N,N-dimethylethanamine'}, { 'index': 3, 'value' : '117-39-5 | Quercetin | 2-(3,4-dihydroxyphenyl)-3,5,7-trihydroxychromen-4-one'}, { 'index': 4, 'value' : ''}];
   this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000058'}];
 
   this.nComInputHolders = 2;
