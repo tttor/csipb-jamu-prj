@@ -4,5 +4,5 @@ MAINTAINER csipb abrari
 
 RUN pip install psycopg2
 
-WORKDIR /ijah-predictor/server/
+WORKDIR /ijah-predictor/predictor/server/
 
