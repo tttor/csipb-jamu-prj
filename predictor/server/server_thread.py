@@ -62,7 +62,7 @@ class ServerThread(threading.Thread):
                     t.setQueryList(queryList)
 
                 # Wait for all predictor threads to finish
-                print >>sys.stderr,self.name+': Wait for all predictor threads to finish'
+                print >>sys.stderr,self.name+': Waiting for all predictor threads to finish'
                 for p in predictorThreads:
                     while p.getPredictionNumber()!=self.queryNum:
                         pass
