@@ -28,7 +28,7 @@ class KronRLS:
         self._trProList = None
         self._nonGIPKernelDict = None
 
-        if iTrConnMat!=None:
+        if iTrConnMat is not None:
             self._trConnMat = iTrConnMat
             self._trComList = iTrComList
             self._trProList = iTrProList
@@ -63,7 +63,7 @@ class KronRLS:
         comList = None
         proList = None
         connMat = None
-        if self._trConnMat!=None:
+        if self._trConnMat is not None:
             comList = self._trComList
             proList = self._trProList
             connMat = self._trConnMat
@@ -140,7 +140,7 @@ class KronRLS:
 
         ## get nonGIP kernels
         nonGIPKernelDict = None
-        if self._nonGIPKernelDict!=None:
+        if self._nonGIPKernelDict is not None:
             nonGIPKernelDict = self._nonGIPKernelDict
         else:
             nonGIPKernelDict = pgUtil.drawKernel( list(set(list1+list2)) )
