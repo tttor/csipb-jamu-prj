@@ -101,7 +101,7 @@ class ServerThread(threading.Thread):
 
                     nPush += 1
                     comId,proId = queryList[i]
-                    src = ','.join([i['name'] for i in pcfg['methods']])
+                    src = '+'.join([i['name'] for i in pcfg['methods']])
 
                     queryCheck = "SELECT * FROM compound_vs_protein WHERE "
                     queryCheck += "com_id='"+comId+"' AND pro_id='"+proId+"'"
