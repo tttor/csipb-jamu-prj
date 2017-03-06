@@ -1,9 +1,10 @@
 import numpy as np
-
 import psycopg2
-import blmnii
 import sys
 import time
+
+from sklearn import svm
+from sklearn.preprocessing import MinMaxScaler
 
 sys.path.append('../../config')
 from database_config import databaseConfig as dcfg
