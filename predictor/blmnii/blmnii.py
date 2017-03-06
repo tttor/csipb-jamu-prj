@@ -46,8 +46,8 @@ def BLM_NII(adjMatrix,sourceSim,targetSim,dataSplit,dataQuery):
     else:
         model = svm.SVC(kernel='precomputed', probability=True)
         model.fit(gramTrain, intProfile)
-        # prediction = model.predict_proba(gramTest.reshape(1,-1))
-        prediction = model.predict(gramTest.reshape(1,-1))
+        prediction = model.predict_proba(gramTest.reshape(1,-1))
+        # prediction = model.predict(gramTest.reshape(1,-1))
 
-    # return (prediction[0][1],sourceIndex,targetIndex)
-    return (float(prediction[0]),sourceIndex,targetIndex)
+    return (prediction[0][1],sourceIndex,targetIndex)
+    # return (float(prediction[0]),sourceIndex,targetIndex)
