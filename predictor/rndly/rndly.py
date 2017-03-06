@@ -15,5 +15,6 @@ class RNDLy:
 
         return preds
 
-     def close(self):
+    def close(self):
         pass
+
