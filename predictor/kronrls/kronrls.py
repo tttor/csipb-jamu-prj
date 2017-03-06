@@ -150,7 +150,11 @@ class KronRLS:
         ## number of interactions per drug; to become gamma as below
         t = util.getType(list1[0])
         alpha = self._param['alpha'+t.capitalize()+'Kernel']
-        gamma = self._param['kernelBandwidth'] / ( np.sum(connMat)/float(len(list1)) )
+
+        gamma = self._param['kernelBandwidth']
+        avgConn = ( np.sum(connMat)/float(len(list1)) )
+        if avgConn!=0:
+            gamma = self._param['kernelBandwidth']/avgConn
 
         ##
         m = len(list1); n = len(list2)
