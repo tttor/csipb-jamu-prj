@@ -130,7 +130,7 @@ class BLMNII:
 
         if len(set(intProfile))==1:
             if self._proba:
-                prediction = [[0.0]]
+                prediction = [[0.0,0.0]]
             else:
                 prediction = [0.0]
         else:
