@@ -73,7 +73,7 @@ def drawKernel(idList):
             for comp in comps:
                 subcomps = comp.split('=')
                 id2 = subcomps[0].split(':')[0]
-                sim = subcomps[1]
+                sim = float(subcomps[1])
                 kernelDict[ (id1,id2) ] = sim
 
     return kernelDict

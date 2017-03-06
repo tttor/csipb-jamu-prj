@@ -61,5 +61,5 @@
 
 ## Implementing predictor classes
 * Each predictor class should implement:
-    * predict(xTestList)
-    * close()
+    * predict(xTestList) returns (yPredList of xTestList)
+    * close() returns (None)
