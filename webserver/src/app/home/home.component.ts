@@ -25,7 +25,7 @@ export class Home implements OnInit {
 
   // List of sources in the form of a string, each separated by an underscore _
   comProConnExperimentSrcs = 'drugbank.ca';
-  comProConnPredictionSrcs = 'blm-nii-svm_rndly';
+  comProConnPredictionSrcs = 'rndly_blmnii_kronrls';
 
   // count number of input rows
   nPlaInputHolders = 0;
