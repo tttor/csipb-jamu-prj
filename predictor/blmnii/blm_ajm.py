@@ -81,7 +81,6 @@ class BLMNII:
         for i,pair in enumerate(pairIndexList):
             if i == nQuery:
                 break
-            print pair
             train = [j for j in range(len(targetSim)) if j != i]
             test = [i]
 

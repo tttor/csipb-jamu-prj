@@ -81,7 +81,7 @@ class ServerThread(threading.Thread):
                     for j in range(nMethods):
                         pred = predictionListRaw[j][i]
                         if not(math.isnan(pred)): # valid
-                            w = pcfg['methods'][j][1]
+                            w = pcfg['methods'][j]['weight']
                             totalPred +=  (w * pred)
                             nValidPred += 1
 
@@ -101,7 +101,7 @@ class ServerThread(threading.Thread):
 
                     nPush += 1
                     comId,proId = queryList[i]
-                    src = ','.join([i[0] for i in pcfg['methods']])
+                    src = ','.join([i['name'] for i in pcfg['methods']])
 
                     queryCheck = "SELECT * FROM compound_vs_protein WHERE "
                     queryCheck += "com_id='"+comId+"' AND pro_id='"+proId+"'"
