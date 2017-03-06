@@ -71,6 +71,9 @@ if [ $8 -ne 0 ]; then
 
     find ../utility/ -name "*.pyc" -type f -delete
     scp -r ../utility/ $IJAH_SERVER:$PREDICTOR_DIR
+
+    find ../config/ -name "*.pyc" -type f -delete
+    scp -r ../config/ $IJAH_SERVER:$PREDICTOR_DIR
   fi
 fi
 

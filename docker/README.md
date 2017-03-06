@@ -9,8 +9,8 @@
 * check log
   * docker logs -f -t [imageName]
 
-* see port status
-  * netstat -ntlp
-
 * build
   * docker build -t [imageTag] -f [Dockerfile] [Path]
+
+* see port status
+  * netstat -ntlp
