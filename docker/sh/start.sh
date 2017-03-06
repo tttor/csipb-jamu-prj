@@ -1,4 +1,5 @@
 #!/bin/bash
+#TODO; use for loop
 
 ################################################################################
 echo "Starting IJAH web..."
@@ -10,10 +11,43 @@ echo "Starting IJAH predictor server 0"
 serverId=0
 LBHostToListenFrom=0.0.0.0
 LBPortToListenFromLo=5010
-LBPortToListenFromHi=5012
+LBPortToListenFromHi=5015
 server=/ijah-predictor/predictor/server/server.py
 
 docker run --restart=always -d --name "ijah_predictor_0_daemon" -p $LBPortToListenFromLo-$LBPortToListenFromHi:$LBPortToListenFromLo-$LBPortToListenFromHi -v /home/ijah/ijah-predictor/python:/ijah-predictor ijahpredictor python -u $server $serverId $LBHostToListenFrom $LBPortToListenFromLo $LBPortToListenFromHi
+
+################################################################################
+echo "Starting IJAH predictor server 1"
+
+serverId=1
+LBHostToListenFrom=0.0.0.0
+LBPortToListenFromLo=5020
+LBPortToListenFromHi=5025
+server=/ijah-predictor/predictor/server/server.py
+
+docker run --restart=always -d --name "ijah_predictor_1_daemon" -p $LBPortToListenFromLo-$LBPortToListenFromHi:$LBPortToListenFromLo-$LBPortToListenFromHi -v /home/ijah/ijah-predictor/python:/ijah-predictor ijahpredictor python -u $server $serverId $LBHostToListenFrom $LBPortToListenFromLo $LBPortToListenFromHi
+
+################################################################################
+echo "Starting IJAH predictor server 2"
+
+serverId=2
+LBHostToListenFrom=0.0.0.0
+LBPortToListenFromLo=5030
+LBPortToListenFromHi=5035
+server=/ijah-predictor/predictor/server/server.py
+
+docker run --restart=always -d --name "ijah_predictor_2_daemon" -p $LBPortToListenFromLo-$LBPortToListenFromHi:$LBPortToListenFromLo-$LBPortToListenFromHi -v /home/ijah/ijah-predictor/python:/ijah-predictor ijahpredictor python -u $server $serverId $LBHostToListenFrom $LBPortToListenFromLo $LBPortToListenFromHi
+
+################################################################################
+echo "Starting IJAH predictor server 3"
+
+serverId=3
+LBHostToListenFrom=0.0.0.0
+LBPortToListenFromLo=5040
+LBPortToListenFromHi=5045
+server=/ijah-predictor/predictor/server/server.py
+
+docker run --restart=always -d --name "ijah_predictor_3_daemon" -p $LBPortToListenFromLo-$LBPortToListenFromHi:$LBPortToListenFromLo-$LBPortToListenFromHi -v /home/ijah/ijah-predictor/python:/ijah-predictor ijahpredictor python -u $server $serverId $LBHostToListenFrom $LBPortToListenFromLo $LBPortToListenFromHi
 
 ################################################################################
 # LB should be started after all predictor servers up
