@@ -2,7 +2,7 @@
 from credential import *
 
 databaseConfigServer = dict(name='ijah',user='ijah',passwd=DB_PASSWD,
-                            host=HOST,port='5432')
+                            host=DB_HOST,port='5432')
 databaseConfigLocal = dict(name='ijah',user='ijah',passwd=DB_PASSWD_LOCAL,
                             host='localhost',port='5432')
 
