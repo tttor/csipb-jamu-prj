@@ -96,7 +96,7 @@ class ServerThread(threading.Thread):
                 # Push the prediction result to database
                 nPush = 0
                 for i,p in enumerate(predictionList):
-                    if math.isnan(p):# invalid
+                    if (math.isnan(p)) or (p<=0.0):# invalid
                         continue
 
                     nPush += 1
