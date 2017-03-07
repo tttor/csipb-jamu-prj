@@ -1,7 +1,7 @@
 %% This is an example first chapter.  You should put chapter/appendix that you
 %% write into a separate file, and add a line \include{yourfilename} to
 %% main.tex, where `yourfilename.tex' is the name of the chapter/appendix file.
-%% You can process specific files by typing their names in at the 
+%% You can process specific files by typing their names in at the
 %% \files=
 %% prompt when you run the file main.tex through LaTeX.
 %\chapter{Use Case 1 - Both Drug and Target Side} \label{Use Case}
@@ -70,11 +70,11 @@ Setelah memasukkan input, langkah berikutnya yaitu input dapat diproses. Setelah
 	\label{fig:ijah_process_bounce}
 	\end{figure}
 
-\section{Membaca luaran \emph{(outputs)}}
+\section{Membaca dan Menganalisis Luaran \emph{(outputs)}}
 \textbf{Catatan:} jika layout halaman output terlihat saling menumpuk, silakan \emph{zoom out} browser anda hingga terlihat sesuai (bergantung resolusi monitor anda).
 
 Setelah proses selesai, maka luaran \emph{(output)} yang dihasilkan sudah dapat dibaca. Terdapat empat kategori \emph{output} yang dihasilkan, yaitu:
-	
+
 	\subsection{Summary} \label{summary}
 	\begin{figure}[H]
 	\centering
@@ -82,19 +82,30 @@ Setelah proses selesai, maka luaran \emph{(output)} yang dihasilkan sudah dapat 
 	\caption{Output Summary}
 	\label{fig:ijah_output_summary}
 	\end{figure}
-	
+
 	Output Summary adalah ringkasan dari proses output, yang meliputi:
 	\begin{enumerate}
-	\item \textbf{Minimum Connectivity Weight to Process} -- nilai minimum skor yang diproses, dapat diubah melalui filter yang akan dijelaskan di bagian \hyperref[nav]{Filter pada Navigasi}.
-	\item \textbf{Connectivity Score} -- jumlah total dari nilai seluruh konektivitas (1 artinya 100\% terhubung, 0 tidak terhubung, di antara 1 dan 0 berarti hasil prediksi yang nilainya belum 100\%, seluruh keterhubungan dijumlah untuk mendapat nilai total).
-	\item \textbf{Number of Unique Items} -- jumlah entitas unik (tidak termasuk pengulangan) yang terlibat dalam proses.
-	\item \textbf{Compound-Protein Connectivity} -- jumlah konektivitas senyawa dan protein. \textbf{Known by experiment} artinya data sudah valid 100\%, berasal dari pangkalan data, sedangkan \textbf{Known by prediction} berarti konektivitas hasil prediksi algoritme, \textbf{Unknown} artinya konektivitas yang tidak diketahui baik dari pangkalan data maupun hasil prediksi algoritme.
-	\item \textbf{Mode} -- mode proses, apakah Search saja atau Search and Predict.
-	\item \textbf{Elapsed Time} -- waktu yang dihabiskan untuk menyelesaikan proses.
+	\item \textbf{Minimum Connectivity Weight to Display}
+	-- nilai minimum skor yang ditampilkan,
+	dapat diubah melalui filter yang akan dijelaskan di bagian \hyperref[nav]{Filter pada Navigasi}.
+	\item \textbf{Connectivity Score}
+	-- adalah jumlah dari weight dari tiap connectivity.
+	Label ``Total'' menunjukkan penjumlahan connectivity-score dari 3 jenis connectivity.
+	Weight tersebut mengindikasikan tingkat kepercayaan bahwa suatu connectivity benar-benar ada;
+	weight bernilai 1 menunjukkan 100\% kepercayaan, yaitu untuk data-data dari database,
+	sedangkan weight bernilai 0 menunjukkan 0\% kepercayaan bahwa suatu connectivity ada.
+	\item \textbf{Number of Unique Items}
+	-- jumlah entitas unik (tidak termasuk pengulangan) yang terlibat dalam proses.
+	\item \textbf{Compound-Protein Connectivity}
+	-- jumlah konektivitas senyawa dan protein. \textbf{Known by experiment} artinya data sudah valid 100\%, berasal dari pangkalan data, sedangkan \textbf{Known by prediction} berarti konektivitas hasil prediksi algoritme, \textbf{Unknown} artinya konektivitas yang tidak diketahui baik dari pangkalan data maupun hasil prediksi algoritme.
+	\item \textbf{Mode}
+	-- mode proses, apakah Search saja atau Search and Predict.
+	\item \textbf{Elapsed Time}
+	-- waktu yang dihabiskan untuk menyelesaikan proses.
 	\end{enumerate}
-	
+
 	\subsection{Connectivity Graph} \label{graph}
-	Connectivity Graph merupakan model output yang berupa \emph{multi-partite graph}, yaitu graf yang verteksnya terbagi menjadi beberapa partisi.
+	Connectivity Graph merupakan model output yang berupa \emph{multi-partite graph}, yaitu graf yang verteksnya terbagi menjadi beberapa partisi (himpunan).
 
 	\begin{figure}[H]
 	\centering
@@ -109,7 +120,7 @@ Setelah proses selesai, maka luaran \emph{(output)} yang dihasilkan sudah dapat 
 	\caption{Connectivity Graph pada Ijah Webserver}
 	\label{fig:ijah_output_graph}
 	\end{figure}
-	
+
 	Pada model Connectivity Graph Output, terdapat vertex dari Plant ke Compound, Compound ke Protein, dan Protein ke Disease, ada 4 partisi pada graf ini.
 
 	\begin{figure}[H]
@@ -122,7 +133,7 @@ Setelah proses selesai, maka luaran \emph{(output)} yang dihasilkan sudah dapat 
 	Pada bagian bawah dan atas graf terdapat panduan setiap partisi graf, dari paling kiri Plants (nama latin | nama Indonesia), lalu Compounds (dan IDnya (CAS, Drugbank, Knapsack, Kegg)), Proteins dan IDnya (nama Uniprot, singkatan (abbrv) Uniprot, ID Uniprot), dan Diseases beserta IDnya di paling kanan (ID dan nama OMIM).
 
 	Navigasi graf dapat dilakukan dengan menggulir \emph{scrolling} ke atas dan bawah. Graf ini bisa didownload menggunakan tombol Download di bawah graf, dengan format gambar PNG.
-	
+
 	\subsection{Connectivity Text} \label{text}
 
 	Selain dalam bentuk \emph{multipartite graph}, output juga dihasilkan dalam bentuk Connectivity Text, yaitu teks yang berisi konektivitas antar entitas
@@ -132,8 +143,8 @@ Setelah proses selesai, maka luaran \emph{(output)} yang dihasilkan sudah dapat 
 	\includegraphics[scale=0.3]{ijah_output_text.png}
 	\caption{Connectivity Text pada Ijah Webserver}
 	\label{fig:ijah_output_text}
-	\end{figure}	
-	
+	\end{figure}
+
 	Isi pada output Text yaitu data konektivitas (nama dan ID entitas pertama), sumber data konektivitas, serta bobot nilai konektivitas (1 jika terhubung 100\% by experiment, jika by prediction nilainya akan bervariasi antara 0 sampai 1, lebih mendekati 1 maka lebih baik), lalu nama dan ID entitas keduanya.
 
 	Pada output Text, dapat dilakukan \emph{swapping} konektivitas, misal dari Plant-Compound menjadi Compound-Plant. Hal ini dapat dilakukan dengan mengklik tombol \textbf{Swap!} di bagian atas tiap kotak konektivitas.
@@ -160,7 +171,7 @@ Setelah proses selesai, maka luaran \emph{(output)} yang dihasilkan sudah dapat 
 	\caption{Tombol Download untuk mengunduh file teks konektivitas}
 	\label{fig:ijah_output_text_download}
 	\end{figure}
-	
+
 	\subsection{Metadata Text} \label{meta}
 	Metadata Text berisi metadata (nama dan ID) dari semua entitas yang terlibat dalam proses ini. Pada bagian bawah, juga terdapat tombol Download untuk mengunduh teks Metadata ini. Pada metadata ini, jika ada item yang tidak ditampilkan pada salah satu entitas namun ada di entitas lainnya, artinya \emph{value} item tersebut pada entitas tersebut tidak ada. Sebagai contoh, pada metadata Compounds, ada beberapa senyawa yang tidak memiliki nama PubChem sehingga tidak ditampilkan.
 
