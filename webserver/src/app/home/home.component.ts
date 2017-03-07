@@ -1414,8 +1414,8 @@ export class Home implements OnInit {
       this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00008027'}, { 'index': 2, 'value' : 'COM00021005'}, { 'index': 3, 'value' : 'COM00009696'}, { 'index': 4, 'value' : 'COM00020511'}];
       this.nComInputHolders = 5;
 
-      this.proInputHolders = [{ 'index': 1, 'value' : 'P30518 | V2R_HUMAN | Vasopressin V2 receptor'}, { 'index': 2, 'value' : 'P16410 | CTLA4_HUMAN | Cytotoxic T-lymphocyte protein 4'}, { 'index': 3, 'value' : 'O43316 | PAX4_HUMAN | Paired box protein Pax-4'}, { 'index': 4, 'value' : ''}];
-      this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00000343'}, { 'index': 2, 'value' : 'PRO00000283'}, { 'index': 3, 'value' : 'PRO00002960'}];
+      this.proInputHolders = [{ 'index': 1, 'value' : 'P53985 | Monocarboxylate transporter 1'}, { 'index': 2, 'value' : 'P20309 | Muscarinic acetylcholine receptor M3'}, { 'index': 3, 'value' : 'Q99720 | Sigma non-opioid intracellular receptor 1'}, { 'index': 4, 'value' : ''}];
+      this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00000040'}, { 'index': 2, 'value' : 'PRO00000452'}, { 'index': 3, 'value' : 'PRO00000377'}];
       this.nProInputHolders = 4;
 
       this.activeTanaman = false;
@@ -1461,8 +1461,8 @@ export class Home implements OnInit {
       this.activeCompound = false;
     }
     else if(type==='disease'){
-      this.disInputHolders = [{ 'index': 1, 'value' : '601665 | Obesity'}, { 'index': 2, 'value' : '600807 | Asthma'}, { 'index': 3, 'value' : '610551 | Herpes simplex encephalitis 1'}, { 'index': 4, 'value' : '177700 | Glaucoma 1, open angle, P'}, { 'index': 5, 'value' : '166710 | Osteoporosis'}];
-      this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000470'}, { 'index': 2, 'value' : 'DIS00001061'}, { 'index': 3, 'value' : 'DIS00000900'}, { 'index': 4, 'value' : 'DIS00001636'}, { 'index': 5, 'value' : 'DIS00003892'}];
+      this.disInputHolders = [{ 'index': 1, 'value' : '601665 | Obesity'}, { 'index': 2, 'value' : '600807 | Asthma'}, { 'index': 3, 'value' : '610551 | Herpes simplex encephalitis 1'}, { 'index': 4, 'value' : '156610 | Skin creases, congenital symmetric circumferential, 1'}, { 'index': 5, 'value' : '166710 | Osteoporosis'}];
+      this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000470'}, { 'index': 2, 'value' : 'DIS00001061'}, { 'index': 3, 'value' : 'DIS00000900'}, { 'index': 4, 'value' : 'DIS00001455'}, { 'index': 5, 'value' : 'DIS00003892'}];
       this.nDisInputHolders = 5;
 
       this.activeProtein = false;
