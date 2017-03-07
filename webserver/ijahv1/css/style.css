@@ -1,0 +1,192 @@
+/*****SLIDING MENU PANEL STYLESHEET*****/
+/*****BY: AMIT JAKHU*****/
+/*****WWW.AMITJAKHU.COM*****/
+
+/*****FONTS*****/
+
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400italic,600,600italic,700italic,700,300italic,300|Acme); /* Acme font is required for .arrow */
+
+/*****END FONTS*****/
+
+/*****DEMO ONLY*****/
+
+::selection {
+	color: #fff;
+	background: #ec6912;
+}
+
+::-moz-selection {
+	color: #fff;
+	background: #ec6912;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+
+body {
+	background: #d3d7dc;
+	font: normal 400 14px/21px 'Source Sans Pro', Helvetica, Arial, sans-serif;
+	color: #464851;
+}
+
+h1 {
+	font: normal 600 48px/56px 'Source Sans Pro', Helvetica, Arial, sans-serif;
+	text-shadow: 1px 1px 0 rgba(255,255,255,0.75);
+	margin-bottom: 30px;
+}
+
+p {
+	text-shadow: 1px 1px 0 rgba(255,255,255,0.75);
+	margin-bottom: 20px;
+}
+
+strong {
+	font-weight: 700;
+}
+
+.wrapper {
+	background: #f3f3f3;
+	border: 1px solid #fff;
+	width: 400px;
+	padding: 50px 40px;
+	margin: 0 auto;
+	position: relative;
+	top: 125px;
+	clear: both;
+	
+	box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+	-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+	-webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+	
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+
+.footer {
+	width: 400px;
+	position: relative;
+	margin: 0 auto;
+	top: 175px;
+}
+
+.footer p {
+	font-size: 12px;
+	color: #888888;
+}
+
+.footer p a {
+	color: #888888;
+	text-decoration: none;
+}
+
+.footer p a:hover {
+	color: #ec6912;
+}
+
+.download {
+	display: block;
+	position: absolute;
+	float: right;
+	right: 25px;
+	bottom: 25px;
+	padding: 5px;
+	
+	font-weight: 700;
+	font-size: 12px;
+	text-align: right;
+	text-decoration: none;
+	color: rgba(0,0,0,0.5);
+	text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+}
+
+.download:hover {
+	color: rgba(0,0,0,0.75);
+	text-shadow: 1px 1px 0 rgba(256,256,256,0.5);
+}
+
+.download:focus {
+	bottom: 24px;
+}
+
+/*****END DEMO ONLY*****/
+
+
+/*****ANIMATONS (optional)*****/
+
+#menu, #menu .arrow, #menu nav a {
+	transition: all 0.4s;
+	-moz-transition: all 0.4s;
+	-webkit-transition: all 0.4s;
+}
+
+/*****END ANIMATONS*****/
+
+
+/*****PANEL*****/
+
+#menu {
+	background: #f9f9f9;
+	border-right: 3px solid #fff;
+	width: 100px;
+	padding: 30px;
+	position: fixed;
+	z-index: 100000;
+	
+	box-shadow: 1px 0 3px rgba(0,0,0,0.25);
+	-moz-box-shadow: 1px 0 3px rgba(0,0,0,0.25);
+	-webkit-box-shadow: 1px 0 3px rgba(0,0,0,0.25);
+}
+
+#menu {
+	left: 0; /* Change to right: 0; if you want the panel to display on the right side. */
+}
+
+#menu:hover, #menu:focus {
+	left: 0 !important; /* Change to right: 0 !important; if you want the panel to display on the right side. */
+}
+
+#menu .arrow {
+	right: 2px; /* Change to left: 2px; if you want the panel to display on the right side. */
+}
+
+#menu .arrow {
+	font: normal 400 25px/25px 'Acme', Helvetica, Arial, sans-serif; /* Acme font is required for .arrow */
+	color: rgba(0,0,0,0.75); /* Arrow color */
+	width: 16px;
+	height: 25px;
+	display: block;
+	position: absolute;
+	top: 20px;
+	cursor: default;
+}
+
+#menu:hover .arrow {
+	transform: rotate(-180deg) translate(6px,-3px);
+	-moz-transform: rotate(-180deg) translate(6px,-3px);
+	-webkit-transform: rotate(-180deg) translate(6px,-3px);
+}
+
+#menu nav {
+	position: relative;
+	top: 75px;
+}
+
+#menu nav a {
+	padding: 20px 5px;
+	border-bottom: 1px dotted #c0c0c0;
+	display: block;
+	clear: both;
+	font: normal 400 12px/18px 'Open Sans', Helvetica, Arial, sans-serif;
+	color: #656565;
+	text-decoration: none;
+}
+
+#menu nav a:hover {
+	color: #ec6912;
+}
+
+/*****END PANEL*****/
