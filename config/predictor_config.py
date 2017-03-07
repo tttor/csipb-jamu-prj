@@ -1,7 +1,8 @@
 # predictor_config.py
 
 ## Individual predictors
-rndlyConfig = dict(name='rndly',weight=0.5,batchSize=1)
+rndlyConfig = dict(name='rndly',weight=0.5,
+                   batchSize=100)
 kronRLSConfig = dict(name='kronrls',weight=0.6,
                      batchSize=10,maxTrainingDataSize=100,
                      gamma=1.0,threshold=0.1,
@@ -13,5 +14,5 @@ blmniiConfig = dict(name='blmnii',weight=0.6,batchSize=1,
 ## Common params
 predictorConfig = dict()
 predictorConfig['maxElapsedTime'] = 7 # in seconds
-predictorConfig['methods'] = [kronRLSConfig,blmniiConfig]
+predictorConfig['methods'] = [kronRLSConfig,blmniiConfig,rndlyConfig]
 predictorConfig['trainingDataSources'] = ['drugbank.ca']
