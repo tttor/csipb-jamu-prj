@@ -2,7 +2,7 @@
 
 ## Individual predictors
 rndlyConfig = dict(name='rndly',weight=0.5,
-                   batchSize=100)
+                   batchSize=5)
 kronRLSConfig = dict(name='kronrls',weight=0.6,
                      batchSize=10,maxTrainingDataSize=100,
                      gamma=1.0,threshold=0.1,

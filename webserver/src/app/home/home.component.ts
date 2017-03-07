@@ -702,8 +702,9 @@ export class Home implements OnInit {
             let nUndefinedComProConn = 0;
             let nKnownByExperimentComProConn = 0;
             let nKnownByPredictionComProConn = 0;
+            let sourceSep = '+';// must match with the one in server_thread.py for merging prediction sources
             for (let i=0; i<comVSpro.length; i++) {
-              let allSrc = comVSpro[i]['source'].split(',');
+              let allSrc = comVSpro[i]['source'].split(sourceSep);
               let src = allSrc[0];// TODO should depends on all sources
               if (src==='null') {// unknown
                 nUnknownComProConn += 1;
