@@ -1402,17 +1402,17 @@ export class Home implements OnInit {
       this.selectedPlants = [{"index":1,"value":"PLA00003831"},{"index":2,"value":"PLA00000683"},{"index":3,"value":"PLA00002036"},{"index":4,"value":"PLA00001034"}];
       this.nDisInputHolders = 5;
 
-      this.proInputHolders = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
-      this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
-      this.nProInputHolders = 3;
+      this.proInputHolders = [{ 'index': 1, 'value' : 'P30518 | V2R_HUMAN | Vasopressin V2 receptor'}, { 'index': 2, 'value' : 'P16410 | CTLA4_HUMAN | Cytotoxic T-lymphocyte protein 4'}, { 'index': 3, 'value' : 'O43316 | PAX4_HUMAN | Paired box protein Pax-4'}, { 'index': 4, 'value' : ''}];
+      this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00000343'}, { 'index': 2, 'value' : 'PRO00000283'}, { 'index': 3, 'value' : 'PRO00002960'}];
+      this.nProInputHolders = 4;
 
       this.activeDisease = false;
       this.activeCompound = false;
     }
     else if(type==='compound_vs_protein'){
-      this.comInputHolders = [{ 'index': 1, 'value' : '51-55-8 | L-hyoscyamine | (8-methyl-8-azabicyclo[3.2.1]octan-3-yl) 3-hydroxy-2-phenylpropanoate'}, { 'index': 2, 'value' : '61-50-7 | N,n-dimethyltryptamine | 2-(1H-indol-3-yl)-N,N-dimethylethanamine'}, { 'index': 3, 'value' : '117-39-5 | Quercetin | 2-(3,4-dihydroxyphenyl)-3,5,7-trihydroxychromen-4-one'}, { 'index': 4, 'value' : ''}];
-      this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000058'}];
-      this.nComInputHolders = 2;
+      this.comInputHolders = [{ 'index': 1, 'value' : '80510-09-4 | N-cis-feruloyltyramine | (Z)-3-(4-hydroxy-3-methoxyphenyl)-N-[2-(4-hydroxyphenyl)ethyl]prop-2-enamide'}, { 'index': 2, 'value' : '29388-59-8 | Secoisolariciresinol | (2R,3R)-2,3-bis[(4-hydroxy-3-methoxyphenyl)methyl]butane-1,4-diol'}, { 'index': 3, 'value' : '18446-73-6 | Tembetarine | (1S)-1-[(3-hydroxy-4-methoxyphenyl)methyl]-6-methoxy-2,2-dimethyl-3,4-dihydro-1H-isoquinolin-2-ium-7-ol'}, { 'index': 4, 'value' : '644-30-4 | Curcumene | 1-methyl-4-(6-methylhept-5-en-2-yl)benzene'}, { 'index': 5, 'value' : ''}];
+      this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00008027'}, { 'index': 2, 'value' : 'COM00021005'}, { 'index': 3, 'value' : 'COM00009696'}, { 'index': 4, 'value' : 'COM00020511'}];
+      this.nComInputHolders = 5;
 
       this.proInputHolders = [{ 'index': 1, 'value' : 'P53985 | Monocarboxylate transporter 1'}, { 'index': 2, 'value' : 'P20309 | Muscarinic acetylcholine receptor M3'}, { 'index': 3, 'value' : 'Q99720 | Sigma non-opioid intracellular receptor 1'}, { 'index': 4, 'value' : ''}];
       this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00000040'}, { 'index': 2, 'value' : 'PRO00000452'}, { 'index': 3, 'value' : 'PRO00000377'}];
@@ -1422,12 +1422,12 @@ export class Home implements OnInit {
       this.activeDisease = false;
     }
     else if(type==='compound_vs_disease'){
-      this.comInputHolders = [{ 'index': 1, 'value' : '51-55-8 | L-hyoscyamine | (8-methyl-8-azabicyclo[3.2.1]octan-3-yl) 3-hydroxy-2-phenylpropanoate'}, { 'index': 2, 'value' : '51-34-3 | Hyoscine'}, { 'index': 3, 'value' : '53-86-1 | Indomethacin | 2-[1-(4-chlorobenzoyl)-5-methoxy-2-methylindol-3-yl]acetic acid'}, { 'index': 4, 'value' : ''}];
-      this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00001628'}, { 'index': 3, 'value' : 'COM00005599'}];
-      this.nComInputHolders = 2;
+      this.comInputHolders = [{ 'index': 1, 'value' : '80510-09-4 | N-cis-feruloyltyramine | (Z)-3-(4-hydroxy-3-methoxyphenyl)-N-[2-(4-hydroxyphenyl)ethyl]prop-2-enamide'}, { 'index': 2, 'value' : '29388-59-8 | Secoisolariciresinol | (2R,3R)-2,3-bis[(4-hydroxy-3-methoxyphenyl)methyl]butane-1,4-diol'}, { 'index': 3, 'value' : '18446-73-6 | Tembetarine | (1S)-1-[(3-hydroxy-4-methoxyphenyl)methyl]-6-methoxy-2,2-dimethyl-3,4-dihydro-1H-isoquinolin-2-ium-7-ol'}, { 'index': 4, 'value' : '644-30-4 | Curcumene | 1-methyl-4-(6-methylhept-5-en-2-yl)benzene'}, { 'index': 5, 'value' : ''}];
+      this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00008027'}, { 'index': 2, 'value' : 'COM00021005'}, { 'index': 3, 'value' : 'COM00009696'}, { 'index': 4, 'value' : 'COM00020511'}];
+      this.nComInputHolders = 5;
 
-      this.disInputHolders = [{ 'index': 1, 'value' : '608516 | Major depressive disorder'}, { 'index': 2, 'value' : '100100 | Prune belly syndrome'}, { 'index': 3, 'value' : '614473 | Arterial calcification of infancy, generalized, 2'}, { 'index': 4, 'value' : ''}];
-      this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000849'}, { 'index': 2, 'value' : 'DIS00003796'}, { 'index': 3, 'value' : 'DIS00000853'}];
+      this.disInputHolders = [{ 'index': 1, 'value' : '601388 | Diabetes mellitus, insulin-dependent, 12'}, { 'index': 2, 'value' : '304800 | Diabetes insipidus, nephrogenic, X-linked'}, { 'index': 3, 'value' : '612227 | Diabetes mellitus, ketosis-prone'}, { 'index': 4, 'value' : ''}];
+      this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000073'}, { 'index': 2, 'value' : 'DIS00000749'}, { 'index': 3, 'value' : 'DIS00000365'}];
       this.nDisInputHolders = 4;
 
       this.activeTanaman = false;
@@ -1443,18 +1443,18 @@ export class Home implements OnInit {
       this.activeDisease = false;
     }
     else if(type==='compound'){
-      this.comInputHolders = [{ 'index': 1, 'value' : '117-39-5 | Quercetin | 2-(3,4-dihydroxyphenyl)-3,5,7-trihydroxychromen-4-one'}, { 'index': 2, 'value' : '61-50-7 | N,n-dimethyltryptamine | 2-(1H-indol-3-yl)-N,N-dimethylethanamine'}, { 'index': 3, 'value' : '51-55-8 | L-hyoscyamine | (8-methyl-8-azabicyclo[3.2.1]octan-3-yl) 3-hydroxy-2-phenylpropanoate'}, { 'index': 4, 'value' : ''}];
-      this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000058'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000039'}];
-      this.nComInputHolders = 2;
+      this.comInputHolders = [{ 'index': 1, 'value' : '57-50-1 | Sucrose | (2R,3R,4S,5S,6R)-2-[(2S,3S,4S,5R)-3,4-dihydroxy-2,5-bis(hydroxymethyl)oxolan-2-yl]oxy-6-(hydroxymethyl)oxane-3,4,5-triol'}, { 'index': 2, 'value' : '53-16-7 | Estrone | (8R,9S,13S,14S)-3-hydroxy-13-methyl-7,8,9,11,12,14,15,16-octahydro-6H-cyclopenta[a]phenanthren-17-one'}, { 'index': 3, 'value' : '334-48-5 | Decanoic acid | decanoic acid'}, { 'index': 4, 'value' : '480-41-1 | Naringenin | (2S)-5,7-dihydroxy-2-(4-hydroxyphenyl)-2,3-dihydrochromen-4-one'}, { 'index': 5, 'value' : ''}];
+      this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00004561'}, { 'index': 2, 'value' : 'COM00001997'}, { 'index': 3, 'value' : 'COM00000363'}, { 'index': 4, 'value' : 'COM00003074'}];
+      this.nComInputHolders = 4;
 
       this.activeDisease = false;
       this.activeTanaman = false;
       this.activeProtein = false;
     }
     else if(type==='protein'){
-      this.proInputHolders = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
-      this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
-      this.nProInputHolders = 3;
+      this.proInputHolders = [{ 'index': 1, 'value' : 'P37231 | PPARG_HUMAN | Peroxisome proliferator-activated receptor gamma'}, { 'index': 2, 'value' : 'P01189 | COLI_HUMAN | Pro-opiomelanocortin'}, { 'index': 3, 'value' : 'P02452 | CO1A1_HUMAN | Collagen alpha-1(I) chain'}, { 'index': 4, 'value' : 'Q9UHD2 | TBK1_HUMAN | Serine/threonine-protein kinase TBK1'}, { 'index': 5, 'value' : ''}];
+      this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00002168'}, { 'index': 2, 'value' : 'PRO00000061'}, { 'index': 3, 'value' : 'PRO00000261'}, { 'index': 4, 'value' : 'PRO00001836'}];
+      this.nProInputHolders = 4;
 
       this.activeDisease = false;
       this.activeTanaman = false;
