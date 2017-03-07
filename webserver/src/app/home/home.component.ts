@@ -1216,15 +1216,23 @@ export class Home implements OnInit {
 
     let urlStr = '';
     if (baseUrl.indexOf('unknown')===-1 && seed && seed!=='' && seed!=='null') {
-      let seedComps = seed.split(',');
+      let sep = 'unknown';
+      if (type==='pro_pdb_id') {
+        sep = ',';
+      }
+      else if (type==='pla_idr_name') {
+        sep = '/';
+      }
+
+      let seedComps = seed.split(sep);
       for (let i=0; i<seedComps.length;i++) {
         let s = seedComps[i];
         let url: string = baseUrl + s;
 
-        urlStr += '<a href="'+url+'" target="_blank">'+s+'</a>';
-        if (i < seedComps.length-1) {
-          urlStr += ',';
+        if (i>0) {
+          urlStr += sep;
         }
+        urlStr += '<a href="'+url+'" target="_blank">'+s+'</a>';
       }
     }
     else {
