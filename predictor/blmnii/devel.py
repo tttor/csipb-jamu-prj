@@ -6,6 +6,7 @@ import time
 import sys
 import os
 import matplotlib.pyplot as plt
+from blm_ajm import BLMNII
 
 from sklearn import svm
 from sklearn.model_selection import KFold
@@ -29,10 +30,13 @@ import blmnii
 #from scoop import futures as fu
 def main():
     # Loocv only To Do added k-fold
+    classParam = dict(name='blmnii',proba=True)
+
     if len(sys.argv)!=4:
         print "python blmniisvm_experiment.py [DataSetCode] [evalMode] [PathDirectory]"
         return
     #Pick data set
+
     dataset = sys.argv[1]
     evalMode = sys.argv[2]
     generalPath = sys.argv[3]
@@ -63,8 +67,7 @@ def main():
     # Build list of pair...
     pairData = []
     connList = []
-    print "Formatting Data" # Or change BLM to compatible with this data structure...?
-    #Split data structure Here
+    print "Split Dataset..."
     if evalMode == "loocv":
         nFold = len(comListIdx)
         kSplit = KFold(n_splits=nFold,shuffle=True)
@@ -85,47 +88,40 @@ def main():
 
     predictedData = np.zeros((len(comList),len(proList)),dtype=float)
     splitPred = []
-    connMat = [[row[i] for row in connMat] for i in range(len(connMat[0]))]
+    proTestList = []
+    proTrainList = []
+    comTestList = []
+    comTrainList = []
 
-    for trainIndex, testIndex in comSplit:
-        testIdx = [i for i in testIndex]
-        trainIdx = [i for i in trainIndex]
-        for source in proListIdx:
-            for target in testIdx:
-                splitPred.append(blmnii.BLM_NII(connMat,proSimMat,comSimMat,
-                                   [testIdx, trainIdx],(source,target)))
-
-    predictedData = np.zeros((len(comList),len(proList)),dtype=float)
-    for i in splitPred:
-        predictedData[i[2]][i[1]] = i[0]
-
-    splitPred = []
-    connMat = [[row[i] for row in connMat] for i in range(len(connMat[0]))]
     for trainIndex, testIndex in proSplit:
-        testIdx = [i for i in testIndex]
-        trainIdx = [i for i in trainIndex]
-        for source in comListIdx:
-            for target in testIdx:
-                splitPred.append(blmnii.BLM_NII(connMat,comSimMat,proSimMat,
-                                   [testIdx, trainIdx],(source,target)))
+        proTestList.append([i for i in testIndex])
+        proTrainList.append([i for i in trainIndex])
+    for trainIndex, testIndex in comSplit:
+        comTestList.append([i for i in testIndex])
+        comTrainList.append([i for i in trainIndex])
 
-    for i in splitPred:
-        predictedData[i[1]][i[2]] = max(predictedData[i[1]][i[2]],i[0])
-
+    predRes = []
     testData = []
-    predictionRes = []
-    idx = 0
-    for i in range(len(comList)):
-        for j in range(len(proList)):
-            testData.append(connMat[i][j])
-            predictionRes.append(predictedData[i][j])
+    print "Predicting..."
+    for ii,i in enumerate(comTestList):
+        for jj,j in enumerate(proTestList):
+            sys.stdout.write("\r"+str(jj+1) +" of "+str(len(proTestList)) +
+                                "||" + str(ii+1) +" of "+str(len(comTestList)))
+            sys.stdout.flush()
+
+            predictor = BLMNII(classParam, connMat, comSimMat, proSimMat,
+                            [comTrainList[ii],proTrainList[jj]],[i,j])
+            for comp in i:
+                for prot in j:
+                    predRes.append(predictor.predict([(comp,prot)]))
+                    testData.append(connMat[comp][prot])
 
 #####################################################################
 
-    print "Calculate Performance"
+    print "\nCalculate Performance"
     key = 'PredictionUsingBLM_NII' #<-- May use other method for comparison
-    precision, recall, _ = precision_recall_curve(testData, predictionRes)
-    prAUC = average_precision_score(testData, predictionRes, average='micro')
+    precision, recall, _ = precision_recall_curve(testData, predRes)
+    prAUC = average_precision_score(testData, predRes, average='micro')
 
     #### Debugging
     ####
