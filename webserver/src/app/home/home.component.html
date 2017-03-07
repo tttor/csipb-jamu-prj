@@ -36,14 +36,14 @@
 <div *ngIf="!click">
   <div class="row" *ngIf="!show">
     <p class="contoh col-md-12 text-center">
-      <button class="btn btn-success"(click)="example7()">Example #1a</button>
-      <button class="btn btn-success"(click)="example5()">Example #1b</button>
-      <button class="btn btn-success"(click)="example8()">Example #1c</button>
-      <button class="btn btn-success"(click)="example6()">Example #1d</button>
-      <button class="btn btn-success"(click)="example1()">Example #2a</button>
-      <button class="btn btn-success"(click)="example2()">Example #2b</button>
-      <button class="btn btn-success"(click)="example3()">Example #3a</button>
-      <button class="btn btn-success"(click)="example4()">Example #3b</button>
+      <button class="btn btn-success"(click)="exampleCallback('plant_vs_disease')">Example #1a</button>
+      <button class="btn btn-success"(click)="exampleCallback('plant_vs_protein')">Example #1b</button>
+      <button class="btn btn-success"(click)="exampleCallback('compound_vs_protein')">Example #1c</button>
+      <button class="btn btn-success"(click)="exampleCallback('compound_vs_disease')">Example #1d</button>
+      <button class="btn btn-success"(click)="exampleCallback('plant')">Example #2a</button>
+      <button class="btn btn-success"(click)="exampleCallback('compound')">Example #2b</button>
+      <button class="btn btn-success"(click)="exampleCallback('protein')">Example #3a</button>
+      <button class="btn btn-success"(click)="exampleCallback('disease')">Example #3b</button>
     </p>
     <div class="col-md-6">
       <div class="row text-center">
