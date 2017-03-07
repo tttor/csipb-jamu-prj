@@ -14,84 +14,100 @@ sys.path.append('../../utility')
 import util
 
 class BLMNII:
-    def __init__(self,params):
+    def __init__(self,params,connMat=None,comSimMat=None,proSimMat=None,
+                    trainList=None,testList=None):
+
+
         self._name = params['name']
         self._proba = params['proba']
-        self._nPair = params['maxTrainingDataSize']
         self._connDB = psycopg2.connect(database=dcfg['name'],user=dcfg['user'],password=dcfg['passwd'],
                                         host=dcfg['host'],port=dcfg['port'])
         self._cur = self._connDB.cursor()
 
+        self._comSimMat = None
+        self._proSimMat = None
+        self._connMat = None
+        self._develMode = False
+        self._trainList = None
+        self._testList = None
+
+        if connMat is not None:
+            self._comSimMat = comSimMat
+            self._proSimMat = proSimMat
+            self._connMat = connMat
+            self._develMode = True
+            self._trainList = trainList
+            self._testList = testList
+        else:
+            self._nPair = params['maxTrainingDataSize']
+
     def predict(self,query):
         nQuery = len(query)
         # sys.stderr.write ("Processing Query.... \n")
-        pairIdList = util.randData(query,self._nPair)
 
-        # sys.stderr.write ("Making kernel....\n")
-        compList = [i[0] for i in pairIdList]
-        compMeta, compSimMat = self._makeKernel(compList,"com")
-        protList = [i[1] for i in pairIdList]
-        protMeta, protSimMat = self._makeKernel(protList,"pro")
+        if self._develMode:
 
-        # sys.stderr.write ("Building connectivity data...\n")
-        adjMat = self._makeAdjMat(compMeta,protMeta)
-        pairIndexList = [[compMeta[i[0]],protMeta[i[1]]] for i in pairIdList]
-        # sys.stderr.write ("Running BLM-NII...\n")
-        # Running Batch
-        comPred = self._predict(adjMat,compSimMat,protSimMat,pairIndexList,
-                                nQuery,0)
-        proPred = self._predict(adjMat,protSimMat,compSimMat,pairIndexList,
-                                nQuery,1)
+            queryIdx = [[i[0],i[1]] for i in query]
 
+            comTrain = self._trainList[0]
+            comTest = self._testList[0]
+
+            proTrain = self._trainList[1]
+            proTest = self._testList[1]
+
+        else:
+
+            # timer = time.time()
+            pairIdList = util.randData(query,self._nPair)
+            # print "This section is running for "+str(time.time()-timer)+" seconds"
+
+
+            # sys.stderr.write ("Making kernel....\n")
+            # timer = time.time()
+
+            comList = [i[0] for i in pairIdList]
+            comMeta, self._comSimMat = self._makeKernel(comList,"com")
+            comTest =  list(set([comMeta[pair[0]] for ii,pair
+                            in enumerate(query) if i<nQuery]))
+            comTrain = [comMeta[i] for i in set(comList) if i not in comTest]
+
+            proList = [i[1] for i in pairIdList]
+            proMeta, self._proSimMat = self._makeKernel(proList,"pro")
+            proTest =  list(set([proMeta[pair[1]] for ii,pair
+                            in enumerate(query) if i<nQuery]))
+            proTrain = [proMeta[i] for i in set(proList) if i not in proTest]
+
+            queryIdx = ([[comMeta[pair[0]],proMeta[pair[1]]] for ii,pair
+                        in enumerate(query) if ii<nQuery])
+            # print "This section is running for "+str(time.time()-timer)+" seconds"
+
+
+            # sys.stderr.write ("Building connectivity data...\n")
+            # timer = time.time()
+            self._connMat = self._makeAdjMat(comMeta,proMeta)
+            # print "This section is running for "+str(time.time()-timer)+" seconds"
+
+            # sys.stderr.write ("Running BLM-NII...\n")
+
+        # timer = time.time()
         mergePred = []
-        for i in range(nQuery):
-            mergePred.append(max(comPred[0][0],proPred[0][0]))
+        for i in queryIdx:
+            comPred = self._predict(self._connMat,self._comSimMat,self._proSimMat,
+                                    [proTest,proTrain],(i[0],i[1]),0)
+            proPred = self._predict(self._connMat,self._proSimMat,self._comSimMat,
+                                    [comTest,comTrain],(i[1],i[0]),1)
+            mergePred.append(max(comPred[0],proPred[0]))
+        # print "This section is running for "+str(time.time()-timer)+" seconds"
         return mergePred
 
     def close(self):
         self._connDB.close()
 
-    def _makeAdjMat(self,compList,protList):
-        adjMat = np.zeros((len(compList), len(protList)), dtype=int)
+    def _predict(self,adjMatrix,sourceSim,targetSim,dataSplit,dataQuery,mode):
 
-        query = "SELECT com_id, pro_id, weight FROM compound_vs_protein"
-        queryC = " WHERE ("
-        for i,j in enumerate(compList):
-            if i>0:
-                queryC += " OR "
-            queryC += " com_id = " + "'"+j+"'"
-        queryC += ")"
-        queryP = " AND ("
-        for i,j in enumerate(protList):
-            if i>0:
-                queryP += " OR "
-            queryP += " pro_id = " + "'"+j+"'"
-        queryP += ")"
+        if mode == 1:
+            adjMatrix = [[row[i] for row in adjMatrix] for i in range(len(adjMatrix[0]))]
 
-        query += queryC + queryP
-        self._cur.execute(query)
-        rows = self._cur.fetchall()
-        for row in rows:
-            adjMat[compList[row[0]]][protList[row[1]]]=(row[2])
-        return adjMat
-
-    def _predict(self,adjMat,sourceSim,targetSim,pairIndexList,nQuery,mode):
-        resPred = []
-        if mode:
-            adjMat = [[row[i] for row in adjMat] for i in range(len(adjMat[0]))]
-
-        for i,pair in enumerate(pairIndexList):
-            if i == nQuery:
-                break
-            train = [j for j in range(len(targetSim)) if j != i]
-            test = [i]
-
-            resPred.append(self._predict2(adjMat,sourceSim,targetSim,
-                        (test,train),(pair[mode],pair[not(mode)])))
-
-        return resPred
-
-    def _predict2(self,adjMatrix,sourceSim,targetSim,dataSplit,dataQuery):
         testIndex = dataSplit[0]
         trainIndex = dataSplit[1]
         sourceIndex = dataQuery[0]
@@ -100,13 +116,7 @@ class BLMNII:
         nTrain = len(trainIndex)
         nTest = len(testIndex)
         nSource = len(sourceSim)
-        gramTest = targetSim[targetIndex]
-        gramTrain = targetSim
 
-        for i in reversed(testIndex):
-            gramTest = np.delete(gramTest,i, 0)
-            gramTrain = np.delete(gramTrain,i, 0)
-            gramTrain = np.delete(gramTrain,i, 1)
 
         intProfile = np.zeros(nTrain,dtype=float)
         neighbors = [j for i,j in enumerate(adjMatrix[sourceIndex]) if i in trainIndex]
@@ -134,6 +144,12 @@ class BLMNII:
             else:
                 prediction = [0.0]
         else:
+            gramTest = targetSim[targetIndex]
+            gramTrain = targetSim
+            for i in reversed(sorted(testIndex)):
+                gramTest = np.delete(gramTest,i, 0)
+                gramTrain = np.delete(gramTrain,i, 0)
+                gramTrain = np.delete(gramTrain,i, 1)
             model = svm.SVC(kernel='precomputed', probability=True)
             model.fit(gramTrain, intProfile)
             if self._proba:
@@ -174,10 +190,35 @@ class BLMNII:
                         simMat[dataDict[row[0]]][dataDict[j[0].split(':')[0]]]=float(j[1])
         return dataDict, simMat
 
+    def _makeAdjMat(self,comList,proList):
+        adjMat = np.zeros((len(comList), len(proList)), dtype=int)
+
+        query = "SELECT com_id, pro_id, weight FROM compound_vs_protein"
+        queryC = " WHERE ("
+        for i,j in enumerate(comList):
+            if i>0:
+                queryC += " OR "
+            queryC += " com_id = " + "'"+j+"'"
+        queryC += ")"
+        queryP = " AND ("
+        for i,j in enumerate(proList):
+            if i>0:
+                queryP += " OR "
+            queryP += " pro_id = " + "'"+j+"'"
+        queryP += ")"
+
+        query += queryC + queryP
+        self._cur.execute(query)
+        rows = self._cur.fetchall()
+        for row in rows:
+            adjMat[comList[row[0]]][proList[row[1]]]=(row[2])
+        return adjMat
+
 def test():
-    pairQuery = [('COM00014256','PRO00001554')]
+    pairQuery = [('COM00000020','PRO00001846')]
     predictorTest = BLMNII(blmniiConfig)
     testRes = predictorTest.predict(pairQuery)
+
 
 if __name__=='__main__':
     startTime = time.time()
