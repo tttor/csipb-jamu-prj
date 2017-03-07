@@ -1,17 +1,17 @@
 %
-% Template Laporan Skripsi/Thesis 
+% Template Laporan Skripsi/Thesis
 %
-% @author  Andreas Febrian, Lia Sadita 
+% @author  Andreas Febrian, Lia Sadita
 % @version 1.03
 %
-% Dokumen ini dibuat berdasarkan standar IEEE dalam membuat class untuk 
-% LaTeX dan konfigurasi LaTeX yang digunakan Fahrurrozi Rahman ketika 
-% membuat laporan skripsi. Konfigurasi yang lama telah disesuaikan dengan 
+% Dokumen ini dibuat berdasarkan standar IEEE dalam membuat class untuk
+% LaTeX dan konfigurasi LaTeX yang digunakan Fahrurrozi Rahman ketika
+% membuat laporan skripsi. Konfigurasi yang lama telah disesuaikan dengan
 % aturan penulisan thesis yang dikeluarkan UI pada tahun 2008.
 %
 
 %
-% Tipe dokumen adalah report dengan satu kolom. 
+% Tipe dokumen adalah report dengan satu kolom.
 %
 \documentclass[12pt, a4paper, onecolumn, oneside, final]{report}
 
@@ -46,12 +46,18 @@
 \input{laporan_setting}
 % Daftar pemenggalan suku kata dan istilah dalam LaTeX
 \include{hype.indonesia}
-% Daftar istilah yang mungkin perlu ditandai 
+% Daftar istilah yang mungkin perlu ditandai
 \input{istilah}
 
 \usepackage[shortlabels]{enumitem}
 \usepackage{lipsum}
 \usepackage{titlesec}
+\usepackage[us,12hr]{datetime}
+
+\titleformat{\paragraph}
+{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
 
 %\usepackage[backend=bibtex]{biblatex}
 %\addbibresource{bib.bib}
@@ -74,6 +80,7 @@
 %
 % setelah bagian ini, halaman dihitung sebagai halaman ke 2
 \setcounter{page}{2}
+%\setcounter{secnumdepth}{4}
 
 % sementara ga usah
 % load halaman pengesahan
@@ -119,12 +126,10 @@
 \include{chap3}
 \include{chap4}
 \include{chap5}
-% \include{chap6}
-% \include{chap7}
 \include{biblio}
 
 
-% % Lampiran 
+% % Lampiran
 % \begin{appendix}
 % 	\include{markLampiran}
 % 	\setcounter{page}{2}

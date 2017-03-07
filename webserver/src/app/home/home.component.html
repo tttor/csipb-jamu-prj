@@ -2,17 +2,28 @@
   <div class="col-sm-12 col-md-12" id="top">
     <h1>Ijah Webserver</h1>
     <h3>Search for (Plant - Compound) - (Protein - Disease) Connectivity</h3>
-    <h3>(Apologize. Ijah is currently under heavy development. Be aware of unstable operations. Thank you.)</h3>
   </div>
 </div>
 
 <div *ngIf="show">
-  <a style="color:white" pageScroll href="#metadataText" class="btn fab6 text-center"><span class="text-center" style="padding-top:3px">Metadata Text</span></a>
-  <a style="color:white" pageScroll href="#connectivityText" class="btn fab5 text-center"><span class="text-center" style="padding-top:3px">Connectivity Text</span></a>
-  <a style="color:white" pageScroll href="#connectivityGraph" class="btn fab4 text-center"><span class="text-center" style="padding-top:3px">Connectivity Graph</span></a>
-  <a style="color:white" pageScroll href="#top" class="btn fab3 text-center"><span class="text-center" style="padding-top:3px">Summary</span></a>
-  <button class="btn btn-danger fab2"(click)="predictMore()">Predict More</button>
-  <button class="btn btn-danger fab"(click)="reset()">Reset</button>
+  <a style="color:white" pageScroll href="#metadataText" class="btn fab6 text-center">
+    <span class="text-center" style="padding-top:3px">MetaText</span></a>
+  <a style="color:white" pageScroll href="#connectivityText" class="btn fab5 text-center">
+    <span class="text-center" style="padding-top:3px">ConnText</span></a>
+  <a style="color:white" pageScroll href="#connectivityGraph" class="btn fab4 text-center">
+    <span class="text-center" style="padding-top:3px">ConnGraph</span></a>
+  <a style="color:white" pageScroll href="#top" class="btn fab3 text-center">
+    <span class="text-center" style="padding-top:3px">Summary</span></a>
+
+  <div *ngIf="(this.mode.indexOf('predict')!==-1)">
+    <button class="btn btn-danger fab2"(click)="predictMore()">Predict</button>
+    <button class="btn btn-danger fab2a"(click)="filter()">Filter {{filterThreshold_}}</button>
+    <button class="btn btn-danger fab"(click)="reset()">Reset</button>
+  </div>
+  <div *ngIf="(this.mode.indexOf('predict')===-1)">
+    <button class="btn btn-danger fab2a"(click)="filter()">Filter {{filterThreshold_}}</button>
+    <button class="btn btn-danger fab2"(click)="reset()">Reset</button>
+  </div>
 </div>
 
 <div>
@@ -25,14 +36,14 @@
 <div *ngIf="!click">
   <div class="row" *ngIf="!show">
     <p class="contoh col-md-12 text-center">
-      <button class="btn btn-success"(click)="example7()">Example #1a</button>
-      <button class="btn btn-success"(click)="example5()">Example #1b</button>
-      <button class="btn btn-success"(click)="example8()">Example #1c</button>
-      <button class="btn btn-success"(click)="example6()">Example #1d</button>
-      <button class="btn btn-success"(click)="example1()">Example #2a</button>
-      <button class="btn btn-success"(click)="example2()">Example #2b</button>
-      <button class="btn btn-success"(click)="example3()">Example #3a</button>
-      <button class="btn btn-success"(click)="example4()">Example #3b</button>
+      <button class="btn btn-success"(click)="exampleCallback('plant_vs_disease')">Example #1a</button>
+      <button class="btn btn-success"(click)="exampleCallback('plant_vs_protein')">Example #1b</button>
+      <button class="btn btn-success"(click)="exampleCallback('compound_vs_protein')">Example #1c</button>
+      <button class="btn btn-success"(click)="exampleCallback('compound_vs_disease')">Example #1d</button>
+      <button class="btn btn-success"(click)="exampleCallback('plant')">Example #2a</button>
+      <button class="btn btn-success"(click)="exampleCallback('compound')">Example #2b</button>
+      <button class="btn btn-success"(click)="exampleCallback('protein')">Example #3a</button>
+      <button class="btn btn-success"(click)="exampleCallback('disease')">Example #3b</button>
     </p>
     <div class="col-md-6">
       <div class="row text-center">
@@ -62,7 +73,7 @@
                      (typeaheadOnSelect)="selectPlant($event, p.index)"
                      (typeaheadNoResults)="changeTypeaheadNoResults($event, 1)"
                      class="form-control verticalLine1"
-                     placeholder="Latin Name | Indonesian Name"
+                     placeholder="LatinName IndonesianName"
                      (focus)="focusPlant(p.index)">
                <div *ngIf="noResultPlant===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
@@ -83,7 +94,7 @@
           <div *ngIf="compoundSearch.length>0">
             <div *ngFor="let c of comInputHolders">
               <template #customCompound let-model="item" let-index="index">
-                <h5>{{model.com_cas_id}} <span *ngIf="model.com_knapsack_id">|</span> {{model.com_knapsack_id}} <span *ngIf="model.com_drugbank_id">|</span> {{model.com_drugbank_id}}</h5>
+                <h5>{{model.com_cas_id}} <span *ngIf="model.com_pubchem_name">|</span> {{model.com_pubchem_name}} <span *ngIf="model.com_iupac_name">|</span> {{model.com_iupac_name}}</h5>
               </template>
               <input [(ngModel)]="c.value"
                      [typeahead]="compoundSearch"
@@ -93,7 +104,7 @@
                      (typeaheadOnSelect)="selectCompound($event, c.index)"
                      (typeaheadNoResults)="changeTypeaheadNoResults($event, 2)"
                      class="form-control verticalLine2"
-                     placeholder="CAS | KnapSack ID | DrugBank ID"
+                     placeholder="CAS PubchemName IUPACName"
                      (focus)="focusCompound(c.index)">
                <div *ngIf="noResultCompound===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
@@ -122,7 +133,7 @@
           <div *ngIf="proteinSearch.length>0">
             <div *ngFor="let p of proInputHolders">
               <template #customProtein let-model="item" let-index="index">
-                <h5>{{model.pro_uniprot_id}} | {{model.pro_name}}</h5>
+                <h5>{{model.pro_uniprot_id}} <span *ngIf="model.pro_uniprot_abbrv">|</span> {{model.pro_uniprot_abbrv}} <span *ngIf="model.pro_name">|</span> {{model.pro_name}}</h5>
               </template>
               <input [(ngModel)]="p.value"
                      [typeahead]="proteinSearch"
@@ -132,7 +143,7 @@
                      (typeaheadOnSelect)="selectProtein($event, p.index)"
                      (typeaheadNoResults)="changeTypeaheadNoResults($event, 3)"
                      class="form-control verticalLine3"
-                     placeholder="Uniprot ID | Uniprot Name"
+                     placeholder="UniprotID UniprotAbbrv UniprotName"
                      (focus)="focusProtein(p.index)">
                <div *ngIf="noResultProtein===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
@@ -163,7 +174,7 @@
                      (typeaheadOnSelect)="selectDisease($event, d.index)"
                      (typeaheadNoResults)="changeTypeaheadNoResults($event, 4)"
                      class="form-control verticalLine4"
-                     placeholder="OMIM ID | OMIM Name"
+                     placeholder="OmimID OmimName"
                      (focus)="focusDisease(d.index)">
                <div *ngIf="noResultDisease===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
@@ -209,32 +220,24 @@
         <pre [innerHTML]="summaryTxtOutput3" style="height:190px"></pre>
       </div>
 
-      <div class="row col-md-12">
-        <br>
-      </div>
-
-      <div>
+<!--       <div>
         <b>Jump to Outputs:</b>
         1) <a pageScroll href="#connectivityGraph">Connectivity Graph</a> or
         2) <a pageScroll href="#connectivityText">Connectivity Text</a> or
         3) <a pageScroll href="#metadataText">Metadata Text</a>
       </div>
-      <br />
-
-      <div *ngIf="(this.mode.indexOf('predict')!==-1)&&(this.unknownComProConn>0)">
-        <div class="col-md-2">
-          <button class="form-control btn btn-danger" (click)="predictMore()">Predict more</button>
-        </div>
-      </div>
+      <br /> -->
 
       <!-- The multi-partite graph output ////////////////////////////////// -->
       <div class="row text-center">
         <font color="#696969">_____________________________________________________________________________________________________________________________________</font>
       </div>
-      <div class="text-center col-md-12" id="connectivityGraph"><h2><strong>Connectivity Graph</strong></h2></div>
-      <iframe id="graph" class="text-center" *ngIf="show" src="assets/app_home_graph_output.html" height="850px" width="100%" frameBorder="0"></iframe>
+      <div class="text-center col-md-12" id="connectivityGraph">
+        <h2><strong>Connectivity Graph</strong></h2>
+      </div>
+      <iframe id="graph" *ngIf="showGraph" class="text-center" src="assets/app_home_graph_output.html" height="850px" width="100%" frameBorder="0"></iframe>
 
-      <!-- Connectivity Text Output ///////////////////////////////////////////////////////// -->
+      <!-- Connectivity Text Output //////////////////////////////////////// -->
       <div class="row text-center">
         <font color="#696969">_____________________________________________________________________________________________________________________________________</font>
       </div>

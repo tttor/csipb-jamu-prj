@@ -24,8 +24,8 @@ export class Home implements OnInit {
   predictAPI;
 
   // List of sources in the form of a string, each separated by an underscore _
-  comProConnExperimentSrcs = 'drugbank.ca';
-  comProConnPredictionSrcs = 'blm-nii-svm_rndly';
+  comProConnExperimentSrcs = ['drugbank.ca'];
+  comProConnPredictionSrcs = ['rndly','blmnii','kronrls'];
 
   // count number of input rows
   nPlaInputHolders = 0;
@@ -83,9 +83,21 @@ export class Home implements OnInit {
   summaryTxtOutput2;
   summaryTxtOutput3;
 
+  //
+  private plaVScom_ = [];
+  private comVSpro_ = [];
+  private proVSdis_ = [];
+  private plaSet_ = [];
+  private comSet_ = [];
+  private proSet_ = [];
+  private disSet_ = [];
+
+  private filterThreshold_ = 0.0;
+
   // Misc.
   // TODO explain the usage
   show = false;// whether to show the output in home.page
+  showGraph = false;
   click = false;// whether searchAndPredictButton was clicked
   elapsedTime = 0;
   mode = 'unknown';
@@ -190,7 +202,7 @@ export class Home implements OnInit {
     this.http.post(this.metaQueryAPI,proPostMsgJSON).map(res => res.json())
       .subscribe(data => {
         for (let i = 0; i < data.length; i++) {
-          let temp = data[i]['pro_uniprot_id']+' | '+data[i]['pro_name'];
+          let temp = data[i]['pro_uniprot_id']+' | '+data[i]['pro_uniprot_abbrv']+' | '+data[i]['pro_name'];
           data[i]['search'] = temp;
         }
         this.proteinSearch = data;
@@ -216,14 +228,11 @@ export class Home implements OnInit {
           if (data[i]['com_cas_id']) {
             valid.push(data[i]['com_cas_id']);
           }
-          if (data[i]['com_drugbank_id']) {
-            valid.push(data[i]['com_drugbank_id']);
+          if (data[i]['com_pubchem_name']) {
+            valid.push(data[i]['com_pubchem_name']);
           }
-          if (data[i]['com_knapsack_id']) {
-            valid.push(data[i]['com_knapsack_id']);
-          }
-          if (data[i]['com_kegg_id']) {
-            valid.push(data[i]['com_kegg_id']);
+          if (data[i]['com_iupac_name']) {
+            valid.push(data[i]['com_iupac_name']);
           }
 
           let str = '';
@@ -445,6 +454,8 @@ export class Home implements OnInit {
 
           this.makeOutput(plaSet,comSet,proSet,disSet,
                           plaVScom,comVSpro,proVSdis);
+          this.storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
+                                        plaVScom,comVSpro,proVSdis);
         })
       })
     })
@@ -479,6 +490,8 @@ export class Home implements OnInit {
 
           this.makeOutput(plaSet,comSet,proSet,disSet,
                           plaVScom,comVSpro,proVSdis);
+          this.storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
+                                        plaVScom,comVSpro,proVSdis);
         })
       })
     })
@@ -603,6 +616,8 @@ export class Home implements OnInit {
 
                 this.makeOutput(plaSet,comSet,proSet,disSet,
                                 plaVScom,comVSproMerged,proVSdis);
+                this.storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
+                                              plaVScom,comVSproMerged,proVSdis);
             })
           })
         })
@@ -611,13 +626,8 @@ export class Home implements OnInit {
   }
 
   // OUTPUT MAKING METHODS /////////////////////////////////////////////////////
-  makeOutput(iplaSet,icomSet,iproSet,idisSet,plaVScom,comVSpro,proVSdis) {
+  makeOutput(plaSet,comSet,proSet,disSet,plaVScom,comVSpro,proVSdis) {
     let t0 = performance.now();
-
-    let plaSet = this.handleIfEmptySet(iplaSet,'pla');
-    let comSet = this.handleIfEmptySet(icomSet,'com');
-    let proSet = this.handleIfEmptySet(iproSet,'pro');
-    let disSet = this.handleIfEmptySet(idisSet,'dis');
 
     // Get metadata of each unique item
     let plaMetaPost = this.makeJSONFormat(plaSet,'id');
@@ -625,7 +635,6 @@ export class Home implements OnInit {
     let proMetaPost = this.makeJSONFormat(proSet,'id');
     let disMetaPost = this.makeJSONFormat(disSet,'id');
 
-    // console.log('getting meta ...');
     this.http.post(this.metaQueryAPI,plaMetaPost).map(resp4 => resp4.json())
     .subscribe(plaMeta => {
       this.http.post(this.metaQueryAPI,comMetaPost).map(resp5=>resp5.json())
@@ -644,7 +653,6 @@ export class Home implements OnInit {
             this.proVSdisTxtOutput = this.makeConnectivityTextOutput(proVSdis,
                                                                      proMeta,disMeta,
                                                                      'pro','dis');
-
             this.comVSplaTxtOutput = this.makeConnectivityTextOutput(plaVScom,
                                                                      comMeta,plaMeta,
                                                                      'com','pla');
@@ -655,33 +663,19 @@ export class Home implements OnInit {
                                                                      disMeta,proMeta,
                                                                      'dis','pro');
 
-
-            // metadata text output ////////////////////////////////////////
-            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',iplaSet,plaMeta);
-            this.comMetaTxtOutput = this.makeMetaTextOutput('com',icomSet,comMeta);
-            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',iproSet,proMeta);
-            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',idisSet,disMeta);
-
             // connectivity graph output ///////////////////////////////////////
-            let nNodeMax = 20;
-            let plaForGraph = plaSet;//plaSet.slice(0,nNodeMax);
-            let comForGraph = comSet;//comSet.slice(0,nNodeMax);
-            let proForGraph = proSet;//proSet.slice(0,nNodeMax);
-            let disForGraph = disSet;//disSet.slice(0,nNodeMax);
-
             let graphDataArr = [this.makeGraphDataOutput(plaVScom,
                                                          plaMeta,comMeta,
                                                          'pla','com',
-                                                         plaForGraph,comForGraph),
+                                                         plaSet,comSet),
                                 this.makeGraphDataOutput(comVSpro,
                                                          comMeta,proMeta,
                                                          'com','pro',
-                                                         comForGraph,proForGraph),
+                                                         comSet,proSet),
                                 this.makeGraphDataOutput(proVSdis,
                                                          proMeta,disMeta,
                                                          'pro','dis',
-                                                         proForGraph,disForGraph)];
-
+                                                         proSet,disSet)];
             let graphData = [];
             for (let ii=0;ii<graphDataArr.length;ii++) {
               for(let jj=0;jj<graphDataArr[ii].length;jj++) {
@@ -689,9 +683,13 @@ export class Home implements OnInit {
                   graphData.push(datum);
               }
             }
-
             localStorage.setItem('connectivityGraphData', JSON.stringify(graphData));
-            this.show = true;
+
+            // metadata text output ////////////////////////////////////////
+            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla',plaSet,plaMeta);
+            this.comMetaTxtOutput = this.makeMetaTextOutput('com',comSet,comMeta);
+            this.proMetaTxtOutput = this.makeMetaTextOutput('pro',proSet,proMeta);
+            this.disMetaTxtOutput = this.makeMetaTextOutput('dis',disSet,disMeta);
 
             // summary text output /////////////////////////////////////////////
             let plaComConnScore = this.getConnectivityScore(plaVScom);
@@ -704,8 +702,10 @@ export class Home implements OnInit {
             let nUndefinedComProConn = 0;
             let nKnownByExperimentComProConn = 0;
             let nKnownByPredictionComProConn = 0;
+            let sourceSep = '+';// must match with the one in server_thread.py for merging prediction sources
             for (let i=0; i<comVSpro.length; i++) {
-              let src = comVSpro[i]['source']
+              let allSrc = comVSpro[i]['source'].split(sourceSep);
+              let src = allSrc[0];// TODO should depends on all sources
               if (src==='null') {// unknown
                 nUnknownComProConn += 1;
               }
@@ -721,20 +721,22 @@ export class Home implements OnInit {
             }
 
             if (this.mode==='search_only') {
-              nUnknownComProConn = (icomSet.length*iproSet.length)-(nKnownByPredictionComProConn+nKnownByExperimentComProConn);
+              nUnknownComProConn = (comSet.length*proSet.length)-(nKnownByPredictionComProConn+nKnownByExperimentComProConn);
             }
 
-            this.summaryTxtOutput = 'Connectivity Score:\n';
-            this.summaryTxtOutput += '   Total: '+this.floatToStrTruncated(totConnScore,nDecimalDigits)+'\n';
+            this.summaryTxtOutput = 'Minimum Connectivity Weight To Process:\n';
+            this.summaryTxtOutput += '   '+this.filterThreshold_.toFixed(nDecimalDigits)+'\n';
+            this.summaryTxtOutput += 'Connectivity Score:\n';
+            this.summaryTxtOutput += '   Total: '+totConnScore.toFixed(nDecimalDigits)+'\n';
             this.summaryTxtOutput += '   Plant-Compound  : '+plaComConnScore.toString()+'\n';
-            this.summaryTxtOutput += '   Compound-Protein: '+this.floatToStrTruncated(comProConnScore,nDecimalDigits)+'\n';
+            this.summaryTxtOutput += '   Compound-Protein: '+comProConnScore.toFixed(nDecimalDigits)+'\n';
             this.summaryTxtOutput += '   Protein-Disease : '+proDisConnScore.toString()+'\n';
 
             this.summaryTxtOutput2 = 'Number of unique items:\n';
-            this.summaryTxtOutput2 += '   #Plants   : '+iplaSet.length.toString()+this.getInputMark('plant')+'\n';
-            this.summaryTxtOutput2 += '   #Compounds: '+icomSet.length.toString()+this.getInputMark('compound')+'\n';
-            this.summaryTxtOutput2 += '   #Proteins : '+iproSet.length.toString()+this.getInputMark('protein')+'\n';
-            this.summaryTxtOutput2 += '   #Diseases : '+idisSet.length.toString()+this.getInputMark('disease')+'\n';
+            this.summaryTxtOutput2 += '   #Plants   : '+plaSet.length.toString()+this.getInputMark('plant')+'\n';
+            this.summaryTxtOutput2 += '   #Compounds: '+comSet.length.toString()+this.getInputMark('compound')+'\n';
+            this.summaryTxtOutput2 += '   #Proteins : '+proSet.length.toString()+this.getInputMark('protein')+'\n';
+            this.summaryTxtOutput2 += '   #Diseases : '+disSet.length.toString()+this.getInputMark('disease')+'\n';
             this.summaryTxtOutput2 += 'Compound-Protein Connectivity:\n';
             this.summaryTxtOutput2 += '   #known_by_experiment: '+nKnownByExperimentComProConn.toString()+'\n';
             this.summaryTxtOutput2 += '   #known_by_prediction: '+nKnownByPredictionComProConn.toString()+'\n';
@@ -750,7 +752,11 @@ export class Home implements OnInit {
             this.summaryTxtOutput3 = 'Mode: \n';
             this.summaryTxtOutput3 += '   '+this.mode+'\n';
             this.summaryTxtOutput3 += 'Elapsed Time: \n';
-            this.summaryTxtOutput3 += '   '+this.floatToStrTruncated(this.elapsedTime,nDecimalDigits)+' seconds\n';
+            this.summaryTxtOutput3 += '   '+this.elapsedTime.toFixed(nDecimalDigits)+' seconds\n';
+
+            // Show the output page
+            this.show = true;
+            this.showGraph = true;
           }) // disMeta
         }) // proMeta
       }) // comMeta
@@ -762,13 +768,25 @@ export class Home implements OnInit {
       return 'No Metadata';
     }
 
-    let keys = this.getPropKeys(type);
-    let txt = '#0 '+this.getHeader(type)+'\n';
+    let indent = '   ';
+    let txt = '';
+    let keys = this.getPropKeys(type,true);
     for (let i=0; i<idList.length;i++) {
-      txt += '#'+(i+1).toString()+' ';
       let props = this.getProps(idList[i],keys,meta);
-      txt += this.concatProps(props,keys,true,true)
-      txt += '\n';
+
+      txt += (i+1).toString()+') ';
+      for (let j=0;j<props.length;j++) {
+        let key = keys[j];
+        let prop = props[j];
+        if (prop) {
+          prop = this.getHyperlinkStr(key,prop);
+          key = key.substring(4);
+          if (j>0) {
+            txt += indent;
+          }
+          txt += key+': '+prop+'\n';
+        }
+      }
     }
     return txt;
   }
@@ -780,10 +798,10 @@ export class Home implements OnInit {
 
     let conn = this.groupBy(srcType,destType,interaction);
 
-    let text = this.getHeader(srcType+'_vs_'+destType)+'\n';
-    let srcPropKeys = this.getPropKeys(srcType);
-    let destPropKeys = this.getPropKeys(destType);
-    let indent = '  ';
+    let indent = '   ';
+    let text = this.getConnHeader(srcType+'_vs_'+destType,indent)+'\n';
+    let srcPropKeys = this.getPropKeys(srcType,false);
+    let destPropKeys = this.getPropKeys(destType,false);
 
     let nUnique = 0;
     let nUniquePerConnSrc = 0;
@@ -793,9 +811,9 @@ export class Home implements OnInit {
 
     for (let i=0;i<conn.length;i++) {
       for (let j=0;j<conn[i].length;j++) {
-        let comps = conn[i][j].split(",");
+        let comps = conn[i][j].split("$");
         let source = comps[0];
-        let weight = comps[1];
+        let weight = comps[1]; weight = parseFloat(weight).toFixed(3);
         let src = comps[2];
         let dest = comps[3];
 
@@ -805,7 +823,7 @@ export class Home implements OnInit {
 
         if (prevSrc!==src) {
           nUnique = nUnique + 1;
-          text = text+'#'+nUnique.toString()+' ';
+          text = text+nUnique.toString()+') ';
 
           let srcProps = this.getProps(src,srcPropKeys,srcMeta);
           text += this.concatProps(srcProps,srcPropKeys,true,true)
@@ -841,8 +859,8 @@ export class Home implements OnInit {
   }
 
   makeGraphDataOutput(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
-    let srcPropKeys = this.getPropKeys(srcType);
-    let destPropKeys = this.getPropKeys(destType);
+    let srcPropKeys = this.getPropKeys(srcType,false);
+    let destPropKeys = this.getPropKeys(destType,false);
     let data = [];
 
     let srcHasDestArr = [];
@@ -942,6 +960,56 @@ export class Home implements OnInit {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
+  private storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
+                                   plaVScom,comVSpro,proVSdis) {
+    this.plaSet_ = plaSet;
+    this.comSet_ = comSet;
+    this.proSet_ = proSet;
+    this.disSet_ = disSet;
+    this.plaVScom_ = plaVScom;
+    this.comVSpro_ = comVSpro;
+    this.proVSdis_ = proVSdis;
+  }
+
+  private filterOnComProConnWeight(threshold,plaVScom,comVSpro,proVSdis) {
+    let comVSproF = [];
+    for (let i=0; i<comVSpro.length;i++) {
+      let source = comVSpro['source'];
+      if (source==='null') {
+        continue;
+      }
+
+      let w = parseFloat(comVSpro[i]['weight']);
+      if (w < threshold) {
+        continue;
+      }
+
+      comVSproF.push(comVSpro[i]);
+    }
+
+    let comSet = this.getSet(comVSproF,'com_id');
+    let proSet = this.getSet(comVSproF,'pro_id');
+
+    // Remake the conn
+    let plaVsComF = [];
+    for (let i=0;i<plaVScom.length;i++) {
+      let com = plaVScom[i]['com_id'];
+      if (comSet.indexOf(com) !== -1) {
+        plaVsComF.push(plaVScom[i]);
+      }
+    }
+
+    let proVSdisF = [];
+    for (let i=0;i<proVSdis.length;i++) {
+      let pro = proVSdis[i]['pro_id'];
+      if (proSet.indexOf(pro) !== -1) {
+        proVSdisF.push(proVSdis[i]);
+      }
+    }
+
+    return [plaVsComF,comVSproF,proVSdisF];
+  }
+
   private find(k,arr) {
     let idx = -1;
     for (let i=0;i<arr.length;i++) {
@@ -969,7 +1037,7 @@ export class Home implements OnInit {
 
       let w = iconn[i]['weight'];
       let s = iconn[i]['source'];
-      let str = s+","+w+","+srcV+","+destV;
+      let str = s+"$"+w+"$"+srcV+"$"+destV;
       connSet[idx].push(str);
     }
 
@@ -992,17 +1060,29 @@ export class Home implements OnInit {
     }
   }
 
-  floatToStrTruncated(f,nDecimalDigits) {
-    let raw = f.toString();
-    let radixPos = raw.indexOf('.');
-    if (radixPos===-1) {
-      return raw;
+  filter() {
+    this.showGraph = false;
+
+    let delta = 0.2;
+    this.filterThreshold_ += delta;
+    if (this.filterThreshold_>1.0) {
+      this.filterThreshold_ = 0.0;
     }
-    else {
-      let intStr = raw.slice(0,radixPos);
-      let decStr = raw.slice(radixPos+1,radixPos+nDecimalDigits+1);
-      return intStr+'.'+decStr;
-    }
+    this.filterThreshold_ = parseFloat( this.filterThreshold_.toFixed(1) );
+
+    let filtered = this.filterOnComProConnWeight(this.filterThreshold_,
+                                                 this.plaVScom_,this.comVSpro_,this.proVSdis_);
+    let plaVScomF = filtered[0];
+    let comVSproF = filtered[1];
+    let proVSdisF = filtered[2];
+
+    let plaSetF = this.getSet(plaVScomF,'pla_id');
+    let comSetF = this.getSet(comVSproF,'com_id');
+    let proSetF = this.getSet(comVSproF,'pro_id');
+    let disSetF = this.getSet(proVSdisF,'dis_id');
+
+    this.makeOutput(plaSetF,comSetF,proSetF,disSetF,
+                    plaVScomF,comVSproF,proVSdisF);
   }
 
   private getConnectivityScore(connectivity) {
@@ -1037,14 +1117,6 @@ export class Home implements OnInit {
     return str;
   }
 
-  private handleIfEmptySet(set,type) {
-    if (set.length>0) {
-      return set;
-    }
-    let newSet = [type.toUpperCase()+'_NONE_DUMMY'];
-    return newSet;
-  }
-
   private getSet(interaction,id) {
     let set = [];
     for (let i=0;i<interaction.length;i++) {
@@ -1056,7 +1128,7 @@ export class Home implements OnInit {
     return set;
   }
 
-  private getPropKeys(type) {
+  private getPropKeys(type,extra) {
     let keys: string[] = [];
     if (type==='pla') {
       keys.push('pla_name');
@@ -1064,13 +1136,18 @@ export class Home implements OnInit {
     }
     if (type==='com') {
       keys.push('com_cas_id');
-      keys.push('com_drugbank_id');
-      keys.push('com_kegg_id');
-      keys.push('com_knapsack_id');
+      keys.push('com_pubchem_name');
+      keys.push('com_iupac_name');
+      if (extra) {
+        keys.push('com_drugbank_id');
+        keys.push('com_knapsack_id');
+        keys.push('com_kegg_id');
+        keys.push('com_pubchem_id');
+      }
     }
     if (type==='pro') {
       keys.push('pro_uniprot_id');
-      // keys.push('pro_uniprot_abbrv');
+      keys.push('pro_uniprot_abbrv');
       keys.push('pro_name');
       keys.push('pro_pdb_id');
     }
@@ -1095,7 +1172,10 @@ export class Home implements OnInit {
     else if (type==='com_kegg_id') {
       baseUrl = 'http://www.genome.jp/dbget-bin/www_bget?cpd:';
     }
-    else if (type==='pro_uniprot_id') {
+    else if (type==='com_pubchem_name' || type==='com_pubchem_id') {
+      baseUrl = 'https://pubchem.ncbi.nlm.nih.gov/compound/'
+    }
+    else if (type==='pro_uniprot_id' || type==='pro_uniprot_abbrv') {
       baseUrl = 'http://www.uniprot.org/uniprot/';
     }
     else if (type==='pro_pdb_id') {
@@ -1154,33 +1234,32 @@ export class Home implements OnInit {
     return props;
   }
 
-  private getHeader(type) {
-    let indent = '  ';
+  private getConnHeader(type,indent) {
     let headerArr = new Array();
     headerArr['pla'] = 'LatinName|IndonesianName';
-    headerArr['com'] = 'CAS|DrugbankID|KnapsackID|KeggID';
-    headerArr['pro'] = 'UniprotID|UniprotName|PDBId(s)';
+    headerArr['com'] = 'CAS|PubchemName|IUPACName';
+    headerArr['pro'] = 'UniprotID|UniprotName|PDBIDs';
     headerArr['dis'] = 'OmimID|OmimName';
 
-    headerArr['pla_vs_com'] ='#0 '+headerArr['pla']+':\n'+
+    headerArr['pla_vs_com'] ='0) '+headerArr['pla']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['com'];
-    headerArr['com_vs_pro'] = '#0 '+headerArr['com']+':\n'+
+                              indent+indent+'[weight] '+headerArr['com'];
+    headerArr['com_vs_pro'] = '0) '+headerArr['com']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['pro'];
-    headerArr['pro_vs_dis'] = '#0 '+headerArr['pro']+':\n'+
+                              indent+indent+'[weight] '+headerArr['pro'];
+    headerArr['pro_vs_dis'] = '0) '+headerArr['pro']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['dis'];
+                              indent+indent+'[weight] '+headerArr['dis'];
 
-    headerArr['com_vs_pla'] = '#0 '+headerArr['com']+':\n'+
+    headerArr['com_vs_pla'] = '0) '+headerArr['com']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['pla'];
-    headerArr['pro_vs_com'] = '#0 '+headerArr['pro']+':\n'+
+                              indent+indent+'[weight] '+headerArr['pla'];
+    headerArr['pro_vs_com'] = '0) '+headerArr['pro']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['com'];
-    headerArr['dis_vs_pro'] = '#0 '+headerArr['dis']+':\n'+
+                              indent+indent+'[weight] '+headerArr['com'];
+    headerArr['dis_vs_pro'] = '0) '+headerArr['dis']+':\n'+
                               indent+'[source:#data]'+'\n'+
-                              indent+'[weight] '+headerArr['pro'];
+                              indent+indent+'[weight] '+headerArr['pro'];
 
     return headerArr[type];
   }
@@ -1280,6 +1359,7 @@ export class Home implements OnInit {
     this.inputType = 'unknown';
     this.elapsedTime = 0;
     this.show = false;
+    this.showGraph = false;
     localStorage.clear();
     this.dataLocal = [];
 
@@ -1289,112 +1369,105 @@ export class Home implements OnInit {
     this.noResultCompound = false;
     this.noResultProtein = false;
     this.noResultDisease = false;
+
+    this.plaVScom_ = [];
+    this.comVSpro_ = [];
+    this.proVSdis_ = [];
+    this.plaSet_ = [];
+    this.comSet_ = [];
+    this.proSet_ = [];
+    this.disSet_ = [];
+
+    this.filterThreshold_ = 0.0;
   }
 
   // EXAMPLE-BUTTON METHODS ////////////////////////////////////////////////////
-  private example1() {
-  this.reset();
-  this.plaInputHolders = [{ 'index': 1, 'value' : 'Datura stramonium'}, { 'index': 2, 'value' : 'Trifolium pratense'}, { 'index': 3, 'value' : 'Acacia senegal'}, { 'index': 4, 'value' : ''}];
-  this.selectedPlants = [{"index":1,"value":"PLA00002565"},{"index":2,"value":"PLA00001090"},{"index":3,"value":"PLA00000325"}];
+  private exampleCallback(type) {
+    this.reset();
 
-  this.nPlaInputHolders = 4;
-  this.activeCompound = false;
-  this.activeProtein = false;
-  this.activeDisease = false;
-  }
+    if (type==='plant_vs_disease') {
+      this.plaInputHolders = [{ 'index': 1, 'value' : 'Blumea balsamifera | Sembung'}, { 'index': 2, 'value' : 'Tinospora crispa | Brotowali'}, { 'index': 3, 'value' : 'Momordica charantia | Pare'}, { 'index': 4, 'value' : 'Zingiber officinale | Jahe'}, { 'index': 5, 'value' : ''}];
+      this.selectedPlants = [{"index":1,"value":"PLA00003831"},{"index":2,"value":"PLA00000683"},{"index":3,"value":"PLA00002036"},{"index":4,"value":"PLA00001034"}];
+      this.nDisInputHolders = 5;
 
-  private example2() {
-  this.reset();
-  this.comInputHolders = [{ 'index': 1, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 4, 'value' : ''}];
-  this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000058'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000039'}];
+      this.disInputHolders = [{ 'index': 1, 'value' : '601388 | Diabetes mellitus, insulin-dependent, 12'}, { 'index': 2, 'value' : '304800 | Diabetes insipidus, nephrogenic, X-linked'}, { 'index': 3, 'value' : '612227 | Diabetes mellitus, ketosis-prone'}, { 'index': 4, 'value' : ''}];
+      this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000073'}, { 'index': 2, 'value' : 'DIS00000749'}, { 'index': 3, 'value' : 'DIS00000365'}];
+      this.nDisInputHolders = 4;
 
-  this.nComInputHolders = 2;
-  this.activeDisease = false;
-  this.activeTanaman = false;
-  this.activeProtein = false;
-  }
+      this.activeCompound = false;
+      this.activeProtein = false;
+    }
+    else if (type==='plant_vs_protein') {
+      this.plaInputHolders = [{ 'index': 1, 'value' : 'Blumea balsamifera | Sembung'}, { 'index': 2, 'value' : 'Tinospora crispa | Brotowali'}, { 'index': 3, 'value' : 'Momordica charantia | Pare'}, { 'index': 4, 'value' : 'Zingiber officinale | Jahe'}, { 'index': 5, 'value' : ''}];
+      this.selectedPlants = [{"index":1,"value":"PLA00003831"},{"index":2,"value":"PLA00000683"},{"index":3,"value":"PLA00002036"},{"index":4,"value":"PLA00001034"}];
+      this.nDisInputHolders = 5;
 
-  private example3() {
-  this.reset();
-  this.proInputHolders = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
-  this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
+      this.proInputHolders = [{ 'index': 1, 'value' : 'P30518 | V2R_HUMAN | Vasopressin V2 receptor'}, { 'index': 2, 'value' : 'P16410 | CTLA4_HUMAN | Cytotoxic T-lymphocyte protein 4'}, { 'index': 3, 'value' : 'O43316 | PAX4_HUMAN | Paired box protein Pax-4'}, { 'index': 4, 'value' : ''}];
+      this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00000343'}, { 'index': 2, 'value' : 'PRO00000283'}, { 'index': 3, 'value' : 'PRO00002960'}];
+      this.nProInputHolders = 4;
 
-  this.nProInputHolders = 3;
-  this.activeDisease = false;
-  this.activeTanaman = false;
-  this.activeCompound = false;
-  }
+      this.activeDisease = false;
+      this.activeCompound = false;
+    }
+    else if(type==='compound_vs_protein'){
+      this.comInputHolders = [{ 'index': 1, 'value' : '80510-09-4 | N-cis-feruloyltyramine | (Z)-3-(4-hydroxy-3-methoxyphenyl)-N-[2-(4-hydroxyphenyl)ethyl]prop-2-enamide'}, { 'index': 2, 'value' : '29388-59-8 | Secoisolariciresinol | (2R,3R)-2,3-bis[(4-hydroxy-3-methoxyphenyl)methyl]butane-1,4-diol'}, { 'index': 3, 'value' : '18446-73-6 | Tembetarine | (1S)-1-[(3-hydroxy-4-methoxyphenyl)methyl]-6-methoxy-2,2-dimethyl-3,4-dihydro-1H-isoquinolin-2-ium-7-ol'}, { 'index': 4, 'value' : '644-30-4 | Curcumene | 1-methyl-4-(6-methylhept-5-en-2-yl)benzene'}, { 'index': 5, 'value' : ''}];
+      this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00008027'}, { 'index': 2, 'value' : 'COM00021005'}, { 'index': 3, 'value' : 'COM00009696'}, { 'index': 4, 'value' : 'COM00020511'}];
+      this.nComInputHolders = 5;
 
-  private example4() {
-  this.reset();
-  this.disInputHolders = [{ 'index': 1, 'value' : '156610 | Skin creases, congenital symmetric circumferential, 1'}, { 'index': 2, 'value' : '614373 | Amyotrophic lateral sclerosis 16, juvenile'}, { 'index': 3, 'value' : '612244 | Inflammatory bowel disInputHolders 13'}, { 'index': 4, 'value' : ''}];
-  this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00001455'}, { 'index': 2, 'value' : 'DIS00000803'}, { 'index': 3, 'value' : 'DIS00003796'}];
+      this.proInputHolders = [{ 'index': 1, 'value' : 'P53985 | Monocarboxylate transporter 1'}, { 'index': 2, 'value' : 'P20309 | Muscarinic acetylcholine receptor M3'}, { 'index': 3, 'value' : 'Q99720 | Sigma non-opioid intracellular receptor 1'}, { 'index': 4, 'value' : ''}];
+      this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00000040'}, { 'index': 2, 'value' : 'PRO00000452'}, { 'index': 3, 'value' : 'PRO00000377'}];
+      this.nProInputHolders = 4;
 
-  this.nDisInputHolders = 4;
-  this.activeProtein = false;
-  this.activeTanaman = false;
-  this.activeCompound = false;
-  }
+      this.activeTanaman = false;
+      this.activeDisease = false;
+    }
+    else if(type==='compound_vs_disease'){
+      this.comInputHolders = [{ 'index': 1, 'value' : '80510-09-4 | N-cis-feruloyltyramine | (Z)-3-(4-hydroxy-3-methoxyphenyl)-N-[2-(4-hydroxyphenyl)ethyl]prop-2-enamide'}, { 'index': 2, 'value' : '29388-59-8 | Secoisolariciresinol | (2R,3R)-2,3-bis[(4-hydroxy-3-methoxyphenyl)methyl]butane-1,4-diol'}, { 'index': 3, 'value' : '18446-73-6 | Tembetarine | (1S)-1-[(3-hydroxy-4-methoxyphenyl)methyl]-6-methoxy-2,2-dimethyl-3,4-dihydro-1H-isoquinolin-2-ium-7-ol'}, { 'index': 4, 'value' : '644-30-4 | Curcumene | 1-methyl-4-(6-methylhept-5-en-2-yl)benzene'}, { 'index': 5, 'value' : ''}];
+      this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00008027'}, { 'index': 2, 'value' : 'COM00021005'}, { 'index': 3, 'value' : 'COM00009696'}, { 'index': 4, 'value' : 'COM00020511'}];
+      this.nComInputHolders = 5;
 
-  private example5() {
-  this.reset();
-  this.plaInputHolders = [{ 'index': 1, 'value' : 'Catharanthus roseus'}, { 'index': 2, 'value' : 'Nigella sativa'}, { 'index': 3, 'value' : 'Cocos nucifera'}, { 'index': 4, 'value' : ''}];
-  this.selectedPlants = [{"index":1,"value":"PLA00001025"},{"index":2,"value":"PLA00003511"},{"index":3,"value":"PLA00001600"}];
-  this.nPlaInputHolders = 4;
+      this.disInputHolders = [{ 'index': 1, 'value' : '601388 | Diabetes mellitus, insulin-dependent, 12'}, { 'index': 2, 'value' : '304800 | Diabetes insipidus, nephrogenic, X-linked'}, { 'index': 3, 'value' : '612227 | Diabetes mellitus, ketosis-prone'}, { 'index': 4, 'value' : ''}];
+      this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000073'}, { 'index': 2, 'value' : 'DIS00000749'}, { 'index': 3, 'value' : 'DIS00000365'}];
+      this.nDisInputHolders = 4;
 
-  this.proInputHolders = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
-  this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
+      this.activeTanaman = false;
+      this.activeProtein = false;
+    }
+    else if (type==='plant'){
+      this.plaInputHolders = [{ 'index': 1, 'value' : 'Phoenix dactylifera | Kurma'}, { 'index': 2, 'value' : 'Aloe vera | Lidah buaya'}, { 'index': 3, 'value' : 'Morinda citrifolia | Mengkudu/Pace'}, { 'index': 4, 'value' : 'Anacardium occidentale | Jambu monyet'}, { 'index': 5, 'value' : 'Cocos nucifera | Kelapa'}];
+      this.selectedPlants = [{"index":1,"value":"PLA00000007"},{"index":2,"value":"PLA00001504"},{"index":3,"value":"PLA00001838"},{"index":4,"value":"PLA00004093"},{"index":5,"value":"PLA00001600"}];
+      this.nPlaInputHolders = 5;
 
-  this.nProInputHolders = 3;
+      this.activeCompound = false;
+      this.activeProtein = false;
+      this.activeDisease = false;
+    }
+    else if(type==='compound'){
+      this.comInputHolders = [{ 'index': 1, 'value' : '57-50-1 | Sucrose | (2R,3R,4S,5S,6R)-2-[(2S,3S,4S,5R)-3,4-dihydroxy-2,5-bis(hydroxymethyl)oxolan-2-yl]oxy-6-(hydroxymethyl)oxane-3,4,5-triol'}, { 'index': 2, 'value' : '53-16-7 | Estrone | (8R,9S,13S,14S)-3-hydroxy-13-methyl-7,8,9,11,12,14,15,16-octahydro-6H-cyclopenta[a]phenanthren-17-one'}, { 'index': 3, 'value' : '334-48-5 | Decanoic acid | decanoic acid'}, { 'index': 4, 'value' : '480-41-1 | Naringenin | (2S)-5,7-dihydroxy-2-(4-hydroxyphenyl)-2,3-dihydrochromen-4-one'}, { 'index': 5, 'value' : ''}];
+      this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00004561'}, { 'index': 2, 'value' : 'COM00001997'}, { 'index': 3, 'value' : 'COM00000363'}, { 'index': 4, 'value' : 'COM00003074'}];
+      this.nComInputHolders = 4;
 
-  this.activeDisease = false;
-  this.activeCompound = false;
-  }
+      this.activeDisease = false;
+      this.activeTanaman = false;
+      this.activeProtein = false;
+    }
+    else if(type==='protein'){
+      this.proInputHolders = [{ 'index': 1, 'value' : 'P37231 | PPARG_HUMAN | Peroxisome proliferator-activated receptor gamma'}, { 'index': 2, 'value' : 'P01189 | COLI_HUMAN | Pro-opiomelanocortin'}, { 'index': 3, 'value' : 'P02452 | CO1A1_HUMAN | Collagen alpha-1(I) chain'}, { 'index': 4, 'value' : 'Q9UHD2 | TBK1_HUMAN | Serine/threonine-protein kinase TBK1'}, { 'index': 5, 'value' : ''}];
+      this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00002168'}, { 'index': 2, 'value' : 'PRO00000061'}, { 'index': 3, 'value' : 'PRO00000261'}, { 'index': 4, 'value' : 'PRO00001836'}];
+      this.nProInputHolders = 4;
 
-  private example6() {
-  this.reset();
-  this.comInputHolders = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '51-34-3 | DB00747 | C00002292 | C01851'}, { 'index': 3, 'value' : '53-86-1 | DB00328 | C00030512 | C01926'}, { 'index': 4, 'value' : ''}];
-  this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00001628'}, { 'index': 3, 'value' : 'COM00005599'}];
+      this.activeDisease = false;
+      this.activeTanaman = false;
+      this.activeCompound = false;
+    }
+    else if(type==='disease'){
+      this.disInputHolders = [{ 'index': 1, 'value' : '601665 | Obesity'}, { 'index': 2, 'value' : '600807 | Asthma'}, { 'index': 3, 'value' : '610551 | Herpes simplex encephalitis 1'}, { 'index': 4, 'value' : '156610 | Skin creases, congenital symmetric circumferential, 1'}, { 'index': 5, 'value' : '166710 | Osteoporosis'}];
+      this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000470'}, { 'index': 2, 'value' : 'DIS00001061'}, { 'index': 3, 'value' : 'DIS00000900'}, { 'index': 4, 'value' : 'DIS00001455'}, { 'index': 5, 'value' : 'DIS00003892'}];
+      this.nDisInputHolders = 5;
 
-  this.nComInputHolders = 2;
-
-  this.disInputHolders = [{ 'index': 1, 'value' : '608516 | Major depressive disorder'}, { 'index': 2, 'value' : '100100 | Prune belly syndrome'}, { 'index': 3, 'value' : '614473 | Arterial calcification of infancy, generalized, 2'}, { 'index': 4, 'value' : ''}];
-  this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000849'}, { 'index': 2, 'value' : 'DIS00003796'}, { 'index': 3, 'value' : 'DIS00000853'}];
-
-  this.nDisInputHolders = 4;
-
-  this.activeTanaman = false;
-  this.activeProtein = false;
-  }
-
-  private example7() {
-  this.reset();
-  this.plaInputHolders = [{ 'index': 1, 'value' : 'Aloe vera'}, { 'index': 2, 'value' : 'Cocos nucifera'}, { 'index': 3, 'value' : 'Panax ginseng'}, { 'index': 4, 'value' : ''}];
-  this.selectedPlants = [{"index":1,"value":"PLA00001504"},{"index":2,"value":"PLA00001600"},{"index":3,"value":"PLA00003447"}];
-  this.nDisInputHolders = 4;
-
-  this.disInputHolders = [{ 'index': 1, 'value' : '61600 | Analbuminemia'}, { 'index': 2, 'value' : '615999 | Hyperthyroxinemia, familial dysalbuminemic'}, { 'index': 3, 'value' : ''}];
-  this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00003787'}, { 'index': 2, 'value' : 'DIS00003675'}];
-
-  this.nDisInputHolders = 3;
-
-  this.activeCompound = false;
-  this.activeProtein = false;
-  }
-
-  private example8() {
-  this.reset();
-  this.comInputHolders = [{ 'index': 1, 'value' : '51-55-8 | DB00572 | C00002277 | 174174'}, { 'index': 2, 'value' : '61-50-7 | DB01488 | C00001407 | 6089'}, { 'index': 3, 'value' : '117-39-5 | DB04216 | C00004631 | 5280343'}, { 'index': 4, 'value' : ''}];
-  this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00000039'}, { 'index': 2, 'value' : 'COM00000014'}, { 'index': 3, 'value' : 'COM00000058'}];
-
-  this.nComInputHolders = 2;
-
-  this.proInputHolders = [{ 'index': 1, 'value' : 'P53985 | Monocarboxylate transporter 1'}, { 'index': 2, 'value' : 'P20309 | Muscarinic acetylcholine receptor M3'}, { 'index': 3, 'value' : 'Q99720 | Sigma non-opioid intracellular receptor 1'}, { 'index': 4, 'value' : ''}];
-  this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00000040'}, { 'index': 2, 'value' : 'PRO00000452'}, { 'index': 3, 'value' : 'PRO00000377'}];
-
-  this.nProInputHolders = 4;
-
-  this.activeTanaman = false;
-  this.activeDisease = false;
+      this.activeProtein = false;
+      this.activeTanaman = false;
+      this.activeCompound = false;
+    }
   }
 }

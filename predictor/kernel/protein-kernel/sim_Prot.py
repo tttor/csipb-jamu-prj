@@ -18,11 +18,11 @@ def main():
     rowEnd = int(sys.argv[2])
     step = int(sys.argv[3])
     poolNum = int(sys.argv[4])
-    colStart = 0
+    colStart = rowStart
     colEnd = 3334
 
     nProtCol = colEnd-colStart
-    nProtRow = rowEnd+1-rowStart
+    nProtRow = rowEnd-rowStart
 
     simMatProtNorm = np.zeros(nProtCol, dtype=float)
     simMatProt = np.zeros(nProtCol, dtype=float)
@@ -31,114 +31,117 @@ def main():
     OutDir = ""
 
     uniprotId = []
-    colSeqProtein = []
-    colMetaProtein = []
-    rowSeqProtein = []
-    rowMetaProtein = []
+    colSeq = []
+    colMeta = []
+    rowSeq = []
+    rowMeta = []
     rowProtein = []
     colProtein = []
     rowIndex = []
     colIndex = []
 
-    it = 0
     ### MultiProcessing ###
     pool = Pool(processes=poolNum)
     ###################
 
     ###Parse uniprot ID from csv###
     sys.stderr.write("Parsing input\n")
-    with open(listDir,'r') as f:
-        csvContent = csv.reader(f,  delimiter=',', quotechar='\"')
-        for row in csvContent:
-            if (it > 0):
-                uniprotId.append(row[2])
-            else:
-                it = 1
+    uniprotId = readProtList(listDir)
+
     ###############################
 
     ###Read file and parse (with library)###
-
     sys.stderr.write("Load fasta file\n")
-    for i in range(rowStart,rowEnd+1):
-        # print i, len(uniprotId)
-        fastaDir = fastaFileDir + uniprotId[i] + ".fasta"
-        recTemp = SeqIO.read(fastaDir, "fasta")
-        rowSeqProtein.append(list(recTemp.seq))
-        recTemp = str(recTemp.id)
-        recTemp = recTemp.split("|")
-        rowMetaProtein.append(recTemp[1])
-
-    for i in range(colStart,colEnd):
-        fastaDir = fastaFileDir + uniprotId[i] + ".fasta"
-        recTemp = SeqIO.read(fastaDir, "fasta")
-        colSeqProtein.append(list(recTemp.seq))
-        recTemp = str(recTemp.id)
-        recTemp = recTemp.split("|")
-        colMetaProtein.append(recTemp[1])
-
+    for i,name in enumerate(uniprotId):
+        fastaDir = fastaFileDir + name + ".fasta"
+        with open (fastaDir) as handle:
+            recTemp = SeqIO.read(handle, "fasta")
+        handle.close()
+        recTempMeta = str(recTemp.id)
+        recTempMeta = recTempMeta.split("|")
+        if i in range(colStart, colEnd):
+            colSeq.append(list(recTemp.seq))
+            colMeta.append(recTempMeta[1])
+        if i in range(rowStart,rowEnd):
+            rowSeq.append(list(recTemp.seq))
+            rowMeta.append(recTempMeta[1])
     ###Cleanning sequance###
     sys.stderr.write("Cleaning Sequance\n")
     for i in range(nProtRow):
-        for j in range(len(rowSeqProtein[i])):
-            if(rowSeqProtein[i][j]=='U'):
-                rowSeqProtein[i][j]='C'
-        rowSeqProtein[i] = "".join(rowSeqProtein[i])
-
+        for j in range(len(rowSeq[i])):
+            if(rowSeq[i][j]=='U'):
+                rowSeq[i][j]='C'
+        rowSeq[i] = "".join(rowSeq[i])
     for i in range(nProtCol):
-        for j in range(len(colSeqProtein[i])):
-            if(colSeqProtein[i][j]=='U'):
-                colSeqProtein[i][j]='C'
-        colSeqProtein[i] = "".join(colSeqProtein[i])
+        for j in range(len(colSeq[i])):
+            if(colSeq[i][j]=='U'):
+                colSeq[i][j]='C'
+        colSeq[i] = "".join(colSeq[i])
     ########################################
     sys.stderr.write("Preparing output file\n")
     outMatDir = OutDir+"RealProtKernel"+str(rowStart)+"_"+str(rowEnd)+".txt"
     outMetaDir = OutDir+"MetaProtKernel"+str(rowStart)+"_"+str(rowEnd)+".txt"
-    listScore = []
-    with open(outMatDir, 'w') as matF, open(outMetaDir, 'w') as metaF:
-        for i in range(nProtRow):
-            ###Preparing data for parallel mapping###
-            columnCursor = rowStart+i
-            while columnCursor < nProtCol:
-                if columnCursor+step > colEnd:
-                    batchLen = 3334-columnCursor
-                else:
-                    batchLen = step
-                for j in range(columnCursor,columnCursor+batchLen):
-                    rowProtein.append(rowSeqProtein[i])
-                    rowIndex.append(i)
-                    colProtein.append(colSeqProtein[j])
-                    colIndex.append(j)
-                ### Calculation ###
-                listScore = [pool.apply_async(alignprot,(rowProtein[j], colProtein[j], rowIndex[j], colIndex[j],)) for j in range(batchLen)] ###Put into row
-                for listS in listScore:
-                    simMatProt[listS.get()[1]] = listS.get()[0]
-                #Reset value
-                colIndex = []
-                rowIndex = []
-                rowProtein = []
-                colProtein = []
-                columnCursor += batchLen
-                listScore = []
 
-            sys.stderr.write("Writing output\n")
-            for j in range(nProtCol):
+    listScore = []
+    simMatProt = [0.0 for k in range(colEnd)]
+    # Open file after batch
+
+    for i in range(nProtRow):
+        ###Preparing data for parallel mapping###
+        startBatch = colStart+i
+        while startBatch < colEnd:
+            if startBatch+step > colEnd:
+                batchLen = 3334 - startBatch
+            else:
+                batchLen = step
+            for j in range(startBatch,startBatch+batchLen):
+                rowProtein.append(rowSeq[i])
+                rowIndex.append(i)
+                colProtein.append(colSeq[j- colStart])
+                colIndex.append(j)
+            ### Calculation ###
+            listScore = [pool.apply_async(alignprot,(rowProtein[j], colProtein[j], rowIndex[j], colIndex[j],)) for j in range(batchLen)] ###Put into row
+            for listS in listScore:
+                simMatProt[listS.get()[1]] = listS.get()[0]
+            #Reset value
+            del rowProtein[:]
+            del rowIndex[:]
+            del colProtein[:]
+            del colIndex[:]
+            del listScore[:]
+            startBatch += batchLen
+        sys.stderr.write("Writing output\n")
+        with open(outMatDir, 'a') as matF, open(outMetaDir, 'ayy') as metaF:
+            for j in range(colEnd):
                 if j>0:
                     matF.write(",")
                 matF.write(str(simMatProt[j]))
             matF.write("\n")
-            metaF.write(rowMetaProtein[i]+"\n")
-            simMatProt = [0.0 for k in range(nProtCol)]
+            metaF.write(rowMeta[i]+"\n")
+        matF.close()
+        metaF.close()
     sys.stderr.write("Closing file output\n")
-    matF.close()
-    metaF.close()
+
 
     ##################
 
 def alignprot(rowSeqProtein,colSeqProtein,rowIndex,colIndex):
-    alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
     sys.stderr.write("\rAligning "+str(rowIndex)+" "+str(colIndex)+",")
     sys.stderr.flush()
+    alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
     return [alignres, colIndex]
+
+def readProtList(path):
+    uniprotIdList = []
+    with open(path,'r') as f:
+        csvContent = csv.reader(f,  delimiter=',', quotechar='\"')
+        for it,row in enumerate(csvContent):
+            if (it > 0):
+                uniprotIdList.append(row[2])
+            else:
+                it = 1
+    f.close()
+    return uniprotIdList
 
 
 if __name__ == '__main__':

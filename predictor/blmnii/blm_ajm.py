@@ -1,71 +1,168 @@
 import numpy as np
-
 import psycopg2
-import blmnii
 import sys
+import time
 
-sys.path.append('../server')
-from config import databaseConfig as dcfg
-sys.path.append('../util')
+from sklearn import svm
+from sklearn.preprocessing import MinMaxScaler
+
+sys.path.append('../../config')
+from database_config import databaseConfig as dcfg
+from predictor_config import blmniiConfig
+
+sys.path.append('../../utility')
 import util
 
 class BLMNII:
-    def __init__(self):
-        self.name = 'blmnii'
-        self.connDB = psycopg2.connect(database=dcfg['name'],user=dcfg['user'],password=dcfg['passwd'],
+    def __init__(self,params,connMat=None,comSimMat=None,proSimMat=None,
+                    trainList=None,testList=None):
+
+
+        self._name = params['name']
+        self._proba = params['proba']
+        self._connDB = psycopg2.connect(database=dcfg['name'],user=dcfg['user'],password=dcfg['passwd'],
                                         host=dcfg['host'],port=dcfg['port'])
-        self.cur = self.connDB.cursor()
+        self._cur = self._connDB.cursor()
+
+        self._comSimMat = None
+        self._proSimMat = None
+        self._connMat = None
+        self._develMode = False
+        self._trainList = None
+        self._testList = None
+
+        if connMat is not None:
+            self._comSimMat = comSimMat
+            self._proSimMat = proSimMat
+            self._connMat = connMat
+            self._develMode = True
+            self._trainList = trainList
+            self._testList = testList
+        else:
+            self._nPair = params['maxTrainingDataSize']
 
     def predict(self,query):
         nQuery = len(query)
         # sys.stderr.write ("Processing Query.... \n")
-        pairIdList = util.randData(query,1000)
 
-        # sys.stderr.write ("Making kernel....\n")
-        compList = [i[0] for i in pairIdList]
-        compMeta, compSimMat = self.makeKernel(compList,"com")
-        protList = [i[1] for i in pairIdList]
-        protMeta, protSimMat = self.makeKernel(protList,"pro")
+        if self._develMode:
 
-        # sys.stderr.write ("Building connectivity data...\n")
-        adjMat = self.makeAdjMat(compMeta,protMeta)
+            queryIdx = [[i[0],i[1]] for i in query]
 
-        pairIndexList = [[compMeta[i[0]],protMeta[i[1]]] for i in pairIdList]
-        # sys.stderr.write ("Running BLM-NII...\n")
-        # Running Batch
-        resPred = []
-        for i,pair in enumerate(pairIndexList):
-            if i == nQuery:
-                break
-            resPred.append(blmnii.predict(adjMat,compSimMat,protSimMat,
-                        pair[0],pair[1]))
-        return resPred
+            comTrain = self._trainList[0]
+            comTest = self._testList[0]
 
-    def makeAdjMat(self,compList,protList):
-        adjMat = np.zeros((len(compList), len(protList)), dtype=int)
+            proTrain = self._trainList[1]
+            proTest = self._testList[1]
 
-        query = "SELECT com_id, pro_id, weight FROM compound_vs_protein"
-        queryC = " WHERE ("
-        for i,j in enumerate(compList):
-            if i>0:
-                queryC += " OR "
-            queryC += " com_id = " + "'"+j+"'"
-        queryC += ")"
-        queryP = " AND ("
-        for i,j in enumerate(protList):
-            if i>0:
-                queryP += " OR "
-            queryP += " pro_id = " + "'"+j+"'"
-        queryP += ")"
+        else:
 
-        query += queryC + queryP
-        self.cur.execute(query)
-        rows = self.cur.fetchall()
-        for row in rows:
-            adjMat[compList[row[0]]][protList[row[1]]]=(row[2])
-        return adjMat
+            # timer = time.time()
+            pairIdList = util.randData(query,self._nPair)
+            # print "This section is running for "+str(time.time()-timer)+" seconds"
 
-    def makeKernel(self,dataList,mode):
+
+            # sys.stderr.write ("Making kernel....\n")
+            # timer = time.time()
+
+            comList = [i[0] for i in pairIdList]
+            comMeta, self._comSimMat = self._makeKernel(comList,"com")
+            comTest =  list(set([comMeta[pair[0]] for ii,pair
+                            in enumerate(query) if i<nQuery]))
+            comTrain = [comMeta[i] for i in set(comList) if i not in comTest]
+
+            proList = [i[1] for i in pairIdList]
+            proMeta, self._proSimMat = self._makeKernel(proList,"pro")
+            proTest =  list(set([proMeta[pair[1]] for ii,pair
+                            in enumerate(query) if i<nQuery]))
+            proTrain = [proMeta[i] for i in set(proList) if i not in proTest]
+
+            queryIdx = ([[comMeta[pair[0]],proMeta[pair[1]]] for ii,pair
+                        in enumerate(query) if ii<nQuery])
+            # print "This section is running for "+str(time.time()-timer)+" seconds"
+
+
+            # sys.stderr.write ("Building connectivity data...\n")
+            # timer = time.time()
+            self._connMat = self._makeAdjMat(comMeta,proMeta)
+            # print "This section is running for "+str(time.time()-timer)+" seconds"
+
+            # sys.stderr.write ("Running BLM-NII...\n")
+
+        # timer = time.time()
+        mergePred = []
+        for i in queryIdx:
+            comPred = self._predict(self._connMat,self._comSimMat,self._proSimMat,
+                                    [proTest,proTrain],(i[0],i[1]),0)
+            proPred = self._predict(self._connMat,self._proSimMat,self._comSimMat,
+                                    [comTest,comTrain],(i[1],i[0]),1)
+            mergePred.append(max(comPred[0],proPred[0]))
+        # print "This section is running for "+str(time.time()-timer)+" seconds"
+        return mergePred
+
+    def close(self):
+        self._connDB.close()
+
+    def _predict(self,adjMatrix,sourceSim,targetSim,dataSplit,dataQuery,mode):
+
+        if mode == 1:
+            adjMatrix = [[row[i] for row in adjMatrix] for i in range(len(adjMatrix[0]))]
+
+        testIndex = dataSplit[0]
+        trainIndex = dataSplit[1]
+        sourceIndex = dataQuery[0]
+        targetIndex = dataQuery[1]
+
+        nTrain = len(trainIndex)
+        nTest = len(testIndex)
+        nSource = len(sourceSim)
+
+
+        intProfile = np.zeros(nTrain,dtype=float)
+        neighbors = [j for i,j in enumerate(adjMatrix[sourceIndex]) if i in trainIndex]
+
+        if len(set(neighbors)) == 1: #New Data use NII
+            for i in range(nSource):
+                for jj,j in enumerate(trainIndex):
+                    intProfile[jj] += sourceSim [sourceIndex][i] * adjMatrix[i][j]
+
+            #Scale I[0,1]
+            scale = MinMaxScaler((0,1))
+            intProfile = intProfile.reshape(-1,1)
+            intProfile = scale.fit_transform(intProfile)
+            intProfile = [i[0] for i in intProfile.tolist()]
+            threshold = 0.5 #Rounding
+            intProfile = [int(i>=threshold) for i in intProfile]
+
+        else:
+            for ii,i in enumerate(trainIndex):
+                intProfile[ii] = adjMatrix[sourceIndex][i]
+
+        if len(set(intProfile))==1:
+            if self._proba:
+                prediction = [[0.0,0.0]]
+            else:
+                prediction = [0.0]
+        else:
+            gramTest = targetSim[targetIndex]
+            gramTrain = targetSim
+            for i in reversed(sorted(testIndex)):
+                gramTest = np.delete(gramTest,i, 0)
+                gramTrain = np.delete(gramTrain,i, 0)
+                gramTrain = np.delete(gramTrain,i, 1)
+            model = svm.SVC(kernel='precomputed', probability=True)
+            model.fit(gramTrain, intProfile)
+            if self._proba:
+                prediction = model.predict_proba(gramTest.reshape(1,-1))
+            else:
+                prediction = model.predict(gramTest.reshape(1,-1))
+
+        if self._proba:
+            return (prediction[0][1],sourceIndex,targetIndex)
+        else:
+            return (float(prediction[0]),sourceIndex,targetIndex)
+
+    def _makeKernel(self,dataList,mode):
         dataList = list(set(dataList))
         dataDict = {e:i for i,e in enumerate(dataList)}#for Index
         simMat = np.zeros((len(dataList),len(dataList)), dtype=float)
@@ -82,8 +179,8 @@ class BLMNII:
                 queryC += " OR "
             queryC += (qParam[0] + " = " + "'" + d + "'")
         query += queryC
-        self.cur.execute(query)
-        dataRows = self.cur.fetchall()
+        self._cur.execute(query)
+        dataRows = self._cur.fetchall()
         for i,row in enumerate(dataRows):
             if row[1] != None:
                 temp = row[1].split(',')
@@ -92,3 +189,38 @@ class BLMNII:
                     if j[0].split(':')[0] in dataDict:
                         simMat[dataDict[row[0]]][dataDict[j[0].split(':')[0]]]=float(j[1])
         return dataDict, simMat
+
+    def _makeAdjMat(self,comList,proList):
+        adjMat = np.zeros((len(comList), len(proList)), dtype=int)
+
+        query = "SELECT com_id, pro_id, weight FROM compound_vs_protein"
+        queryC = " WHERE ("
+        for i,j in enumerate(comList):
+            if i>0:
+                queryC += " OR "
+            queryC += " com_id = " + "'"+j+"'"
+        queryC += ")"
+        queryP = " AND ("
+        for i,j in enumerate(proList):
+            if i>0:
+                queryP += " OR "
+            queryP += " pro_id = " + "'"+j+"'"
+        queryP += ")"
+
+        query += queryC + queryP
+        self._cur.execute(query)
+        rows = self._cur.fetchall()
+        for row in rows:
+            adjMat[comList[row[0]]][proList[row[1]]]=(row[2])
+        return adjMat
+
+def test():
+    pairQuery = [('COM00000020','PRO00001846')]
+    predictorTest = BLMNII(blmniiConfig)
+    testRes = predictorTest.predict(pairQuery)
+
+
+if __name__=='__main__':
+    startTime = time.time()
+    test()
+    print "Program is running for "+str(time.time()-startTime)+" seconds"
