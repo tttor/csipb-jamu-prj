@@ -3,7 +3,7 @@
 
 ################################################################################
 echo "Starting IJAH web..."
-docker run --restart=always -d --name "ijahweb_daemon" -p 2002:80 -v /home/ijah/ijah/web:/var/www/html ijah
+docker run --restart=always -d --name "ijah_web_daemon" -p 2002:80 -v /home/ijah/ijah/web:/var/www/html ijah
 
 ################################################################################
 echo "Starting IJAH predictor server 0"
