@@ -1,4 +1,3 @@
-
 import {
   Component, OnInit, Inject, ElementRef, ViewChild
 } from '@angular/core';
@@ -17,8 +16,8 @@ declare var saveAs: any;
 })
 export class Home implements OnInit {
   // API URL addresses
-  // baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  baseAPI ='http://localhost/ijah-api/';
+  baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+  // baseAPI ='http://localhost/ijah-api/';
 
   interactionQueryAPI;
   metaQueryAPI;
@@ -436,13 +435,6 @@ export class Home implements OnInit {
     this.http.post(this.interactionQueryAPI,dsi).map(resp => resp.json())
     .subscribe(plaVScom => {
       let comSet = this.getSet(plaVScom,'com_id');
-      if (comSet.length==0) {// input compounds may have no connectivity to plants
-        for (let i=0;i<drugSideInput.length;i++) {
-          let com = drugSideInput[i]['value'];
-          comSet.push(com);
-        }
-      }
-
       let comSetJSON = this.makeJSONFormat(comSet,'comId');
       // console.log(comSetJSON);
 
@@ -479,13 +471,6 @@ export class Home implements OnInit {
     this.http.post(this.interactionQueryAPI,tsi).map(resp => resp.json())
     .subscribe(proVSdis => {
       let proSet = this.getSet(proVSdis,'pro_id');
-      if (proSet.length==0) {// input proteins may have no connectivity to diseases
-        for (let i=0;i<targetSideInput.length;i++) {
-          let pro = targetSideInput[i]['value'];
-          proSet.push(pro);
-        }
-      }
-
       let proSetJSON = this.makeJSONFormat(proSet,'proId');
       // console.log(proSetJSON);
 
@@ -738,7 +723,7 @@ export class Home implements OnInit {
               nUnknownComProConn = (comSet.length*proSet.length)-(nKnownByPredictionComProConn+nKnownByExperimentComProConn);
             }
 
-            this.summaryTxtOutput = 'Minimum Connectivity Weight To Display:\n';
+            this.summaryTxtOutput = 'Minimum Connectivity Weight To Process:\n';
             this.summaryTxtOutput += '   '+this.filterThreshold_.toFixed(nDecimalDigits)+'\n';
             this.summaryTxtOutput += 'Connectivity Score:\n';
             this.summaryTxtOutput += '   Total: '+totConnScore.toFixed(nDecimalDigits)+'\n';
@@ -797,9 +782,6 @@ export class Home implements OnInit {
           key = key.substring(4);
           if (j>0) {
             txt += indent;
-            if ((i+1)>9) {
-              txt += ' ';
-            }
           }
           txt += key+': '+prop+'\n';
         }
@@ -855,9 +837,6 @@ export class Home implements OnInit {
             text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
           }
 
-          if (nUnique>9) {
-            text += ' ';
-          }
           text += indent+'['+source+':]\n';
           pos = text.length - 2;
           prevConnSource = source;
@@ -868,9 +847,6 @@ export class Home implements OnInit {
         }
 
         let destProps = this.getProps(dest,destPropKeys,destMeta);
-        if (nUnique>9) {
-          text += ' ';
-        }
         text += indent+indent+'['+weight+'] ';
         text += this.concatProps(destProps,destPropKeys,true,true)
         text += '\n';
@@ -1186,9 +1162,6 @@ export class Home implements OnInit {
     if (type==='pla_name') {
       baseUrl = 'https://en.wikipedia.org/wiki/';
     }
-    else if (type==='pla_idr_name') {
-      baseUrl = 'https://id.wikipedia.org/wiki/';
-    }
     else if (type==='com_knapsack_id') {
       baseUrl = 'http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=';
     }
@@ -1216,23 +1189,15 @@ export class Home implements OnInit {
 
     let urlStr = '';
     if (baseUrl.indexOf('unknown')===-1 && seed && seed!=='' && seed!=='null') {
-      let sep = 'unknown';
-      if (type==='pro_pdb_id') {
-        sep = ',';
-      }
-      else if (type==='pla_idr_name') {
-        sep = '/';
-      }
-
-      let seedComps = seed.split(sep);
+      let seedComps = seed.split(',');
       for (let i=0; i<seedComps.length;i++) {
         let s = seedComps[i];
         let url: string = baseUrl + s;
 
-        if (i>0) {
-          urlStr += sep;
-        }
         urlStr += '<a href="'+url+'" target="_blank">'+s+'</a>';
+        if (i < seedComps.length-1) {
+          urlStr += ',';
+        }
       }
     }
     else {
@@ -1418,10 +1383,10 @@ export class Home implements OnInit {
   // EXAMPLE-BUTTON METHODS ////////////////////////////////////////////////////
   private example1() {
   this.reset();
-  this.plaInputHolders = [{ 'index': 1, 'value' : 'Datura stramonium'}, { 'index': 2, 'value' : 'Trifolium pratense'}, { 'index': 3, 'value' : 'Acacia senegal'}, { 'index': 4, 'value' : ''}];
-  this.selectedPlants = [{"index":1,"value":"PLA00002565"},{"index":2,"value":"PLA00001090"},{"index":3,"value":"PLA00000325"}];
+  this.plaInputHolders = [{ 'index': 1, 'value' : 'Phoenix dactylifera | Kurma'}, { 'index': 2, 'value' : 'Aloe vera | Lidah buaya'}, { 'index': 3, 'value' : 'Morinda citrifolia | Mengkudu/Pace'}, { 'index': 4, 'value' : 'Anacardium occidentale | Jambu monyet'}, { 'index': 5, 'value' : 'Cocos nucifera | Kelapa'}];
+  this.selectedPlants = [{"index":1,"value":"PLA00000007"},{"index":2,"value":"PLA00001504"},{"index":3,"value":"PLA00001838"},{"index":4,"value":"PLA00004093"},{"index":5,"value":"PLA00001600"}];
 
-  this.nPlaInputHolders = 4;
+  this.nPlaInputHolders = 5;
   this.activeCompound = false;
   this.activeProtein = false;
   this.activeDisease = false;
@@ -1451,10 +1416,10 @@ export class Home implements OnInit {
 
   private example4() {
   this.reset();
-  this.disInputHolders = [{ 'index': 1, 'value' : '156610 | Skin creases, congenital symmetric circumferential, 1'}, { 'index': 2, 'value' : '614373 | Amyotrophic lateral sclerosis 16, juvenile'}, { 'index': 3, 'value' : '612244 | Inflammatory bowel disInputHolders 13'}, { 'index': 4, 'value' : ''}];
-  this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00001455'}, { 'index': 2, 'value' : 'DIS00000803'}, { 'index': 3, 'value' : 'DIS00003796'}];
+  this.disInputHolders = [{ 'index': 1, 'value' : '601665 | Obesity'}, { 'index': 2, 'value' : '600807 | Asthma'}, { 'index': 3, 'value' : '610551 | Herpes simplex encephalitis 1'}, { 'index': 4, 'value' : '177700 | Glaucoma 1, open angle, P'}, { 'index': 5, 'value' : '166710 | Osteoporosis'}];
+  this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000470'}, { 'index': 2, 'value' : 'DIS00001061'}, { 'index': 3, 'value' : 'DIS00000900'}, { 'index': 4, 'value' : 'DIS00001636'}, { 'index': 5, 'value' : 'DIS00003892'}];
 
-  this.nDisInputHolders = 4;
+  this.nDisInputHolders = 5;
   this.activeProtein = false;
   this.activeTanaman = false;
   this.activeCompound = false;
@@ -1462,9 +1427,9 @@ export class Home implements OnInit {
 
   private example5() {
   this.reset();
-  this.plaInputHolders = [{ 'index': 1, 'value' : 'Catharanthus roseus'}, { 'index': 2, 'value' : 'Nigella sativa'}, { 'index': 3, 'value' : 'Cocos nucifera'}, { 'index': 4, 'value' : ''}];
-  this.selectedPlants = [{"index":1,"value":"PLA00001025"},{"index":2,"value":"PLA00003511"},{"index":3,"value":"PLA00001600"}];
-  this.nPlaInputHolders = 4;
+  this.plaInputHolders = [{ 'index': 1, 'value' : 'Blumea balsamifera | Sembung'}, { 'index': 2, 'value' : 'Tinospora crispa | Brotowali'}, { 'index': 3, 'value' : 'Momordica charantia | Pare'}, { 'index': 4, 'value' : 'Zingiber officinale | Jahe'}, { 'index': 5, 'value' : ''}];
+  this.selectedPlants = [{"index":1,"value":"PLA00003831"},{"index":2,"value":"PLA00000683"},{"index":3,"value":"PLA00002036"},{"index":4,"value":"PLA00001034"}];
+  this.nDisInputHolders = 5;
 
   this.proInputHolders = [{ 'index': 1, 'value' : 'P07437 | Tubulin beta chain'}, { 'index': 2, 'value' : 'P02768 | Serum albumin'}, { 'index': 3, 'value' : ''}];
   this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00002823'}, { 'index': 2, 'value' : 'PRO00001554'}];
@@ -1493,14 +1458,14 @@ export class Home implements OnInit {
 
   private example7() {
   this.reset();
-  this.plaInputHolders = [{ 'index': 1, 'value' : 'Aloe vera'}, { 'index': 2, 'value' : 'Cocos nucifera'}, { 'index': 3, 'value' : 'Panax ginseng'}, { 'index': 4, 'value' : ''}];
-  this.selectedPlants = [{"index":1,"value":"PLA00001504"},{"index":2,"value":"PLA00001600"},{"index":3,"value":"PLA00003447"}];
+  this.plaInputHolders = [{ 'index': 1, 'value' : 'Blumea balsamifera | Sembung'}, { 'index': 2, 'value' : 'Tinospora crispa | Brotowali'}, { 'index': 3, 'value' : 'Momordica charantia | Pare'}, { 'index': 4, 'value' : 'Zingiber officinale | Jahe'}, { 'index': 5, 'value' : ''}];
+  this.selectedPlants = [{"index":1,"value":"PLA00003831"},{"index":2,"value":"PLA00000683"},{"index":3,"value":"PLA00002036"},{"index":4,"value":"PLA00001034"}];
+  this.nDisInputHolders = 5;
+
+  this.disInputHolders = [{ 'index': 1, 'value' : '601388 | Diabetes mellitus, insulin-dependent, 12'}, { 'index': 2, 'value' : '304800 | Diabetes insipidus, nephrogenic, X-linked'}, { 'index': 3, 'value' : '612227 | Diabetes mellitus, ketosis-prone'}, { 'index': 4, 'value' : ''}];
+  this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000073'}, { 'index': 2, 'value' : 'DIS00000749'}, { 'index': 3, 'value' : 'DIS00000365'}];
+
   this.nDisInputHolders = 4;
-
-  this.disInputHolders = [{ 'index': 1, 'value' : '61600 | Analbuminemia'}, { 'index': 2, 'value' : '615999 | Hyperthyroxinemia, familial dysalbuminemic'}, { 'index': 3, 'value' : ''}];
-  this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00003787'}, { 'index': 2, 'value' : 'DIS00003675'}];
-
-  this.nDisInputHolders = 3;
 
   this.activeCompound = false;
   this.activeProtein = false;
