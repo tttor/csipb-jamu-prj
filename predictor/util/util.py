@@ -4,7 +4,7 @@ import sys
 
 def randData(pairList,limit):
 ############# Generate random ID #############
-    sys.stderr.write ("Generating additional random data...\n")
+    # sys.stderr.write ("Generating additional random data...\n")
     temp1 = None
     tempC = None
     tempP = None

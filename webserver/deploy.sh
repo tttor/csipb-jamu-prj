@@ -1,9 +1,7 @@
 #!/bin/bash
-# $ npm install
-# $ npm run start:hmr
-# $ npm run build:prod
-if [ "$#" -ne 6 ]; then
-  echo "USAGE: bash deploy.sh -bak [0/1] -api [0/1] -predictor [0/1]"
+if [ "$#" -ne 10 ]; then
+  echo "USAGE:"
+  echo "bash deploy.sh -bak [0/1] -web [0/1] -api [0/1] -predictor [0/1] -docker [0/1]"
   exit 1
 fi
 
@@ -15,7 +13,7 @@ BACKUP_DIR_STR='/home/ijah/ijah-backup/ijah-web-backup_'
 
 if [ $2 -ne 0 ]; then
   echo "#######################################################################"
-  echo "backing up ..."
+  echo "backing up _web_ only ..."
   stamp=`date +%Y-%m-%d-%H-%M-%S`
   copyCMD='cp -r'
   cmd=$copyCMD' '$IJAH_DIR_STR' '$BACKUP_DIR_STR$stamp
@@ -32,19 +30,21 @@ if [ $2 -ne 0 ]; then
 fi
 
 #build the src in production stage
-echo "#########################################################################"
-echo 'Have you set the _version_ at app.component.html? [0/1]'
-read vSet
-echo 'Have you set the _baseAPI_ at home.component.ts _and_ download.component.ts? [0/1]'
-read baseAPISet
-if [ "$baseAPISet" -ne 0 ] && [ "$vSet" -ne 0 ]; then
-  echo 'Yeay, lets roll...'
-  echo "building then deploying dist ..."
-  npm run build:prod
-  scp -r dist/* $IJAH_SERVER:$IJAH_DIR
+if [ $4 -ne 0 ]; then
+  echo "#########################################################################"
+  echo 'Have you set the _version_ at app.component.html? [0/1]'
+  read vSet
+  echo 'Have you set the _baseAPI_ at home.component.ts _and_ download.component.ts? [0/1]'
+  read baseAPISet
+  if [ "$baseAPISet" -ne 0 ] && [ "$vSet" -ne 0 ]; then
+    echo 'Yeay, lets roll...'
+    echo "building then deploying dist ..."
+    npm run build:prod
+    scp -r dist/* $IJAH_SERVER:$IJAH_DIR
+  fi
 fi
 
-if [ $4 -ne 0 ]; then
+if [ $6 -ne 0 ]; then
   echo "#######################################################################"
   echo 'Have you set the _DBlink_ at api/config.php? [0/1]'
   read dbLinkSet
@@ -54,13 +54,21 @@ if [ $4 -ne 0 ]; then
   fi
 fi
 
-if [ $6 -ne 0 ]; then
+if [ $8 -ne 0 ]; then
   echo "#######################################################################"
   echo 'Have you set the _DBlink_ at predictor/config.py? [0/1]'
   read predictorConfigSet
   if [ "$predictorConfigSet" -ne 0 ]; then
     echo "deploying predictors ..."
-    rm -f ../predictor/*.pyc
+    find ../predictor/ -name "*.pyc" -type f -delete
     scp -r ../predictor/* $IJAH_SERVER:$PREDICTOR_DIR
   fi
+fi
+
+if [ $10 -ne 0 ]; then
+  echo "#######################################################################"
+  echo "deploying docker files ..."
+  scp ../docker/start.sh ../docker/stop.sh ijah@ijahserver:/home/ijah/
+  # scp ../docker/webDockerfile ijah@ijahserver:/home/ijah/ijah/
+  # scp ../docker/predictorDockerfile ijah@ijahserver:/home/ijah/ijah-predictor
 fi

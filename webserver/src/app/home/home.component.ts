@@ -1,16 +1,12 @@
 import {
   Component, OnInit, Inject, ElementRef, ViewChild
 } from '@angular/core';
-
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
-
 import { Http } from '@angular/http';
-
-declare var saveAs: any;
-
 import { AppState } from '../app.service';
+declare var saveAs: any;
 
 @Component({
   selector: 'home',
@@ -19,6 +15,18 @@ import { AppState } from '../app.service';
   templateUrl: './home.component.html'
 })
 export class Home implements OnInit {
+  // API URL addresses
+  baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+  // baseAPI ='http://localhost/ijah-api/';
+
+  interactionQueryAPI;
+  metaQueryAPI;
+  predictAPI;
+
+  // List of sources in the form of a string, each separated by an underscore _
+  comProConnExperimentSrcs = 'drugbank.ca';
+  comProConnPredictionSrcs = 'blm-nii-svm_rndly';
+
   // count number of input rows
   nPlaInputHolders = 0;
   nComInputHolders = 0;
@@ -75,12 +83,6 @@ export class Home implements OnInit {
   summaryTxtOutput2;
   summaryTxtOutput3;
 
-  // API URL addresses
-  baseAPI;
-  interactionQueryAPI;
-  metaQueryAPI;
-  predictAPI;
-
   // Misc.
   // TODO explain the usage
   show = false;// whether to show the output in home.page
@@ -88,9 +90,6 @@ export class Home implements OnInit {
   elapsedTime = 0;
   mode = 'unknown';
   inputType = 'unknown';
-
-  comProConnExperimentSrcs = 'drugbank.ca';
-  comProConnPredictionSrcs = 'blm-nii-svm';
 
   dataLocal = [];
   typeaheadNoResults:boolean = false;
@@ -143,9 +142,6 @@ export class Home implements OnInit {
   }
 
   constructor(public appState: AppState, private http: Http) {
-    this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-    this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
-
     this.interactionQueryAPI = this.baseAPI+'connectivity.php';
     this.metaQueryAPI = this.baseAPI+'metadata.php';
     this.predictAPI = this.baseAPI+'predict.php';
@@ -1012,7 +1008,11 @@ export class Home implements OnInit {
   private getConnectivityScore(connectivity) {
     let score = 0.0;
     for (let i=0;i<connectivity.length;i++) {
-      score += parseFloat(connectivity[i]['weight'])
+      let src = connectivity[i]['source'];
+      if (src!=='null') {
+        let wStr = connectivity[i]['weight'];
+        score += parseFloat(wStr);
+      }
     }
     return score;
   }

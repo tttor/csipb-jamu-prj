@@ -8,7 +8,6 @@ def BLM_NII(adjMatrix,sourceSim,targetSim,sourceIndex,targetIndex,mode):
     rowSum = 0 #Param for BLM/NII
     nSource = len(sourceSim)
     nTarget = len(targetSim)
-    originalValue = 0
     #Flag Variables
     foo = 0
     boo = 0
@@ -22,7 +21,6 @@ def BLM_NII(adjMatrix,sourceSim,targetSim,sourceIndex,targetIndex,mode):
     #Make Kernel For Testing
     gramTest = targetSim[targetIndex]
     gramTest = np.delete(gramTest, targetIndex, 0)
-
     #Make Kernel for Training
     gramTrain = targetSim
     gramTrain = np.delete(gramTrain,targetIndex, 0)
@@ -32,63 +30,47 @@ def BLM_NII(adjMatrix,sourceSim,targetSim,sourceIndex,targetIndex,mode):
         #transpose adjacency Matrix
         adjMatrix = [[row[i] for row in adjMatrix] for i in range(len(adjMatrix[0]))]
 
-    #Since the current index is our testing data so we set current element to 0
-    originalValue = adjMatrix[sourceIndex][targetIndex]
-    adjMatrix[sourceIndex][targetIndex] = 0
-
-    #Compute number interaction from the source
     for row in range(len(adjMatrix[0])):
         rowSum += adjMatrix[sourceIndex][row]
-
     if (rowSum == 0):
         for i in range(nSource):
             for j in range(nTarget):
                 if (j!=targetIndex):
-                    intProfileTemp[j-boo] += sourceSim [sourceIndex][i] * adjMatrix[i][j]
+                    intProfile[j-boo] += sourceSim [sourceIndex][i] * adjMatrix[i][j]
                 else:
                     boo = 1
-        scale = MinMaxScaler()
-        intProfileTemp = intProfileTemp.reshape(-1,1)
-        intProfileTemp = scale.fit_transform(intProfileTemp)
+        
+        scale = MinMaxScaler((0,1))
+        intProfile = intProfile.reshape(-1,1)
+        intProfile = scale.fit_transform(intProfile)
+        intProfile = [i[0] for i in intProfile.tolist()]
 
-        #### use threshold ####
-        #-------- Using Fix Number --------#
-        threshold = 0.01
+        threshold = 0.5
         for i in range(nTarget-1):
-            if intProfileTemp[i] >= threshold:
-                intProfileTemp[i] = 1.0
+            if intProfile[i] >= threshold:
+                intProfile[i] = 1.0
             else:
-                intProfileTemp[i] = 0.0
-
-
+                intProfile[i] = 0.0
     else:
         for i in range(nTarget):
             if(i != targetIndex):
-                intProfileTemp[i - foo] = adjMatrix[sourceIndex][i]
+                intProfile[i - foo] = adjMatrix[sourceIndex][i]
             else:
                 foo = 1
     ##### debugging section
-
     ######################
-    if (len(set(intProfile)))>1:
-        #Train SVM
-        model = svm.SVC(kernel='precomputed')
+    if sum(intProfile)>0 and sum(intProfile)<nTarget:
+        model = svm.SVC(kernel='precomputed',probability=True)
         model.fit(gramTrain, intProfile)
-        #Predict
-        prediction = model.predict(gramTest)
+        prediction = model.predict_proba(gramTest.reshape(1,-1)) # This is Slow
+
     else:
-        prediction = 0.65*np.random.randint(0,50)/100.0 # TODO fix me!
-    return prediction
+        prediction = np.random.randint(0,50)/1000.0 # TODO fix me!
+    return prediction[0][1]
 ##################################################################
 
 def predict(adjMatrix,compSimMat,protSimMat,compIndex,protIndex):
-    #Make A prediction from DrugSide
     pComp = BLM_NII(adjMatrix,compSimMat,protSimMat,compIndex,protIndex,0)
-
-    #Make A prediction form TargetSide
     pProt = BLM_NII(adjMatrix,protSimMat,compSimMat,protIndex,compIndex,1)
-
-    #Merge Both prediction
     pred=max(pComp, pProt)
-
     return pred

@@ -1,0 +1,119 @@
+%-----------------------------------------------------------------------------%
+\addChapter{Lampiran 1 : Kode Sumber}
+\chapter*{Lampiran 1 : Kode Sumber}
+%-----------------------------------------------------------------------------%
+\section*{\code{admin\_useraddmaster}} \label{cha:lampir-admin}
+Skrip ini diletakkan pada direktori \co{/usr/sesuatu} dan hanya dapat dieksekusi oleh \f{root}. Skrip ini berguna untuk menambahkan pengguna baru sesuai dengan konfigurasi baru yang telah ditetapkan.
+\begin{lstlisting}[style=L,caption={Skrip menambahkan pengguna baru},label={lst:adduser}]
+#!/bin/csh -f
+blah blah blah
+blah blah blah
+blah blah blah
+blah blah blah
+blah blah blah
+\end{lstlisting}
+
+\section*{\code{getuser.cron}} \label{cha:lampir-cronadmin}
+Penjelasan skrip disini
+\begin{lstlisting}[style=L,caption={\f{Cronjob} menambahkan pengguna baru},label={lst:cronadduser}]
+#!/bin/bash
+# Change these two lines to localize to your system:
+# Adapted from /usr/local/sbin/admin_useradd
+
+cat /dev/null > $userlist
+for (( i=0; i<${#listemailto[@]}; i++ ))
+do
+        uname=${listusername[$i]}
+        mailto=${listemailto[$i]}
+
+        echo "User $uname created, please use torqace wisely." | mail -s "Torqace user registration" $mailto
+done
+
+\end{lstlisting}
+
+%-----------------------------------------------------------------------------%
+\addChapter{Lampiran 2 : Berkas Konfigurasi}
+\chapter*{Lampiran 2 : Berkas Konfigurasi}
+%-----------------------------------------------------------------------------%
+\section*{compute.xml}
+\begin{lstlisting}[caption={Berkas \co{compute.xml}},label={lst:excomp},language=XML]
+<?xml version="1.0" standalone="no"?>
+<kickstart>
+<description>
+	Compute node XML file
+</description>
+</kickstart> 
+\end{lstlisting}
+
+%-----------------------------------------------------------------------------%
+\addChapter{Lampiran 8 : UAT dan Kuesioner}
+%-----------------------------------------------------------------------------%
+\begin{landscape}
+\chapter*{Lampiran 8 : UAT dan Kuesioner}
+\begin{longtable}{|c|p{7cm}|p{2.5cm}|p{3.5cm}|p{3.3cm}|p{1.8cm}|}
+\caption{Tabel UAT dan Kuesioner} \label{tab:uattbl}\\
+\hline
+No. & \multicolumn{1}{c|}{Langkah Penggunaan} & Fitur Berjalan & Tingkat Kemudahan (1-5) & Tingkat Kepuasan (1-5) & Saran / Komentar \\ 
+\cline{3-5} & & Berhasil /Tidak & 1:Sangat sulit ; \hspace{100pt} 5:sangat mudah & 1 : Sangat kecewa ; 5 : sangat puas &  \\ \hline
+\multicolumn{ 6}{|>{\columncolor{headertbl}}c|}{Use Case : Login} \\ \hline
+1.1 & Pengguna berada pada halaman depan torqace &  &  &  &  \\ \hline
+1.2 & Pengguna memasukkan username dan password pada field yang telah disediakan.Kemudian menekan tombol 'login' &  &  &  &  \\ \hline
+1.3 & Apabila Sukses, maka pengguna masuk ke dalam sistem dan dihadapkan pada menu utama &  &  &  &  \\ \hline
+\multicolumn{ 6}{|>{\columncolor{headertbl}}c|}{Use Case : Register} \\ \hline
+2.1 & Pengguna berada pada halaman registrasi pengguna torqace &  &  &  &  \\ \hline
+2.2 & Pengguna memasukkan username,password, dan email pada field yang telah disediakan. Kemudian menekan tombol 'submit' &  &  &  &  \\ \hline
+2.3 & Sistem akan mengonfirmasi masukan, dan akan mengirimkan email untuk memberitahu pengguna apabila proses pendaftaran telah selesai &  &  &  &  \\ \hline
+\multicolumn{ 6}{|>{\columncolor{headertbl}}c|}{Use Case : Logout} \\ \hline
+3.1 & Pengguna memilih menu untuk melakukan logout &  &  &  &  \\ \hline
+3.2 & Sistem akan mengeluarkan pengguna, dan pengguna tidak dapat menggunakan fitur-fitur utama aplikasi &  &  &  &  \\ \hline
+\multicolumn{ 6}{|>{\columncolor{headertbl}}c|}{Use Case : Upload Job Sederhana} \\ \hline
+4.1 & Pengguna memilih menu upload file/project pada menu utama &  &  &  &  \\ \hline
+4.2 & Pengguna memilih pilihan 'single file' pada tipe project &  &  &  &  \\ \hline
+4.3 & Pengguna memilih berkas yang akan diunggah, mengisi label, dan menentukan apakah akan menimpa project sebelumnya dengan nama yang sama atau tidak &  &  &  &  \\ \hline
+4.4 & Pengguna menekan tombol 'submit' dan mengonfirmasi  &  &  &  &  \\ \hline
+4.5 & Sistem akan menampilkan informasi terkait berkas yang diupload &  &  &  &  \\ \hline
+\multicolumn{ 6}{|>{\columncolor{headertbl}}c|}{Use Case : Upload Job Compressed} \\ \hline
+5.1 & Pengguna memilih menu upload file/project pada menu utama &  &  &  &  \\ \hline
+5.2 & Pengguna memilih pilihan 'compressed files' pada tipe project &  &  &  &  \\ \hline
+5.3 & Pengguna memilih arsip yang akan diunggah, mengisi label, menentukan akan melakukan make atau tidak dan menentukan apakah akan menimpa project sebelumnya dengan nama yang sama atau tidak &  &  &  &  \\ \hline
+5.4 & Pengguna menekan tombol 'submit' dan mengonfirmasi  &  &  &  &  \\ \hline
+5.5 & Sistem akan menampilkan informasi terkait berkas yang diupload dan diekstrak. Keluaran make juga akan ditampilkan bila dipilih &  &  &  &  \\ \hline
+\multicolumn{ 6}{|>{\columncolor{headertbl}}c|}{Use Case : Upload Array Job} \\ \hline
+6.1 & Pengguna memilih menu upload file/project pada menu utama &  &  &  &  \\ \hline
+6.2 & Pengguna memilih pilihan 'array' pada tipe project &  &  &  &  \\ \hline
+6.3 & Pengguna memilih arsip-arsip yang akan diunggah, mengisi label, menentukan akan melakukan make atau tidak dan menentukan apakah akan menimpa project sebelumnya dengan nama yang sama atau tidak &  &  &  &  \\ \hline
+6.4 & Pengguna menekan tombol 'submit' dan mengonfirmasi  &  &  &  &  \\ \hline
+6.5 & Sistem akan menampilkan informasi terkait berkas yang diupload dan diekstrak. Keluaran make juga akan ditampilkan bila dipilih &  &  &  &  \\ \hline
+\multicolumn{ 6}{|>{\columncolor{headertbl}}c|}{Use Case : Melihat antrian pada queue} \\ \hline
+7.1 & Pengguna memilih menu  queue status pada menu utama &  &  &  &  \\ \hline
+7.2 & Pengguna berada pada halaman yang berisi informasi queue &  &  &  &  \\ \hline
+\multicolumn{ 6}{|>{\columncolor{headertbl}}c|}{Use Case : Melihat detil antrian} \\ \hline
+8.1 & Dari halaman status queue, pengguna memilih job tertentu &  &  &  &  \\ \hline
+8.2 & Informasi mengenai detil job tersebut ditampilkan dalam bentuk tabel &  &  &  &  \\ \hline
+8.2.1 & Apabila job tersebut bukan milik pengguna, maka sistem akan melarang pengguna melihat informasi detil suatu job &  &  &  &  \\ \hline
+\multicolumn{ 6}{|>{\columncolor{headertbl}}c|}{Use Case : Membuat script job} \\ \hline
+9.1 & Pengguna memilih untuk melakukan 'generate script' baik dari laporan upload berkas, atau dari penjelajahan direktori &  &  &  &  \\ \hline
+9.2 & Pengguna mengisi nama job, parameter job, dan script yang akan dijalankan.  &  &  &  &  \\ \hline
+9.3 & Pengguna mengonfirmasi konfirmasi submit job &  &  &  &  \\ \hline
+9.4 & Pengguna dapat melihat informasi script secara keseluruhan dan pesan apakah terjadi kegagalan atau tidak, serta id job yang diberikan &  &  &  &  \\ \hline
+\multicolumn{ 6}{|>{\columncolor{headertbl}}c|}{Use Case : Load spesifikasi job lain} \\ \hline
+10.1 & Pengguna berada pada halaman untuk membuat script &  &  &  &  \\ \hline
+10.2 & Pengguna memilih 'Load a Previous Job' &  &  &  &  \\ \hline
+10.3 & Pengguna memilih job mana yang akan dimuat dan menekan tombol 'Load' &  &  &  &  \\ \hline
+10.4 & Pengguna kembali ke halaman pembuatan script dengan spesifikasi job sebelumnya &  &  &  &  \\ \hline
+\multicolumn{ 6}{|>{\columncolor{headertbl}}c|}{Use Case : Menjelajah Direktori} \\ \hline
+11.1 & Pengguna memilih menu  'View File/Project'  pada menu utama &  &  &  &  \\ \hline
+11.2 & Pengguna dapat melakukan navigasi untuk masuk ke dalam direktori tertentu, atau kembali ke direktori diatasnya, dan dapat melihat terdapat berkas apa saja dalam direktori &  &  &  &  \\ \hline
+\multicolumn{ 6}{|>{\columncolor{headertbl}}c|}{Use Case : Menghapus Berkas/Direktori} \\ \hline
+12.1 & Pengguna berada pada halaman penjelajahan direktori &  &  &  &  \\ \hline
+12.2 & Pengguna memilih pilihan untuk menghapus berkas/direktori di samping item yang akan dihapus &  &  &  &  \\ \hline
+12.3 & Pengguna mengonfirmasi konfirmasi penghapusan &  &  &  &  \\ \hline
+\multicolumn{ 6}{|>{\columncolor{headertbl}}c|}{Use Case : Mengunduh Berkas/Direktori} \\ \hline
+13.1 & Pengguna berada pada halaman penjelajahan direktori &  &  &  &  \\ \hline
+13.2 & Pengguna memilih pilihan untuk mengunduh berkas/direktori di samping item yang akan dihapus &  &  &  &  \\ \hline
+\multicolumn{ 6}{|>{\columncolor{headertbl}}c|}{Use Case : Melihat Berkas} \\ \hline
+14.1 & Pengguna berada pada halaman penjelajahan direktori &  &  &  &  \\ \hline
+14.2 & Pengguna memilih berkas yang berupa berkas teks &  &  &  &  \\ \hline
+14.3 & Sistem akan menampilkan konten dari berkas tersebut &  &  &  &  \\ \hline
+\end{longtable}
+\end{landscape}

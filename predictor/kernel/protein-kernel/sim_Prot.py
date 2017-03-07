@@ -11,23 +11,18 @@ from Bio import pairwise2
 from Bio.SubsMat.MatrixInfo import blosum62
 from multiprocessing import Pool
 
-def alignprot(rowSeqProtein,colSeqProtein,i,j):
-    alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
-    sys.stderr.write("Aligning "+str(i)+" "+str(j)+",")
-    return [alignres, j]
-
-
-if __name__ == '__main__':
-    start = time.time()
-
+def main():
+    if len(sys.argv)!=5:
+        print "python sim_Prot.py [rowStart] [rowEnd] [columnBatch] [poolNum]"
     rowStart = int(sys.argv[1])
     rowEnd = int(sys.argv[2])
+    step = int(sys.argv[3])
+    poolNum = int(sys.argv[4])
     colStart = 0
     colEnd = 3334
-    step = int(sys.argv[3])
 
     nProtCol = colEnd-colStart
-    nProtRow = rowEnd-rowStart
+    nProtRow = rowEnd+1-rowStart
 
     simMatProtNorm = np.zeros(nProtCol, dtype=float)
     simMatProt = np.zeros(nProtCol, dtype=float)
@@ -47,7 +42,7 @@ if __name__ == '__main__':
 
     it = 0
     ### MultiProcessing ###
-    pool = Pool(processes=4)
+    pool = Pool(processes=poolNum)
     ###################
 
     ###Parse uniprot ID from csv###
@@ -64,7 +59,8 @@ if __name__ == '__main__':
     ###Read file and parse (with library)###
 
     sys.stderr.write("Load fasta file\n")
-    for i in xrange(rowStart,rowEnd):
+    for i in range(rowStart,rowEnd+1):
+        # print i, len(uniprotId)
         fastaDir = fastaFileDir + uniprotId[i] + ".fasta"
         recTemp = SeqIO.read(fastaDir, "fasta")
         rowSeqProtein.append(list(recTemp.seq))
@@ -72,7 +68,7 @@ if __name__ == '__main__':
         recTemp = recTemp.split("|")
         rowMetaProtein.append(recTemp[1])
 
-    for i in xrange(colStart,colEnd):
+    for i in range(colStart,colEnd):
         fastaDir = fastaFileDir + uniprotId[i] + ".fasta"
         recTemp = SeqIO.read(fastaDir, "fasta")
         colSeqProtein.append(list(recTemp.seq))
@@ -98,26 +94,22 @@ if __name__ == '__main__':
     outMatDir = OutDir+"RealProtKernel"+str(rowStart)+"_"+str(rowEnd)+".txt"
     outMetaDir = OutDir+"MetaProtKernel"+str(rowStart)+"_"+str(rowEnd)+".txt"
     listScore = []
-
     with open(outMatDir, 'w') as matF, open(outMetaDir, 'w') as metaF:
         for i in range(nProtRow):
             ###Preparing data for parallel mapping###
             columnCursor = rowStart+i
             while columnCursor < nProtCol:
-
                 if columnCursor+step > colEnd:
                     batchLen = 3334-columnCursor
                 else:
                     batchLen = step
-
-                for j in xrange(columnCursor,columnCursor+batchLen):
+                for j in range(columnCursor,columnCursor+batchLen):
                     rowProtein.append(rowSeqProtein[i])
                     rowIndex.append(i)
                     colProtein.append(colSeqProtein[j])
                     colIndex.append(j)
                 ### Calculation ###
-                listScore = [pool.apply_async(alignprot,(rowProtein[i], colProtein[i], rowIndex[i], colIndex[i],)) for i in range(batchLen)]
-                ###Put into row
+                listScore = [pool.apply_async(alignprot,(rowProtein[j], colProtein[j], rowIndex[j], colIndex[j],)) for j in range(batchLen)] ###Put into row
                 for listS in listScore:
                     simMatProt[listS.get()[1]] = listS.get()[0]
                 #Reset value
@@ -142,6 +134,16 @@ if __name__ == '__main__':
 
     ##################
 
+def alignprot(rowSeqProtein,colSeqProtein,rowIndex,colIndex):
+    alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
+    sys.stderr.write("\rAligning "+str(rowIndex)+" "+str(colIndex)+",")
+    sys.stderr.flush()
+    return [alignres, colIndex]
+
+
+if __name__ == '__main__':
+    start = time.time()
+    main()
     #############Debugging section#############
     print "Runtime :"+ str(time.time()-start)
     ###########################################
