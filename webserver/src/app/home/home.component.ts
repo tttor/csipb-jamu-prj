@@ -479,6 +479,13 @@ export class Home implements OnInit {
     this.http.post(this.interactionQueryAPI,tsi).map(resp => resp.json())
     .subscribe(proVSdis => {
       let proSet = this.getSet(proVSdis,'pro_id');
+      if (proSet.length==0) {// input proteins may have no connectivity to diseases
+        for (let i=0;i<targetSideInput.length;i++) {
+          let pro = targetSideInput[i]['value'];
+          proSet.push(pro);
+        }
+      }
+
       let proSetJSON = this.makeJSONFormat(proSet,'proId');
       // console.log(proSetJSON);
 
