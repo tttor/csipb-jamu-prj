@@ -1186,6 +1186,9 @@ export class Home implements OnInit {
     if (type==='pla_name') {
       baseUrl = 'https://en.wikipedia.org/wiki/';
     }
+    else if (type==='pla_idr_name') {
+      baseUrl = 'https://id.wikipedia.org/wiki/';
+    }
     else if (type==='com_knapsack_id') {
       baseUrl = 'http://kanaya.naist.jp/knapsack_jsp/information.jsp?sname=C_ID&word=';
     }
