@@ -738,7 +738,7 @@ export class Home implements OnInit {
               nUnknownComProConn = (comSet.length*proSet.length)-(nKnownByPredictionComProConn+nKnownByExperimentComProConn);
             }
 
-            this.summaryTxtOutput = 'Minimum Connectivity Weight To Process:\n';
+            this.summaryTxtOutput = 'Minimum Connectivity Weight To Display:\n';
             this.summaryTxtOutput += '   '+this.filterThreshold_.toFixed(nDecimalDigits)+'\n';
             this.summaryTxtOutput += 'Connectivity Score:\n';
             this.summaryTxtOutput += '   Total: '+totConnScore.toFixed(nDecimalDigits)+'\n';
