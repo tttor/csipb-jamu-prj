@@ -1,13 +1,17 @@
 # db_disease
 
-- [ ] UNIPROT <br />
+##UNIPROT 
+
 http://www.uniprot.org/diseases/DI-02847
 
-- [ ] HPO <br />
+##HPO 
+
 http://human-phenotype-ontology.github.io/
 
-- [ ] OMIM <br />
+##OMIM 
+
 https://www.omim.org/entry/613347
 
-- [ ] ORPHA <br />
+##ORPHA 
+
 http://www.orpha.net/consor/cgi-bin/index.php
