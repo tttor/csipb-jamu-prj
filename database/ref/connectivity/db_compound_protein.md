@@ -2,48 +2,48 @@
 
 ## DATABASE WEBSERVER
 
-[x] DRUGBANK <br />
+- [x] DRUGBANK <br />
 http://www.drugbank.ca/ <br />
 contains UniprotID
 
-[ ] SUPERTARGET + MATADOR <br />
+- [ ] SUPERTARGET + MATADOR <br />
 http://insilico.charite.de/supertarget/
 http://insilico.charite.de/supertarget/index.php?site=drug_target&id=4594-CP2D6_HUMAN
 http://insilico.charite.de/supertarget/index.php?site=drug_target&id=5103-SERC_HUMAN
 http://insilico.charite.de/supertarget/index.php?site=drug_target&id=5103-S5A2_HUMAN
 http://insilico.charite.de/supertarget/index.php?site=drug_target&id=5103-AUTS2_HUMAN
 
-[ ] TRANSFORMER <br />
+- [ ] TRANSFORMER <br />
 http://bioinformatics.charite.de/transformer/
 http://bioinformatics.charite.de/supercyp/
 
-[ ] Antibioticome <br />
+- [ ] Antibioticome <br />
 http://magarveylab.ca/antibioticome
 
-[ ] Therapeutic Target Database <br />
+- [ ] Therapeutic Target Database <br />
 http://bidd.nus.edu.sg/group/cjttd/
 
-[ ] BindingDB <br />
+- [ ] BindingDB <br />
 http://www.bindingdb.org/bind/index.jsp
 
-[ ] STITCH
+- [ ] STITCH
 
-[ ] BRENDA
+- [ ] BRENDA
 Schomburg I, Chang A, Ebeling C, Gremse M, Heldt C, et al. (2004) BRENDA,
 the enzyme database: updates and major new developments. Nucleic Acids Res
 32: D431–433.
 
-[ ] Pubchem
+- [ ] Pubchem
 Pubchem Bioassay
 https://pubchem.ncbi.nlm.nih.gov
 most compound-protein info is from drugbank,
 may use ftp service to download compound info,
 then look for "Target"
 
-[ ] GLIDA
+- [ ] GLIDA
 http://pharminfo.pharm.kyoto-u.ac.jp/services/glida/
 
-[ ] HPO <br />
+- [ ] HPO <br />
 http://human-phenotype-ontology.github.io/
 
 KEGG
