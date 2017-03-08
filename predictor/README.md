@@ -56,8 +56,7 @@
 * feature/representation
     * TODO
 * similarity-function/kernel
-    * Gaussian Interaction Profile (GIP) Kernel
-        * Laarhoven (2011):
+    * see ../similarity/README.md
 
 ## Implementing predictor classes
 * Each predictor class should implement:
