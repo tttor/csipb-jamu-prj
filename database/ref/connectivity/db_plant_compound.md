@@ -1,5 +1,4 @@
 #db_plant_compound
-#db_pla_com
 
 - [ ] Knapsack  <br />
 http://kanaya.naist.jp/KNApSAcK/ <br />
@@ -17,12 +16,13 @@ http://www.pharmaceutical-bioinformatics.de/streptomedb2/
 - [ ] NABD <br />
 http://www.antibiotics.or.jp/journal/database/database-top.htm
 
-- [ ] http://www.naturalmedicinefacts.info/
+- [ ] naturalmedicinefacts <br />
+http://www.naturalmedicinefacts.info/
 
-The herb dataset supporting the conclusions of this art-
-icle is available in the TCMID (http://www.megabionet.org/
-tcmid/), TCM-ID (http://bidd.nus.edu.sg/group/TCMsite/
-Default.aspx), KTKP (http://www.koreantk.com), and
-KAMPO (http://www.kampo.ca).
+- [ ] Traditional Chinese medicine information database () <br />
+TCMID: http://www.megabionet.org/tcmid/, <br />
+TCM-ID: http://bidd.nus.edu.sg/group/TCMsite/Default.aspx, <br />
+KTKP: http://www.koreantk.com, <br />
+KAMPO: http://www.kampo.ca.
 
-Traditional Chinese medicine information database
+

@@ -1,5 +1,4 @@
 #db_protein_disease
-#db_pro_dis
 
 - [ ] UNIPROT <br />
 http://www.uniprot.org/ <br />

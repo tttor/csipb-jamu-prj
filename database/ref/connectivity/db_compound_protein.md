@@ -26,19 +26,16 @@ http://bidd.nus.edu.sg/group/cjttd/
 - [ ] BindingDB <br />
 http://www.bindingdb.org/bind/index.jsp
 
-- [ ] STITCH
+- [ ] STITCH <br />
+http://stitch.embl.de/
 
-- [ ] BRENDA
-Schomburg I, Chang A, Ebeling C, Gremse M, Heldt C, et al. (2004) BRENDA,
-the enzyme database: updates and major new developments. Nucleic Acids Res
-32: D431–433.
+- [ ] BRENDA <br />
+http://www.brenda-enzymes.org/
 
-- [ ] Pubchem
-Pubchem Bioassay
-https://pubchem.ncbi.nlm.nih.gov
-most compound-protein info is from drugbank,
-may use ftp service to download compound info,
-then look for "Target"
+- [ ] Pubchem Bioassay  <br />
+https://pubchem.ncbi.nlm.nih.gov  <br />
+most compound-protein info is from drugbank,  <br />
+may use ftp service to download compound info, then look for "Target"
 
 - [ ] GLIDA <br />
 http://pharminfo.pharm.kyoto-u.ac.jp/services/glida/
@@ -47,8 +44,6 @@ http://pharminfo.pharm.kyoto-u.ac.jp/services/glida/
 http://human-phenotype-ontology.github.io/
 
 - [ ] KEGG <br />
-KEGG BRITE <br />
-http://www.drugbank.ca/drugs/DB00149 <br />
 http://www.genome.jp/dbget-bin/www_bget?dr:D00030 <br />
 http://www.genome.jp/dbget-bin/www_bget?cpd:C00123
 
@@ -57,8 +52,6 @@ http://wishart.biology.ualberta.ca/polysearch/index.htm
 
 - [ ] TTD <br />
 http://bidd.nus.edu.sg/group/cjttd/TTD.asp
-
-KEGG Drugs
 
 - [ ] ChEMBL <br />
 https://www.ebi.ac.uk/chembl
