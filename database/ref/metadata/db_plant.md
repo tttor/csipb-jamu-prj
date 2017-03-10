@@ -1,11 +1,11 @@
-#db_plant
+# db_plant
 
 - [ ] kanaya <br />
 http://kanaya.naist.jp/jamu/sdatalist_gk.jsp <br />
 http://kanaya.naist.jp/kampo/sdatalist_gk.jsp <br />
 http://kanaya.naist.jp/KNApSAcK_World/top.jsp <br />
 http://kanaya.naist.jp/KNApSAcK_World/list.jsp <br />
-ijah raw data <br /> 
+ijah raw data <br />
 sony's disertation
 
 - [ ] List: name only <br />
