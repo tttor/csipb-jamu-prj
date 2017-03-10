@@ -76,7 +76,6 @@ class ServerThread(threading.Thread):
                 predictionList = []
                 predictionSourceList = []
                 nMethods = len(pcfg['methods'])
-                normalizer = 1.0/float(nMethods)
                 for i in range(len(queryList)):
                     totalPred = 0.0
                     sources = []
@@ -87,7 +86,7 @@ class ServerThread(threading.Thread):
                             totalPred +=  (w * pred)
                             sources.append( pcfg['methods'][j]['name'] )
 
-                    normPred = totalPred/normalizer
+                    normPred = totalPred / float(nMethods)
                     predictionList.append(normPred)
                     predictionSourceList.append(sources)
                 # print self.name+': predictionList '+str(predictionList)
