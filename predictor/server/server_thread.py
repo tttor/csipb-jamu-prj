@@ -74,34 +74,32 @@ class ServerThread(threading.Thread):
                     predictionListRaw.append( t.getPredictionList() )
 
                 predictionList = []
+                predictionSourceList = []
                 nMethods = len(pcfg['methods'])
                 for i in range(len(queryList)):
-                    nValidPred = 0
                     totalPred = 0.0
+                    sources = []
                     for j in range(nMethods):
                         pred = predictionListRaw[j][i]
                         if not(math.isnan(pred)): # valid
                             w = pcfg['methods'][j]['weight']
                             totalPred +=  (w * pred)
-                            nValidPred += 1
+                            sources.append( pcfg['methods'][j]['name'] )
 
-                    normPred = float('NaN')
-                    if nValidPred>0:
-                        normalizer = 1.0/float(nValidPred)
-                        normPred = totalPred/normalizer
-
+                    normPred = totalPred / float(nMethods)
                     predictionList.append(normPred)
+                    predictionSourceList.append(sources)
                 # print self.name+': predictionList '+str(predictionList)
 
                 # Push the prediction result to database
                 nPush = 0
                 for i,p in enumerate(predictionList):
-                    if (math.isnan(p)) or (p<=0.0):# invalid
+                    if (math.isnan(p)) or (p<=0.0) or (p>1.0):# invalid
                         continue
 
                     nPush += 1
                     comId,proId = queryList[i]
-                    src = '+'.join([i['name'] for i in pcfg['methods']])
+                    src = '+'.join(predictionSourceList[i])
 
                     queryCheck = "SELECT * FROM compound_vs_protein WHERE "
                     queryCheck += "com_id='"+comId+"' AND pro_id='"+proId+"'"

@@ -8,3 +8,4 @@ Please visit: http://ijah.apps.cs.ipb.ac.id
 * scikit-learn >= 0.18.1
 * PHP >= 5.5.9
 * PostgreSQL >= 9.6.1
+* and more (see other READMEs)

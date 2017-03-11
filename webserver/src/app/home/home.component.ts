@@ -738,7 +738,7 @@ export class Home implements OnInit {
               nUnknownComProConn = (comSet.length*proSet.length)-(nKnownByPredictionComProConn+nKnownByExperimentComProConn);
             }
 
-            this.summaryTxtOutput = 'Minimum Connectivity Weight To Process:\n';
+            this.summaryTxtOutput = 'Minimum Connectivity Weight To Display:\n';
             this.summaryTxtOutput += '   '+this.filterThreshold_.toFixed(nDecimalDigits)+'\n';
             this.summaryTxtOutput += 'Connectivity Score:\n';
             this.summaryTxtOutput += '   Total: '+totConnScore.toFixed(nDecimalDigits)+'\n';
@@ -797,6 +797,7 @@ export class Home implements OnInit {
           key = key.substring(4);
           if (j>0) {
             txt += indent;
+            if ((i+1)>9) {txt += ' ';}
           }
           txt += key+': '+prop+'\n';
         }
@@ -852,6 +853,7 @@ export class Home implements OnInit {
             text = [text.slice(0,pos),nUniquePerConnSrc.toString(), text.slice(pos)].join('');
           }
 
+          if (nUnique>9) {text += ' ';}
           text += indent+'['+source+':]\n';
           pos = text.length - 2;
           prevConnSource = source;
@@ -862,6 +864,7 @@ export class Home implements OnInit {
         }
 
         let destProps = this.getProps(dest,destPropKeys,destMeta);
+        if (nUnique>9) {text += ' ';}
         text += indent+indent+'['+weight+'] ';
         text += this.concatProps(destProps,destPropKeys,true,true)
         text += '\n';
