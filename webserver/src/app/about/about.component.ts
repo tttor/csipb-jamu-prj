@@ -8,16 +8,16 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './about.template.html'
 })
 export class About {
-  localState;
+  private localState;
   constructor(public route: ActivatedRoute) {
-
+    // do nothing
   }
 
-  ngOnInit() {
-
+  private ngOnInit() {
+    // do nothing
   }
-  asyncDataWithWebpack() {
-
+  private asyncDataWithWebpack() {
+    // do nothing
   }
 
 }
