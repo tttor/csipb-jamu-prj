@@ -163,7 +163,7 @@ export class Home implements OnInit {
         this.nCompoundInDB = data[0]['compound_total'];
         this.nProteinInDB = data[0]['protein_total'];
         this.nDiseaseInDB = data[0]['disease_total'];
-      })
+      });
 
     // Query for metadata for _text_ _completion_ //////////////////////////////
     let plaPostMsg = ['PLA_ALL_ROWS'];
@@ -189,7 +189,7 @@ export class Home implements OnInit {
           data[i]['search'] = str;
         }
         this.plantSearch = data;
-      })
+      });
 
     let proPostMsg = ['PRO_ALL_ROWS'];
     let proPostMsgJSON = this.makeJSONFormat(proPostMsg,'id');
@@ -200,7 +200,7 @@ export class Home implements OnInit {
           data[i]['search'] = temp;
         }
         this.proteinSearch = data;
-      })
+      });
 
     let disPostMsg = ['DIS_ALL_ROWS'];
     let disPostMsgJSON = this.makeJSONFormat(disPostMsg,'id');
@@ -211,7 +211,7 @@ export class Home implements OnInit {
           data[i]['search'] = temp;
         }
         this.diseaseSearch = data;
-      })
+      });
 
     let comPostMsg = ['COM_ALL_ROWS'];
     let comPostMsgJSON = this.makeJSONFormat(comPostMsg,'id');
@@ -239,7 +239,7 @@ export class Home implements OnInit {
           data[i]['search'] = str;
         }
         this.compoundSearch = data;
-      })
+      });
   }
 
   // INPUT HANDLING METHODS ////////////////////////////////////////////////////
@@ -360,7 +360,7 @@ export class Home implements OnInit {
     } else if (this.plaInputHolders.length > 1 && this.disInputHolders.length > 1) {
       this.mode = 'search_and_predict';
       this.inputType = 'plant+disease';
-      this.searchAndPredict(this.selectedPlants,this.selectedDiseases)
+      this.searchAndPredict(this.selectedPlants,this.selectedDiseases);
 
     } else if (this.comInputHolders.length > 1 && this.proInputHolders.length > 1) {
       this.mode = 'search_and_predict';
@@ -453,9 +453,9 @@ export class Home implements OnInit {
                           plaVScom,comVSpro,proVSdis);
           this.storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
                                         plaVScom,comVSpro,proVSdis);
-        })
-      })
-    })
+        });
+      });
+    });
   }
 
   public searchFromTargetSide(targetSideInput) {
@@ -496,9 +496,9 @@ export class Home implements OnInit {
                           plaVScom,comVSpro,proVSdis);
           this.storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
                                         plaVScom,comVSpro,proVSdis);
-        })
-      })
-    })
+        });
+      });
+    });
   }
 
   public searchAndPredict(drugSideInput,targetSideInput) {
@@ -521,12 +521,12 @@ export class Home implements OnInit {
         if (plaVScom.length===0) {
           for (let i=0;i<drugSideInput.length;i++) {
             let comId = drugSideInput[i]['value'];
-            comArr.push(comId)
+            comArr.push(comId);
           }
         } else {
           for (let i=0;i<plaVScom.length;i++) {
             let comId = plaVScom[i]['com_id'];
-            comArr.push(comId)
+            comArr.push(comId);
           }
         }
 
@@ -534,12 +534,12 @@ export class Home implements OnInit {
         if (proVSdis.length===0) {
           for (let i=0;i<targetSideInput.length;i++) {
             let proId = targetSideInput[i]['value'];
-            proArr.push(proId)
+            proArr.push(proId);
           }
         } else {
           for (let i=0;i<proVSdis.length;i++) {
             let proId = proVSdis[i]['pro_id'];
-            proArr.push(proId)
+            proArr.push(proId);
           }
         }
 
@@ -620,11 +620,11 @@ export class Home implements OnInit {
                                 plaVScom,comVSproMerged,proVSdis);
                 this.storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
                                               plaVScom,comVSproMerged,proVSdis);
-            })
-          })
-        })
-      })
-    })
+            });
+          });
+        });
+      });
+    });
   }
 
   // OUTPUT MAKING METHODS /////////////////////////////////////////////////////
@@ -756,10 +756,10 @@ export class Home implements OnInit {
             // Show the output page
             this.show = true;
             this.showGraph = true;
-          }) // disMeta
-        }) // proMeta
-      }) // comMeta
-    }) // plaMeta
+          }); // disMeta
+        }); // proMeta
+      }); // comMeta
+    }); // plaMeta
   }
 
   public makeMetaTextOutput(type,idList,meta) {
@@ -811,7 +811,7 @@ export class Home implements OnInit {
 
     for (let i=0;i<conn.length;i++) {
       for (let j=0;j<conn[i].length;j++) {
-        let comps = conn[i][j].split("$");
+        let comps = conn[i][j].split('$');
         let source = comps[0];
         let weight = comps[1]; weight = parseFloat(weight).toFixed(3);
         let src = comps[2];
@@ -826,7 +826,7 @@ export class Home implements OnInit {
           text = text+nUnique.toString()+') ';
 
           let srcProps = this.getProps(src,srcPropKeys,srcMeta);
-          text += this.concatProps(srcProps,srcPropKeys,true,true)
+          text += this.concatProps(srcProps,srcPropKeys,true,true);
           text +=':\n';
 
           prevSrc = src;
@@ -850,7 +850,7 @@ export class Home implements OnInit {
         let destProps = this.getProps(dest,destPropKeys,destMeta);
         if (nUnique>9) {text += ' ';}
         text += indent+indent+'['+weight+'] ';
-        text += this.concatProps(destProps,destPropKeys,true,true)
+        text += this.concatProps(destProps,destPropKeys,true,true);
         text += '\n';
       }
     }
@@ -1038,7 +1038,7 @@ export class Home implements OnInit {
 
       let w = iconn[i]['weight'];
       let s = iconn[i]['source'];
-      let str = s+"$"+w+"$"+srcV+"$"+destV;
+      let str = s+'$'+w+'$'+srcV+'$'+destV;
       connSet[idx].push(str);
     }
 
@@ -1111,7 +1111,7 @@ export class Home implements OnInit {
     for (let j=0;j<arr.length;j++){
       str = str+'{'+'"'+key+'"'+':'+'"'+arr[j]+'"'+'}';
       if (j<arr.length-1) {
-        str = str+','
+        str = str+',';
       }
     }
     str = '['+str+']';
@@ -1133,7 +1133,7 @@ export class Home implements OnInit {
     let keys: string[] = [];
     if (type==='pla') {
       keys.push('pla_name');
-      keys.push('pla_idr_name')
+      keys.push('pla_idr_name');
     }
     if (type==='com') {
       keys.push('com_cas_id');
@@ -1172,11 +1172,11 @@ export class Home implements OnInit {
     } else if (type==='com_kegg_id') {
       baseUrl = 'http://www.genome.jp/dbget-bin/www_bget?cpd:';
     } else if (type==='com_pubchem_name' || type==='com_pubchem_id') {
-      baseUrl = 'https://pubchem.ncbi.nlm.nih.gov/compound/'
+      baseUrl = 'https://pubchem.ncbi.nlm.nih.gov/compound/';
     } else if (type==='pro_uniprot_id' || type==='pro_uniprot_abbrv') {
       baseUrl = 'http://www.uniprot.org/uniprot/';
     } else if (type==='pro_pdb_id') {
-      baseUrl = 'http://www.rcsb.org/pdb/explore/explore.do?structureId='
+      baseUrl = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=';
     } else if (type==='dis_omim_id') {
       baseUrl = 'https://www.omim.org/entry/';
     } else {
@@ -1221,7 +1221,7 @@ export class Home implements OnInit {
       }
     }
 
-    let props = []
+    let props = [];
     if (idx !== -1) {
       for(let j=0;j<keys.length;j++) {
         let k = keys[j];
@@ -1321,7 +1321,7 @@ export class Home implements OnInit {
     }
 
     let filename = 'ijah_'+type+suffix+'.txt';
-    let blob = new Blob([ txtArr[type] ], {type: "text/plain;charset=utf-8"});
+    let blob = new Blob([ txtArr[type] ], {type: 'text/plain;charset=utf-8'});
     saveAs(blob,filename);
   }
 
@@ -1386,7 +1386,7 @@ export class Home implements OnInit {
 
     if (type==='plant_vs_disease') {
       this.plaInputHolders = [{ 'index': 1, 'value' : 'Blumea balsamifera | Sembung'}, { 'index': 2, 'value' : 'Tinospora crispa | Brotowali'}, { 'index': 3, 'value' : 'Momordica charantia | Pare'}, { 'index': 4, 'value' : 'Zingiber officinale | Jahe'}, { 'index': 5, 'value' : ''}];
-      this.selectedPlants = [{"index":1,"value":"PLA00003831"},{"index":2,"value":"PLA00000683"},{"index":3,"value":"PLA00002036"},{"index":4,"value":"PLA00001034"}];
+      this.selectedPlants = [{'index':1,'value':'PLA00003831'},{'index':2,'value':'PLA00000683'},{'index':3,'value':'PLA00002036'},{'index':4,'value':'PLA00001034'}];
       this.nDisInputHolders = 5;
 
       this.disInputHolders = [{ 'index': 1, 'value' : '601388 | Diabetes mellitus, insulin-dependent, 12'}, { 'index': 2, 'value' : '304800 | Diabetes insipidus, nephrogenic, X-linked'}, { 'index': 3, 'value' : '612227 | Diabetes mellitus, ketosis-prone'}, { 'index': 4, 'value' : ''}];
@@ -1398,7 +1398,7 @@ export class Home implements OnInit {
 
     } else if (type==='plant_vs_protein') {
       this.plaInputHolders = [{ 'index': 1, 'value' : 'Blumea balsamifera | Sembung'}, { 'index': 2, 'value' : 'Tinospora crispa | Brotowali'}, { 'index': 3, 'value' : 'Momordica charantia | Pare'}, { 'index': 4, 'value' : 'Zingiber officinale | Jahe'}, { 'index': 5, 'value' : ''}];
-      this.selectedPlants = [{"index":1,"value":"PLA00003831"},{"index":2,"value":"PLA00000683"},{"index":3,"value":"PLA00002036"},{"index":4,"value":"PLA00001034"}];
+      this.selectedPlants = [{'index':1,'value':'PLA00003831'},{'index':2,'value':'PLA00000683'},{'index':3,'value':'PLA00002036'},{'index':4,'value':'PLA00001034'}];
       this.nDisInputHolders = 5;
 
       this.proInputHolders = [{ 'index': 1, 'value' : 'P30518 | V2R_HUMAN | Vasopressin V2 receptor'}, { 'index': 2, 'value' : 'P16410 | CTLA4_HUMAN | Cytotoxic T-lymphocyte protein 4'}, { 'index': 3, 'value' : 'O43316 | PAX4_HUMAN | Paired box protein Pax-4'}, { 'index': 4, 'value' : ''}];
@@ -1434,7 +1434,7 @@ export class Home implements OnInit {
 
     } else if (type==='plant'){
       this.plaInputHolders = [{ 'index': 1, 'value' : 'Phoenix dactylifera | Kurma'}, { 'index': 2, 'value' : 'Aloe vera | Lidah buaya'}, { 'index': 3, 'value' : 'Morinda citrifolia | Mengkudu/Pace'}, { 'index': 4, 'value' : 'Anacardium occidentale | Jambu monyet'}, { 'index': 5, 'value' : 'Cocos nucifera | Kelapa'}];
-      this.selectedPlants = [{"index":1,"value":"PLA00000007"},{"index":2,"value":"PLA00001504"},{"index":3,"value":"PLA00001838"},{"index":4,"value":"PLA00004093"},{"index":5,"value":"PLA00001600"}];
+      this.selectedPlants = [{'index':1,'value':'PLA00000007'},{'index':2,'value':'PLA00001504'},{'index':3,'value':'PLA00001838'},{'index':4,'value':'PLA00004093'},{'index':5,'value':'PLA00001600'}];
       this.nPlaInputHolders = 5;
 
       this.activeCompound = false;
