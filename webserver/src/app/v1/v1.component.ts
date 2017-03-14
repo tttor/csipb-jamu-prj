@@ -7,17 +7,17 @@ import { ActivatedRoute } from '@angular/router';
   `],
   templateUrl: './v1.html'
 })
-export class V1 {
-  localState;
+export class V1Component {
+  private localState;
   constructor(public route: ActivatedRoute) {
-
+    // do nothing
   }
 
-  ngOnInit() {
-
+  private ngOnInit() {
+    // do nothing
   }
-  asyncDataWithWebpack() {
-
+  private asyncDataWithWebpack() {
+    // do nothing
   }
 
 }
