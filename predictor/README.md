@@ -50,10 +50,12 @@
     * Yuan (2016)
     * Zhang (2015)
 * Deep-learning
-    * RBM
+    * Restricted Boltzmann machines (RBM)
+      * Wang (2013)
 
 ## Dealing with skewed/imbalanced dataset
-* Liu (2015):  building up highly credible negative samples
+* credible negative samples
+  * Liu (2015)
 
 ## Standards in implementing predictor classes
 * Each predictor class should implement:
