@@ -136,13 +136,13 @@ export class Home implements OnInit {
   public changeTypeaheadNoResults(e:boolean, id):void {
     this.typeaheadNoResults = e;
 
-    if (id == 1) {
+    if (id === 1) {
       this.noResultPlant = e;
-    } else if (id == 2) {
+    } else if (id === 2) {
       this.noResultCompound = e;
-    } else if (id == 3) {
+    } else if (id === 3) {
       this.noResultProtein = e;
-    } else if (id == 4) {
+    } else if (id === 4) {
       this.noResultDisease = e;
     }
   }
@@ -244,25 +244,25 @@ export class Home implements OnInit {
 
   // INPUT HANDLING METHODS ////////////////////////////////////////////////////
   public selectPlant(e:any, index):void {
-    if (index != this.nPlaInputHolders) {
+    if (index !== this.nPlaInputHolders) {
       this.selectedPlants.push({ 'index': this.nPlaInputHolders, 'value' : e.item.pla_id});
     }
   }
 
   public selectCompound(e:any, index):void {
-    if (index != this.nComInputHolders) {
+    if (index !== this.nComInputHolders) {
       this.selectedCompounds.push({ 'index': this.nComInputHolders, 'value' : e.item.com_id});
     }
   }
 
   public selectProtein(e:any, index):void {
-    if (index != this.nProInputHolders) {
+    if (index !== this.nProInputHolders) {
       this.selectedProteins.push({ 'index': this.nProInputHolders, 'value' : e.item.pro_id});
     }
   }
 
   public selectDisease(e:any, index):void {
-    if (index != this.nDisInputHolders) {
+    if (index !== this.nDisInputHolders) {
       this.selectedDiseases.push({ 'index': this.nDisInputHolders, 'value' : e.item.dis_id});
     }
   }
@@ -270,7 +270,7 @@ export class Home implements OnInit {
   public focusPlant(index: number) {
     let MAX_INPUT_PLANTS = 5;
     this.activeCompound = false;
-    if (index == this.nPlaInputHolders) {
+    if (index === this.nPlaInputHolders) {
       if (this.nPlaInputHolders+1 < MAX_INPUT_PLANTS) {
         this.nPlaInputHolders++;
         this.plaInputHolders.push({ 'index': this.nPlaInputHolders, 'value' : ''});
@@ -281,7 +281,7 @@ export class Home implements OnInit {
   public focusCompound(index: number) {
     let MAX_INPUT_COMPOUNDS = 5;
     this.activeTanaman = false;
-    if (index == this.nComInputHolders) {
+    if (index === this.nComInputHolders) {
       if (this.nComInputHolders+1 < MAX_INPUT_COMPOUNDS) {
         this.nComInputHolders++;
         this.comInputHolders.push({ 'index': this.nComInputHolders, 'value' : ''});
@@ -292,7 +292,7 @@ export class Home implements OnInit {
   public focusProtein(index: number) {
     let MAX_INPUT_PROTEINS = 5;
     this.activeDisease = false;
-    if (index == this.nProInputHolders) {
+    if (index === this.nProInputHolders) {
       if (this.nProInputHolders+1 < MAX_INPUT_PROTEINS) {
         this.nProInputHolders++;
         this.proInputHolders.push({ 'index': this.nProInputHolders, 'value' : ''});
@@ -303,7 +303,7 @@ export class Home implements OnInit {
   public focusDisease(index: number) {
     let MAX_INPUT_DISEASES = 5;
     this.activeProtein = false;
-    if (index == this.nDisInputHolders) {
+    if (index === this.nDisInputHolders) {
       if (this.nDisInputHolders+1 < MAX_INPUT_DISEASES) {
         this.nDisInputHolders++;
         this.disInputHolders.push({ 'index': this.nDisInputHolders, 'value' : ''});
@@ -313,8 +313,8 @@ export class Home implements OnInit {
 
   // SEARCH+PREDICT METHODS ////////////////////////////////////////////////////
   public searchAndPredictButtonCallback() {
-    if (this.selectedPlants.length==0 && this.selectedCompounds.length==0 &&
-        this.selectedProteins.length==0 && this.selectedDiseases.length==0) {
+    if (this.selectedPlants.length===0 && this.selectedCompounds.length===0 &&
+        this.selectedProteins.length===0 && this.selectedDiseases.length===0) {
       this.reset();
       return;
     }
@@ -425,7 +425,7 @@ export class Home implements OnInit {
     this.http.post(this.interactionQueryAPI,dsi).map((resp) => resp.json())
     .subscribe((plaVScom) => {
       let comSet = this.getSet(plaVScom,'com_id');
-      if (comSet.length==0) {// input compounds may have no connectivity to plants
+      if (comSet.length===0) {// input compounds may have no connectivity to plants
         for (let i=0;i<drugSideInput.length;i++) {
           let com = drugSideInput[i]['value'];
           comSet.push(com);
@@ -468,7 +468,7 @@ export class Home implements OnInit {
     this.http.post(this.interactionQueryAPI,tsi).map((resp) => resp.json())
     .subscribe((proVSdis) => {
       let proSet = this.getSet(proVSdis,'pro_id');
-      if (proSet.length==0) {// input proteins may have no connectivity to diseases
+      if (proSet.length===0) {// input proteins may have no connectivity to diseases
         for (let i=0;i<targetSideInput.length;i++) {
           let pro = targetSideInput[i]['value'];
           proSet.push(pro);
