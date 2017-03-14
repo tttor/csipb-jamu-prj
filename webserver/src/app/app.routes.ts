@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { Home } from './home';
 import { Manual } from './manual';
 import { Download } from './download';
-import { Help } from './help';
+import { HelpComponent } from './help';
 import { DisclaimerComponent } from './disclaimer';
 import { V1Component } from './v1';
 import { Contact } from './contact';
@@ -14,7 +14,7 @@ export const ROUTES: Routes = [
   { path: 'home',  component: Home },
   { path: 'manual',  component: Manual },
   { path: 'downloads', component: Download },
-  { path: 'help-faq', component: Help },
+  { path: 'help-faq', component: HelpComponent },
   { path: 'disclaimer', component: DisclaimerComponent },
   { path: 'ijahv1', component: V1Component },
   { path: 'contact', component: Contact },

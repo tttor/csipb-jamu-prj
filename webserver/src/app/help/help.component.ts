@@ -7,18 +7,18 @@ import { ActivatedRoute } from '@angular/router';
   `],
   templateUrl: './help.template.html'
 })
-export class Help {
-  localState;
+export class HelpComponent {
+  private localState;
   constructor(public route: ActivatedRoute) {
-
+    // do nothing
   }
 
-  ngOnInit() {
-
+  private ngOnInit() {
+    // do nothing
   }
 
-  asyncDataWithWebpack() {
-
+  private asyncDataWithWebpack() {
+    // do nothing
   }
 
 }
