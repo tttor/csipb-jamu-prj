@@ -11,19 +11,21 @@ declare var saveAs: any;
   templateUrl: './download.template.html'
 })
 export class Download {
-  baseAPI;
+  public baseAPI;
   constructor(public route: ActivatedRoute, private http: Http) {
     this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
     // this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
   }
 
-  ngOnInit() {
+  public ngOnInit() {
+    // do nothing
   }
 
-  asyncDataWithWebpack() {
+  public asyncDataWithWebpack() {
+    // do nothing
   }
 
-  getProps(type){
+  public getProps(type) {
     // This method actually duplicates the one in apps.home class
     // TODO merge them
     let props = [];
@@ -78,7 +80,7 @@ export class Download {
     return props;
   }
 
-  getHeader(type) {
+  public getHeader(type) {
     let header = '';
     if (type === 'pla') {
       header = '[Plant ID,Latin Name,Indonesian Name]';
@@ -104,8 +106,8 @@ export class Download {
     return header;
   }
 
-  getFilename(type) {
-    let prefix = 'ijah_all_'
+  public getFilename(type) {
+    let prefix = 'ijah_all_';
     let suffix = '';
     let ext = '.txt';
     let body = '';
@@ -153,27 +155,26 @@ export class Download {
     return filename;
   }
 
-  makeTwoDigitStr(str) {
+  public makeTwoDigitStr(str) {
     str = str.toString();
     if (str.length===2) {
       return str;
-    }
-    else {
+    } else {
       return '0'+str;
     }
   }
 
-  download(type) {
+  public download(type) {
     let api = this.baseAPI+'metadata.php';
     if (type.indexOf('_vs_') !== -1) {
       api = this.baseAPI+'connectivity.php';
     }
 
     let msg = '[{"id":"'+type.toUpperCase()+'_ALL_ROWS"}]';
-    this.http.post(api,msg).map(res => res.json())
-      .subscribe(data => {
+    this.http.post(api,msg).map((res) => res.json())
+      .subscribe((data) => {
         let txt = this.getHeader(type)+'\n';
-        for (let i = 0; i < data.length; i++){
+        for (let i = 0; i < data.length; i++) {
           let props = this.getProps(type);
           for (let j=0; j < props.length;j++) {
             txt += data[i][props[j]];
@@ -183,8 +184,8 @@ export class Download {
           }
           txt = txt + '\n';
         }
-        let blob = new Blob([txt], {type: "text/plain;charset=utf-8"});
+        let blob = new Blob([txt], {type: 'text/plain;charset=utf-8'});
         saveAs(blob,this.getFilename(type));
-      })
+      });
   }
 }
