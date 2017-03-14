@@ -7,17 +7,17 @@ import { ActivatedRoute } from '@angular/router';
   `],
   templateUrl: './disclaimer.html'
 })
-export class Disclaimer {
-  localState;
+export class DisclaimerComponent {
+  private localState;
   constructor(public route: ActivatedRoute) {
-
+    // do nothing
   }
 
-  ngOnInit() {
-
+  private ngOnInit() {
+    // do nothing
   }
-  asyncDataWithWebpack() {
-
+  private asyncDataWithWebpack() {
+    // do nothing
   }
 
 }

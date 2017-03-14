@@ -26,7 +26,7 @@ import { Home } from './home';
 import { Manual } from './manual';
 import { Download } from './download';
 import { Help } from './help';
-import { Disclaimer } from './disclaimer';
+import { DisclaimerComponent } from './disclaimer';
 import { V1Component } from './v1';
 import { Contact } from './contact';
 import { AboutComponent } from './about';
@@ -53,7 +53,7 @@ type StoreType = {
     Manual,
     Help,
     Download,
-    Disclaimer,
+    DisclaimerComponent,
     V1Component,
     Contact,
     AboutComponent
