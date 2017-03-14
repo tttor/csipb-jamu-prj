@@ -104,7 +104,7 @@ export class Home implements OnInit {
   public inputType = 'unknown';
 
   public dataLocal = [];
-  public typeaheadNoResults:boolean = false;
+  public typeaheadNoResults: boolean = false;
 
   public noResultPlant = false;
   public noResultCompound = false;
@@ -123,17 +123,17 @@ export class Home implements OnInit {
     // Do nothing
   }
 
-  public stateCtrl:FormControl = new FormControl();
+  public stateCtrl: FormControl = new FormControl();
 
-  public myForm:FormGroup = new FormGroup({
+  public myForm: FormGroup = new FormGroup({
     state: this.stateCtrl
   });
 
-  public typeaheadOnSelect(e:any):void {
+  public typeaheadOnSelect(e: any): void {
     // Do nothing
   }
 
-  public changeTypeaheadNoResults(e:boolean, id):void {
+  public changeTypeaheadNoResults(e: boolean, id): void {
     this.typeaheadNoResults = e;
 
     if (id === 1) {
@@ -243,25 +243,25 @@ export class Home implements OnInit {
   }
 
   // INPUT HANDLING METHODS ////////////////////////////////////////////////////
-  public selectPlant(e:any, index):void {
+  public selectPlant(e: any, index): void {
     if (index !== this.nPlaInputHolders) {
       this.selectedPlants.push({ 'index': this.nPlaInputHolders, 'value' : e.item.pla_id});
     }
   }
 
-  public selectCompound(e:any, index):void {
+  public selectCompound(e: any, index): void {
     if (index !== this.nComInputHolders) {
       this.selectedCompounds.push({ 'index': this.nComInputHolders, 'value' : e.item.com_id});
     }
   }
 
-  public selectProtein(e:any, index):void {
+  public selectProtein(e: any, index): void {
     if (index !== this.nProInputHolders) {
       this.selectedProteins.push({ 'index': this.nProInputHolders, 'value' : e.item.pro_id});
     }
   }
 
-  public selectDisease(e:any, index):void {
+  public selectDisease(e: any, index): void {
     if (index !== this.nDisInputHolders) {
       this.selectedDiseases.push({ 'index': this.nDisInputHolders, 'value' : e.item.dis_id});
     }
