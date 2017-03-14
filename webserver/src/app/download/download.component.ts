@@ -10,7 +10,7 @@ declare var saveAs: any;
   `],
   templateUrl: './download.template.html'
 })
-export class Download {
+export class DownloadComponent {
   public baseAPI;
   constructor(public route: ActivatedRoute, private http: Http) {
     this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
@@ -141,51 +141,51 @@ export class Download {
     }
 
     const dateTime = +new Date();
-    const unixTS = Math.floor(dateTime/1000);
-    let date = new Date(unixTS*1000);
+    const unixTS = Math.floor(dateTime / 1000);
+    let date = new Date(unixTS * 1000);
     let y = date.getFullYear();
-    let m = this.makeTwoDigitStr(date.getMonth()+1);
+    let m = this.makeTwoDigitStr(date.getMonth() + 1);
     let d = this.makeTwoDigitStr(date.getDate());
     let hh = this.makeTwoDigitStr(date.getHours());
     let mm = this.makeTwoDigitStr(date.getMinutes());
     let ss = this.makeTwoDigitStr(date.getSeconds());
-    let timestamp = '_'+y+m+d+'-'+hh+mm+ss;
+    let timestamp = '_' + y + m + d + '-' + hh + mm + ss;
 
-    let filename = prefix+body+suffix+timestamp+ext;
+    let filename = prefix + body + suffix + timestamp + ext;
     return filename;
   }
 
   public makeTwoDigitStr(str) {
     str = str.toString();
-    if (str.length===2) {
+    if (str.length === 2) {
       return str;
     } else {
-      return '0'+str;
+      return '0' + str;
     }
   }
 
   public download(type) {
-    let api = this.baseAPI+'metadata.php';
+    let api = this.baseAPI + 'metadata.php';
     if (type.indexOf('_vs_') !== -1) {
-      api = this.baseAPI+'connectivity.php';
+      api = this.baseAPI + 'connectivity.php';
     }
 
-    let msg = '[{"id":"'+type.toUpperCase()+'_ALL_ROWS"}]';
-    this.http.post(api,msg).map((res) => res.json())
+    let msg = '[{"id":"' + type.toUpperCase() + '_ALL_ROWS"}]';
+    this.http.post(api, msg).map((res) => res.json())
       .subscribe((data) => {
-        let txt = this.getHeader(type)+'\n';
+        let txt = this.getHeader(type) + '\n';
         for (let i = 0; i < data.length; i++) {
           let props = this.getProps(type);
-          for (let j=0; j < props.length;j++) {
+          for (let j  = 0; j < props.length; j++) {
             txt += data[i][props[j]];
-            if (j<props.length-1) {
+            if (j < props.length - 1) {
               txt += ',';
             }
           }
           txt = txt + '\n';
         }
         let blob = new Blob([txt], {type: 'text/plain;charset=utf-8'});
-        saveAs(blob,this.getFilename(type));
+        saveAs(blob, this.getFilename(type));
       });
   }
 }

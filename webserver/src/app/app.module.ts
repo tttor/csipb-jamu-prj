@@ -24,7 +24,7 @@ import { APP_RESOLVER_PROVIDERS } from './app.resolver';
 import { AppState, InternalStateType } from './app.service';
 import { Home } from './home';
 import { ManualComponent } from './manual';
-import { Download } from './download';
+import { DownloadComponent } from './download';
 import { HelpComponent } from './help';
 import { DisclaimerComponent } from './disclaimer';
 import { V1Component } from './v1';
@@ -52,7 +52,7 @@ type StoreType = {
     Home,
     ManualComponent,
     HelpComponent,
-    Download,
+    DownloadComponent,
     DisclaimerComponent,
     V1Component,
     ContactComponent,
