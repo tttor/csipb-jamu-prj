@@ -23,7 +23,7 @@ import { AppComponent } from './app.component';
 import { APP_RESOLVER_PROVIDERS } from './app.resolver';
 import { AppState, InternalStateType } from './app.service';
 import { Home } from './home';
-import { Manual } from './manual';
+import { ManualComponent } from './manual';
 import { Download } from './download';
 import { HelpComponent } from './help';
 import { DisclaimerComponent } from './disclaimer';
@@ -50,7 +50,7 @@ type StoreType = {
   declarations: [
     AppComponent,
     Home,
-    Manual,
+    ManualComponent,
     HelpComponent,
     Download,
     DisclaimerComponent,

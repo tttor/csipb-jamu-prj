@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { Home } from './home';
-import { Manual } from './manual';
+import { ManualComponent } from './manual';
 import { Download } from './download';
 import { HelpComponent } from './help';
 import { DisclaimerComponent } from './disclaimer';
@@ -12,7 +12,7 @@ import { DataResolver } from './app.resolver';
 export const ROUTES: Routes = [
   { path: '',      component: Home },
   { path: 'home',  component: Home },
-  { path: 'manual',  component: Manual },
+  { path: 'manual',  component: ManualComponent },
   { path: 'downloads', component: Download },
   { path: 'help-faq', component: HelpComponent },
   { path: 'disclaimer', component: DisclaimerComponent },

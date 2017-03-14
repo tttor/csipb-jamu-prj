@@ -4,16 +4,16 @@ import { Component } from '@angular/core';
   selector: 'manual',
   templateUrl: './manual.template.html'
 })
-export class Manual {
+export class ManualComponent {
 
-  data = [];
+  private data = [];
 
   constructor() {
-
+    // do nothing
   }
 
-  ngOnInit() {
-
+  private ngOnInit() {
+    // do nothing
   }
 
 }
