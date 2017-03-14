@@ -84,15 +84,15 @@ export class Home implements OnInit {
   public summaryTxtOutput3;
 
   //
-  public plaVScom_ = [];
-  public comVSpro_ = [];
-  public proVSdis_ = [];
-  public plaSet_ = [];
-  public comSet_ = [];
-  public proSet_ = [];
-  public disSet_ = [];
+  public plaVScom_ = []; // tslint:disable-line
+  public comVSpro_ = []; // tslint:disable-line
+  public proVSdis_ = []; // tslint:disable-line
+  public plaSet_ = []; // tslint:disable-line
+  public comSet_ = []; // tslint:disable-line
+  public proSet_ = []; // tslint:disable-line
+  public disSet_ = []; // tslint:disable-line
 
-  public filterThreshold_ = 0.0;
+  public filterThreshold_ = 0.0; // tslint:disable-line
 
   // Misc.
   // TODO explain the usage
