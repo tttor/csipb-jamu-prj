@@ -29,7 +29,7 @@ import { Help } from './help';
 import { Disclaimer } from './disclaimer';
 import { V1 } from './v1';
 import { Contact } from './contact';
-import { About } from './about';
+import { AboutComponent } from './about';
 
 import '../styles/styles.scss';
 import '../styles/headings.css';
@@ -56,7 +56,7 @@ type StoreType = {
     Disclaimer,
     V1,
     Contact,
-    About
+    AboutComponent
   ],
   imports: [
     BrowserModule,

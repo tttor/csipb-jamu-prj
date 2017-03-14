@@ -7,7 +7,7 @@ import { ActivatedRoute } from '@angular/router';
   `],
   templateUrl: './about.template.html'
 })
-export class About {
+export class AboutComponent {
   private localState;
   constructor(public route: ActivatedRoute) {
     // do nothing
