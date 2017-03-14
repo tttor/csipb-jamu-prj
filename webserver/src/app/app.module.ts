@@ -28,7 +28,7 @@ import { Download } from './download';
 import { HelpComponent } from './help';
 import { DisclaimerComponent } from './disclaimer';
 import { V1Component } from './v1';
-import { Contact } from './contact';
+import { ContactComponent } from './contact';
 import { AboutComponent } from './about';
 
 import '../styles/styles.scss';
@@ -55,7 +55,7 @@ type StoreType = {
     Download,
     DisclaimerComponent,
     V1Component,
-    Contact,
+    ContactComponent,
     AboutComponent
   ],
   imports: [
