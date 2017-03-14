@@ -170,7 +170,7 @@ export class HomeComponent implements OnInit {
     let plaPostMsgJSON = this.makeJSONFormat(plaPostMsg, 'id');
     this.http.post(this.metaQueryAPI, plaPostMsgJSON).map((res) => res.json())
       .subscribe((data) => {
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) { // tslint:disable-line
           let valid = [];
           if (data[i]['pla_name']) {
             valid.push(data[i]['pla_name']);
@@ -195,8 +195,8 @@ export class HomeComponent implements OnInit {
     let proPostMsgJSON = this.makeJSONFormat(proPostMsg, 'id');
     this.http.post(this.metaQueryAPI, proPostMsgJSON).map((res) => res.json())
       .subscribe((data) => {
-        for (let i = 0; i < data.length; i++) {
-          let temp = data[i]['pro_uniprot_id'] + ' | ' + data[i]['pro_uniprot_abbrv'] + ' | ' + data[i]['pro_name'];
+        for (let i = 0; i < data.length; i++) { // tslint:disable-line
+          let temp = data[i]['pro_uniprot_id'] + ' | ' + data[i]['pro_uniprot_abbrv'] + ' | ' + data[i]['pro_name']; // tslint:disable-line
           data[i]['search'] = temp;
         }
         this.proteinSearch = data;
@@ -206,7 +206,7 @@ export class HomeComponent implements OnInit {
     let disPostMsgJSON = this.makeJSONFormat(disPostMsg, 'id');
     this.http.post(this.metaQueryAPI, disPostMsgJSON).map((res) => res.json())
       .subscribe((data) => {
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) { // tslint:disable-line
           let temp = data[i]['dis_omim_id'] + ' | ' + data[i]['dis_name'];
           data[i]['search'] = temp;
         }
@@ -217,7 +217,7 @@ export class HomeComponent implements OnInit {
     let comPostMsgJSON = this.makeJSONFormat(comPostMsg, 'id');
     this.http.post(this.metaQueryAPI, comPostMsgJSON).map((res) => res.json())
       .subscribe((data) => {
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) { // tslint:disable-line
           let valid = [];
           if (data[i]['com_cas_id']) {
             valid.push(data[i]['com_cas_id']);
@@ -327,32 +327,32 @@ export class HomeComponent implements OnInit {
     let showProtein = false;
     let showDisease = false;
 
-    if (this.plaInputHolders.length > 1 && this.disInputHolders.length <= 1 && this.proInputHolders.length <= 1) {
+    if (this.plaInputHolders.length > 1 && this.disInputHolders.length <= 1 && this.proInputHolders.length <= 1) { // tslint:disable-line
       this.searchFromDrugSide(this.selectedPlants);
       this.mode = 'search_only';
       this.inputType = 'plant';
       showPlant = true;
 
-    } else if (this.comInputHolders.length > 1 && this.proInputHolders.length <= 1 && this.disInputHolders.length <= 1) {
+    } else if (this.comInputHolders.length > 1 && this.proInputHolders.length <= 1 && this.disInputHolders.length <= 1) { // tslint:disable-line
       this.searchFromDrugSide(this.selectedCompounds);
       this.mode = 'search_only';
       this.inputType = 'compound';
       showCompound = true;
 
-    } else if (this.proInputHolders.length > 1 && this.plaInputHolders.length <= 1 && this.comInputHolders.length <= 1) {
+    } else if (this.proInputHolders.length > 1 && this.plaInputHolders.length <= 1 && this.comInputHolders.length <= 1) { // tslint:disable-line
       this.searchFromTargetSide(this.selectedProteins);
       this.mode = 'search_only';
       this.inputType = 'protein';
       showProtein = true;
 
-    } else if (this.disInputHolders.length > 1 && this.plaInputHolders.length <= 1 && this.comInputHolders.length <= 1) {
+    } else if (this.disInputHolders.length > 1 && this.plaInputHolders.length <= 1 && this.comInputHolders.length <= 1) { // tslint:disable-line
       this.mode = 'search_only';
       this.inputType = 'disease';
       this.searchFromTargetSide(this.selectedDiseases);
       showDisease = true;
 
-      // Starting next line: Use case 1: both sides are specified ////////////////////////////////////
-    } else if (this.plaInputHolders.length > 1 && this.proInputHolders.length > 1) {
+      // tslint:disable-line // Starting next line: Use case 1: both sides are specified ////////////////////////////////////
+    } else if (this.plaInputHolders.length > 1 && this.proInputHolders.length > 1) { // tslint:disable-line
       this.mode = 'search_and_predict';
       this.inputType = 'plant+protein';
       this.searchAndPredict(this.selectedPlants, this.selectedProteins);
@@ -426,7 +426,7 @@ export class HomeComponent implements OnInit {
     .subscribe((plaVScom) => {
       let comSet = this.getSet(plaVScom, 'com_id');
       if (comSet.length === 0) {// input compounds may have no connectivity to plants
-        for (let i = 0; i < drugSideInput.length; i++) {
+        for (let i = 0; i < drugSideInput.length; i++) { // tslint:disable-line
           let com = drugSideInput[i]['value'];
           comSet.push(com);
         }
@@ -469,7 +469,7 @@ export class HomeComponent implements OnInit {
     .subscribe((proVSdis) => {
       let proSet = this.getSet(proVSdis, 'pro_id');
       if (proSet.length === 0) {// input proteins may have no connectivity to diseases
-        for (let i = 0; i < targetSideInput.length; i++) {
+        for (let i = 0; i < targetSideInput.length; i++) { // tslint:disable-line
           let pro = targetSideInput[i]['value'];
           proSet.push(pro);
         }
@@ -519,12 +519,12 @@ export class HomeComponent implements OnInit {
         // However, all plants have compounds, and all diseases have proteins
         let comArr = [];
         if (plaVScom.length === 0) {
-          for (let i = 0; i < drugSideInput.length; i++) {
+          for (let i = 0; i < drugSideInput.length; i++) { // tslint:disable-line
             let comId = drugSideInput[i]['value'];
             comArr.push(comId);
           }
         } else {
-          for (let i = 0; i < plaVScom.length; i++) {
+          for (let i = 0; i < plaVScom.length; i++) { // tslint:disable-line
             let comId = plaVScom[i]['com_id'];
             comArr.push(comId);
           }
@@ -532,19 +532,19 @@ export class HomeComponent implements OnInit {
 
         let proArr = [];
         if (proVSdis.length === 0) {
-          for (let i = 0; i < targetSideInput.length; i++) {
+          for (let i = 0; i < targetSideInput.length; i++) { // tslint:disable-line
             let proId = targetSideInput[i]['value'];
             proArr.push(proId);
           }
         } else {
-          for (let i = 0; i < proVSdis.length; i++) {
+          for (let i = 0; i < proVSdis.length; i++) { // tslint:disable-line
             let proId = proVSdis[i]['pro_id'];
             proArr.push(proId);
           }
         }
 
         let comVSproList = [];
-        for (let i = 0; i < comArr.length; i++) {
+        for (let i = 0; i < comArr.length; i++) { // tslint:disable-line
           for (let j = 0; j < proVSdis.length; j++) {
             let comId = '"' + comArr[i] + '"';
             let proId = '"' + proArr[j] + '"';
@@ -596,7 +596,7 @@ export class HomeComponent implements OnInit {
             let hasWaitedFor = parseFloat( hasWaitedForMsg[0]['has_waited_for'] );
             console.log('hasWaitedFor= ' + hasWaitedFor.toString());
 
-            this.http.post(this.interactionQueryAPI, comVSproToPredictStr).map((resp5) => resp5.json())
+            this.http.post(this.interactionQueryAPI, comVSproToPredictStr).map((resp5) => resp5.json()) // tslint:disable-line
               .subscribe((comVSproPred) => {
                 let comVSproMerged = comVSpro;
                 for (let i = 0; i < comVSproPred.length; i++) {
@@ -679,8 +679,8 @@ export class HomeComponent implements OnInit {
                                                          'pro', 'dis',
                                                          proSet, disSet)];
             let graphData = [];
-            for (let ii = 0; ii < graphDataArr.length; ii++) {
-              for (let jj = 0; jj < graphDataArr[ii].length; jj++) {
+            for (let ii = 0; ii < graphDataArr.length; ii++) { // tslint:disable-line
+              for (let jj = 0; jj < graphDataArr[ii].length; jj++) { // tslint:disable-line
                   let datum = graphDataArr[ii][jj];
                   graphData.push(datum);
               }
@@ -704,8 +704,8 @@ export class HomeComponent implements OnInit {
             let nUndefinedComProConn = 0;
             let nKnownByExperimentComProConn = 0;
             let nKnownByPredictionComProConn = 0;
-            let sourceSep = ' + '; // must match with the one in server_thread.py for merging prediction sources
-            for (let i = 0; i < comVSpro.length; i++) {
+            let sourceSep = ' + '; // tslint:disable-line // must match with the one in server_thread.py for merging prediction sources
+            for (let i = 0; i < comVSpro.length; i++) { // tslint:disable-line
               let allSrc = comVSpro[i]['source'].split(sourceSep);
               let src = allSrc[0]; // TODO should depends on all sources
               if (src === 'null') {// unknown
@@ -720,7 +720,7 @@ export class HomeComponent implements OnInit {
             }
 
             if (this.mode === 'search_only') {
-              nUnknownComProConn = (comSet.length * proSet.length) - (nKnownByPredictionComProConn + nKnownByExperimentComProConn);
+              nUnknownComProConn = (comSet.length * proSet.length) - (nKnownByPredictionComProConn + nKnownByExperimentComProConn); // tslint:disable-line
             }
 
             this.summaryTxtOutput = 'Minimum Connectivity Weight To Display:\n';
@@ -728,20 +728,20 @@ export class HomeComponent implements OnInit {
             this.summaryTxtOutput += 'Connectivity Score:\n';
             this.summaryTxtOutput += '   Total: ' + totConnScore.toFixed(nDecimalDigits) + '\n';
             this.summaryTxtOutput += '   Plant-Compound  : ' + plaComConnScore.toString() + '\n';
-            this.summaryTxtOutput += '   Compound-Protein: ' + comProConnScore.toFixed(nDecimalDigits) + '\n';
+            this.summaryTxtOutput += '   Compound-Protein: ' + comProConnScore.toFixed(nDecimalDigits) + '\n'; // tslint:disable-line
             this.summaryTxtOutput += '   Protein-Disease : ' + proDisConnScore.toString() + '\n';
 
             this.summaryTxtOutput2 = 'Number of unique items:\n';
-            this.summaryTxtOutput2 += '   #Plants   : ' + plaSet.length.toString() + this.getInputMark('plant') + '\n';
-            this.summaryTxtOutput2 += '   #Compounds: ' + comSet.length.toString() + this.getInputMark('compound') + '\n';
-            this.summaryTxtOutput2 += '   #Proteins : ' + proSet.length.toString() + this.getInputMark('protein') + '\n';
-            this.summaryTxtOutput2 += '   #Diseases : ' + disSet.length.toString() + this.getInputMark('disease') + '\n';
+            this.summaryTxtOutput2 += '   #Plants   : ' + plaSet.length.toString() + this.getInputMark('plant') + '\n'; // tslint:disable-line
+            this.summaryTxtOutput2 += '   #Compounds: ' + comSet.length.toString() + this.getInputMark('compound') + '\n'; // tslint:disable-line
+            this.summaryTxtOutput2 += '   #Proteins : ' + proSet.length.toString() + this.getInputMark('protein') + '\n'; // tslint:disable-line
+            this.summaryTxtOutput2 += '   #Diseases : ' + disSet.length.toString() + this.getInputMark('disease') + '\n'; // tslint:disable-line
             this.summaryTxtOutput2 += 'Compound-Protein Connectivity:\n';
-            this.summaryTxtOutput2 += '   #known_by_experiment: ' + nKnownByExperimentComProConn.toString() + '\n';
-            this.summaryTxtOutput2 += '   #known_by_prediction: ' + nKnownByPredictionComProConn.toString() + '\n';
-            this.summaryTxtOutput2 += '   #unknown            : ' + nUnknownComProConn.toString() + '\n';
+            this.summaryTxtOutput2 += '   #known_by_experiment: ' + nKnownByExperimentComProConn.toString() + '\n'; // tslint:disable-line
+            this.summaryTxtOutput2 += '   #known_by_prediction: ' + nKnownByPredictionComProConn.toString() + '\n'; // tslint:disable-line
+            this.summaryTxtOutput2 += '   #unknown            : ' + nUnknownComProConn.toString() + '\n'; // tslint:disable-line
             if (nUndefinedComProConn > 0) {
-              this.summaryTxtOutput2 += '   #undefined            : ' + nUndefinedComProConn.toString() + '\n';
+              this.summaryTxtOutput2 += '   #undefined            : ' + nUndefinedComProConn.toString() + '\n'; // tslint:disable-line
             }
 
             let t1 = performance.now();
@@ -751,7 +751,7 @@ export class HomeComponent implements OnInit {
             this.summaryTxtOutput3 = 'Mode: \n';
             this.summaryTxtOutput3 += '   ' + this.mode + '\n';
             this.summaryTxtOutput3 += 'Elapsed Time: \n';
-            this.summaryTxtOutput3 += '   ' + this.elapsedTime.toFixed(nDecimalDigits) + ' seconds\n';
+            this.summaryTxtOutput3 += '   ' + this.elapsedTime.toFixed(nDecimalDigits) + ' seconds\n'; // tslint:disable-line
 
             // Show the output page
             this.show = true;
@@ -809,8 +809,8 @@ export class HomeComponent implements OnInit {
     let prevSrc = '';
     let prevConnSource = '';
 
-    for (let i = 0; i < conn.length; i++) {
-      for (let j = 0; j < conn[i].length; j++) {
+    for (let i = 0; i < conn.length; i++) { // tslint:disable-line
+      for (let j = 0; j < conn[i].length; j++) { // tslint:disable-line
         let comps = conn[i][j].split('$');
         let source = comps[0];
         let weight = comps[1]; weight = parseFloat(weight).toFixed(3);
@@ -859,21 +859,21 @@ export class HomeComponent implements OnInit {
     return text;
   }
 
-  public makeGraphDataOutput(interaction, srcMeta, destMeta, srcType, destType, srcItems, destItems) {
+  public makeGraphDataOutput(interaction, srcMeta, destMeta, srcType, destType, srcItems, destItems) { // tslint:disable-line
     let srcPropKeys = this.getPropKeys(srcType, false);
     let destPropKeys = this.getPropKeys(destType, false);
     let data = [];
 
     let srcHasDestArr = [];
     let destHasSrcArr = [];
-    for (let i = 0; i < srcItems.length; i++) {
+    for (let i = 0; i < srcItems.length; i++) { // tslint:disable-line
       srcHasDestArr.push(false);
     }
-    for (let i = 0; i < destItems.length; i++) {
+    for (let i = 0; i < destItems.length; i++) { // tslint:disable-line
       destHasSrcArr.push(false);
     }
 
-    for (let i = 0; i < interaction.length; i++) {
+    for (let i = 0; i < interaction.length; i++) { // tslint:disable-line
       let datum = [];
 
       let srcKey = srcType + '_id';
@@ -961,8 +961,7 @@ export class HomeComponent implements OnInit {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
-  public storeMetaAndConnectivity(plaSet, comSet, proSet, disSet,
-                                   plaVScom, comVSpro, proVSdis) {
+  public storeMetaAndConnectivity(plaSet, comSet, proSet, disSet, plaVScom, comVSpro, proVSdis) {
     this.plaSet_ = plaSet;
     this.comSet_ = comSet;
     this.proSet_ = proSet;
@@ -974,7 +973,7 @@ export class HomeComponent implements OnInit {
 
   public filterOnComProConnWeight(threshold, plaVScom, comVSpro, proVSdis) {
     let comVSproF = [];
-    for (let i = 0; i < comVSpro.length; i++) {
+    for (let i = 0; i < comVSpro.length; i++) { // tslint:disable-line
       let source = comVSpro['source'];
       if (source === 'null') {
         continue;
@@ -993,7 +992,7 @@ export class HomeComponent implements OnInit {
 
     // Remake the conn
     let plaVsComF = [];
-    for (let i = 0; i < plaVScom.length; i++) {
+    for (let i = 0; i < plaVScom.length; i++) { // tslint:disable-line
       let com = plaVScom[i]['com_id'];
       if (comSet.indexOf(com) !== -1) {
         plaVsComF.push(plaVScom[i]);
@@ -1001,7 +1000,7 @@ export class HomeComponent implements OnInit {
     }
 
     let proVSdisF = [];
-    for (let i = 0; i < proVSdis.length; i++) {
+    for (let i = 0; i < proVSdis.length; i++) { // tslint:disable-line
       let pro = proVSdis[i]['pro_id'];
       if (proSet.indexOf(pro) !== -1) {
         proVSdisF.push(proVSdis[i]);
@@ -1025,7 +1024,7 @@ export class HomeComponent implements OnInit {
   public groupBy(srcT, destT, iconn) {
     let srcSet = new Array();
     let connSet = new Array();
-    for (let i = 0; i < iconn.length; i++) {
+    for (let i = 0; i < iconn.length; i++) { // tslint:disable-line
       let srcV = iconn[i][srcT + '_id'];
       let destV = iconn[i][destT + '_id'];
 
@@ -1088,7 +1087,7 @@ export class HomeComponent implements OnInit {
 
   public getConnectivityScore(connectivity) {
     let score = 0.0;
-    for (let i = 0; i < connectivity.length; i++) {
+    for (let i = 0; i < connectivity.length; i++) { // tslint:disable-line
       let src = connectivity[i]['source'];
       if (src !== 'null') {
         let wStr = connectivity[i]['weight'];
@@ -1108,7 +1107,7 @@ export class HomeComponent implements OnInit {
 
   public makeJSONFormat(arr, key) {
     let str = '';
-    for (let j = 0; j < arr.length; j++ ){
+    for (let j = 0; j < arr.length; j++ ) {
       str = str + '{' + '"' + key + '"' + ':' + '"' + arr[j] + '"' + '}';
       if (j < arr.length - 1) {
         str = str + ', ';
@@ -1120,7 +1119,7 @@ export class HomeComponent implements OnInit {
 
   public getSet(interaction, id) {
     let set = [];
-    for (let i = 0; i < interaction.length; i++) {
+    for (let i = 0; i < interaction.length; i++) { // tslint:disable-line
       let item = interaction[i][id];
       if (set.indexOf(item) === -1) {
         set.push(item);
@@ -1223,7 +1222,7 @@ export class HomeComponent implements OnInit {
 
     let props = [];
     if (idx !== -1) {
-      for (let j = 0; j < keys.length; j++) {
+      for (let j = 0; j < keys.length; j++) { // tslint:disable-line
         let k = keys[j];
         props.push( meta[idx][k] );
       }
