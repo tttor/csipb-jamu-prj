@@ -10,14 +10,14 @@ declare var saveAs: any;
   `],
   templateUrl: './download.template.html'
 })
-export class DownloadComponent {
+export class DownloadComponent { // tslint:disable-line
   public baseAPI;
   constructor(public route: ActivatedRoute, private http: Http) {
     this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
     // this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
   }
 
-  public ngOnInit() {
+  public ngOnInit() { // tslint:disable-line
     // do nothing
   }
 
@@ -174,7 +174,7 @@ export class DownloadComponent {
     this.http.post(api, msg).map((res) => res.json())
       .subscribe((data) => {
         let txt = this.getHeader(type) + '\n';
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) { // tslint:disable-line
           let props = this.getProps(type);
           for (let j  = 0; j < props.length; j++) {
             txt += data[i][props[j]];

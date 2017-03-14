@@ -7,13 +7,13 @@ import { ActivatedRoute } from '@angular/router';
   `],
   templateUrl: './about.template.html'
 })
-export class AboutComponent {
+export class AboutComponent { // tslint:disable-line
   private localState;
   constructor(public route: ActivatedRoute) {
     // do nothing
   }
 
-  private ngOnInit() {
+  private ngOnInit() { // tslint:disable-line
     // do nothing
   }
   private asyncDataWithWebpack() {

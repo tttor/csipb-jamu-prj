@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
   selector: 'manual',
   templateUrl: './manual.template.html'
 })
-export class ManualComponent {
+export class ManualComponent { // tslint:disable-line
 
   private data = [];
 
@@ -12,7 +12,7 @@ export class ManualComponent {
     // do nothing
   }
 
-  private ngOnInit() {
+  private ngOnInit() { // tslint:disable-line
     // do nothing
   }
 

@@ -7,13 +7,13 @@ import { ActivatedRoute } from '@angular/router';
   `],
   templateUrl: './help.template.html'
 })
-export class HelpComponent {
+export class HelpComponent { // tslint:disable-line
   private localState;
   constructor(public route: ActivatedRoute) {
     // do nothing
   }
 
-  private ngOnInit() {
+  private ngOnInit() { // tslint:disable-line
     // do nothing
   }
 
