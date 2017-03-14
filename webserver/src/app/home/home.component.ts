@@ -16,107 +16,107 @@ declare var saveAs: any;
 })
 export class Home implements OnInit {
   // API URL addresses
-  baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+  public baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
   // baseAPI ='http://localhost/ijah-api/';
 
-  interactionQueryAPI;
-  metaQueryAPI;
-  predictAPI;
+  public interactionQueryAPI;
+  public metaQueryAPI;
+  public predictAPI;
 
   // List of sources in the form of a string, each separated by an underscore _
-  comProConnExperimentSrcs = ['drugbank.ca'];
-  comProConnPredictionSrcs = ['rndly','blmnii','kronrls'];
+  public comProConnExperimentSrcs = ['drugbank.ca'];
+  public comProConnPredictionSrcs = ['rndly','blmnii','kronrls'];
 
   // count number of input rows
-  nPlaInputHolders = 0;
-  nComInputHolders = 0;
-  nProInputHolders = 0;
-  nDisInputHolders = 0;
-  plaInputHolders = [];
-  comInputHolders = [];
-  proInputHolders = [];
-  disInputHolders = [];
+  public nPlaInputHolders = 0;
+  public nComInputHolders = 0;
+  public nProInputHolders = 0;
+  public nDisInputHolders = 0;
+  public plaInputHolders = [];
+  public comInputHolders = [];
+  public proInputHolders = [];
+  public disInputHolders = [];
 
   // active variable
-  activeTanaman = true;
-  activeCompound = true;
-  activeProtein = true;
-  activeDisease = true;
+  public activeTanaman = true;
+  public activeCompound = true;
+  public activeProtein = true;
+  public activeDisease = true;
 
   // Search data for auto completion, search while filling
-  plantSearch = [];
-  compoundSearch = [];
-  proteinSearch = [];
-  diseaseSearch = [];
+  public plantSearch = [];
+  public compoundSearch = [];
+  public proteinSearch = [];
+  public diseaseSearch = [];
 
   // Total number of items in each set
-  nPlantInDB;
-  nCompoundInDB;
-  nProteinInDB;
-  nDiseaseInDB;
+  public nPlantInDB;
+  public nCompoundInDB;
+  public nProteinInDB;
+  public nDiseaseInDB;
 
   // Items selected by users
-  selectedPlants = [];
-  selectedCompounds = [];
-  selectedProteins = [];
-  selectedDiseases = [];
+  public selectedPlants = [];
+  public selectedCompounds = [];
+  public selectedProteins = [];
+  public selectedDiseases = [];
 
   // Used in connectivity text output
-  plaVScomTxtOutput;
-  comVSproTxtOutput;
-  proVSdisTxtOutput;
-  comVSplaTxtOutput;
-  proVScomTxtOutput;
-  disVSproTxtOutput;
-  plaVScomSwapped = false;
-  comVSproSwapped = false;
-  proVSdisSwapped = false;
+  public plaVScomTxtOutput;
+  public comVSproTxtOutput;
+  public proVSdisTxtOutput;
+  public comVSplaTxtOutput;
+  public proVScomTxtOutput;
+  public disVSproTxtOutput;
+  public plaVScomSwapped = false;
+  public comVSproSwapped = false;
+  public proVSdisSwapped = false;
 
   // Used in metadata text output
-  plaMetaTxtOutput;
-  comMetaTxtOutput;
-  proMetaTxtOutput;
-  disMetaTxtOutput;
+  public plaMetaTxtOutput;
+  public comMetaTxtOutput;
+  public proMetaTxtOutput;
+  public disMetaTxtOutput;
 
   // Used in summary text output
-  summaryTxtOutput;
-  summaryTxtOutput2;
-  summaryTxtOutput3;
+  public summaryTxtOutput;
+  public summaryTxtOutput2;
+  public summaryTxtOutput3;
 
   //
-  private plaVScom_ = [];
-  private comVSpro_ = [];
-  private proVSdis_ = [];
-  private plaSet_ = [];
-  private comSet_ = [];
-  private proSet_ = [];
-  private disSet_ = [];
+  public plaVScom_ = [];
+  public comVSpro_ = [];
+  public proVSdis_ = [];
+  public plaSet_ = [];
+  public comSet_ = [];
+  public proSet_ = [];
+  public disSet_ = [];
 
-  private filterThreshold_ = 0.0;
+  public filterThreshold_ = 0.0;
 
   // Misc.
   // TODO explain the usage
-  show = false;// whether to show the output in home.page
-  showGraph = false;
-  click = false;// whether searchAndPredictButton was clicked
-  elapsedTime = 0;
-  mode = 'unknown';
-  inputType = 'unknown';
+  public show = false;// whether to show the output in home.page
+  public showGraph = false;
+  public click = false;// whether searchAndPredictButton was clicked
+  public elapsedTime = 0;
+  public mode = 'unknown';
+  public inputType = 'unknown';
 
-  dataLocal = [];
-  typeaheadNoResults:boolean = false;
+  public dataLocal = [];
+  public typeaheadNoResults:boolean = false;
 
-  noResultPlant = false;
-  noResultCompound = false;
-  noResultProtein = false;
-  noResultDisease = false;
+  public noResultPlant = false;
+  public noResultCompound = false;
+  public noResultProtein = false;
+  public noResultDisease = false;
 
-  pTanaman = false;
-  pProtein = false;
-  pCompound = false;
-  pDisease = false;
+  public pTanaman = false;
+  public pProtein = false;
+  public pCompound = false;
+  public pDisease = false;
 
-  data: any;
+  public data: any;
 
   //////////////////////////////////////////////////////////////////////////////
   public ngOnInit() {
@@ -249,31 +249,31 @@ export class Home implements OnInit {
   }
 
   // INPUT HANDLING METHODS ////////////////////////////////////////////////////
-  private selectPlant(e:any, index):void {
+  public selectPlant(e:any, index):void {
     if (index != this.nPlaInputHolders) {
       this.selectedPlants.push({ 'index': this.nPlaInputHolders, 'value' : e.item.pla_id});
     }
   }
 
-  private selectCompound(e:any, index):void {
+  public selectCompound(e:any, index):void {
     if (index != this.nComInputHolders) {
       this.selectedCompounds.push({ 'index': this.nComInputHolders, 'value' : e.item.com_id});
     }
   }
 
-  private selectProtein(e:any, index):void {
+  public selectProtein(e:any, index):void {
     if (index != this.nProInputHolders) {
       this.selectedProteins.push({ 'index': this.nProInputHolders, 'value' : e.item.pro_id});
     }
   }
 
-  private selectDisease(e:any, index):void {
+  public selectDisease(e:any, index):void {
     if (index != this.nDisInputHolders) {
       this.selectedDiseases.push({ 'index': this.nDisInputHolders, 'value' : e.item.dis_id});
     }
   }
 
-  private focusPlant(index: number) {
+  public focusPlant(index: number) {
     let MAX_INPUT_PLANTS = 5;
     this.activeCompound = false;
     if (index == this.nPlaInputHolders) {
@@ -284,7 +284,7 @@ export class Home implements OnInit {
     }
   }
 
-  private focusCompound(index: number) {
+  public focusCompound(index: number) {
     let MAX_INPUT_COMPOUNDS = 5;
     this.activeTanaman = false;
     if (index == this.nComInputHolders) {
@@ -295,7 +295,7 @@ export class Home implements OnInit {
     }
   }
 
-  private focusProtein(index: number) {
+  public focusProtein(index: number) {
     let MAX_INPUT_PROTEINS = 5;
     this.activeDisease = false;
     if (index == this.nProInputHolders) {
@@ -306,7 +306,7 @@ export class Home implements OnInit {
     }
   }
 
-  private focusDisease(index: number) {
+  public focusDisease(index: number) {
     let MAX_INPUT_DISEASES = 5;
     this.activeProtein = false;
     if (index == this.nDisInputHolders) {
@@ -318,7 +318,7 @@ export class Home implements OnInit {
   }
 
   // SEARCH+PREDICT METHODS ////////////////////////////////////////////////////
-  private searchAndPredictButtonCallback() {
+  public searchAndPredictButtonCallback() {
     if (this.selectedPlants.length==0 && this.selectedCompounds.length==0 &&
         this.selectedProteins.length==0 && this.selectedDiseases.length==0) {
       this.reset();
@@ -420,12 +420,12 @@ export class Home implements OnInit {
     }, 100);
   }
 
-  predictMore() {
+  public predictMore() {
     this.show = false;
     this.searchAndPredictButtonCallback();
   }
 
-  searchFromDrugSide(drugSideInput) {
+  public searchFromDrugSide(drugSideInput) {
     console.log('searchOnly: drugSideInput');
     let t0 = performance.now();
 
@@ -468,7 +468,7 @@ export class Home implements OnInit {
     })
   }
 
-  searchFromTargetSide(targetSideInput) {
+  public searchFromTargetSide(targetSideInput) {
     console.log('searchOnly: targetSideInput');
     let t0 = performance.now();
 
@@ -511,7 +511,7 @@ export class Home implements OnInit {
     })
   }
 
-  searchAndPredict(drugSideInput,targetSideInput) {
+  public searchAndPredict(drugSideInput,targetSideInput) {
     console.log('searchAndPredict');
     let t0 = performance.now();
 
@@ -640,7 +640,7 @@ export class Home implements OnInit {
   }
 
   // OUTPUT MAKING METHODS /////////////////////////////////////////////////////
-  makeOutput(plaSet,comSet,proSet,disSet,plaVScom,comVSpro,proVSdis) {
+  public makeOutput(plaSet,comSet,proSet,disSet,plaVScom,comVSpro,proVSdis) {
     let t0 = performance.now();
 
     // Get metadata of each unique item
@@ -777,7 +777,7 @@ export class Home implements OnInit {
     }) // plaMeta
   }
 
-  makeMetaTextOutput(type,idList,meta) {
+  public makeMetaTextOutput(type,idList,meta) {
     if (idList.length===0) {
       return 'No Metadata';
     }
@@ -806,7 +806,7 @@ export class Home implements OnInit {
     return txt;
   }
 
-  makeConnectivityTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
+  public makeConnectivityTextOutput(interaction,srcMeta,destMeta,srcType,destType) {
     if (interaction.length===0) {
       return 'No Connectivity';
     }
@@ -875,7 +875,7 @@ export class Home implements OnInit {
     return text;
   }
 
-  makeGraphDataOutput(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
+  public makeGraphDataOutput(interaction,srcMeta,destMeta,srcType,destType,srcItems,destItems) {
     let srcPropKeys = this.getPropKeys(srcType,false);
     let destPropKeys = this.getPropKeys(destType,false);
     let data = [];
@@ -977,7 +977,7 @@ export class Home implements OnInit {
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
-  private storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
+  public storeMetaAndConnectivity(plaSet,comSet,proSet,disSet,
                                    plaVScom,comVSpro,proVSdis) {
     this.plaSet_ = plaSet;
     this.comSet_ = comSet;
@@ -988,7 +988,7 @@ export class Home implements OnInit {
     this.proVSdis_ = proVSdis;
   }
 
-  private filterOnComProConnWeight(threshold,plaVScom,comVSpro,proVSdis) {
+  public filterOnComProConnWeight(threshold,plaVScom,comVSpro,proVSdis) {
     let comVSproF = [];
     for (let i=0; i<comVSpro.length;i++) {
       let source = comVSpro['source'];
@@ -1027,7 +1027,7 @@ export class Home implements OnInit {
     return [plaVsComF,comVSproF,proVSdisF];
   }
 
-  private find(k,arr) {
+  public find(k,arr) {
     let idx = -1;
     for (let i=0;i<arr.length;i++) {
       if (arr[i]===k) {
@@ -1038,7 +1038,7 @@ export class Home implements OnInit {
     return idx;
   }
 
-  private groupBy(srcT,destT,iconn) {
+  public groupBy(srcT,destT,iconn) {
     let srcSet = new Array();
     let connSet = new Array();
     for (let i=0;i<iconn.length;i++) {
@@ -1065,7 +1065,7 @@ export class Home implements OnInit {
     return connSet;
   }
 
-  toggleConnectivitySwap(type) {
+  public toggleConnectivitySwap(type) {
     if (type==='plaVScom') {
       this.plaVScomSwapped = !this.plaVScomSwapped;
     }
@@ -1077,7 +1077,7 @@ export class Home implements OnInit {
     }
   }
 
-  filter() {
+  public filter() {
     this.showGraph = false;
 
     let delta = 0.2;
@@ -1102,7 +1102,7 @@ export class Home implements OnInit {
                     plaVScomF,comVSproF,proVSdisF);
   }
 
-  private getConnectivityScore(connectivity) {
+  public getConnectivityScore(connectivity) {
     let score = 0.0;
     for (let i=0;i<connectivity.length;i++) {
       let src = connectivity[i]['source'];
@@ -1114,7 +1114,7 @@ export class Home implements OnInit {
     return score;
   }
 
-  private getInputMark(type) {
+  public getInputMark(type) {
     let mark = '';
     if (this.inputType.indexOf(type)!==-1) {
       mark = ' (as inputs)';
@@ -1122,7 +1122,7 @@ export class Home implements OnInit {
     return mark;
   }
 
-  private makeJSONFormat(arr,key) {
+  public makeJSONFormat(arr,key) {
     let str = '';
     for (let j=0;j<arr.length;j++){
       str = str+'{'+'"'+key+'"'+':'+'"'+arr[j]+'"'+'}';
@@ -1134,7 +1134,7 @@ export class Home implements OnInit {
     return str;
   }
 
-  private getSet(interaction,id) {
+  public getSet(interaction,id) {
     let set = [];
     for (let i=0;i<interaction.length;i++) {
       let item = interaction[i][id];
@@ -1145,7 +1145,7 @@ export class Home implements OnInit {
     return set;
   }
 
-  private getPropKeys(type,extra) {
+  public getPropKeys(type,extra) {
     let keys: string[] = [];
     if (type==='pla') {
       keys.push('pla_name');
@@ -1175,7 +1175,7 @@ export class Home implements OnInit {
     return keys;
   }
 
-  private getHyperlinkStr(type,seed) {
+  public getHyperlinkStr(type,seed) {
     let baseUrl = '';
     if (type==='pla_name') {
       baseUrl = 'https://en.wikipedia.org/wiki/';
@@ -1236,7 +1236,7 @@ export class Home implements OnInit {
     return urlStr;
   }
 
-  private getProps(id,keys,meta) {
+  public getProps(id,keys,meta) {
     let prefix = id.substr(0,3);
     prefix = prefix.toLowerCase() + '_id';
 
@@ -1262,7 +1262,7 @@ export class Home implements OnInit {
     return props;
   }
 
-  private getConnHeader(type,indent) {
+  public getConnHeader(type,indent) {
     let headerArr = new Array();
     headerArr['pla'] = 'LatinName|IndonesianName';
     headerArr['com'] = 'CAS|PubchemName|IUPACName';
@@ -1292,7 +1292,7 @@ export class Home implements OnInit {
     return headerArr[type];
   }
 
-  private concatProps(props,keys,showNull,hyperlinked) {
+  public concatProps(props,keys,showNull,hyperlinked) {
     let sep = '|';
     let str = '';
 
@@ -1319,7 +1319,7 @@ export class Home implements OnInit {
     return str;
   }
 
-  private truncateText(text) {
+  public truncateText(text) {
     let MAX_NODE_LABEL_LEN = 32;
     let suffix = '...';
 
@@ -1331,7 +1331,7 @@ export class Home implements OnInit {
     return trunText;
   }
 
-  private downloadTextOutput(type){
+  public downloadTextOutput(type){
     let txtArr = new Array();
     txtArr['plant_vs_compound'] = this.plaVScomTxtOutput;
     txtArr['compound_vs_protein'] = this.comVSproTxtOutput;
@@ -1354,7 +1354,7 @@ export class Home implements OnInit {
     saveAs(blob,filename);
   }
 
-  private reset() {
+  public reset() {
     this.activeTanaman = true;
     this.activeCompound = true;
     this.activeProtein = true;
@@ -1410,7 +1410,7 @@ export class Home implements OnInit {
   }
 
   // EXAMPLE-BUTTON METHODS ////////////////////////////////////////////////////
-  private exampleCallback(type) {
+  public exampleCallback(type) {
     this.reset();
 
     if (type==='plant_vs_disease') {
