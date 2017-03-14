@@ -163,8 +163,8 @@ export class Home implements OnInit {
     this.proInputHolders = [{ 'index': this.nProInputHolders, 'value' : ''}];
     this.disInputHolders = [{ 'index': this.nDisInputHolders, 'value' : ''}];
 
-    this.http.get(this.baseAPI+'total.php').map(res => res.json())
-      .subscribe(data => {
+    this.http.get(this.baseAPI+'total.php').map((res) => res.json())
+      .subscribe((data) => {
         this.nPlantInDB = data[0]['plant_total'];
         this.nCompoundInDB = data[0]['compound_total'];
         this.nProteinInDB = data[0]['protein_total'];
@@ -174,8 +174,8 @@ export class Home implements OnInit {
     // Query for metadata for _text_ _completion_ //////////////////////////////
     let plaPostMsg = ['PLA_ALL_ROWS'];
     let plaPostMsgJSON = this.makeJSONFormat(plaPostMsg,'id');
-    this.http.post(this.metaQueryAPI,plaPostMsgJSON).map(res => res.json())
-      .subscribe(data => {
+    this.http.post(this.metaQueryAPI,plaPostMsgJSON).map((res) => res.json())
+      .subscribe((data) => {
         for (let i = 0; i < data.length; i++) {
           let valid = [];
           if (data[i]['pla_name']) {
@@ -199,8 +199,8 @@ export class Home implements OnInit {
 
     let proPostMsg = ['PRO_ALL_ROWS'];
     let proPostMsgJSON = this.makeJSONFormat(proPostMsg,'id');
-    this.http.post(this.metaQueryAPI,proPostMsgJSON).map(res => res.json())
-      .subscribe(data => {
+    this.http.post(this.metaQueryAPI,proPostMsgJSON).map((res) => res.json())
+      .subscribe((data) => {
         for (let i = 0; i < data.length; i++) {
           let temp = data[i]['pro_uniprot_id']+' | '+data[i]['pro_uniprot_abbrv']+' | '+data[i]['pro_name'];
           data[i]['search'] = temp;
@@ -210,8 +210,8 @@ export class Home implements OnInit {
 
     let disPostMsg = ['DIS_ALL_ROWS'];
     let disPostMsgJSON = this.makeJSONFormat(disPostMsg,'id');
-    this.http.post(this.metaQueryAPI,disPostMsgJSON).map(res => res.json())
-      .subscribe(data => {
+    this.http.post(this.metaQueryAPI,disPostMsgJSON).map((res) => res.json())
+      .subscribe((data) => {
         for (let i = 0; i < data.length; i++) {
           let temp = data[i]['dis_omim_id']+' | '+data[i]['dis_name'];
           data[i]['search'] = temp;
@@ -221,8 +221,8 @@ export class Home implements OnInit {
 
     let comPostMsg = ['COM_ALL_ROWS'];
     let comPostMsgJSON = this.makeJSONFormat(comPostMsg,'id');
-    this.http.post(this.metaQueryAPI,comPostMsgJSON).map(res => res.json())
-      .subscribe(data => {
+    this.http.post(this.metaQueryAPI,comPostMsgJSON).map((res) => res.json())
+      .subscribe((data) => {
         for (let i = 0; i < data.length; i++) {
           let valid = [];
           if (data[i]['com_cas_id']) {
@@ -432,8 +432,8 @@ export class Home implements OnInit {
     let dsi = JSON.stringify(drugSideInput);
     // console.log(dsi);
 
-    this.http.post(this.interactionQueryAPI,dsi).map(resp => resp.json())
-    .subscribe(plaVScom => {
+    this.http.post(this.interactionQueryAPI,dsi).map((resp) => resp.json())
+    .subscribe((plaVScom) => {
       let comSet = this.getSet(plaVScom,'com_id');
       if (comSet.length==0) {// input compounds may have no connectivity to plants
         for (let i=0;i<drugSideInput.length;i++) {
@@ -445,14 +445,14 @@ export class Home implements OnInit {
       let comSetJSON = this.makeJSONFormat(comSet,'comId');
       // console.log(comSetJSON);
 
-      this.http.post(this.interactionQueryAPI,comSetJSON).map(resp2 => resp2.json())
-      .subscribe(comVSpro => {
+      this.http.post(this.interactionQueryAPI,comSetJSON).map((resp2) => resp2.json())
+      .subscribe((comVSpro) => {
         let proSet = this.getSet(comVSpro,'pro_id');
         let proSetJSON = this.makeJSONFormat(proSet,'value');
         // console.log(proSetJSON);
 
-        this.http.post(this.interactionQueryAPI,proSetJSON).map(resp3 => resp3.json())
-        .subscribe(proVSdis => {
+        this.http.post(this.interactionQueryAPI,proSetJSON).map((resp3) => resp3.json())
+        .subscribe((proVSdis) => {
           let plaSet = this.getSet(plaVScom,'pla_id');
           let disSet = this.getSet(proVSdis,'dis_id');
 
@@ -475,8 +475,8 @@ export class Home implements OnInit {
     let tsi = JSON.stringify(targetSideInput);
     // console.log(tsi);
 
-    this.http.post(this.interactionQueryAPI,tsi).map(resp => resp.json())
-    .subscribe(proVSdis => {
+    this.http.post(this.interactionQueryAPI,tsi).map((resp) => resp.json())
+    .subscribe((proVSdis) => {
       let proSet = this.getSet(proVSdis,'pro_id');
       if (proSet.length==0) {// input proteins may have no connectivity to diseases
         for (let i=0;i<targetSideInput.length;i++) {
@@ -488,14 +488,14 @@ export class Home implements OnInit {
       let proSetJSON = this.makeJSONFormat(proSet,'proId');
       // console.log(proSetJSON);
 
-      this.http.post(this.interactionQueryAPI,proSetJSON).map(resp2 => resp2.json())
-      .subscribe(comVSpro => {
+      this.http.post(this.interactionQueryAPI,proSetJSON).map((resp2) => resp2.json())
+      .subscribe((comVSpro) => {
         let comSet = this.getSet(comVSpro,'com_id');
         let comSetJSON = this.makeJSONFormat(comSet,'value');
         // console.log(comSetJSON);
 
-        this.http.post(this.interactionQueryAPI,comSetJSON).map(resp3 => resp3.json())
-        .subscribe(plaVScom => {
+        this.http.post(this.interactionQueryAPI,comSetJSON).map((resp3) => resp3.json())
+        .subscribe((plaVScom) => {
           let plaSet = this.getSet(plaVScom,'pla_id');
           let disSet = this.getSet(proVSdis,'dis_id');
 
@@ -520,10 +520,10 @@ export class Home implements OnInit {
     // console.log(dsi);
     // console.log(tsi);
 
-    this.http.post(this.interactionQueryAPI,dsi).map(resp => resp.json())
-    .subscribe(plaVScom => {
-      this.http.post(this.interactionQueryAPI,tsi).map(resp2 => resp2.json())
-      .subscribe(proVSdis => {
+    this.http.post(this.interactionQueryAPI,dsi).map((resp) => resp.json())
+    .subscribe((plaVScom) => {
+      this.http.post(this.interactionQueryAPI,tsi).map((resp2) => resp2.json())
+      .subscribe((proVSdis) => {
         // Ijah also accomodates syntetic compound vs protein.
         // This means that some compounds have no plant, and some some protein have no disease.
         // However, all plants have compounds, and all diseases have proteins
@@ -578,8 +578,8 @@ export class Home implements OnInit {
         }
         comVSproStr = '['+comVSproStr+']';
 
-        this.http.post(this.interactionQueryAPI,comVSproStr).map(resp3 => resp3.json())
-        .subscribe(comVSpro => {
+        this.http.post(this.interactionQueryAPI,comVSproStr).map((resp3) => resp3.json())
+        .subscribe((comVSpro) => {
           let comToPredictArr = [];
           let proToPredictArr = [];
           let idxToPredictArr = [];
@@ -603,13 +603,13 @@ export class Home implements OnInit {
           comVSproToPredictStr = '['+comVSproToPredictStr+']';
           // console.log(comVSproToPredictStr);
 
-          this.http.post(this.predictAPI,comVSproToPredictStr).map(resp4 => resp4.json())
-          .subscribe(hasWaitedForMsg => {
+          this.http.post(this.predictAPI,comVSproToPredictStr).map((resp4) => resp4.json())
+          .subscribe((hasWaitedForMsg) => {
             let hasWaitedFor = parseFloat( hasWaitedForMsg[0]['has_waited_for'] );
             console.log('hasWaitedFor= '+hasWaitedFor.toString());
 
-            this.http.post(this.interactionQueryAPI,comVSproToPredictStr).map(resp5 => resp5.json())
-              .subscribe(comVSproPred => {
+            this.http.post(this.interactionQueryAPI,comVSproToPredictStr).map((resp5) => resp5.json())
+              .subscribe((comVSproPred) => {
                 let comVSproMerged = comVSpro;
                 for (let i=0; i<comVSproPred.length; i++) {
                   let idx = idxToPredictArr[i];
@@ -649,14 +649,14 @@ export class Home implements OnInit {
     let proMetaPost = this.makeJSONFormat(proSet,'id');
     let disMetaPost = this.makeJSONFormat(disSet,'id');
 
-    this.http.post(this.metaQueryAPI,plaMetaPost).map(resp4 => resp4.json())
-    .subscribe(plaMeta => {
-      this.http.post(this.metaQueryAPI,comMetaPost).map(resp5=>resp5.json())
-      .subscribe(comMeta => {
-        this.http.post(this.metaQueryAPI,proMetaPost).map(resp6=>resp6.json())
-        .subscribe(proMeta => {
-          this.http.post(this.metaQueryAPI,disMetaPost).map(resp7=>resp7.json())
-          .subscribe(disMeta => {
+    this.http.post(this.metaQueryAPI,plaMetaPost).map((resp4) => resp4.json())
+    .subscribe((plaMeta) => {
+      this.http.post(this.metaQueryAPI,comMetaPost).map((resp5) => resp5.json())
+      .subscribe((comMeta) => {
+        this.http.post(this.metaQueryAPI,proMetaPost).map((resp6) => resp6.json())
+        .subscribe((proMeta) => {
+          this.http.post(this.metaQueryAPI,disMetaPost).map((resp7) => resp7.json())
+          .subscribe((disMeta) => {
             // connectivity text output ////////////////////////////////////////
             this.plaVScomTxtOutput = this.makeConnectivityTextOutput(plaVScom,
                                                                      plaMeta,comMeta,
