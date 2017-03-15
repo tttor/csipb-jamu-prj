@@ -15,18 +15,6 @@ declare var saveAs: any;
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit {
-  // API URL addresses
-  public baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  // baseAPI ='http://localhost/ijah-api/';
-
-  public interactionQueryAPI;
-  public metaQueryAPI;
-  public predictAPI;
-
-  // List of sources in the form of a string, each separated by an underscore _
-  public comProConnExperimentSrcs = ['drugbank.ca'];
-  public comProConnPredictionSrcs = ['rndly', 'blmnii', 'kronrls'];
-
   // count number of input rows
   public nPlaInputHolders = 0;
   public nComInputHolders = 0;
@@ -83,15 +71,6 @@ export class HomeComponent implements OnInit {
   public summaryTxtOutput2;
   public summaryTxtOutput3;
 
-  //
-  public plaVScom_ = []; // tslint:disable-line
-  public comVSpro_ = []; // tslint:disable-line
-  public proVSdis_ = []; // tslint:disable-line
-  public plaSet_ = []; // tslint:disable-line
-  public comSet_ = []; // tslint:disable-line
-  public proSet_ = []; // tslint:disable-line
-  public disSet_ = []; // tslint:disable-line
-
   public filterThreshold_ = 0.0; // tslint:disable-line
 
   // Misc.
@@ -111,43 +90,42 @@ export class HomeComponent implements OnInit {
   public noResultProtein = false;
   public noResultDisease = false;
 
-  public pTanaman = false;
-  public pProtein = false;
-  public pCompound = false;
-  public pDisease = false;
+  // API URL addresses
+  private baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+  // baseAPI ='http://localhost/ijah-api/';
 
-  public data: any;
+  private interactionQueryAPI;
+  private metaQueryAPI;
+  private predictAPI;
 
-  //////////////////////////////////////////////////////////////////////////////
-  public ngOnInit() {
-    // Do nothing
-  }
+  // List of sources in the form of a string, each separated by an underscore _
+  private comProConnExperimentSrcs = ['drugbank.ca'];
+  private comProConnPredictionSrcs = ['rndly', 'blmnii', 'kronrls'];
 
-  public stateCtrl: FormControl = new FormControl();
+  //
+  private plaVScom_ = []; // tslint:disable-line
+  private comVSpro_ = []; // tslint:disable-line
+  private proVSdis_ = []; // tslint:disable-line
+  private plaSet_ = []; // tslint:disable-line
+  private comSet_ = []; // tslint:disable-line
+  private proSet_ = []; // tslint:disable-line
+  private disSet_ = []; // tslint:disable-line
 
-  public myForm: FormGroup = new FormGroup({
+  private pTanaman = false;
+  private pProtein = false;
+  private pCompound = false;
+  private pDisease = false;
+
+  private data: any;
+
+  private stateCtrl: FormControl = new FormControl();
+
+  private myForm: FormGroup = new FormGroup({
     state: this.stateCtrl
   });
 
-  public typeaheadOnSelect(e: any): void {
-    // Do nothing
-  }
-
-  public changeTypeaheadNoResults(e: boolean, id): void {
-    this.typeaheadNoResults = e;
-
-    if (id === 1) {
-      this.noResultPlant = e;
-    } else if (id === 2) {
-      this.noResultCompound = e;
-    } else if (id === 3) {
-      this.noResultProtein = e;
-    } else if (id === 4) {
-      this.noResultDisease = e;
-    }
-  }
-
-  constructor(public appState: AppState, private http: Http) {
+  //////////////////////////////////////////////////////////////////////////////
+  public constructor(public appState: AppState, private http: Http) {
     this.interactionQueryAPI = this.baseAPI + 'connectivity.php';
     this.metaQueryAPI = this.baseAPI + 'metadata.php';
     this.predictAPI = this.baseAPI + 'predict.php';
@@ -240,6 +218,24 @@ export class HomeComponent implements OnInit {
         }
         this.compoundSearch = data;
       });
+  }
+
+  public ngOnInit() {
+    // Do nothing
+  }
+
+  public changeTypeaheadNoResults(e: boolean, id): void {
+    this.typeaheadNoResults = e;
+
+    if (id === 1) {
+      this.noResultPlant = e;
+    } else if (id === 2) {
+      this.noResultCompound = e;
+    } else if (id === 3) {
+      this.noResultProtein = e;
+    } else if (id === 4) {
+      this.noResultDisease = e;
+    }
   }
 
   // INPUT HANDLING METHODS ////////////////////////////////////////////////////
@@ -351,8 +347,8 @@ export class HomeComponent implements OnInit {
       this.searchFromTargetSide(this.selectedDiseases);
       showDisease = true;
 
-      // tslint:disable-line // Starting next line: Use case 1: both sides are specified ////////////////////////////////////
-    } else if (this.plaInputHolders.length > 1 && this.proInputHolders.length > 1) { // tslint:disable-line
+    // Starting next line: Use case 1: both sides are specified /////////////////////////////////
+    } else if (this.plaInputHolders.length > 1 && this.proInputHolders.length > 1) {
       this.mode = 'search_and_predict';
       this.inputType = 'plant+protein';
       this.searchAndPredict(this.selectedPlants, this.selectedProteins);
@@ -413,92 +409,6 @@ export class HomeComponent implements OnInit {
   public predictMore() {
     this.show = false;
     this.searchAndPredictButtonCallback();
-  }
-
-  public searchFromDrugSide(drugSideInput) {
-    console.log('searchOnly: drugSideInput');
-    let t0 = performance.now();
-
-    let dsi = JSON.stringify(drugSideInput);
-    // console.log(dsi);
-
-    this.http.post(this.interactionQueryAPI, dsi).map((resp) => resp.json())
-    .subscribe((plaVScom) => {
-      let comSet = this.getSet(plaVScom, 'com_id');
-      if (comSet.length === 0) {// input compounds may have no connectivity to plants
-        for (let i = 0; i < drugSideInput.length; i++) { // tslint:disable-line
-          let com = drugSideInput[i]['value'];
-          comSet.push(com);
-        }
-      }
-
-      let comSetJSON = this.makeJSONFormat(comSet, 'comId');
-      // console.log(comSetJSON);
-
-      this.http.post(this.interactionQueryAPI, comSetJSON).map((resp2) => resp2.json())
-      .subscribe((comVSpro) => {
-        let proSet = this.getSet(comVSpro, 'pro_id');
-        let proSetJSON = this.makeJSONFormat(proSet, 'value');
-        // console.log(proSetJSON);
-
-        this.http.post(this.interactionQueryAPI, proSetJSON).map((resp3) => resp3.json())
-        .subscribe((proVSdis) => {
-          let plaSet = this.getSet(plaVScom, 'pla_id');
-          let disSet = this.getSet(proVSdis, 'dis_id');
-
-          let t1 = performance.now();
-          this.elapsedTime += (t1 - t0);
-
-          this.makeOutput(plaSet, comSet, proSet, disSet,
-                          plaVScom, comVSpro, proVSdis);
-          this.storeMetaAndConnectivity(plaSet, comSet, proSet, disSet,
-                                        plaVScom, comVSpro, proVSdis);
-        });
-      });
-    });
-  }
-
-  public searchFromTargetSide(targetSideInput) {
-    console.log('searchOnly: targetSideInput');
-    let t0 = performance.now();
-
-    let tsi = JSON.stringify(targetSideInput);
-    // console.log(tsi);
-
-    this.http.post(this.interactionQueryAPI, tsi).map((resp) => resp.json())
-    .subscribe((proVSdis) => {
-      let proSet = this.getSet(proVSdis, 'pro_id');
-      if (proSet.length === 0) {// input proteins may have no connectivity to diseases
-        for (let i = 0; i < targetSideInput.length; i++) { // tslint:disable-line
-          let pro = targetSideInput[i]['value'];
-          proSet.push(pro);
-        }
-      }
-
-      let proSetJSON = this.makeJSONFormat(proSet, 'proId');
-      // console.log(proSetJSON);
-
-      this.http.post(this.interactionQueryAPI, proSetJSON).map((resp2) => resp2.json())
-      .subscribe((comVSpro) => {
-        let comSet = this.getSet(comVSpro, 'com_id');
-        let comSetJSON = this.makeJSONFormat(comSet, 'value');
-        // console.log(comSetJSON);
-
-        this.http.post(this.interactionQueryAPI, comSetJSON).map((resp3) => resp3.json())
-        .subscribe((plaVScom) => {
-          let plaSet = this.getSet(plaVScom, 'pla_id');
-          let disSet = this.getSet(proVSdis, 'dis_id');
-
-          let t1 = performance.now();
-          this.elapsedTime += (t1 - t0);
-
-          this.makeOutput(plaSet, comSet, proSet, disSet,
-                          plaVScom, comVSpro, proVSdis);
-          this.storeMetaAndConnectivity(plaSet, comSet, proSet, disSet,
-                                        plaVScom, comVSpro, proVSdis);
-        });
-      });
-    });
   }
 
   public searchAndPredict(drugSideInput, targetSideInput) {
@@ -625,339 +535,6 @@ export class HomeComponent implements OnInit {
         });
       });
     });
-  }
-
-  // OUTPUT MAKING METHODS /////////////////////////////////////////////////////
-  public makeOutput(plaSet, comSet, proSet, disSet, plaVScom, comVSpro, proVSdis) {
-    let t0 = performance.now();
-
-    // Get metadata of each unique item
-    let plaMetaPost = this.makeJSONFormat(plaSet, 'id');
-    let comMetaPost = this.makeJSONFormat(comSet, 'id');
-    let proMetaPost = this.makeJSONFormat(proSet, 'id');
-    let disMetaPost = this.makeJSONFormat(disSet, 'id');
-
-    this.http.post(this.metaQueryAPI, plaMetaPost).map((resp4) => resp4.json())
-    .subscribe((plaMeta) => {
-      this.http.post(this.metaQueryAPI, comMetaPost).map((resp5) => resp5.json())
-      .subscribe((comMeta) => {
-        this.http.post(this.metaQueryAPI, proMetaPost).map((resp6) => resp6.json())
-        .subscribe((proMeta) => {
-          this.http.post(this.metaQueryAPI, disMetaPost).map((resp7) => resp7.json())
-          .subscribe((disMeta) => {
-            // connectivity text output ////////////////////////////////////////
-            this.plaVScomTxtOutput = this.makeConnectivityTextOutput(plaVScom,
-                                                                     plaMeta, comMeta,
-                                                                     'pla', 'com');
-            this.comVSproTxtOutput = this.makeConnectivityTextOutput(comVSpro,
-                                                                     comMeta, proMeta,
-                                                                     'com', 'pro');
-            this.proVSdisTxtOutput = this.makeConnectivityTextOutput(proVSdis,
-                                                                     proMeta, disMeta,
-                                                                     'pro', 'dis');
-            this.comVSplaTxtOutput = this.makeConnectivityTextOutput(plaVScom,
-                                                                     comMeta, plaMeta,
-                                                                     'com', 'pla');
-            this.proVScomTxtOutput = this.makeConnectivityTextOutput(comVSpro,
-                                                                     proMeta, comMeta,
-                                                                     'pro', 'com');
-            this.disVSproTxtOutput = this.makeConnectivityTextOutput(proVSdis,
-                                                                     disMeta, proMeta,
-                                                                     'dis', 'pro');
-
-            // connectivity graph output ///////////////////////////////////////
-            let graphDataArr = [this.makeGraphDataOutput(plaVScom,
-                                                         plaMeta, comMeta,
-                                                         'pla', 'com',
-                                                         plaSet, comSet),
-                                this.makeGraphDataOutput(comVSpro,
-                                                         comMeta, proMeta,
-                                                         'com', 'pro',
-                                                         comSet, proSet),
-                                this.makeGraphDataOutput(proVSdis,
-                                                         proMeta, disMeta,
-                                                         'pro', 'dis',
-                                                         proSet, disSet)];
-            let graphData = [];
-            for (let ii = 0; ii < graphDataArr.length; ii++) { // tslint:disable-line
-              for (let jj = 0; jj < graphDataArr[ii].length; jj++) { // tslint:disable-line
-                  let datum = graphDataArr[ii][jj];
-                  graphData.push(datum);
-              }
-            }
-            localStorage.setItem('connectivityGraphData', JSON.stringify(graphData));
-
-            // metadata text output ////////////////////////////////////////
-            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla', plaSet, plaMeta);
-            this.comMetaTxtOutput = this.makeMetaTextOutput('com', comSet, comMeta);
-            this.proMetaTxtOutput = this.makeMetaTextOutput('pro', proSet, proMeta);
-            this.disMetaTxtOutput = this.makeMetaTextOutput('dis', disSet, disMeta);
-
-            // summary text output /////////////////////////////////////////////
-            let plaComConnScore = this.getConnectivityScore(plaVScom);
-            let comProConnScore = this.getConnectivityScore(comVSpro);
-            let proDisConnScore = this.getConnectivityScore(proVSdis);
-            let totConnScore = plaComConnScore + comProConnScore + proDisConnScore;
-            let nDecimalDigits = 5;
-
-            let nUnknownComProConn = 0;
-            let nUndefinedComProConn = 0;
-            let nKnownByExperimentComProConn = 0;
-            let nKnownByPredictionComProConn = 0;
-            let sourceSep = ' + '; // tslint:disable-line // must match with the one in server_thread.py for merging prediction sources
-            for (let i = 0; i < comVSpro.length; i++) { // tslint:disable-line
-              let allSrc = comVSpro[i]['source'].split(sourceSep);
-              let src = allSrc[0]; // TODO should depends on all sources
-              if (src === 'null') {// unknown
-                nUnknownComProConn += 1;
-              } else if (this.comProConnExperimentSrcs.indexOf(src) !== -1) {
-                nKnownByExperimentComProConn += 1;
-              } else if (this.comProConnPredictionSrcs.indexOf(src) !== -1) {
-                nKnownByPredictionComProConn += 1;
-              } else {
-                nUndefinedComProConn += 1;
-              }
-            }
-
-            if (this.mode === 'search_only') {
-              nUnknownComProConn = (comSet.length * proSet.length) - (nKnownByPredictionComProConn + nKnownByExperimentComProConn); // tslint:disable-line
-            }
-
-            this.summaryTxtOutput = 'Minimum Connectivity Weight To Display:\n';
-            this.summaryTxtOutput += '   ' + this.filterThreshold_.toFixed(nDecimalDigits) + '\n';
-            this.summaryTxtOutput += 'Connectivity Score:\n';
-            this.summaryTxtOutput += '   Total: ' + totConnScore.toFixed(nDecimalDigits) + '\n';
-            this.summaryTxtOutput += '   Plant-Compound  : ' + plaComConnScore.toString() + '\n';
-            this.summaryTxtOutput += '   Compound-Protein: ' + comProConnScore.toFixed(nDecimalDigits) + '\n'; // tslint:disable-line
-            this.summaryTxtOutput += '   Protein-Disease : ' + proDisConnScore.toString() + '\n';
-
-            this.summaryTxtOutput2 = 'Number of unique items:\n';
-            this.summaryTxtOutput2 += '   #Plants   : ' + plaSet.length.toString() + this.getInputMark('plant') + '\n'; // tslint:disable-line
-            this.summaryTxtOutput2 += '   #Compounds: ' + comSet.length.toString() + this.getInputMark('compound') + '\n'; // tslint:disable-line
-            this.summaryTxtOutput2 += '   #Proteins : ' + proSet.length.toString() + this.getInputMark('protein') + '\n'; // tslint:disable-line
-            this.summaryTxtOutput2 += '   #Diseases : ' + disSet.length.toString() + this.getInputMark('disease') + '\n'; // tslint:disable-line
-            this.summaryTxtOutput2 += 'Compound-Protein Connectivity:\n';
-            this.summaryTxtOutput2 += '   #known_by_experiment: ' + nKnownByExperimentComProConn.toString() + '\n'; // tslint:disable-line
-            this.summaryTxtOutput2 += '   #known_by_prediction: ' + nKnownByPredictionComProConn.toString() + '\n'; // tslint:disable-line
-            this.summaryTxtOutput2 += '   #unknown            : ' + nUnknownComProConn.toString() + '\n'; // tslint:disable-line
-            if (nUndefinedComProConn > 0) {
-              this.summaryTxtOutput2 += '   #undefined            : ' + nUndefinedComProConn.toString() + '\n'; // tslint:disable-line
-            }
-
-            let t1 = performance.now();
-            this.elapsedTime += (t1 - t0);
-            this.elapsedTime = this.elapsedTime / 1000.0; // from ms to s
-
-            this.summaryTxtOutput3 = 'Mode: \n';
-            this.summaryTxtOutput3 += '   ' + this.mode + '\n';
-            this.summaryTxtOutput3 += 'Elapsed Time: \n';
-            this.summaryTxtOutput3 += '   ' + this.elapsedTime.toFixed(nDecimalDigits) + ' seconds\n'; // tslint:disable-line
-
-            // Show the output page
-            this.show = true;
-            this.showGraph = true;
-          }); // disMeta
-        }); // proMeta
-      }); // comMeta
-    }); // plaMeta
-  }
-
-  public makeMetaTextOutput(type, idList, meta) {
-    if (idList.length === 0) {
-      return 'No Metadata';
-    }
-
-    let indent = '   ';
-    let txt = '';
-    let keys = this.getPropKeys(type, true);
-    for (let i = 0; i < idList.length; i++) {
-      let props = this.getProps(idList[i], keys, meta);
-
-      txt += (i + 1).toString() + ') ';
-      for (let j = 0; j < props.length; j++) {
-        let key = keys[j];
-        let prop = props[j];
-        if (prop) {
-          prop = this.getHyperlinkStr(key, prop);
-          key = key.substring(4);
-          if (j > 0) {
-            txt += indent;
-            if ((i + 1) > 9) {txt += ' '; }
-          }
-          txt += key + ': ' + prop + '\n';
-        }
-      }
-    }
-    return txt;
-  }
-
-  public makeConnectivityTextOutput(interaction, srcMeta, destMeta, srcType, destType) {
-    if (interaction.length === 0) {
-      return 'No Connectivity';
-    }
-
-    let conn = this.groupBy(srcType, destType, interaction);
-
-    let indent = '   ';
-    let text = this.getConnHeader(srcType + '_vs_' + destType, indent) + '\n';
-    let srcPropKeys = this.getPropKeys(srcType, false);
-    let destPropKeys = this.getPropKeys(destType, false);
-
-    let nUnique = 0;
-    let nUniquePerConnSrc = 0;
-    let pos = -1; // in which, we will insert nUniquePerConnSrc
-    let prevSrc = '';
-    let prevConnSource = '';
-
-    for (let i = 0; i < conn.length; i++) { // tslint:disable-line
-      for (let j = 0; j < conn[i].length; j++) { // tslint:disable-line
-        let comps = conn[i][j].split('$');
-        let source = comps[0];
-        let weight = comps[1]; weight = parseFloat(weight).toFixed(3);
-        let src = comps[2];
-        let dest = comps[3];
-
-        if (source === 'null') {
-          continue;
-        }
-
-        if (prevSrc !== src) {
-          nUnique = nUnique + 1;
-          text = text + nUnique.toString() + ') ';
-
-          let srcProps = this.getProps(src, srcPropKeys, srcMeta);
-          text += this.concatProps(srcProps, srcPropKeys, true, true);
-          text += ':\n';
-
-          prevSrc = src;
-          prevConnSource = '';
-        }
-
-        if (prevConnSource !== source) {
-          if (nUniquePerConnSrc > 0) {
-            text = [text.slice(0, pos), nUniquePerConnSrc.toString(), text.slice(pos)].join('');
-          }
-
-          if (nUnique > 9) {text += ' '; }
-          text += indent + '[' + source + ':]\n';
-          pos = text.length - 2;
-          prevConnSource = source;
-          nUniquePerConnSrc = 1;
-        } else {
-          nUniquePerConnSrc += 1;
-        }
-
-        let destProps = this.getProps(dest, destPropKeys, destMeta);
-        if (nUnique > 9) {text += ' '; }
-        text += indent + indent + '[' + weight + '] ';
-        text += this.concatProps(destProps, destPropKeys, true, true);
-        text += '\n';
-      }
-    }
-    text = [text.slice(0, pos), nUniquePerConnSrc.toString(), text.slice(pos)].join('');
-
-    return text;
-  }
-
-  public makeGraphDataOutput(interaction, srcMeta, destMeta, srcType, destType, srcItems, destItems) { // tslint:disable-line
-    let srcPropKeys = this.getPropKeys(srcType, false);
-    let destPropKeys = this.getPropKeys(destType, false);
-    let data = [];
-
-    let srcHasDestArr = [];
-    let destHasSrcArr = [];
-    for (let i = 0; i < srcItems.length; i++) { // tslint:disable-line
-      srcHasDestArr.push(false);
-    }
-    for (let i = 0; i < destItems.length; i++) { // tslint:disable-line
-      destHasSrcArr.push(false);
-    }
-
-    for (let i = 0; i < interaction.length; i++) { // tslint:disable-line
-      let datum = [];
-
-      let srcKey = srcType + '_id';
-      let destKey = destType + '_id';
-
-      let src = interaction[i][srcKey];
-      let dest = interaction[i][destKey];
-
-      let srcIdx = srcItems.indexOf(src);
-      let destIdx = destItems.indexOf(dest);
-
-      if ((srcIdx !== -1) && (destIdx !== -1)) {
-        srcHasDestArr[srcIdx] = true;
-        destHasSrcArr[destIdx] = true;
-
-        let source = interaction[i]['source'];
-        let weight = parseFloat( interaction[i]['weight'] );
-
-        let srcProps = this.getProps(src, srcPropKeys, srcMeta);
-        let destProps = this.getProps(dest, destPropKeys, destMeta);
-        let srcText = this.concatProps(srcProps, srcPropKeys, false, false);
-        let destText = this.concatProps(destProps, destPropKeys, false, false);
-
-        srcText = this.truncateText(srcText);
-        destText = this.truncateText(destText);
-
-        datum.push(srcText);
-        datum.push(destText);
-        datum.push(weight);
-
-        data.push(datum);
-      }
-    }
-
-    // Make _dummy_ interaction (... vs anchor) to beautify the graph rendering
-    let wDummy = 0.00001; // to become "invisible"
-    let prefix = '';
-    let srcDummyText = prefix + srcType.toUpperCase();
-    let destDummyText = prefix + destType.toUpperCase();
-
-    let anchor = [];
-    anchor.push(srcDummyText);
-    anchor.push(destDummyText);
-    anchor.push(wDummy);
-    data.push(anchor);
-
-    for (let i = 0; i < srcHasDestArr.length; i++) {
-      if (srcHasDestArr[i] === false) {
-        let src = srcItems[i];
-        let srcProps = this.getProps(src, srcPropKeys, srcMeta);
-        let srcText = this.concatProps(srcProps, srcPropKeys, false, false);
-        let destText = destDummyText;
-        let w = wDummy;
-
-        srcText = this.truncateText(srcText);
-        destText = this.truncateText(destText);
-
-        let dummy = [];
-        dummy.push(srcText);
-        dummy.push(destText);
-        dummy.push(w);
-        data.push(dummy);
-      }
-    }
-    for (let i = 0; i < destHasSrcArr.length; i++) {
-      if (destHasSrcArr[i] === false) {
-        let srcText = srcDummyText;
-        let dest = destItems[i];
-        let destProps = this.getProps(dest, destPropKeys, destMeta);
-        let destText = this.concatProps(destProps, destPropKeys, false, false);
-        let w = wDummy;
-
-        srcText = this.truncateText(srcText);
-        destText = this.truncateText(destText);
-
-        let dummy = [];
-        dummy.push(srcText);
-        dummy.push(destText);
-        dummy.push(w);
-        data.push(dummy);
-      }
-    }
-
-    return data;
   }
 
   // UTILITY METHODS ///////////////////////////////////////////////////////////
@@ -1466,5 +1043,430 @@ export class HomeComponent implements OnInit {
       this.activeTanaman = false;
       this.activeCompound = false;
     }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////
+  private typeaheadOnSelect(e: any): void {
+    // Do nothing
+  }
+
+  private searchFromDrugSide(drugSideInput) {
+    console.log('searchOnly: drugSideInput');
+    let t0 = performance.now();
+
+    let dsi = JSON.stringify(drugSideInput);
+    // console.log(dsi);
+
+    this.http.post(this.interactionQueryAPI, dsi).map((resp) => resp.json())
+    .subscribe((plaVScom) => {
+      let comSet = this.getSet(plaVScom, 'com_id');
+      if (comSet.length === 0) {// input compounds may have no connectivity to plants
+        for (let i = 0; i < drugSideInput.length; i++) { // tslint:disable-line
+          let com = drugSideInput[i]['value'];
+          comSet.push(com);
+        }
+      }
+
+      let comSetJSON = this.makeJSONFormat(comSet, 'comId');
+      // console.log(comSetJSON);
+
+      this.http.post(this.interactionQueryAPI, comSetJSON).map((resp2) => resp2.json())
+      .subscribe((comVSpro) => {
+        let proSet = this.getSet(comVSpro, 'pro_id');
+        let proSetJSON = this.makeJSONFormat(proSet, 'value');
+        // console.log(proSetJSON);
+
+        this.http.post(this.interactionQueryAPI, proSetJSON).map((resp3) => resp3.json())
+        .subscribe((proVSdis) => {
+          let plaSet = this.getSet(plaVScom, 'pla_id');
+          let disSet = this.getSet(proVSdis, 'dis_id');
+
+          let t1 = performance.now();
+          this.elapsedTime += (t1 - t0);
+
+          this.makeOutput(plaSet, comSet, proSet, disSet,
+                          plaVScom, comVSpro, proVSdis);
+          this.storeMetaAndConnectivity(plaSet, comSet, proSet, disSet,
+                                        plaVScom, comVSpro, proVSdis);
+        });
+      });
+    });
+  }
+
+  private searchFromTargetSide(targetSideInput) {
+    console.log('searchOnly: targetSideInput');
+    let t0 = performance.now();
+
+    let tsi = JSON.stringify(targetSideInput);
+    // console.log(tsi);
+
+    this.http.post(this.interactionQueryAPI, tsi).map((resp) => resp.json())
+    .subscribe((proVSdis) => {
+      let proSet = this.getSet(proVSdis, 'pro_id');
+      if (proSet.length === 0) {// input proteins may have no connectivity to diseases
+        for (let i = 0; i < targetSideInput.length; i++) { // tslint:disable-line
+          let pro = targetSideInput[i]['value'];
+          proSet.push(pro);
+        }
+      }
+
+      let proSetJSON = this.makeJSONFormat(proSet, 'proId');
+      // console.log(proSetJSON);
+
+      this.http.post(this.interactionQueryAPI, proSetJSON).map((resp2) => resp2.json())
+      .subscribe((comVSpro) => {
+        let comSet = this.getSet(comVSpro, 'com_id');
+        let comSetJSON = this.makeJSONFormat(comSet, 'value');
+        // console.log(comSetJSON);
+
+        this.http.post(this.interactionQueryAPI, comSetJSON).map((resp3) => resp3.json())
+        .subscribe((plaVScom) => {
+          let plaSet = this.getSet(plaVScom, 'pla_id');
+          let disSet = this.getSet(proVSdis, 'dis_id');
+
+          let t1 = performance.now();
+          this.elapsedTime += (t1 - t0);
+
+          this.makeOutput(plaSet, comSet, proSet, disSet,
+                          plaVScom, comVSpro, proVSdis);
+          this.storeMetaAndConnectivity(plaSet, comSet, proSet, disSet,
+                                        plaVScom, comVSpro, proVSdis);
+        });
+      });
+    });
+  }
+
+  // OUTPUT MAKING METHODS /////////////////////////////////////////////////////
+  private makeOutput(plaSet, comSet, proSet, disSet, plaVScom, comVSpro, proVSdis) {
+    let t0 = performance.now();
+
+    // Get metadata of each unique item
+    let plaMetaPost = this.makeJSONFormat(plaSet, 'id');
+    let comMetaPost = this.makeJSONFormat(comSet, 'id');
+    let proMetaPost = this.makeJSONFormat(proSet, 'id');
+    let disMetaPost = this.makeJSONFormat(disSet, 'id');
+
+    this.http.post(this.metaQueryAPI, plaMetaPost).map((resp4) => resp4.json())
+    .subscribe((plaMeta) => {
+      this.http.post(this.metaQueryAPI, comMetaPost).map((resp5) => resp5.json())
+      .subscribe((comMeta) => {
+        this.http.post(this.metaQueryAPI, proMetaPost).map((resp6) => resp6.json())
+        .subscribe((proMeta) => {
+          this.http.post(this.metaQueryAPI, disMetaPost).map((resp7) => resp7.json())
+          .subscribe((disMeta) => {
+            // connectivity text output ////////////////////////////////////////
+            this.plaVScomTxtOutput = this.makeConnectivityTextOutput(plaVScom,
+                                                                     plaMeta, comMeta,
+                                                                     'pla', 'com');
+            this.comVSproTxtOutput = this.makeConnectivityTextOutput(comVSpro,
+                                                                     comMeta, proMeta,
+                                                                     'com', 'pro');
+            this.proVSdisTxtOutput = this.makeConnectivityTextOutput(proVSdis,
+                                                                     proMeta, disMeta,
+                                                                     'pro', 'dis');
+            this.comVSplaTxtOutput = this.makeConnectivityTextOutput(plaVScom,
+                                                                     comMeta, plaMeta,
+                                                                     'com', 'pla');
+            this.proVScomTxtOutput = this.makeConnectivityTextOutput(comVSpro,
+                                                                     proMeta, comMeta,
+                                                                     'pro', 'com');
+            this.disVSproTxtOutput = this.makeConnectivityTextOutput(proVSdis,
+                                                                     disMeta, proMeta,
+                                                                     'dis', 'pro');
+
+            // connectivity graph output ///////////////////////////////////////
+            let graphDataArr = [this.makeGraphDataOutput(plaVScom,
+                                                         plaMeta, comMeta,
+                                                         'pla', 'com',
+                                                         plaSet, comSet),
+                                this.makeGraphDataOutput(comVSpro,
+                                                         comMeta, proMeta,
+                                                         'com', 'pro',
+                                                         comSet, proSet),
+                                this.makeGraphDataOutput(proVSdis,
+                                                         proMeta, disMeta,
+                                                         'pro', 'dis',
+                                                         proSet, disSet)];
+            let graphData = [];
+            for (let ii = 0; ii < graphDataArr.length; ii++) { // tslint:disable-line
+              for (let jj = 0; jj < graphDataArr[ii].length; jj++) { // tslint:disable-line
+                  let datum = graphDataArr[ii][jj];
+                  graphData.push(datum);
+              }
+            }
+            localStorage.setItem('connectivityGraphData', JSON.stringify(graphData));
+
+            // metadata text output ////////////////////////////////////////
+            this.plaMetaTxtOutput = this.makeMetaTextOutput('pla', plaSet, plaMeta);
+            this.comMetaTxtOutput = this.makeMetaTextOutput('com', comSet, comMeta);
+            this.proMetaTxtOutput = this.makeMetaTextOutput('pro', proSet, proMeta);
+            this.disMetaTxtOutput = this.makeMetaTextOutput('dis', disSet, disMeta);
+
+            // summary text output /////////////////////////////////////////////
+            let plaComConnScore = this.getConnectivityScore(plaVScom);
+            let comProConnScore = this.getConnectivityScore(comVSpro);
+            let proDisConnScore = this.getConnectivityScore(proVSdis);
+            let totConnScore = plaComConnScore + comProConnScore + proDisConnScore;
+            let nDecimalDigits = 5;
+
+            let nUnknownComProConn = 0;
+            let nUndefinedComProConn = 0;
+            let nKnownByExperimentComProConn = 0;
+            let nKnownByPredictionComProConn = 0;
+            let sourceSep = ' + ';
+            // ^^ above: must match with the one in server_thread.py for merging prediction sources
+            for (let i = 0; i < comVSpro.length; i++) { // tslint:disable-line
+              let allSrc = comVSpro[i]['source'].split(sourceSep);
+              let src = allSrc[0]; // TODO should depends on all sources
+              if (src === 'null') {// unknown
+                nUnknownComProConn += 1;
+              } else if (this.comProConnExperimentSrcs.indexOf(src) !== -1) {
+                nKnownByExperimentComProConn += 1;
+              } else if (this.comProConnPredictionSrcs.indexOf(src) !== -1) {
+                nKnownByPredictionComProConn += 1;
+              } else {
+                nUndefinedComProConn += 1;
+              }
+            }
+
+            if (this.mode === 'search_only') {
+              nUnknownComProConn = (comSet.length * proSet.length) - (nKnownByPredictionComProConn + nKnownByExperimentComProConn); // tslint:disable-line
+            }
+
+            this.summaryTxtOutput = 'Minimum Connectivity Weight To Display:\n';
+            this.summaryTxtOutput += '   ' + this.filterThreshold_.toFixed(nDecimalDigits) + '\n';
+            this.summaryTxtOutput += 'Connectivity Score:\n';
+            this.summaryTxtOutput += '   Total: ' + totConnScore.toFixed(nDecimalDigits) + '\n';
+            this.summaryTxtOutput += '   Plant-Compound  : ' + plaComConnScore.toString() + '\n';
+            this.summaryTxtOutput += '   Compound-Protein: ' + comProConnScore.toFixed(nDecimalDigits) + '\n'; // tslint:disable-line
+            this.summaryTxtOutput += '   Protein-Disease : ' + proDisConnScore.toString() + '\n';
+
+            this.summaryTxtOutput2 = 'Number of unique items:\n';
+            this.summaryTxtOutput2 += '   #Plants   : ' + plaSet.length.toString() + this.getInputMark('plant') + '\n'; // tslint:disable-line
+            this.summaryTxtOutput2 += '   #Compounds: ' + comSet.length.toString() + this.getInputMark('compound') + '\n'; // tslint:disable-line
+            this.summaryTxtOutput2 += '   #Proteins : ' + proSet.length.toString() + this.getInputMark('protein') + '\n'; // tslint:disable-line
+            this.summaryTxtOutput2 += '   #Diseases : ' + disSet.length.toString() + this.getInputMark('disease') + '\n'; // tslint:disable-line
+            this.summaryTxtOutput2 += 'Compound-Protein Connectivity:\n';
+            this.summaryTxtOutput2 += '   #known_by_experiment: ' + nKnownByExperimentComProConn.toString() + '\n'; // tslint:disable-line
+            this.summaryTxtOutput2 += '   #known_by_prediction: ' + nKnownByPredictionComProConn.toString() + '\n'; // tslint:disable-line
+            this.summaryTxtOutput2 += '   #unknown            : ' + nUnknownComProConn.toString() + '\n'; // tslint:disable-line
+            if (nUndefinedComProConn > 0) {
+              this.summaryTxtOutput2 += '   #undefined            : ' + nUndefinedComProConn.toString() + '\n'; // tslint:disable-line
+            }
+
+            let t1 = performance.now();
+            this.elapsedTime += (t1 - t0);
+            this.elapsedTime = this.elapsedTime / 1000.0; // from ms to s
+
+            this.summaryTxtOutput3 = 'Mode: \n';
+            this.summaryTxtOutput3 += '   ' + this.mode + '\n';
+            this.summaryTxtOutput3 += 'Elapsed Time: \n';
+            this.summaryTxtOutput3 += '   ' + this.elapsedTime.toFixed(nDecimalDigits) + ' seconds\n'; // tslint:disable-line
+
+            // Show the output page
+            this.show = true;
+            this.showGraph = true;
+          }); // disMeta
+        }); // proMeta
+      }); // comMeta
+    }); // plaMeta
+  }
+
+  private makeMetaTextOutput(type, idList, meta) {
+    if (idList.length === 0) {
+      return 'No Metadata';
+    }
+
+    let indent = '   ';
+    let txt = '';
+    let keys = this.getPropKeys(type, true);
+    for (let i = 0; i < idList.length; i++) {
+      let props = this.getProps(idList[i], keys, meta);
+
+      txt += (i + 1).toString() + ') ';
+      for (let j = 0; j < props.length; j++) {
+        let key = keys[j];
+        let prop = props[j];
+        if (prop) {
+          prop = this.getHyperlinkStr(key, prop);
+          key = key.substring(4);
+          if (j > 0) {
+            txt += indent;
+            if ((i + 1) > 9) {txt += ' '; }
+          }
+          txt += key + ': ' + prop + '\n';
+        }
+      }
+    }
+    return txt;
+  }
+
+  private makeConnectivityTextOutput(interaction, srcMeta, destMeta, srcType, destType) {
+    if (interaction.length === 0) {
+      return 'No Connectivity';
+    }
+
+    let conn = this.groupBy(srcType, destType, interaction);
+
+    let indent = '   ';
+    let text = this.getConnHeader(srcType + '_vs_' + destType, indent) + '\n';
+    let srcPropKeys = this.getPropKeys(srcType, false);
+    let destPropKeys = this.getPropKeys(destType, false);
+
+    let nUnique = 0;
+    let nUniquePerConnSrc = 0;
+    let pos = -1; // in which, we will insert nUniquePerConnSrc
+    let prevSrc = '';
+    let prevConnSource = '';
+
+    for (let i = 0; i < conn.length; i++) { // tslint:disable-line
+      for (let j = 0; j < conn[i].length; j++) { // tslint:disable-line
+        let comps = conn[i][j].split('$');
+        let source = comps[0];
+        let weight = comps[1]; weight = parseFloat(weight).toFixed(3);
+        let src = comps[2];
+        let dest = comps[3];
+
+        if (source === 'null') {
+          continue;
+        }
+
+        if (prevSrc !== src) {
+          nUnique = nUnique + 1;
+          text = text + nUnique.toString() + ') ';
+
+          let srcProps = this.getProps(src, srcPropKeys, srcMeta);
+          text += this.concatProps(srcProps, srcPropKeys, true, true);
+          text += ':\n';
+
+          prevSrc = src;
+          prevConnSource = '';
+        }
+
+        if (prevConnSource !== source) {
+          if (nUniquePerConnSrc > 0) {
+            text = [text.slice(0, pos), nUniquePerConnSrc.toString(), text.slice(pos)].join('');
+          }
+
+          if (nUnique > 9) {text += ' '; }
+          text += indent + '[' + source + ':]\n';
+          pos = text.length - 2;
+          prevConnSource = source;
+          nUniquePerConnSrc = 1;
+        } else {
+          nUniquePerConnSrc += 1;
+        }
+
+        let destProps = this.getProps(dest, destPropKeys, destMeta);
+        if (nUnique > 9) {text += ' '; }
+        text += indent + indent + '[' + weight + '] ';
+        text += this.concatProps(destProps, destPropKeys, true, true);
+        text += '\n';
+      }
+    }
+    text = [text.slice(0, pos), nUniquePerConnSrc.toString(), text.slice(pos)].join('');
+
+    return text;
+  }
+
+  private makeGraphDataOutput(interaction, srcMeta, destMeta, srcType, destType, srcItems, destItems) { // tslint:disable-line
+    let srcPropKeys = this.getPropKeys(srcType, false);
+    let destPropKeys = this.getPropKeys(destType, false);
+    let data = [];
+
+    let srcHasDestArr = [];
+    let destHasSrcArr = [];
+    for (let i = 0; i < srcItems.length; i++) { // tslint:disable-line
+      srcHasDestArr.push(false);
+    }
+    for (let i = 0; i < destItems.length; i++) { // tslint:disable-line
+      destHasSrcArr.push(false);
+    }
+
+    for (let i = 0; i < interaction.length; i++) { // tslint:disable-line
+      let datum = [];
+
+      let srcKey = srcType + '_id';
+      let destKey = destType + '_id';
+
+      let src = interaction[i][srcKey];
+      let dest = interaction[i][destKey];
+
+      let srcIdx = srcItems.indexOf(src);
+      let destIdx = destItems.indexOf(dest);
+
+      if ((srcIdx !== -1) && (destIdx !== -1)) {
+        srcHasDestArr[srcIdx] = true;
+        destHasSrcArr[destIdx] = true;
+
+        let source = interaction[i]['source'];
+        let weight = parseFloat( interaction[i]['weight'] );
+
+        let srcProps = this.getProps(src, srcPropKeys, srcMeta);
+        let destProps = this.getProps(dest, destPropKeys, destMeta);
+        let srcText = this.concatProps(srcProps, srcPropKeys, false, false);
+        let destText = this.concatProps(destProps, destPropKeys, false, false);
+
+        srcText = this.truncateText(srcText);
+        destText = this.truncateText(destText);
+
+        datum.push(srcText);
+        datum.push(destText);
+        datum.push(weight);
+
+        data.push(datum);
+      }
+    }
+
+    // Make _dummy_ interaction (... vs anchor) to beautify the graph rendering
+    let wDummy = 0.00001; // to become "invisible"
+    let prefix = '';
+    let srcDummyText = prefix + srcType.toUpperCase();
+    let destDummyText = prefix + destType.toUpperCase();
+
+    let anchor = [];
+    anchor.push(srcDummyText);
+    anchor.push(destDummyText);
+    anchor.push(wDummy);
+    data.push(anchor);
+
+    for (let i = 0; i < srcHasDestArr.length; i++) {
+      if (srcHasDestArr[i] === false) {
+        let src = srcItems[i];
+        let srcProps = this.getProps(src, srcPropKeys, srcMeta);
+        let srcText = this.concatProps(srcProps, srcPropKeys, false, false);
+        let destText = destDummyText;
+        let w = wDummy;
+
+        srcText = this.truncateText(srcText);
+        destText = this.truncateText(destText);
+
+        let dummy = [];
+        dummy.push(srcText);
+        dummy.push(destText);
+        dummy.push(w);
+        data.push(dummy);
+      }
+    }
+    for (let i = 0; i < destHasSrcArr.length; i++) {
+      if (destHasSrcArr[i] === false) {
+        let srcText = srcDummyText;
+        let dest = destItems[i];
+        let destProps = this.getProps(dest, destPropKeys, destMeta);
+        let destText = this.concatProps(destProps, destPropKeys, false, false);
+        let w = wDummy;
+
+        srcText = this.truncateText(srcText);
+        destText = this.truncateText(destText);
+
+        let dummy = [];
+        dummy.push(srcText);
+        dummy.push(destText);
+        dummy.push(w);
+        data.push(dummy);
+      }
+    }
+
+    return data;
   }
 }
