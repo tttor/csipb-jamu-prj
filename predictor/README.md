@@ -29,12 +29,12 @@
 ## Supervised ML-based approaches
 * BLM (Bipartite Local Model)
   * Original
-    * Yamanishi (2008)
-    * Bleakley (2009)
     * Yamanishi (2010)
+    * Bleakley (2009)
+    * Yamanishi (2008)
   * BLM-NII (bipartite local model with neighbor-based inferring) or Globalized BLM
-    * Mei (2012)
     * Mei (2013)
+    * Mei (2012)
 * Kernel-based
   * Kronecker regularized least squares (KronRLS)
     * Laarhoven (2011): KronRLS+GIP (_not_ handle new drugs/targets)
@@ -56,6 +56,23 @@
 ## Dealing with skewed/imbalanced dataset
 * credible negative samples
   * Liu (2015)
+
+* other approaches:
+  * anomaly detection,
+  * change detection,
+  * ensemble classifier
+
+* Metrics:
+  * cohen-kappa score
+  * area under precision-recall (aupr)
+  * receiver operating characteristic (roc)
+
+* library:
+  * https://github.com/scikit-learn-contrib/imbalanced-learn
+
+## Standard datasets for development
+* Yamanishi (2008):
+  * 4 types: e, gpcr, ic, nr
 
 ## Standards in implementing predictor classes
 * Each predictor class should implement:
