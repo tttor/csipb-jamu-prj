@@ -71,7 +71,7 @@ export class HomeComponent implements OnInit {
   public summaryTxtOutput2;
   public summaryTxtOutput3;
 
-  public filterThreshold = 0.0; // tslint:disable-line
+  public filterThreshold = 0.0;
 
   // Misc.
   // TODO explain the usage
@@ -1327,7 +1327,8 @@ export class HomeComponent implements OnInit {
             }
 
             if (this.mode === 'search_only') {
-              nUnknownComProConn = (comSet.length * proSet.length) - (nKnownByPredictionComProConn + nKnownByExperimentComProConn); // tslint:disable-line
+              nUnknownComProConn = (comSet.length * proSet.length)
+              - (nKnownByPredictionComProConn + nKnownByExperimentComProConn);
             }
 
             this.summaryTxtOutput = 'Minimum Connectivity Weight To Display:\n';
