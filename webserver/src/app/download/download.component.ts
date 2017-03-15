@@ -10,14 +10,14 @@ declare var saveAs: any;
   `],
   templateUrl: './download.template.html'
 })
-export class DownloadComponent implements OnInit { // tslint:disable-line
-  public baseAPI;
+export class DownloadComponent implements OnInit {
+  private baseAPI;
   constructor(public route: ActivatedRoute, private http: Http) {
     this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
     // this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
   }
 
-  public ngOnInit() { // tslint:disable-line
+  public ngOnInit() {
     // do nothing
   }
 
@@ -25,7 +25,7 @@ export class DownloadComponent implements OnInit { // tslint:disable-line
     // do nothing
   }
 
-  public getProps(type) {
+  private getProps(type) {
     // This method actually duplicates the one in apps.home class
     // TODO merge them
     let props = [];
@@ -80,7 +80,7 @@ export class DownloadComponent implements OnInit { // tslint:disable-line
     return props;
   }
 
-  public getHeader(type) {
+  private getHeader(type) {
     let header = '';
     if (type === 'pla') {
       header = '[Plant ID,Latin Name,Indonesian Name]';
@@ -106,7 +106,7 @@ export class DownloadComponent implements OnInit { // tslint:disable-line
     return header;
   }
 
-  public getFilename(type) {
+  private getFilename(type) {
     let prefix = 'ijah_all_';
     let suffix = '';
     let ext = '.txt';
@@ -155,7 +155,7 @@ export class DownloadComponent implements OnInit { // tslint:disable-line
     return filename;
   }
 
-  public makeTwoDigitStr(str) {
+  private makeTwoDigitStr(str) {
     str = str.toString();
     if (str.length === 2) {
       return str;
