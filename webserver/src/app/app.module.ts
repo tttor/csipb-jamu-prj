@@ -22,14 +22,14 @@ import { ROUTES } from './app.routes';
 import { AppComponent } from './app.component';
 import { APP_RESOLVER_PROVIDERS } from './app.resolver';
 import { AppState, InternalStateType } from './app.service';
-import { Home } from './home';
-import { Manual } from './manual';
-import { Download } from './download';
-import { Help } from './help';
-import { Disclaimer } from './disclaimer';
-import { V1 } from './v1';
-import { Contact } from './contact';
-import { About } from './about';
+import { HomeComponent } from './home';
+import { ManualComponent } from './manual';
+import { DownloadComponent } from './download';
+import { HelpComponent } from './help';
+import { DisclaimerComponent } from './disclaimer';
+import { V1Component } from './v1';
+import { ContactComponent } from './contact';
+import { AboutComponent } from './about';
 
 import '../styles/styles.scss';
 import '../styles/headings.css';
@@ -49,14 +49,14 @@ type StoreType = {
   bootstrap: [ AppComponent ],
   declarations: [
     AppComponent,
-    Home,
-    Manual,
-    Help,
-    Download,
-    Disclaimer,
-    V1,
-    Contact,
-    About
+    HomeComponent,
+    ManualComponent,
+    HelpComponent,
+    DownloadComponent,
+    DisclaimerComponent,
+    V1Component,
+    ContactComponent,
+    AboutComponent
   ],
   imports: [
     BrowserModule,

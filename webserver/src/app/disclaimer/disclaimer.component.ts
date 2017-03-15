@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -7,17 +7,17 @@ import { ActivatedRoute } from '@angular/router';
   `],
   templateUrl: './disclaimer.html'
 })
-export class Disclaimer {
-  localState;
+export class DisclaimerComponent implements OnInit {
+  private localState;
   constructor(public route: ActivatedRoute) {
-
+    // do nothing
   }
 
-  ngOnInit() {
-
+  public ngOnInit() {
+    // do nothing
   }
-  asyncDataWithWebpack() {
-
+  private asyncDataWithWebpack() {
+    // do nothing
   }
 
 }

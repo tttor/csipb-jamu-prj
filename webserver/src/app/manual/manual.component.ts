@@ -1,19 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'manual',
   templateUrl: './manual.template.html'
 })
-export class Manual {
-
-  data = [];
+export class ManualComponent implements OnInit {
 
   constructor() {
-
+    // do nothing
   }
 
-  ngOnInit() {
-
+  public ngOnInit() {
+    // do nothing
   }
 
 }
