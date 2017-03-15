@@ -62,6 +62,9 @@ https://www.bindingdb.org
 - [ ] PDTD <br />
 http://www.dddc.ac.cn/pdtd/
 
+- [ ] BioGRID <br />
+https://thebiogrid.org/
+
 ## PREDICTING WEBSERVER
 
 - [ ] SuperPred <br />
