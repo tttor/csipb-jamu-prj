@@ -17,11 +17,11 @@
 
   <div *ngIf="(this.mode.indexOf('predict')!==-1)">
     <button class="btn btn-danger fab2"(click)="predictMore()">Predict</button>
-    <button class="btn btn-danger fab2a"(click)="filter()">Filter {{filterThreshold_}}</button>
+    <button class="btn btn-danger fab2a"(click)="filter()">Filter {{filterThreshold}}</button>
     <button class="btn btn-danger fab"(click)="reset()">Reset</button>
   </div>
   <div *ngIf="(this.mode.indexOf('predict')===-1)">
-    <button class="btn btn-danger fab2a"(click)="filter()">Filter {{filterThreshold_}}</button>
+    <button class="btn btn-danger fab2a"(click)="filter()">Filter {{filterThreshold}}</button>
     <button class="btn btn-danger fab2"(click)="reset()">Reset</button>
   </div>
 </div>

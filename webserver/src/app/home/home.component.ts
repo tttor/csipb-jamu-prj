@@ -71,7 +71,7 @@ export class HomeComponent implements OnInit {
   public summaryTxtOutput2;
   public summaryTxtOutput3;
 
-  public filterThreshold_ = 0.0; // tslint:disable-line
+  public filterThreshold = 0.0; // tslint:disable-line
 
   // Misc.
   // TODO explain the usage
@@ -641,13 +641,13 @@ export class HomeComponent implements OnInit {
     this.showGraph = false;
 
     let delta = 0.2;
-    this.filterThreshold_ += delta;
-    if (this.filterThreshold_ > 1.0) {
-      this.filterThreshold_ = 0.0;
+    this.filterThreshold += delta;
+    if (this.filterThreshold > 1.0) {
+      this.filterThreshold = 0.0;
     }
-    this.filterThreshold_ = parseFloat( this.filterThreshold_.toFixed(1) );
+    this.filterThreshold = parseFloat( this.filterThreshold.toFixed(1) );
 
-    let filtered = this.filterOnComProConnWeight(this.filterThreshold_,
+    let filtered = this.filterOnComProConnWeight(this.filterThreshold,
                                                  this.plaVScom_, this.comVSpro_, this.proVSdis_);
     let plaVScomF = filtered[0];
     let comVSproF = filtered[1];
@@ -953,7 +953,7 @@ export class HomeComponent implements OnInit {
     this.proSet_ = [];
     this.disSet_ = [];
 
-    this.filterThreshold_ = 0.0;
+    this.filterThreshold = 0.0;
   }
 
   // EXAMPLE-BUTTON METHODS ////////////////////////////////////////////////////
@@ -1234,7 +1234,7 @@ export class HomeComponent implements OnInit {
             }
 
             this.summaryTxtOutput = 'Minimum Connectivity Weight To Display:\n';
-            this.summaryTxtOutput += '   ' + this.filterThreshold_.toFixed(nDecimalDigits) + '\n';
+            this.summaryTxtOutput += '   ' + this.filterThreshold.toFixed(nDecimalDigits) + '\n';
             this.summaryTxtOutput += 'Connectivity Score:\n';
             this.summaryTxtOutput += '   Total: ' + totConnScore.toFixed(nDecimalDigits) + '\n';
             this.summaryTxtOutput += '   Plant-Compound  : ' + plaComConnScore.toString() + '\n';
