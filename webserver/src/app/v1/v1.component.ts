@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -7,13 +7,13 @@ import { ActivatedRoute } from '@angular/router';
   `],
   templateUrl: './v1.html'
 })
-export class V1Component { // tslint:disable-line
+export class V1Component implements OnInit {
   private localState;
   constructor(public route: ActivatedRoute) {
     // do nothing
   }
 
-  private ngOnInit() { // tslint:disable-line
+  public ngOnInit() {
     // do nothing
   }
   private asyncDataWithWebpack() {
