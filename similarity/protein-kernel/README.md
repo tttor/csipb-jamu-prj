@@ -9,8 +9,8 @@
 
 * spectrum, mismatch string
   * Nascimento (2016)
-  * ** Leslie, C. (2004)**
-  * ** Leslie, C. (2002)**
+  * **Leslie, C. (2004)**
+  * **Leslie, C. (2002)**
 
 * gene-ontology
   * Nascimento (2016)
