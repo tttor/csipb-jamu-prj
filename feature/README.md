@@ -1,4 +1,4 @@
-# Feature and feature-extractor
+# Features and feature-extractors
 
 ## compound features
 * general descritors via RDKit: Open-Source Cheminformatics Software
@@ -14,7 +14,7 @@
   * **Rao et al. (2011)**
 
 * protein-domains via PFAM database
-  * ** Punta et al. (2012)**
+  * **Punta et al. (2012)**
 
 ## pharmacological features
 * interaction profiles
@@ -22,5 +22,5 @@
   * Laarhoven, T. (2013)
   * **Laarhoven, T. (2011)**
 
-* boostrapping, interaction is predicted by prediction methods.
+* boostrapping, features from interaction predicted by predictors
   * Yuan, Q. (2016)
