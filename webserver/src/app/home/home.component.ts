@@ -174,7 +174,8 @@ export class HomeComponent implements OnInit {
     this.http.post(this.metaQueryAPI, proPostMsgJSON).map((res) => res.json())
       .subscribe((data) => {
         for (let i = 0; i < data.length; i++) { // tslint:disable-line
-          let temp = data[i]['pro_uniprot_id'] + ' | ' + data[i]['pro_uniprot_abbrv'] + ' | ' + data[i]['pro_name']; // tslint:disable-line
+          let temp = data[i]['pro_uniprot_id'] + ' | ' + data[i]['pro_uniprot_abbrv'] + ' | '
+           + data[i]['pro_name'];
           data[i]['search'] = temp;
         }
         this.proteinSearch = data;
@@ -323,32 +324,37 @@ export class HomeComponent implements OnInit {
     let showProtein = false;
     let showDisease = false;
 
-    if (this.plaInputHolders.length > 1 && this.disInputHolders.length <= 1 && this.proInputHolders.length <= 1) { // tslint:disable-line
+    if (this.plaInputHolders.length > 1 && this.disInputHolders.length <= 1
+       && this.proInputHolders.length <= 1) {
       this.searchFromDrugSide(this.selectedPlants);
       this.mode = 'search_only';
       this.inputType = 'plant';
       showPlant = true;
 
-    } else if (this.comInputHolders.length > 1 && this.proInputHolders.length <= 1 && this.disInputHolders.length <= 1) { // tslint:disable-line
+    } else if (this.comInputHolders.length > 1 && this.proInputHolders.length <= 1
+       && this.disInputHolders.length <= 1) {
       this.searchFromDrugSide(this.selectedCompounds);
       this.mode = 'search_only';
       this.inputType = 'compound';
       showCompound = true;
 
-    } else if (this.proInputHolders.length > 1 && this.plaInputHolders.length <= 1 && this.comInputHolders.length <= 1) { // tslint:disable-line
+    } else if (this.proInputHolders.length > 1 && this.plaInputHolders.length <= 1
+       && this.comInputHolders.length <= 1) {
       this.searchFromTargetSide(this.selectedProteins);
       this.mode = 'search_only';
       this.inputType = 'protein';
       showProtein = true;
 
-    } else if (this.disInputHolders.length > 1 && this.plaInputHolders.length <= 1 && this.comInputHolders.length <= 1) { // tslint:disable-line
+    } else if (this.disInputHolders.length > 1 && this.plaInputHolders.length <= 1
+       && this.comInputHolders.length <= 1) {
       this.mode = 'search_only';
       this.inputType = 'disease';
       this.searchFromTargetSide(this.selectedDiseases);
       showDisease = true;
 
     // Starting next line: Use case 1: both sides are specified /////////////////////////////////
-    } else if (this.plaInputHolders.length > 1 && this.proInputHolders.length > 1) {
+    } else if (this.plaInputHolders.length > 1
+       && this.proInputHolders.length > 1) {
       this.mode = 'search_and_predict';
       this.inputType = 'plant+protein';
       this.searchAndPredict(this.selectedPlants, this.selectedProteins);
@@ -506,7 +512,8 @@ export class HomeComponent implements OnInit {
             let hasWaitedFor = parseFloat( hasWaitedForMsg[0]['has_waited_for'] );
             console.log('hasWaitedFor= ' + hasWaitedFor.toString());
 
-            this.http.post(this.interactionQueryAPI, comVSproToPredictStr).map((resp5) => resp5.json()) // tslint:disable-line
+            this.http.post(this.interactionQueryAPI, comVSproToPredictStr).map((resp5) =>
+            resp5.json())
               .subscribe((comVSproPred) => {
                 let comVSproMerged = comVSpro;
                 for (let i = 0; i < comVSproPred.length; i++) {
@@ -961,64 +968,135 @@ export class HomeComponent implements OnInit {
     this.reset();
 
     if (type === 'plant_vs_disease') {
-      this.plaInputHolders = [{ 'index': 1, 'value' : 'Blumea balsamifera | Sembung'}, { 'index': 2, 'value' : 'Tinospora crispa | Brotowali'}, { 'index': 3, 'value' : 'Momordica charantia | Pare'}, { 'index': 4, 'value' : 'Zingiber officinale | Jahe'}, { 'index': 5, 'value' : ''}]; // tslint:disable-line
-      this.selectedPlants = [{'index':1, 'value':'PLA00003831'},{'index':2, 'value':'PLA00000683'},{'index':3, 'value':'PLA00002036'},{'index':4, 'value':'PLA00001034'}]; // tslint:disable-line
+      this.plaInputHolders =
+          [{ index: 1, value : 'Blumea balsamifera | Sembung'},
+          { index: 2, value : 'Tinospora crispa | Brotowali'},
+          { index: 3, value : 'Momordica charantia | Pare'},
+          { index: 4, value : 'Zingiber officinale | Jahe'},
+          { index: 5, value : ''}];
+      this.selectedPlants =
+          [{index: 1, value: 'PLA00003831'},
+          {index: 2, value: 'PLA00000683'},
+          {index: 3, value: 'PLA00002036'},
+          {index: 4, value: 'PLA00001034'}];
       this.nDisInputHolders = 5;
 
-      this.disInputHolders = [{ 'index': 1, 'value' : '601388 | Diabetes mellitus, insulin-dependent, 12'}, { 'index': 2, 'value' : '304800 | Diabetes insipidus, nephrogenic, X-linked'}, { 'index': 3, 'value' : '612227 | Diabetes mellitus, ketosis-prone'}, { 'index': 4, 'value' : ''}]; // tslint:disable-line
-      this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000073'}, { 'index': 2, 'value' : 'DIS00000749'}, { 'index': 3, 'value' : 'DIS00000365'}]; // tslint:disable-line
+      this.disInputHolders =
+          [{ index: 1, value : '601388 | Diabetes mellitus, insulin-dependent, 12'},
+          { index: 2, value : '304800 | Diabetes insipidus, nephrogenic, X-linked'},
+          { index: 3, value : '612227 | Diabetes mellitus, ketosis-prone'},
+          { index: 4, value : ''}];
+      this.selectedDiseases = [{ index: 1, value : 'DIS00000073'},
+          { index: 2, value : 'DIS00000749'},
+          { index: 3, value : 'DIS00000365'}];
       this.nDisInputHolders = 4;
 
       this.activeCompound = false;
       this.activeProtein = false;
 
     } else if (type === 'plant_vs_protein') {
-      this.plaInputHolders = [{ 'index': 1, 'value' : 'Blumea balsamifera | Sembung'}, { 'index': 2, 'value' : 'Tinospora crispa | Brotowali'}, { 'index': 3, 'value' : 'Momordica charantia | Pare'}, { 'index': 4, 'value' : 'Zingiber officinale | Jahe'}, { 'index': 5, 'value' : ''}]; // tslint:disable-line
-      this.selectedPlants = [{'index':1, 'value':'PLA00003831'},{'index':2, 'value':'PLA00000683'},{'index':3, 'value':'PLA00002036'},{'index':4, 'value':'PLA00001034'}]; // tslint:disable-line
+      this.plaInputHolders =
+          [{ index: 1, value : 'Blumea balsamifera | Sembung'},
+          { index: 2, value : 'Tinospora crispa | Brotowali'},
+          { index: 3, value : 'Momordica charantia | Pare'},
+          { index: 4, value : 'Zingiber officinale | Jahe'},
+          { index: 5, value : ''}];
+      this.selectedPlants =
+          [{index: 1, value: 'PLA00003831'},
+          {index: 2, value: 'PLA00000683'},
+          {index: 3, value: 'PLA00002036'},
+          {index: 4, value: 'PLA00001034'}];
       this.nDisInputHolders = 5;
 
-      this.proInputHolders = [{ 'index': 1, 'value' : 'P30518 | V2R_HUMAN | Vasopressin V2 receptor'}, { 'index': 2, 'value' : 'P16410 | CTLA4_HUMAN | Cytotoxic T-lymphocyte protein 4'}, { 'index': 3, 'value' : 'O43316 | PAX4_HUMAN | Paired box protein Pax-4'}, { 'index': 4, 'value' : ''}]; // tslint:disable-line
-      this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00000343'}, { 'index': 2, 'value' : 'PRO00000283'}, { 'index': 3, 'value' : 'PRO00002960'}]; // tslint:disable-line
+      this.proInputHolders =
+          [{ index: 1, value : 'P30518 | V2R_HUMAN | Vasopressin V2 receptor'},
+          { index: 2, value : 'P16410 | CTLA4_HUMAN | Cytotoxic T-lymphocyte protein 4'},
+          { index: 3, value : 'O43316 | PAX4_HUMAN | Paired box protein Pax-4'},
+          { index: 4, value : ''}];
+      this.selectedProteins = [{ index: 1, value : 'PRO00000343'},
+          { index: 2, value : 'PRO00000283'},
+          { index: 3, value : 'PRO00002960'}];
       this.nProInputHolders = 4;
 
       this.activeDisease = false;
       this.activeCompound = false;
 
     } else if (type === 'compound_vs_protein') {
-      this.comInputHolders = [{ 'index': 1, 'value' : '80510-09-4 | N-cis-feruloyltyramine | (Z)-3-(4-hydroxy-3-methoxyphenyl)-N-[2-(4-hydroxyphenyl)ethyl]prop-2-enamide'}, { 'index': 2, 'value' : '29388-59-8 | Secoisolariciresinol | (2R,3R)-2,3-bis[(4-hydroxy-3-methoxyphenyl)methyl]butane-1,4-diol'}, { 'index': 3, 'value' : '18446-73-6 | Tembetarine | (1S)-1-[(3-hydroxy-4-methoxyphenyl)methyl]-6-methoxy-2,2-dimethyl-3,4-dihydro-1H-isoquinolin-2-ium-7-ol'}, { 'index': 4, 'value' : '644-30-4 | Curcumene | 1-methyl-4-(6-methylhept-5-en-2-yl)benzene'}, { 'index': 5, 'value' : ''}]; // tslint:disable-line
-      this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00008027'}, { 'index': 2, 'value' : 'COM00021005'}, { 'index': 3, 'value' : 'COM00009696'}, { 'index': 4, 'value' : 'COM00020511'}]; // tslint:disable-line
+      this.comInputHolders =
+          [{ index: 1, value : '80510-09-4 | N-cis-feruloyltyramine | (Z)-3-(4-hydroxy-3-methoxyphenyl)-N-[2-(4-hydroxyphenyl)ethyl]prop-2-enamide'},  // tslint:disable-line
+          { index: 2, value : '29388-59-8 | Secoisolariciresinol | (2R,3R)-2,3-bis[(4-hydroxy-3-methoxyphenyl)methyl]butane-1,4-diol'},  // tslint:disable-line
+          { index: 3, value : '18446-73-6 | Tembetarine | (1S)-1-[(3-hydroxy-4-methoxyphenyl)methyl]-6-methoxy-2,2-dimethyl-3,4-dihydro-1H-isoquinolin-2-ium-7-ol'},  // tslint:disable-line
+          { index: 4, value : '644-30-4 | Curcumene | 1-methyl-4-(6-methylhept-5-en-2-yl)benzene'},  // tslint:disable-line
+          { index: 5, value : ''}];
+      this.selectedCompounds = [{ index: 1, value : 'COM00008027'}, { index: 2, value : 'COM00021005'}, { index: 3, value : 'COM00009696'}, { index: 4, value : 'COM00020511'}]; // tslint:disable-line
       this.nComInputHolders = 5;
 
-      this.proInputHolders = [{ 'index': 1, 'value' : 'P53985 | Monocarboxylate transporter 1'}, { 'index': 2, 'value' : 'P20309 | Muscarinic acetylcholine receptor M3'}, { 'index': 3, 'value' : 'Q99720 | Sigma non-opioid intracellular receptor 1'}, { 'index': 4, 'value' : ''}]; // tslint:disable-line
-      this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00000040'}, { 'index': 2, 'value' : 'PRO00000452'}, { 'index': 3, 'value' : 'PRO00000377'}]; // tslint:disable-line
+      this.proInputHolders =
+          [{ index: 1, value : 'P53985 | Monocarboxylate transporter 1'},
+          { index: 2, value : 'P20309 | Muscarinic acetylcholine receptor M3'},
+          { index: 3, value : 'Q99720 | Sigma non-opioid intracellular receptor 1'},
+          { index: 4, value : ''}];
+      this.selectedProteins = [{ index: 1, value : 'PRO00000040'},
+          { index: 2, value : 'PRO00000452'},
+          { index: 3, value : 'PRO00000377'}];
       this.nProInputHolders = 4;
 
       this.activeTanaman = false;
       this.activeDisease = false;
 
     } else if (type === 'compound_vs_disease') {
-      this.comInputHolders = [{ 'index': 1, 'value' : '80510-09-4 | N-cis-feruloyltyramine | (Z)-3-(4-hydroxy-3-methoxyphenyl)-N-[2-(4-hydroxyphenyl)ethyl]prop-2-enamide'}, { 'index': 2, 'value' : '29388-59-8 | Secoisolariciresinol | (2R,3R)-2,3-bis[(4-hydroxy-3-methoxyphenyl)methyl]butane-1,4-diol'}, { 'index': 3, 'value' : '18446-73-6 | Tembetarine | (1S)-1-[(3-hydroxy-4-methoxyphenyl)methyl]-6-methoxy-2,2-dimethyl-3,4-dihydro-1H-isoquinolin-2-ium-7-ol'}, { 'index': 4, 'value' : '644-30-4 | Curcumene | 1-methyl-4-(6-methylhept-5-en-2-yl)benzene'}, { 'index': 5, 'value' : ''}]; // tslint:disable-line
-      this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00008027'}, { 'index': 2, 'value' : 'COM00021005'}, { 'index': 3, 'value' : 'COM00009696'}, { 'index': 4, 'value' : 'COM00020511'}]; // tslint:disable-line
+      this.comInputHolders =
+          [{ index: 1, value : '80510-09-4 | N-cis-feruloyltyramine | (Z)-3-(4-hydroxy-3-methoxyphenyl)-N-[2-(4-hydroxyphenyl)ethyl]prop-2-enamide'},  // tslint:disable-line
+          { index: 2, value : '29388-59-8 | Secoisolariciresinol | (2R,3R)-2,3-bis[(4-hydroxy-3-methoxyphenyl)methyl]butane-1,4-diol'},  // tslint:disable-line
+          { index: 3, value : '18446-73-6 | Tembetarine | (1S)-1-[(3-hydroxy-4-methoxyphenyl)methyl]-6-methoxy-2,2-dimethyl-3,4-dihydro-1H-isoquinolin-2-ium-7-ol'},  // tslint:disable-line
+          { index: 4, value : '644-30-4 | Curcumene | 1-methyl-4-(6-methylhept-5-en-2-yl)benzene'},
+          { index: 5, value : ''}];
+      this.selectedCompounds = [{ index: 1, value : 'COM00008027'}, { index: 2, value : 'COM00021005'}, { index: 3, value : 'COM00009696'}, { index: 4, value : 'COM00020511'}]; // tslint:disable-line
       this.nComInputHolders = 5;
 
-      this.disInputHolders = [{ 'index': 1, 'value' : '601388 | Diabetes mellitus, insulin-dependent, 12'}, { 'index': 2, 'value' : '304800 | Diabetes insipidus, nephrogenic, X-linked'}, { 'index': 3, 'value' : '612227 | Diabetes mellitus, ketosis-prone'}, { 'index': 4, 'value' : ''}]; // tslint:disable-line
-      this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000073'}, { 'index': 2, 'value' : 'DIS00000749'}, { 'index': 3, 'value' : 'DIS00000365'}]; // tslint:disable-line
+      this.disInputHolders =
+          [{ index: 1, value : '601388 | Diabetes mellitus, insulin-dependent, 12'},
+          { index: 2, value : '304800 | Diabetes insipidus, nephrogenic, X-linked'},
+          { index: 3, value : '612227 | Diabetes mellitus, ketosis-prone'},
+          { index: 4, value : ''}];
+      this.selectedDiseases = [{ index: 1, value : 'DIS00000073'},
+          { index: 2, value : 'DIS00000749'},
+          { index: 3, value : 'DIS00000365'}];
       this.nDisInputHolders = 4;
 
       this.activeTanaman = false;
       this.activeProtein = false;
 
     } else if (type === 'plant') {
-      this.plaInputHolders = [{ 'index': 1, 'value' : 'Phoenix dactylifera | Kurma'}, { 'index': 2, 'value' : 'Aloe vera | Lidah buaya'}, { 'index': 3, 'value' : 'Morinda citrifolia | Mengkudu/Pace'}, { 'index': 4, 'value' : 'Anacardium occidentale | Jambu monyet'}, { 'index': 5, 'value' : 'Cocos nucifera | Kelapa'}]; // tslint:disable-line
-      this.selectedPlants = [{'index':1, 'value':'PLA00000007'},{'index':2, 'value':'PLA00001504'},{'index':3, 'value':'PLA00001838'},{'index':4, 'value':'PLA00004093'},{'index':5, 'value':'PLA00001600'}]; // tslint:disable-line
+      this.plaInputHolders =
+          [{ index: 1, value : 'Phoenix dactylifera | Kurma'},
+          { index: 2, value : 'Aloe vera | Lidah buaya'},
+          { index: 3, value : 'Morinda citrifolia | Mengkudu/Pace'},
+          { index: 4, value : 'Anacardium occidentale | Jambu monyet'},
+          { index: 5, value : 'Cocos nucifera | Kelapa'}];
+      this.selectedPlants =
+          [{index: 1, value: 'PLA00000007'},
+          {index: 2, value: 'PLA00001504'},
+          {index: 3, value: 'PLA00001838'},
+          {index: 4, value: 'PLA00004093'},
+          {index: 5, value: 'PLA00001600'}];
       this.nPlaInputHolders = 5;
 
       this.activeCompound = false;
       this.activeProtein = false;
       this.activeDisease = false;
     } else if (type === 'compound') {
-      this.comInputHolders = [{ 'index': 1, 'value' : '57-50-1 | Sucrose | (2R,3R,4S,5S,6R)-2-[(2S,3S,4S,5R)-3,4-dihydroxy-2,5-bis(hydroxymethyl)oxolan-2-yl]oxy-6-(hydroxymethyl)oxane-3,4,5-triol'}, { 'index': 2, 'value' : '53-16-7 | Estrone | (8R,9S,13S,14S)-3-hydroxy-13-methyl-7,8,9,11,12,14,15,16-octahydro-6H-cyclopenta[a]phenanthren-17-one'}, { 'index': 3, 'value' : '334-48-5 | Decanoic acid | decanoic acid'}, { 'index': 4, 'value' : '480-41-1 | Naringenin | (2S)-5,7-dihydroxy-2-(4-hydroxyphenyl)-2,3-dihydrochromen-4-one'}, { 'index': 5, 'value' : ''}]; // tslint:disable-line
-      this.selectedCompounds = [{ 'index': 1, 'value' : 'COM00004561'}, { 'index': 2, 'value' : 'COM00001997'}, { 'index': 3, 'value' : 'COM00000363'}, { 'index': 4, 'value' : 'COM00003074'}]; // tslint:disable-line
+      this.comInputHolders =
+          [{ index: 1, value : '57-50-1 | Sucrose | (2R,3R,4S,5S,6R)-2-[(2S,3S,4S,5R)-3,4-dihydroxy-2,5-bis(hydroxymethyl)oxolan-2-yl]oxy-6-(hydroxymethyl)oxane-3,4,5-triol'},   // tslint:disable-line
+          { index: 2, value : '53-16-7 | Estrone | (8R,9S,13S,14S)-3-hydroxy-13-methyl-7,8,9,11,12,14,15,16-octahydro-6H-cyclopenta[a]phenanthren-17-one'},   // tslint:disable-line
+          { index: 3, value : '334-48-5 | Decanoic acid | decanoic acid'},
+          { index: 4, value : '480-41-1 | Naringenin | (2S)-5,7-dihydroxy-2-(4-hydroxyphenyl)-2,3-dihydrochromen-4-one'},   // tslint:disable-line
+          { index: 5, value : ''}];
+      this.selectedCompounds =
+          [{ index: 1, value : 'COM00004561'},
+          { index: 2, value : 'COM00001997'},
+          { index: 3, value : 'COM00000363'},
+          { index: 4, value : 'COM00003074'}];
       this.nComInputHolders = 4;
 
       this.activeDisease = false;
@@ -1026,8 +1104,17 @@ export class HomeComponent implements OnInit {
       this.activeProtein = false;
 
     } else if (type === 'protein') {
-      this.proInputHolders = [{ 'index': 1, 'value' : 'P37231 | PPARG_HUMAN | Peroxisome proliferator-activated receptor gamma'}, { 'index': 2, 'value' : 'P01189 | COLI_HUMAN | Pro-opiomelanocortin'}, { 'index': 3, 'value' : 'P02452 | CO1A1_HUMAN | Collagen alpha-1(I) chain'}, { 'index': 4, 'value' : 'Q9UHD2 | TBK1_HUMAN | Serine/threonine-protein kinase TBK1'}, { 'index': 5, 'value' : ''}]; // tslint:disable-line
-      this.selectedProteins = [{ 'index': 1, 'value' : 'PRO00002168'}, { 'index': 2, 'value' : 'PRO00000061'}, { 'index': 3, 'value' : 'PRO00000261'}, { 'index': 4, 'value' : 'PRO00001836'}]; // tslint:disable-line
+      this.proInputHolders =
+          [{ index: 1, value : 'P37231 | PPARG_HUMAN | Peroxisome proliferator-activated receptor gamma'},   // tslint:disable-line
+          { index: 2, value : 'P01189 | COLI_HUMAN | Pro-opiomelanocortin'},
+          { index: 3, value : 'P02452 | CO1A1_HUMAN | Collagen alpha-1(I) chain'},
+          { index: 4, value : 'Q9UHD2 | TBK1_HUMAN | Serine/threonine-protein kinase TBK1'},
+          { index: 5, value : ''}];
+      this.selectedProteins =
+          [{ index: 1, value : 'PRO00002168'},
+          { index: 2, value : 'PRO00000061'},
+          { index: 3, value : 'PRO00000261'},
+          { index: 4, value : 'PRO00001836'}];
       this.nProInputHolders = 4;
 
       this.activeDisease = false;
@@ -1035,8 +1122,18 @@ export class HomeComponent implements OnInit {
       this.activeCompound = false;
 
     } else if (type === 'disease') {
-      this.disInputHolders = [{ 'index': 1, 'value' : '601665 | Obesity'}, { 'index': 2, 'value' : '600807 | Asthma'}, { 'index': 3, 'value' : '610551 | Herpes simplex encephalitis 1'}, { 'index': 4, 'value' : '156610 | Skin creases, congenital symmetric circumferential, 1'}, { 'index': 5, 'value' : '166710 | Osteoporosis'}]; // tslint:disable-line
-      this.selectedDiseases = [{ 'index': 1, 'value' : 'DIS00000470'}, { 'index': 2, 'value' : 'DIS00001061'}, { 'index': 3, 'value' : 'DIS00000900'}, { 'index': 4, 'value' : 'DIS00001455'}, { 'index': 5, 'value' : 'DIS00003892'}]; // tslint:disable-line
+      this.disInputHolders =
+          [{ index: 1, value : '601665 | Obesity'},
+          { index: 2, value : '600807 | Asthma'},
+          { index: 3, value : '610551 | Herpes simplex encephalitis 1'},
+          { index: 4, value : '156610 | Skin creases, congenital symmetric circumferential, 1'},
+          { index: 5, value : '166710 | Osteoporosis'}];
+      this.selectedDiseases =
+          [{ index: 1, value : 'DIS00000470'},
+          { index: 2, value : 'DIS00001061'},
+          { index: 3, value : 'DIS00000900'},
+          { index: 4, value : 'DIS00001455'},
+          { index: 5, value : 'DIS00003892'}];
       this.nDisInputHolders = 5;
 
       this.activeProtein = false;
@@ -1238,20 +1335,29 @@ export class HomeComponent implements OnInit {
             this.summaryTxtOutput += 'Connectivity Score:\n';
             this.summaryTxtOutput += '   Total: ' + totConnScore.toFixed(nDecimalDigits) + '\n';
             this.summaryTxtOutput += '   Plant-Compound  : ' + plaComConnScore.toString() + '\n';
-            this.summaryTxtOutput += '   Compound-Protein: ' + comProConnScore.toFixed(nDecimalDigits) + '\n'; // tslint:disable-line
+            this.summaryTxtOutput += '   Compound-Protein: '
+                                  + comProConnScore.toFixed(nDecimalDigits) + '\n';
             this.summaryTxtOutput += '   Protein-Disease : ' + proDisConnScore.toString() + '\n';
 
             this.summaryTxtOutput2 = 'Number of unique items:\n';
-            this.summaryTxtOutput2 += '   #Plants   : ' + plaSet.length.toString() + this.getInputMark('plant') + '\n'; // tslint:disable-line
-            this.summaryTxtOutput2 += '   #Compounds: ' + comSet.length.toString() + this.getInputMark('compound') + '\n'; // tslint:disable-line
-            this.summaryTxtOutput2 += '   #Proteins : ' + proSet.length.toString() + this.getInputMark('protein') + '\n'; // tslint:disable-line
-            this.summaryTxtOutput2 += '   #Diseases : ' + disSet.length.toString() + this.getInputMark('disease') + '\n'; // tslint:disable-line
+            this.summaryTxtOutput2 += '   #Plants   : ' + plaSet.length.toString()
+                                  + this.getInputMark('plant') + '\n';
+            this.summaryTxtOutput2 += '   #Compounds: ' + comSet.length.toString()
+                                  + this.getInputMark('compound') + '\n';
+            this.summaryTxtOutput2 += '   #Proteins : ' + proSet.length.toString()
+                                  + this.getInputMark('protein') + '\n';
+            this.summaryTxtOutput2 += '   #Diseases : ' + disSet.length.toString()
+                                  + this.getInputMark('disease') + '\n';
             this.summaryTxtOutput2 += 'Compound-Protein Connectivity:\n';
-            this.summaryTxtOutput2 += '   #known_by_experiment: ' + nKnownByExperimentComProConn.toString() + '\n'; // tslint:disable-line
-            this.summaryTxtOutput2 += '   #known_by_prediction: ' + nKnownByPredictionComProConn.toString() + '\n'; // tslint:disable-line
-            this.summaryTxtOutput2 += '   #unknown            : ' + nUnknownComProConn.toString() + '\n'; // tslint:disable-line
+            this.summaryTxtOutput2 += '   #known_by_experiment: '
+                                  + nKnownByExperimentComProConn.toString() + '\n';
+            this.summaryTxtOutput2 += '   #known_by_prediction: '
+                                  + nKnownByPredictionComProConn.toString() + '\n';
+            this.summaryTxtOutput2 += '   #unknown            : '
+                                  + nUnknownComProConn.toString() + '\n';
             if (nUndefinedComProConn > 0) {
-              this.summaryTxtOutput2 += '   #undefined            : ' + nUndefinedComProConn.toString() + '\n'; // tslint:disable-line
+              this.summaryTxtOutput2 += '   #undefined            : '
+                                    + nUndefinedComProConn.toString() + '\n';
             }
 
             let t1 = performance.now();
@@ -1261,7 +1367,8 @@ export class HomeComponent implements OnInit {
             this.summaryTxtOutput3 = 'Mode: \n';
             this.summaryTxtOutput3 += '   ' + this.mode + '\n';
             this.summaryTxtOutput3 += 'Elapsed Time: \n';
-            this.summaryTxtOutput3 += '   ' + this.elapsedTime.toFixed(nDecimalDigits) + ' seconds\n'; // tslint:disable-line
+            this.summaryTxtOutput3 += '   ' + this.elapsedTime.toFixed(nDecimalDigits)
+                                  + ' seconds\n';
 
             // Show the output page
             this.show = true;
