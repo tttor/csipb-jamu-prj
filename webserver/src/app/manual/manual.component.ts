@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'manual',
   templateUrl: './manual.template.html'
 })
-export class ManualComponent { // tslint:disable-line
+export class ManualComponent implements OnInit {
 
   private data = [];
 
@@ -12,7 +12,7 @@ export class ManualComponent { // tslint:disable-line
     // do nothing
   }
 
-  private ngOnInit() { // tslint:disable-line
+  public ngOnInit() {
     // do nothing
   }
 
