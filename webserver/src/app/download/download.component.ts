@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Http } from '@angular/http';
 
@@ -10,7 +10,7 @@ declare var saveAs: any;
   `],
   templateUrl: './download.template.html'
 })
-export class DownloadComponent { // tslint:disable-line
+export class DownloadComponent implements OnInit { // tslint:disable-line
   public baseAPI;
   constructor(public route: ActivatedRoute, private http: Http) {
     this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
