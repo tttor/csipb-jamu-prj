@@ -19,13 +19,10 @@ def main(argv):
                             user=dcfg['user'],password=dcfg['passwd'],
                             host=dcfg['host'],port=dcfg['port'])
     csr = conn.cursor()
-
-    insert(csr,outDir,simcompDir)
-
-    conn.commit()
+    insert(csr,conn,outDir,simcompDir)
     conn.close()
 
-def insert(csr,outDir,simcompDir):
+def insert(csr,conn,outDir,simcompDir):
     # SELECT com_id FROM `compound` where com_kegg_id!=''
     q = "SELECT com_kegg_id,com_id FROM compound where com_kegg_id!=''"
     csr.execute(q)
@@ -34,10 +31,10 @@ def insert(csr,outDir,simcompDir):
 
     #
     method = 'simcomp'
-    idx = 0; log = []
+    idx = 0; log = []; n = len(kegg2ComIdMap)
     for keggId,comId in kegg2ComIdMap.iteritems():
         idx += 1
-        s = 'inserting simcomp '+keggId+':'+comId+ ' idx= '+str(idx)+' of '+str(len(resp))
+        s = 'inserting simcomp '+keggId+':'+comId+ ' idx= '+str(idx)+' of '+str(n)
         print s
 
         fname = 'simcomp_'+keggId
@@ -57,13 +54,15 @@ def insert(csr,outDir,simcompDir):
                         q  = "INSERT INTO compound_similarity (com_id_i,com_id_j,method,value) "
                         q += "VALUES ("+pgUtil.quote(comId)+","+pgUtil.quote(comId2)+","
                         q += pgUtil.quote(method)+","+score+")"
-                        # csr.execute(q)
+                        csr.execute(q)
+                        conn.commit()
         else:
             s = 'NOT-FOUND: '+fpath+' for '+s
             log.append(s)
 
-    with open(os.path.join(outDir,'updateComSimcomp.log'),'w') as f:
-        for l in log: f.write(l+'\n')
+        if idx%100==0 or idx==n:
+            with open(os.path.join(outDir,'updateComSimcomp.log'),'w') as f:
+                for l in log: f.write(l+'\n')
 
 if __name__ == '__main__':
     start_time = time.time()
