@@ -36,12 +36,6 @@ elif [ "$1" == "uckg" ]; then
   path2=/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010/keggdrug_data_2016-10-11_16:58:04.683546.pkl
   exe=insert_compound.py
   python $exe $db $user $passwd $host $port $mode $outDir $path $path2
-elif [ "$1" == "ucsc" ]; then
-  ### update compound_simcomp from kegg
-  mode=updateComSimcomp
-  path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161014/simcomp
-  exe=insert_compound.py
-  python $exe $db $user $passwd $host $port $mode $outDir $path
 ## PROTEIN #####################################################################
 elif [ "$1" == "ipu" ]; then
   ### insert_protein: Uniprot's protein-disease connectivity

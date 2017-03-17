@@ -33,8 +33,7 @@ def main(argv):
                 com_pubchem_id varchar(128),
                 com_smiles_canonical varchar(32768),
                 com_smiles_isomeric varchar(32768),
-                com_pubchem_synonym text,
-                com_similarity_simcomp text
+                com_pubchem_synonym text
                 );
                 ''')
 
@@ -44,7 +43,6 @@ def main(argv):
                 pro_name varchar(512) NOT NULL UNIQUE,
                 pro_uniprot_id varchar(8) NOT NULL UNIQUE,
                 pro_uniprot_abbrv varchar(64) NOT NULL UNIQUE,
-                pro_similarity_smithwaterman text,
                 pro_pdb_id text
                 );
                 ''')
@@ -106,6 +104,28 @@ def main(argv):
                 (select count (*) from compound) as compound_total,
                 (select count (*) from protein) as protein_total,
                 (select count (*) from disease) as disease_total;
+                ''')
+
+    cur.execute('DROP TABLE IF EXISTS compound_similarity;')
+    curr.execute('''
+                CREATE TABLE compound_similarity (
+                com_id_i varchar(12) NOT NULL,
+                com_id_j varchar(12) NOT NULL,
+                method varchar(64) NOT NULL,
+                value float(16) NOT NULL,
+                time_stamp timestamp DEFAULT now()
+                );
+                ''')
+
+    cur.execute('DROP TABLE IF EXISTS protein_similarity;')
+    curr.execute('''
+                CREATE TABLE protein_similarity (
+                pro_id_i varchar(12) NOT NULL,
+                pro_id_j varchar(12) NOT NULL,
+                method varchar(64) NOT NULL,
+                value float(16) NOT NULL,
+                time_stamp timestamp DEFAULT now()
+                );
                 ''')
 
     conn.commit()
