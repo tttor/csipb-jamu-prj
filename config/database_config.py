@@ -6,5 +6,10 @@ databaseConfigServer = dict(name='ijah',user='ijah',passwd=DB_PASSWD,
 databaseConfigLocal = dict(name='ijah',user='ijah',passwd=DB_PASSWD_LOCAL,
                             host='localhost',port='5432')
 
-databaseConfig = databaseConfigServer
-# databaseConfig = databaseConfigLocal
+databaseConfig = None
+if DB_MODE=='server':
+    databaseConfig = databaseConfigServer
+elif DB_MODE=='local':
+    databaseConfig = databaseConfigLocal
+else:
+    assert False,'FATAL: Unknown DB_MODE'
