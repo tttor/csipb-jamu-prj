@@ -15,6 +15,9 @@ declare var saveAs: any;
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit {
+  // public baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+  public baseAPI ='http://localhost/ijah-api/';
+
   // count number of input rows
   public nPlaInputHolders = 0;
   public nComInputHolders = 0;
@@ -91,9 +94,6 @@ export class HomeComponent implements OnInit {
   public noResultDisease = false;
 
   // API URL addresses
-  private baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  // baseAPI ='http://localhost/ijah-api/';
-
   private interactionQueryAPI;
   private metaQueryAPI;
   private predictAPI;
