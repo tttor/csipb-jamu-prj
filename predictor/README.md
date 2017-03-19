@@ -53,23 +53,6 @@
     * Restricted Boltzmann machines (RBM)
       * Wang (2013)
 
-## Dealing with skewed/imbalanced dataset
-* credible negative samples
-  * Liu (2015)
-
-* other approaches:
-  * anomaly detection,
-  * change detection,
-  * ensemble classifier
-
-* Metrics:
-  * cohen-kappa score
-  * area under precision-recall (aupr)
-  * receiver operating characteristic (roc)
-
-* library:
-  * https://github.com/scikit-learn-contrib/imbalanced-learn
-
 ## Standard datasets for development
 * Yamanishi (2008):
   * 4 types: e, gpcr, ic, nr
