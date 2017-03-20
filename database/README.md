@@ -27,6 +27,8 @@ psql ijah  -h 127.0.0.1 -d ijah < ijah_201612141709.sql
 
 ## Queries
 ```sql
+* CREATE INDEX com_sim_idx ON compound_similarity (com_id_i,com_id_j,method);
+
 * ALTER SEQUENCE [tablename]_[id]_seq RESTART WITH 1
   * ALTER SEQUENCE user_msg_id_seq RESTART WITH 1;
 
