@@ -2,7 +2,7 @@
 
 ## Aliases and Keywords
 * compound-protein/drug-target interaction/link prediction
-* in-silico/virtual/computational drug screening
+* in-silico/virtual/computational drug screening/repurposing/repositioning
 
 ## Challenges
 * imbalanced data, highly skewed datasets:
@@ -53,11 +53,14 @@
   * enhanced similarity measures and super-target clustering
     * Shi (2015)
 * Learning to Rank (LTR)
-    * Yuan (2016)
-    * Zhang (2015)
+  * Yuan (2016)
+  * Zhang (2015)
 * Deep-learning
-    * Restricted Boltzmann machines (RBM)
-      * Wang (2013)
+  * Restricted Boltzmann machines (RBM)
+    * Wang (2013)
+* Survey/review
+  * Li, J (2016)
+  * Jin, G (2014)
 
 ## Standard datasets for development
 * Yamanishi (2008):
