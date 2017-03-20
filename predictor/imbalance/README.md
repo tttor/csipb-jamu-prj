@@ -2,7 +2,7 @@
 
 ## approaches
 * problem-definition-level
-  * Redefine the Problem
+  * redefine the problem
     * to focus on a subdomain or partition of the data,
       where the degree of imbalance is lessened.
     * anomaly detection, one-class learning or novelty detection
@@ -16,7 +16,7 @@
       subject to the constraints of a given budget.
   * sampling methods
     * random undersampling and random oversampling
-    * synthetic minority oversampling technique (smote)
+    * synthetic minority oversampling technique (SMOTE)
 * algorithm-level
   * ensemble classifiers
     * Bagging-Style Methods
@@ -33,7 +33,17 @@
     * AdaCost
   * skew-insensitive learners
     * naive bayes
-    * Hellinger distance decision trees (HDDTs)
+    * hellinger distance decision trees (HDDTs)
+
+## related works on drug-target prediction
+* credible negative samples
+  * Liu (2015)
+* ensemble learners
+  * Ezzat, A (2016)
+  * Niu, Y (2015) (RandomForest)
+  * Kumari, P (2014) (+SMOTE +ReliefF feature-selection)
+  * Li, Q (2009) (granular-SVM repetitive under sampling method (GSVM-RU))
+  * Radivojac, P (2004)
 
 ## metrics:
   * cohen-kappa score
@@ -41,9 +51,5 @@
   * receiver operating characteristic, area under roc (auroc)
   * F1-measure, F_{beta}-measure,
 
-## line of works (related to drug-target prediction):
-* credible negative samples
-  * Liu (2015)
-
-## library:
-  * https://github.com/scikit-learn-contrib/imbalanced-learn
+## depedencies
+  * imbalanced-learn >=0.21
