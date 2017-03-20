@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
   selector: 'v1',
   styles: [`
   `],
-  templateUrl: './v1.html'
+  templateUrl: './v1.component.html'
 })
 export class V1Component implements OnInit {
   private localState;
