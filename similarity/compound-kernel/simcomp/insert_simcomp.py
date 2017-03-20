@@ -55,10 +55,13 @@ def insert(csr,conn,outDir,simcompDir):
                         q += "VALUES ("+pgUtil.quote(comId)+","+pgUtil.quote(comId2)+","
                         q += pgUtil.quote(method)+","+score+")"
                         csr.execute(q)
-                        conn.commit()
+
         else:
             s = 'NOT-FOUND: '+fpath+' for '+s
             log.append(s)
+
+        ##
+        conn.commit()
 
         if idx%100==0 or idx==n:
             with open(os.path.join(outDir,'updateComSimcomp.log'),'w') as f:
