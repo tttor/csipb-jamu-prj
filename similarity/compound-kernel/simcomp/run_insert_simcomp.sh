@@ -1,6 +1,7 @@
 #!/bin/bash
-EXE=insert_simcomp.py
-OUT_DIR=../../../xprmt/similarity
-SIMCOMP_DIR=../../../dataset/metadata/compound/kegg/kegg_20161014/simcomp
+ROOT=../../..
+OUT_DIR=$ROOT/xprmt/similarity
 
-python $EXE $OUT_DIR $SIMCOMP_DIR
+SIMCOMP_DIR=$ROOT/dataset/metadata/compound/kegg/kegg_20161014/simcomp
+
+python insert_simcomp.py $OUT_DIR $SIMCOMP_DIR
