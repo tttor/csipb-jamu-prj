@@ -27,13 +27,20 @@ Skor agen digunakan untuk mengukur skor kesamaan dua senyawa berdasarkan fenotip
 
 Kesamaan fenotipe didasarkan ada struktur *Human Phenotype Ontology* (HPO) yang berbentuk *Directed Acyclyc Graph* (DAG) (Robinson *et al.* 2008)
 
-Metode NIMS digunkaan untuk menghitung skor sinergi antar senyawa yang menarget protein dari penyakit. Langkah-langkah pengaplikasian NIMS adalah sebagai berikut:
-A Membuat jejaring topologi yang terdiri atas jejaring protein target dan
-jejaring PPI.
-B Menghitung tiga nilai sentralitas, yaitu degree, betweenness, dan closeness.
-C Menghitung nilai IP(v) dengan mengintegrasikan tiga nilai sentralitas.
-D Menghitung minimum shortest path antar protein target kombinasi senyawa.
-E Menghitung matriks skor topologi (TS).
-F Menghitung kesamaan fenotipe (PS).
-G Menghitung matriks skor agen (AS).
-H Menghitung skor sinergi (SS) yang didapat dari hasil perkalian antara TS dan AS.
+Metode NIMS digunakan untuk menghitung skor sinergi antar senyawa yang menarget protein dari penyakit. Langkah-langkah pengaplikasian NIMS adalah sebagai berikut:
+A. Membuat jejaring topologi yang terdiri atas jejaring protein target dan jejaring PPI.
+B. Menghitung tiga nilai sentralitas, yaitu degree, betweenness, dan closeness.
+C. Menghitung nilai IP(v) dengan mengintegrasikan tiga nilai sentralitas.
+D. Menghitung minimum shortest path antar protein target kombinasi senyawa.
+E. Menghitung matriks skor topologi (TS).
+F. Menghitung kesamaan fenotipe (PS).
+G. Menghitung matriks skor agen (AS).
+
+
+** NIMS
+* Network target for screening synergistic drug combinations with application to traditional Chinese medicine (NIMS Theory)
+	* Li, S. (2010)
+* Herb Network Analysis for a Famous TCM Doctor’s Prescriptions on Treatment of Rheumatoid Arthritis
+	* Li, Y. (2015)
+* Network-based drug discovery by integrating systems biology and computational technologies
+	* Leung, E. (2012)
