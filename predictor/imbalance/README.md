@@ -8,12 +8,7 @@
     * anomaly detection, one-class learning or novelty detection
 * data-level
   * active learning
-    * to preferentially sample the rare classes
-      by focusing the learning on the instances around the classification boundary
-    * to reduce, and potentially eliminate, any adverse effects that
-      the class imbalance can have on the model's generalization performance.
-    * to select informative examples both from the majority and minority classes for labeling,
-      subject to the constraints of a given budget.
+    * Ertekin, S (2007): SVM based active learning selection strategy
   * sampling methods
     * random undersampling and random oversampling
     * synthetic minority oversampling technique (SMOTE)
@@ -39,11 +34,11 @@
 * credible negative samples
   * Liu (2015)
 * ensemble learners
-  * Ezzat, A (2016)
+  * Ezzat, A (2016) (proposed ensemble learners)
   * Niu, Y (2015) (RandomForest)
   * Kumari, P (2014) (+SMOTE +ReliefF feature-selection)
   * Li, Q (2009) (granular-SVM repetitive under sampling method (GSVM-RU))
-  * Radivojac, P (2004)
+  * Radivojac, P (2004) (ensembles of neural networks)
 
 ## metrics:
   * cohen-kappa score
@@ -53,3 +48,6 @@
 
 ## depedencies
   * imbalanced-learn >=0.21
+
+## web resources
+  * http://active-learning.net/

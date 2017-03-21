@@ -48,6 +48,8 @@
       * Hao, M (2017)
     * collaborative matrix factorization with multiple similarities (MSCMF)
       * Zheng (2013)
+    * probabilistic matrix factorization
+      * Cobanoglu, M (2013)
     * kernelized bayesian matrix factorization with twin kernels (KBMF2K)
       * Gonen (2012)
   * enhanced similarity measures and super-target clustering
@@ -56,8 +58,8 @@
   * Yuan (2016)
   * Zhang (2015)
 * Deep-learning
-  * Restricted Boltzmann machines (RBM)
-    * Wang (2013)
+  * Min, W (2017)
+  * Wang (2013): Restricted Boltzmann machines (RBM)
 * Survey/review
   * Li, J (2016)
   * Jin, G (2014)
