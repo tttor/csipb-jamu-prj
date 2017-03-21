@@ -49,8 +49,10 @@ def insert(csr,conn,outDir,simcompDir):
 
                     if keggId2 in kegg2ComIdMap.keys():
                         comId2 = kegg2ComIdMap[keggId2]
-                        score = words[1]
+                        if comId==comId2:
+                            continue
 
+                        score = words[1]
                         q  = "INSERT INTO compound_similarity (com_id_i,com_id_j,method,value) "
                         q += "VALUES ("+pgUtil.quote(comId)+","+pgUtil.quote(comId2)+","
                         q += pgUtil.quote(method)+","+score+")"

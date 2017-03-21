@@ -59,6 +59,9 @@ def insert(csr,conn,outDir,simFpath,metaFpath):
             else:
                 continue
 
+            if pro==pro2:
+                continue
+
             val = mat[i][j]
             q  = "INSERT INTO protein_similarity (pro_id_i,pro_id_j,method,value) "
             q += "VALUES ("+util.quote(pro)+","+util.quote(pro2)+","
