@@ -10,7 +10,8 @@
 psql ijah  -h 127.0.0.1 -d ijah
 
 ### dump
-* $ sudo -u ijah pg_dump ijah > ijah.sql
+* tor@torpc:~$ sudo -u ijah pg_dump ijah > ijah.sql
+* ijah@compute-engine:~$ pg_dump ijah > ijah_20160322-1018.sql
 * ijah=> \copy protein to /home/tor/protein.csv csv header
 * ijah=> \copy (SELECT com_cas_id FROM compound) TO '/home/tor/tmp/test.csv' With CSV;
 
