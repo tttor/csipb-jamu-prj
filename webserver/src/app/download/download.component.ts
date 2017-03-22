@@ -8,7 +8,7 @@ declare var saveAs: any;
   selector: 'download',
   styles: [`
   `],
-  templateUrl: './download.template.html'
+  templateUrl: './download.component.html'
 })
 export class DownloadComponent implements OnInit {
   private baseAPI;

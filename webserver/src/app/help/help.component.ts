@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
   selector: 'help',
   styles: [`
   `],
-  templateUrl: './help.template.html'
+  templateUrl: './help.component.html'
 })
 export class HelpComponent implements OnInit {
   private localState;

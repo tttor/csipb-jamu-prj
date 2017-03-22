@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
   selector: 'disclaimer',
   styles: [`
   `],
-  templateUrl: './disclaimer.html'
+  templateUrl: './disclaimer.component.html'
 })
 export class DisclaimerComponent implements OnInit {
   private localState;
