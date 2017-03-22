@@ -56,13 +56,15 @@ def insert(csr,conn,outDir,simFpath,metaFpath):
         for j,pro2 in enumerate(proList):
             if pro2 in uniprotID2proID:
                 pro2 = uniprotID2proID[pro2]
+                if pro==pro2:
+                    continue
             else:
                 continue
 
-            if pro==pro2:
+            val = mat[i][j]
+            if val < 0.0:
                 continue
 
-            val = mat[i][j]
             q  = "INSERT INTO protein_similarity (pro_id_i,pro_id_j,method,value) "
             q += "VALUES ("+util.quote(pro)+","+util.quote(pro2)+","
             q += util.quote(method)+","+str(val)+")"

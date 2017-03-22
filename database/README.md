@@ -28,12 +28,14 @@ psql ijah  -h 127.0.0.1 -d ijah < ijah_201612141709.sql
 ## Queries
 ```sql
 * CREATE INDEX com_sim_idx ON compound_similarity (com_id_i,com_id_j,method);
+  * CREATE INDEX pro_sim_idx ON protein_similarity (pro_id_i,pro_id_j,method);
 
 * ALTER SEQUENCE [tablename]_[id]_seq RESTART WITH 1
   * ALTER SEQUENCE user_msg_id_seq RESTART WITH 1;
 
-* ALTER TABLE compound DROP COLUMN com_simcomp;
-  * ALTER TABLE plant ADD COLUMN pla_idr_name varchar(256);
+* ALTER TABLE compound DROP COLUMN com_similarity_simcomp;
+
+* ALTER TABLE plant ADD COLUMN pla_idr_name varchar(256);
   * ALTER TABLE protein ADD COLUMN pro_pdb_id text;
 
 * SELECT COUNT(DISTINCT (c.com_id)) from compound as c ,plant_vs_compound as pc
@@ -45,12 +47,6 @@ psql ijah  -h 127.0.0.1 -d ijah < ijah_201612141709.sql
                 method varchar(64) NOT NULL,
                 value float(16) NOT NULL,
                 time_stamp timestamp DEFAULT now()
-                );
-
-* CREATE TABLE compound_similarity (
-                com_id_i varchar(12),
-                com_id_j varchar(12),
-                pla_idr_name varchar(256)
                 );
 
 * SELECT
