@@ -40,7 +40,6 @@ def insert(csr,conn,outDir,simFpath,metaFpath):
     csr.execute(q)
     resp = csr.fetchall(); assert len(resp)>0
     uniprotID2proID = {u:p for u,p in resp}
-    print len(uniprotID2proID)
 
     ## insert
     method = 'smith-waterman'
