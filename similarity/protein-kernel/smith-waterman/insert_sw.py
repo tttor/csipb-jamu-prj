@@ -43,7 +43,7 @@ def insert(csr,conn,outDir,simFpath,metaFpath):
     print len(uniprotID2proID)
 
     ## insert
-    method = 'smith-watermann'
+    method = 'smith-waterman'
     for i,pro in enumerate(proList):
         if pro in uniprotID2proID:
             pro = uniprotID2proID[pro]
@@ -68,7 +68,6 @@ def insert(csr,conn,outDir,simFpath,metaFpath):
             q  = "INSERT INTO protein_similarity (pro_id_i,pro_id_j,method,value) "
             q += "VALUES ("+util.quote(pro)+","+util.quote(pro2)+","
             q += util.quote(method)+","+str(val)+")"
-            print q
             csr.execute(q)
         conn.commit()
 
