@@ -41,8 +41,9 @@
 
   $mail->From = 'ijahweb@gmail.com';
   $mail->FromName = 'Ijah Webserver Feedback';
-  //$mail->addAddress('vektor.dewanto@gmail.com');
-  $mail->addAddress('hzbarkan@gmail.com');
+  $mail->addAddress('vektor.dewanto@gmail.com');
+  $mail->addCC('hzbarkan@gmail.com');
+  $mail->addCC('vlaatahzan@gmail.com');
 
   $mail->isHTML(false);
 
