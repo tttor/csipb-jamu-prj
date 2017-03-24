@@ -52,10 +52,13 @@ def insert(csr,conn,outDir,simcompDir):
                         if comId==comId2:
                             continue
 
-                        score = words[1]
+                        val = float(words[1])
+                        if val<=0.0 or val>=1.0:
+                            continue
+
                         q  = "INSERT INTO compound_similarity (com_id_i,com_id_j,method,value) "
                         q += "VALUES ("+pgUtil.quote(comId)+","+pgUtil.quote(comId2)+","
-                        q += pgUtil.quote(method)+","+score+")"
+                        q += pgUtil.quote(method)+","+str(val)+")"
                         csr.execute(q)
 
         else:

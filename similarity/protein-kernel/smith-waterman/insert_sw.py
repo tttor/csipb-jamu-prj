@@ -61,7 +61,7 @@ def insert(csr,conn,outDir,simFpath,metaFpath):
                 continue
 
             val = mat[i][j]
-            if val < 0.0:
+            if val<=0.0 or val>=1.0:
                 continue
 
             q  = "INSERT INTO protein_similarity (pro_id_i,pro_id_j,method,value) "
