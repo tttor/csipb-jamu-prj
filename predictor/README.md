@@ -2,7 +2,7 @@
 
 ## Aliases and Keywords
 * compound-protein/drug-target interaction/link prediction
-* in-silico/virtual/computational drug screening/repurposing/repositioning
+* in-silico/virtual/computational drug screening/repurposing/repositioning/elucidation
 
 ## Challenges
 * imbalanced data, highly skewed datasets:
