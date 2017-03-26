@@ -2,14 +2,16 @@
 
 ## Aliases and Keywords
 * compound-protein/drug-target interaction/link prediction
-* in-silico/virtual/computational drug screening/repurposing/repositioning/elucidation
+* in-silico/virtual/computational drug screening/repurposing/repositioning/elucidation/identification
 
 ## Challenges
-* imbalanced data, highly skewed datasets:
+* imbalanced (highly skewed) datasets:
   * ratio of positiveSamples to negativeSamples is too small
-* deceptive negative samples as they can be either trully negative or simply unknown (not yet clinically/chemically tested)
+* deceptive negative samples:
+  * a negative sample is either _trully_ negative or _simply_ unknown (not yet clinically/chemically tested)
   * validated negative samples are not available;
-    people never report negative results after clinical/chemical experiments
+    people never report negative results after clinical/chemical experiments;
+    negative results are rarely published (the positive results bias)
   * negative samples that actually positive may fool the learning machine;
     they are negative because their true interactions are simply unknown/not-tested
   * one solution: train locally
