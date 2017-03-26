@@ -64,9 +64,14 @@
   * Li, J (2016)
   * Jin, G (2014)
 
-## Standard datasets for development
+## Benchmarking datasets for development
 * Yamanishi (2008):
   * 4 types: e, gpcr, ic, nr
+  * http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/
+  * http://cbio.ensmp.fr/~yyamanishi/pharmaco/
+* Ezzat (2016)
+  * collected from the DrugBank database (version 4.3,released on 17 Nov. 2015)
+  * 12674 drug-target interactions between 5877 drugs and 3348 proteins
 
 ## Standards in implementing predictor classes
 * Each predictor class should implement:
