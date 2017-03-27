@@ -33,7 +33,7 @@
     * naive bayes
     * hellinger distance decision trees (HDDTs)
 
-## related works on drug-target prediction
+## dealing with imbalance in drug-target prediction
 * credible negative samples
   * Liu (2015)
 * ensemble learners

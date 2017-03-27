@@ -65,6 +65,9 @@ http://www.dddc.ac.cn/pdtd/
 - [ ] BioGRID <br />
 https://thebiogrid.org/
 
+- [ ] DSigDB <br />
+http://tanlab.ucdenver.edu/DSigDB
+
 ## PREDICTING WEBSERVER
 
 - [ ] SuperPred <br />
