@@ -2,21 +2,26 @@
 
 ## Aliases and Keywords
 * compound-protein/drug-target interaction/link prediction
-* in-silico/virtual/computational drug screening/repurposing/repositioning
+* in-silico/virtual/computational drug screening/repurposing/repositioning/elucidation/identification
 
 ## Challenges
-* imbalanced data, highly skewed datasets:
+* imbalanced (highly skewed) datasets:
   * ratio of positiveSamples to negativeSamples is too small
-* deceptive negative samples as they can be either trully negative or simply unknown (not yet clinically/chemically tested)
+  * solutions:
+    * bipartite local model (BLM), to lessen the imbalance
+      * the training data are drawn locally ``near'' the testing compound-protein pairs
+      * each testing compound-protein pair has its own model/classifier, which is computationally expensive
+* deceptive negative samples:
+  * a negative sample is either _trully_ negative or _simply_ unknown
+    (not yet clinically/chemically tested; potentially becomes positive)
   * validated negative samples are not available;
-    people never report negative results after clinical/chemical experiments
+    people never report negative results after clinical/chemical experiments;
+    negative results are rarely published (the positive results bias)
   * negative samples that actually positive may fool the learning machine;
     they are negative because their true interactions are simply unknown/not-tested
-  * one solution: train locally
-    in that the training data are drawn locally ``near'' the testing compound-protein pairs;
-    * helps reducing irrelevant training data wrt the testing data
-    * but, implies that each testing compound-protein pair has its own model/classifier,
-      which is computationally expensive
+  * solutions:
+    * BLM, as above, to help reducing irrelevant training data wrt the testing data
+    * unsupervised learning: positive vs unlabeled interactions
 * handle 4 scenarios: (new: having no existing/known interaction)
   * known drug, known target
   * new drug, known target
@@ -52,8 +57,8 @@
       * Cobanoglu, M (2013)
     * kernelized bayesian matrix factorization with twin kernels (KBMF2K)
       * Gonen (2012)
-  * enhanced similarity measures and super-target clustering
-    * Shi (2015)
+  * enhanced similarity measures and super-target clustering (DTI prediction as probabilistic events)
+    * Shi, J. Y. (2015)
 * Learning to Rank (LTR)
   * Yuan (2016)
   * Zhang (2015)
@@ -64,9 +69,18 @@
   * Li, J (2016)
   * Jin, G (2014)
 
-## Standard datasets for development
+## Semi-supervised ML-based approaches
+* NetLapRLS
+  * Xia, Z (2010)
+
+## Benchmarking datasets for development
 * Yamanishi (2008):
   * 4 types: e, gpcr, ic, nr
+  * http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/
+  * http://cbio.ensmp.fr/~yyamanishi/pharmaco/
+* Ezzat (2016)
+  * collected from the DrugBank database (version 4.3,released on 17 Nov. 2015)
+  * 12674 drug-target interactions between 5877 drugs and 3348 proteins
 
 ## Standards in implementing predictor classes
 * Each predictor class should implement:

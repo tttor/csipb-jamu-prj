@@ -8,7 +8,10 @@
     * anomaly detection, one-class learning or novelty detection
 * data-level
   * active learning
-    * Ertekin, S (2007): SVM based active learning selection strategy
+    * SVM-based
+      * Ertekin, S (2007)
+      * Schohn, G (2000)
+      * Ho, C (2011)
   * sampling methods
     * random undersampling and random oversampling
     * synthetic minority oversampling technique (SMOTE)
@@ -30,7 +33,7 @@
     * naive bayes
     * hellinger distance decision trees (HDDTs)
 
-## related works on drug-target prediction
+## dealing with imbalance in drug-target prediction
 * credible negative samples
   * Liu (2015)
 * ensemble learners
@@ -39,6 +42,8 @@
   * Kumari, P (2014) (+SMOTE +ReliefF feature-selection)
   * Li, Q (2009) (granular-SVM repetitive under sampling method (GSVM-RU))
   * Radivojac, P (2004) (ensembles of neural networks)
+* Weighted Tanimoto Extreme Learning Machine (T-WELM)
+  * Czarnecki, W (2015)
 
 ## metrics:
   * cohen-kappa score
