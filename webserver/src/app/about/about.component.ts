@@ -1,23 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'about',
   styles: [`
   `],
-  templateUrl: './about.template.html'
+  templateUrl: './about.component.html'
 })
-export class About {
-  localState;
+export class AboutComponent implements OnInit {
+  private localState;
   constructor(public route: ActivatedRoute) {
-
+    // do nothing
   }
 
-  ngOnInit() {
-
+  public ngOnInit() {
+    // do nothing
   }
-  asyncDataWithWebpack() {
-
+  private asyncDataWithWebpack() {
+    // do nothing
   }
 
 }

@@ -29,8 +29,6 @@ def main(argv):
 
     if mode=='insertProteinUniprot':
         insertProteinUniprot(csr,paths[0])
-    elif mode=='updateProteinSmithWaterman':
-        updateProteinSmithWaterman(csr,paths[0],paths[1])
     elif mode=='updateProteinPDB':
         updateProteinPDB(csr,paths[0])
     else:
@@ -57,43 +55,6 @@ def updateProteinPDB(csr,path):
         simStrMerged = "'"+simStrMerged+"'"
         qf = "UPDATE protein SET pro_pdb_id="+simStrMerged
         qr = " WHERE pro_uniprot_id="+"'"+uniprot+"'"
-        q = qf+qr
-        csr.execute(q)
-
-def updateProteinSmithWaterman(csr,simFpath,metaFpath):
-    proList = [] # uniprodID
-    with open(metaFpath,'r') as f:
-        for line in f:
-            s = line.strip()
-            proList.append(s)
-
-    mat = np.loadtxt(simFpath,delimiter=',')
-    assert mat.shape[0]==mat.shape[1]
-    assert mat.shape[0]==len(proList)
-
-    ## get uniproID to proID mapping
-    q = "SELECT pro_uniprot_id,pro_id FROM protein where pro_uniprot_id!=''"
-    csr.execute(q)
-    resp = csr.fetchall(); assert len(resp)>0
-    uniprotID2proID = {u:p for u,p in resp}
-
-    print len(uniprotID2proID)
-
-    ## update
-    for i,pro in enumerate(proList):
-        s = 'updating proSimSW '+pro+' idx= '+str(i+1)+' of '+str(len(proList))
-        print s
-
-        simStrList = []
-        for j,pro2 in enumerate(proList):
-            sim = mat[i][j]
-            simStr = uniprotID2proID[pro2]+':'+pro2+'='+str(sim)
-            simStrList.append(simStr)
-
-        simStrMerged = ','.join(simStrList)
-        simStrMerged = "'"+simStrMerged+"'"
-        qf = "UPDATE protein SET pro_similarity_smithwaterman="+simStrMerged
-        qr = " WHERE pro_uniprot_id="+"'"+pro+"'"
         q = qf+qr
         csr.execute(q)
 

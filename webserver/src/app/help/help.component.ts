@@ -1,24 +1,24 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'help',
   styles: [`
   `],
-  templateUrl: './help.template.html'
+  templateUrl: './help.component.html'
 })
-export class Help {
-  localState;
+export class HelpComponent implements OnInit {
+  private localState;
   constructor(public route: ActivatedRoute) {
-
+    // do nothing
   }
 
-  ngOnInit() {
-
+  public ngOnInit() {
+    // do nothing
   }
 
-  asyncDataWithWebpack() {
-
+  private asyncDataWithWebpack() {
+    // do nothing
   }
 
 }

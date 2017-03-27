@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Http } from '@angular/http';
 
@@ -8,22 +8,24 @@ declare var saveAs: any;
   selector: 'download',
   styles: [`
   `],
-  templateUrl: './download.template.html'
+  templateUrl: './download.component.html'
 })
-export class Download {
-  baseAPI;
+export class DownloadComponent implements OnInit {
+  private baseAPI;
   constructor(public route: ActivatedRoute, private http: Http) {
     this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
     // this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
   }
 
-  ngOnInit() {
+  public ngOnInit() {
+    // do nothing
   }
 
-  asyncDataWithWebpack() {
+  public asyncDataWithWebpack() {
+    // do nothing
   }
 
-  getProps(type){
+  private getProps(type) {
     // This method actually duplicates the one in apps.home class
     // TODO merge them
     let props = [];
@@ -78,7 +80,7 @@ export class Download {
     return props;
   }
 
-  getHeader(type) {
+  private getHeader(type) {
     let header = '';
     if (type === 'pla') {
       header = '[Plant ID,Latin Name,Indonesian Name]';
@@ -104,8 +106,8 @@ export class Download {
     return header;
   }
 
-  getFilename(type) {
-    let prefix = 'ijah_all_'
+  private getFilename(type) {
+    let prefix = 'ijah_all_';
     let suffix = '';
     let ext = '.txt';
     let body = '';
@@ -139,52 +141,51 @@ export class Download {
     }
 
     const dateTime = +new Date();
-    const unixTS = Math.floor(dateTime/1000);
-    let date = new Date(unixTS*1000);
+    const unixTS = Math.floor(dateTime / 1000);
+    let date = new Date(unixTS * 1000);
     let y = date.getFullYear();
-    let m = this.makeTwoDigitStr(date.getMonth()+1);
+    let m = this.makeTwoDigitStr(date.getMonth() + 1);
     let d = this.makeTwoDigitStr(date.getDate());
     let hh = this.makeTwoDigitStr(date.getHours());
     let mm = this.makeTwoDigitStr(date.getMinutes());
     let ss = this.makeTwoDigitStr(date.getSeconds());
-    let timestamp = '_'+y+m+d+'-'+hh+mm+ss;
+    let timestamp = '_' + y + m + d + '-' + hh + mm + ss;
 
-    let filename = prefix+body+suffix+timestamp+ext;
+    let filename = prefix + body + suffix + timestamp + ext;
     return filename;
   }
 
-  makeTwoDigitStr(str) {
+  private makeTwoDigitStr(str) {
     str = str.toString();
-    if (str.length===2) {
+    if (str.length === 2) {
       return str;
-    }
-    else {
-      return '0'+str;
+    } else {
+      return '0' + str;
     }
   }
 
-  download(type) {
-    let api = this.baseAPI+'metadata.php';
+  public download(type) {
+    let api = this.baseAPI + 'metadata.php';
     if (type.indexOf('_vs_') !== -1) {
-      api = this.baseAPI+'connectivity.php';
+      api = this.baseAPI + 'connectivity.php';
     }
 
-    let msg = '[{"id":"'+type.toUpperCase()+'_ALL_ROWS"}]';
-    this.http.post(api,msg).map(res => res.json())
-      .subscribe(data => {
-        let txt = this.getHeader(type)+'\n';
-        for (let i = 0; i < data.length; i++){
+    let msg = '[{"id":"' + type.toUpperCase() + '_ALL_ROWS"}]';
+    this.http.post(api, msg).map((res) => res.json())
+      .subscribe((data) => {
+        let txt = this.getHeader(type) + '\n';
+        for (let i = 0; i < data.length; i++) { // tslint:disable-line
           let props = this.getProps(type);
-          for (let j=0; j < props.length;j++) {
+          for (let j  = 0; j < props.length; j++) {
             txt += data[i][props[j]];
-            if (j<props.length-1) {
+            if (j < props.length - 1) {
               txt += ',';
             }
           }
           txt = txt + '\n';
         }
-        let blob = new Blob([txt], {type: "text/plain;charset=utf-8"});
-        saveAs(blob,this.getFilename(type));
-      })
+        let blob = new Blob([txt], {type: 'text/plain;charset=utf-8'});
+        saveAs(blob, this.getFilename(type));
+      });
   }
 }
