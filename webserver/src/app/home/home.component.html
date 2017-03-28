@@ -206,9 +206,9 @@
   <div class="row" *ngIf="show">
     <!-- The summary output //////////////////////////////////////////////// -->
     <div>
-      <div class="row text-center" id="summary">
-        <font color="#696969">_____________________________________________________________________________________________________________________________________</font>
-      </div>
+      <div class="card card-2" id="summary">
+        <!-- <font color="#696969">_____________________________________________________________________________________________________________________________________</font> -->
+
       <div class="text-center col-md-12"><h2><strong>Summary</strong></h2></div>
       <div class="col-md-4">
         <pre [innerHTML]="summaryTxtOutput" style="height:190px"></pre>
@@ -218,6 +218,7 @@
       </div>
       <div class="col-md-4">
         <pre [innerHTML]="summaryTxtOutput3" style="height:190px"></pre>
+      </div>
       </div>
 
 <!--       <div>
@@ -229,19 +230,16 @@
       <br /> -->
 
       <!-- The multi-partite graph output ////////////////////////////////// -->
-      <div class="row text-center">
-        <font color="#696969">_____________________________________________________________________________________________________________________________________</font>
-      </div>
-      <div class="text-center col-md-12" id="connectivityGraph">
+      <div class="card card-2" id="connectivityGraph">
+      <div class="text-center col-md-12">
         <h2><strong>Connectivity Graph</strong></h2>
       </div>
       <iframe id="graph" *ngIf="showGraph" class="text-center" src="assets/app_home_graph_output.html" height="850px" width="100%" frameBorder="0"></iframe>
+    </div>
 
       <!-- Connectivity Text Output //////////////////////////////////////// -->
-      <div class="row text-center">
-        <font color="#696969">_____________________________________________________________________________________________________________________________________</font>
-      </div>
-      <div class="text-center col-md-12" id="connectivityText">
+      <div class="card card-2" id="connectivityText">
+      <div class="text-center col-md-12">
         <h2><strong>Connectivity Text</strong></h2>
       </div>
 
@@ -317,12 +315,11 @@
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('disease_vs_protein')">Download Disease-Protein Connectivity</button>
       </div>
       <br />
+    </div>
 
       <!-- Metadata Text Output /////////////////////////////////////////// -->
-      <div class="row text-center">
-        <font color="#696969">_____________________________________________________________________________________________________________________________________</font>
-      </div>
-      <div class="text-center col-md-12" id="metadataText">
+      <div class="card card-2" id="metadataText">
+      <div class="text-center col-md-12">
         <h2><strong>Metadata Text</strong></h2>
       </div>
       <div class="col-md-3">
@@ -357,6 +354,7 @@
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('disease')">Download Disease Meta</button>
       </div>
       <br />
+    </div>
 
     </div>
   </div>
