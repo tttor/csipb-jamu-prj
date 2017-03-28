@@ -1,7 +1,7 @@
 # Clustering on compound and protein sets
 
 ## Notes
-* **no** ground-truth cluster-label is available)
+* **no** ground-truth cluster-label is available
 * traning-phase only, no testing phase
 
 ## Methods

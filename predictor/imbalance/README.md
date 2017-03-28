@@ -10,8 +10,9 @@
   * active learning
     * SVM-based
       * Ertekin, S (2007)
-      * Schohn, G (2000)
       * Ho, C (2011)
+      * S. Tong (2002)
+      * Schohn, G (2000)
   * sampling methods
     * random undersampling and random oversampling
     * synthetic minority oversampling technique (SMOTE)
@@ -46,13 +47,17 @@
   * Czarnecki, W (2015)
 
 ## metrics:
-  * cohen-kappa score
-  * precision-recall curve, area under precision-recall (aupr)
-  * receiver operating characteristic, area under roc (auroc)
-  * F1-measure, F_{beta}-measure,
+* cohen-kappa score
+* precision-recall curve, area under precision-recall (aupr)
+* receiver operating characteristic, area under roc (auroc)
+* F1-measure, F_{beta}-measure,
 
 ## depedencies
-  * imbalanced-learn >=0.21
+* imbalanced-learn >=0.21
 
 ## web resources
-  * http://active-learning.net/
+* http://active-learning.net/
+
+## misc
+* active learning for imbalanced and deceptive samples on drug-target prediction
+* benchmarking methods for dealing with imbalanced data on drug-target prediction
