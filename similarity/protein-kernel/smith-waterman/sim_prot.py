@@ -35,10 +35,10 @@ def main():
     colMeta = []
     rowSeq = []
     rowMeta = []
-    rowProtein = []
-    colProtein = []
-    rowIndex = []
-    colIndex = []
+    # rowProtein = []
+    # colProtein = []
+    # rowIndex = []
+    # colIndex = []
 
     ### MultiProcessing ###
     pool = Pool(processes=poolNum)
@@ -94,20 +94,22 @@ def main():
                 batchLen = 3334 - startBatch
             else:
                 batchLen = step
-            for j in range(startBatch,startBatch+batchLen):
-                rowProtein.append(rowSeq[i])
-                rowIndex.append(i)
-                colProtein.append(colSeq[j- colStart])
-                colIndex.append(j)
+            # for j in range(startBatch,startBatch+batchLen):
+            #     rowProtein.append(rowSeq[i])
+            #     rowIndex.append(i)
+            #     colProtein.append(colSeq[j-colStart])
+            #     colIndex.append(j)
             ### Calculation ###
-            listScore = [pool.apply_async(alignprot,(rowProtein[j], colProtein[j], rowIndex[j], colIndex[j],)) for j in range(batchLen)] ###Put into row
+            listScore = [pool.apply_async(alignprot,(rowSeq[i],
+                            colSeq[j+startBatch-colStart], i, j+startBatch-colStart,))
+                            for j in range(batchLen)]
             for listS in listScore:
                 simMatProt[listS.get()[1]] = listS.get()[0]
             #Reset value
-            del rowProtein[:]
-            del rowIndex[:]
-            del colProtein[:]
-            del colIndex[:]
+            # del rowProtein[:]
+            # del rowIndex[:]
+            # del colProtein[:]
+            # del colIndex[:]
             del listScore[:]
             startBatch += batchLen
         sys.stderr.write("Writing output\n")
