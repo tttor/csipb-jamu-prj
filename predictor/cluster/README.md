@@ -3,12 +3,20 @@
 ## Notes
 * **no** ground-truth cluster-label is available
 * traning-phase only, no testing phase
+* large number of samples: >10K
 
 ## Methods
+* DBSCAN
+  * sklearn v0.17: metric precomputed to accept precomputed sparse matrix
+* Spectral clustering
+  * sklearn: operate on similarity
+  * scalability: medium n_samples
 * K-medoid
-  * Keum, J (2017)
-* agglomerative hierarchical clustering
-  * Shi, J. Y. (2015)
+  * Keum, J (2017): operate on similarity
+* agglomerative hierarchical clustering (with linkage= ward)
+  * Shi, J. Y. (2015), operate on similarity
+* (Mini Batch) K-Means
+  * sklearn: operate on distances on feature space
 
 ## Performance metrics
 * Silhouette Coefficient
