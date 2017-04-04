@@ -60,17 +60,17 @@ template .right-input {
 
 .fab{
   /*background: #03A9F4;*/
-  width: 100px;
-  height: 50px;
+  width: 80px;
+  height: 40px;
   bottom: 0;
   right: 0;
   margin-bottom: 50px;
-  margin-right: 50px;
+  margin-right: 25px;
   text-align:center;
   color: #FFF;
   box-shadow:0px 0px 3px rgba(0,0,0,0.5),3px 3px 3px rgba(0,0,0,0.25);
   position: fixed;
-  font-size: 20px;
+  font-size: 18px;
   display: inline-block;
   cursor: default;
   z-index: 5;
@@ -82,17 +82,17 @@ template .right-input {
 
 .fab2{
   /*background: #03A9F4;*/
-  width: 100px;
-  height: 50px;
+  width: 80px;
+  height: 40px;
   bottom: 0;
   right: 0;
-  margin-bottom: 110px;
-  margin-right: 50px;
+  margin-bottom: 100px;
+  margin-right: 25px;
   text-align:center;
   color: #FFF;
   box-shadow:0px 0px 3px rgba(0,0,0,0.5),3px 3px 3px rgba(0,0,0,0.25);
   position: fixed;
-  font-size: 20px;
+  font-size: 18px;
   display: inline-block;
   cursor: default;
 }
@@ -103,17 +103,17 @@ template .right-input {
 
 .fab2a{
   /*background: #03A9F4;*/
-  width: 100px;
-  height: 50px;
+  width: 80px;
+  height: 40px;
   bottom: 0;
   right: 0;
-  margin-bottom: 170px;
-  margin-right: 50px;
+  margin-bottom: 150px;
+  margin-right: 25px;
   text-align:center;
   color: #FFF;
   box-shadow:0px 0px 3px rgba(0,0,0,0.5),3px 3px 3px rgba(0,0,0,0.25);
   position: fixed;
-  font-size: 20px;
+  font-size: 18px;
   display: inline-block;
   cursor: default;
 }
@@ -124,17 +124,17 @@ template .right-input {
 
 .fab3{
   background: #03A9F4;
-  width: 120px;
-  height: 50px;
+  width: 100px;
+  height: 40px;
   bottom: 0;
   right: 0;
-  margin-bottom: 230px;
-  margin-right: 50px;
+  margin-bottom: 200px;
+  margin-right: 25px;
   text-align:center;
   color: #FFF;
   box-shadow:0px 0px 3px rgba(0,0,0,0.5),3px 3px 3px rgba(0,0,0,0.25);
   position: fixed;
-  font-size: 20px;
+  font-size: 18px;
   display: inline-block;
   cursor: default;
 }
@@ -145,17 +145,17 @@ template .right-input {
 
 .fab4{
   background: #03A9F4;
-  width: 120px;
-  height: 50px;
+  width: 110px;
+  height: 40px;
   bottom: 0;
   right: 0;
-  margin-bottom: 290px;
-  margin-right: 50px;
+  margin-bottom: 250px;
+  margin-right: 25px;
   text-align:center;
   color: #FFF;
   box-shadow:0px 0px 3px rgba(0,0,0,0.5),3px 3px 3px rgba(0,0,0,0.25);
   position: fixed;
-  font-size: 20px;
+  font-size: 18px;
   display: inline-block;
   cursor: default;
 }
@@ -166,17 +166,17 @@ template .right-input {
 
 .fab5{
   background: #03A9F4;
-  width: 120px;
-  height: 50px;
+  width: 100px;
+  height: 40px;
   bottom: 0;
   right: 0;
-  margin-bottom: 350px;
-  margin-right: 50px;
+  margin-bottom: 300px;
+  margin-right: 25px;
   text-align:center;
   color: #FFF;
   box-shadow:0px 0px 3px rgba(0,0,0,0.5),3px 3px 3px rgba(0,0,0,0.25);
   position: fixed;
-  font-size: 20px;
+  font-size: 18px;
   display: inline-block;
   cursor: default;
 }
@@ -187,17 +187,17 @@ template .right-input {
 
 .fab6{
   background: #03A9F4;
-  width: 120px;
-  height: 50px;
+  width: 100px;
+  height: 40px;
   bottom: 0;
   right: 0;
-  margin-bottom: 410px;
-  margin-right: 50px;
+  margin-bottom: 350px;
+  margin-right: 25px;
   text-align:center;
   color: #FFF;
   box-shadow:0px 0px 3px rgba(0,0,0,0.5),3px 3px 3px rgba(0,0,0,0.25);
   position: fixed;
-  font-size: 20px;
+  font-size: 18px;
   display: inline-block;
   cursor: default;
 }
