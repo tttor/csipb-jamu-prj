@@ -22,6 +22,13 @@ h2{font-size: 30px; font-weight: 300; color:#444; margin: 30px 0}
 h3{font-size: 20px; font-weight: 400; margin: 20px 0;}
 h4{font-size:18px; font-weight: 400}
 
+pre {
+  font-family:'Source Sans Pro', sans-serif;
+	font-size:13px;
+	position:relative;
+	z-index: 1;
+}
+
 @pre {
   height: 500px;
 }
@@ -66,6 +73,7 @@ template .right-input {
   font-size: 20px;
   display: inline-block;
   cursor: default;
+  z-index: 5;
 }
 
 .fab span{

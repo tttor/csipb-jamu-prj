@@ -5,7 +5,7 @@
   </div>
 </div>
 
-<div *ngIf="show">
+<div style="z-index:10000; position: fixed" *ngIf="show">
   <a style="color:white" pageScroll href="#metadataText" class="btn fab6 text-center">
     <span class="text-center" style="padding-top:3px">MetaText</span></a>
   <a style="color:white" pageScroll href="#connectivityText" class="btn fab5 text-center">
@@ -206,11 +206,11 @@
   <div class="row" *ngIf="show">
     <!-- The summary output //////////////////////////////////////////////// -->
     <div>
-      <div class="card card-2" id="summary">
+      <div style="z-index:500; position: relative" class="card card-2" id="summary">
         <!-- <font color="#696969">_____________________________________________________________________________________________________________________________________</font> -->
 
       <div class="text-center col-md-12"><h2><strong>Summary</strong></h2></div>
-      <div class="col-md-4">
+      <div style="z-index:500; position: relative" class="col-md-4">
         <pre [innerHTML]="summaryTxtOutput" style="height:190px"></pre>
       </div>
       <div class="col-md-4">
@@ -230,7 +230,7 @@
       <br /> -->
 
       <!-- The multi-partite graph output ////////////////////////////////// -->
-      <div class="card card-2" id="connectivityGraph">
+      <div style="z-index:500; position: relative" class="card card-2" id="connectivityGraph">
       <div class="text-center col-md-12">
         <h2><strong>Connectivity Graph</strong></h2>
       </div>
@@ -238,12 +238,12 @@
     </div>
 
       <!-- Connectivity Text Output //////////////////////////////////////// -->
-      <div class="card card-2" id="connectivityText">
+      <div style="z-index:500; position: relative" class="card card-2" id="connectivityText">
       <div class="text-center col-md-12">
         <h2><strong>Connectivity Text</strong></h2>
       </div>
 
-      <div class="col-md-4" *ngIf="!plaVScomSwapped">
+      <div style="z-index:500; position: relative" class="col-md-4" *ngIf="!plaVScomSwapped">
         Plant - Compound Connectivity:
           <button style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer; color: blue"
           (click)="toggleConnectivitySwap('plaVScom')">
@@ -251,7 +251,7 @@
           </button>
         <pre [innerHTML]="plaVScomTxtOutput" style="height:800px"></pre>
       </div>
-      <div class="col-md-4" *ngIf="plaVScomSwapped">
+      <div style="z-index:500; position: relative" class="col-md-4" *ngIf="plaVScomSwapped">
         Compound - Plant Connectivity:
         <button style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer; color: blue"
           (click)="toggleConnectivitySwap('plaVScom')">
@@ -260,7 +260,7 @@
         <pre [innerHTML]="comVSplaTxtOutput" style="height:800px"></pre>
       </div>
 
-      <div class="col-md-4" *ngIf="!comVSproSwapped">
+      <div style="z-index:500; position: relative" class="col-md-4" *ngIf="!comVSproSwapped">
         Compound - Protein Connectivity:
           <button style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer; color: blue"
           (click)="toggleConnectivitySwap('comVSpro')">
@@ -268,7 +268,7 @@
           </button>
         <pre [innerHTML]="comVSproTxtOutput" style="height:800px"></pre>
       </div>
-      <div class="col-md-4" *ngIf="comVSproSwapped">
+      <div style="z-index:500; position: relative" class="col-md-4" *ngIf="comVSproSwapped">
         Protein - Compound Connectivity:
         <button style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer; color: blue"
           (click)="toggleConnectivitySwap('comVSpro')">
@@ -277,7 +277,7 @@
         <pre [innerHTML]="proVScomTxtOutput" style="height:800px"></pre>
       </div>
 
-      <div class="col-md-4" *ngIf="!proVSdisSwapped">
+      <div style="z-index:500; position: relative" class="col-md-4" *ngIf="!proVSdisSwapped">
         Protein - Disease Connectivity:
           <button style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer; color: blue"
           (click)="toggleConnectivitySwap('proVSdis')">
@@ -285,7 +285,7 @@
           </button>
         <pre [innerHTML]="proVSdisTxtOutput" style="height:800px"></pre>
       </div>
-      <div class="col-md-4" *ngIf="proVSdisSwapped">
+      <div style="z-index:500; position: relative" class="col-md-4" *ngIf="proVSdisSwapped">
         Disease - Protein Connectivity:
         <button style="background:none!important; border:none; padding:0!important; font: inherit; border-bottom:0px solid #444; cursor: pointer; color: blue"
           (click)="toggleConnectivitySwap('proVSdis')">
@@ -294,35 +294,35 @@
         <pre [innerHTML]="disVSproTxtOutput" style="height:800px"></pre>
       </div>
 
-      <div class="col-md-4" *ngIf="!plaVScomSwapped">
+      <div style="z-index:500; position: relative" class="col-md-4" *ngIf="!plaVScomSwapped">
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('plant_vs_compound')">Download Plant-Compound Connectivity</button>
       </div>
-      <div class="col-md-4" *ngIf="plaVScomSwapped">
+      <div style="z-index:500; position: relative" class="col-md-4" *ngIf="plaVScomSwapped">
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('compound_vs_plant')">Download Compound-Plant Connectivity</button>
       </div>
 
-      <div class="col-md-4" *ngIf="!comVSproSwapped">
+      <div style="z-index:500; position: relative" class="col-md-4" *ngIf="!comVSproSwapped">
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('compound_vs_protein')">Download Compound-Protein Connectivity</button>
       </div>
-      <div class="col-md-4" *ngIf="comVSproSwapped">
+      <div style="z-index:500; position: relative" class="col-md-4" *ngIf="comVSproSwapped">
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('protein_vs_compound')">Download Protein-Compound Connectivity</button>
       </div>
 
-      <div class="col-md-4" *ngIf="!proVSdisSwapped">
+      <div style="z-index:500; position: relative" class="col-md-4" *ngIf="!proVSdisSwapped">
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('protein_vs_disease')">Download Protein-Disease Connectivity</button>
       </div>
-      <div class="col-md-4" *ngIf="proVSdisSwapped">
+      <div style="z-index:500; position: relative" class="col-md-4" *ngIf="proVSdisSwapped">
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('disease_vs_protein')">Download Disease-Protein Connectivity</button>
       </div>
       <br />
     </div>
 
       <!-- Metadata Text Output /////////////////////////////////////////// -->
-      <div class="card card-2" id="metadataText">
+      <div style="z-index:500; position: relative" class="card card-2" id="metadataText">
       <div class="text-center col-md-12">
         <h2><strong>Metadata Text</strong></h2>
       </div>
-      <div class="col-md-3">
+      <div style="z-index:500; position: relative" class="col-md-3">
         Plant Metadata
         <pre [innerHTML]="plaMetaTxtOutput" style="height:800px"></pre>
       </div>
@@ -330,27 +330,27 @@
         Compound Metadata
         <pre [innerHTML]="comMetaTxtOutput" style="height:800px"></pre>
       </div>
-      <div class="col-md-3">
+      <div style="z-index:500; position: relative" class="col-md-3">
         Protein Metadata
         <pre [innerHTML]="proMetaTxtOutput" style="height:800px"></pre>
       </div>
       <br />
-      <div class="col-md-3">
+      <div style="z-index:500; position: relative" class="col-md-3">
         Disease Metadata
         <pre [innerHTML]="disMetaTxtOutput" style="height:800px"></pre>
       </div>
       <br />
 
-      <div class="col-md-3">
+      <div style="z-index:500; position: relative" class="col-md-3">
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('plant')">Download Plant Meta</button>
       </div>
-      <div class="col-md-3">
+      <div style="z-index:500; position: relative" class="col-md-3">
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('compound')">Download Compound Meta</button>
       </div>
-      <div class="col-md-3">
+      <div style="z-index:500; position: relative" class="col-md-3">
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('protein')">Download Protein Meta</button>
       </div>
-      <div class="col-md-3">
+      <div style="z-index:500; position: relative" class="col-md-3">
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('disease')">Download Disease Meta</button>
       </div>
       <br />

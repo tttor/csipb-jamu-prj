@@ -16,10 +16,12 @@ html,body{
      text-shadow: 0 1px 1px rgba(255,255,255,.3);
 }
 
-pre {
+/*pre {
   font-family:'Source Sans Pro', sans-serif;
 	font-size:13px;
-}
+	position:relative;
+	z-index: 1;
+}*/
 
 p{line-height: 24px}
 a{color:#0088cc;}
