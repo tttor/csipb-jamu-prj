@@ -57,6 +57,7 @@
                <div *ngIf="noResultPlant===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
                </div>
+               <!-- <span id="iconSpan"><img src="app/home/cancel.png" onclick="reset()"/></span> -->
             </div>
           </div>
         </div>
@@ -184,7 +185,10 @@
 
   <div class="row" *ngIf="show">
     <!-- The controls buttons on bottom -->
-    <div style="z-index:10000000; position: fixed" class="card-fixed" id="summary">
+    <div style="z-index:10000000; position: fixed" class="card-fixed" id="buttoncard">
+      <div style="z-index:500; position: relative" class="col-md-1">
+        <button class="btn btn-danger col-md-12 text-center"(click)="backButtonCallback()">Back</button>
+      </div>
       <div style="z-index:500; position: relative" class="col-md-2">
         <a style="color:white" pageScroll href="#metadataText" class="btn btn-info col-md-12 text-center">MetaText</a>
       </div>
@@ -200,7 +204,7 @@
       <div style="z-index:500; position: relative" class="col-md-2">
         <button class="btn btn-danger col-md-12 text-center"(click)="filter()">Filter {{filterThreshold}}</button>
       </div>
-      <div style="z-index:500; position: relative" class="col-md-2">
+      <div style="z-index:500; position: relative" class="col-md-1">
         <button class="btn btn-danger col-md-12 text-center"(click)="reset()">Reset</button>
       </div>
       <div *ngIf="(this.mode.indexOf('predict')!==-1)" style="z-index:500; position: relative; padding-top:8px" class="col-md-12">

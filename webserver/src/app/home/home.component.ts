@@ -963,6 +963,11 @@ export class HomeComponent implements OnInit {
     this.filterThreshold = 0.0;
   }
 
+  // BACK-BUTTON METHOD ////////////////////////////////////////////////////////
+  public backButtonCallback() {
+    this.show = false;
+  }
+
   // EXAMPLE-BUTTON METHODS ////////////////////////////////////////////////////
   public exampleCallback(type) {
     this.reset();
