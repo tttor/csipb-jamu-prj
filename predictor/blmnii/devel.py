@@ -4,7 +4,7 @@ import numpy as np
 import json
 import time
 import sys
-import os
+
 import matplotlib.pyplot as plt
 from blm_ajm import BLMNII
 
@@ -13,37 +13,26 @@ from sklearn.model_selection import KFold
 from sklearn.model_selection import StratifiedKFold
 
 from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import average_precision_score
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import recall_score
-from sklearn.metrics import precision_score
 from sklearn.preprocessing import MinMaxScaler
-
-from scipy import interp
 
 sys.path.append('../../utility')
 import yamanishi_data_util as yam
 
-import blmnii
-#from scoop import futures as fu
 def main():
-    # Loocv only To Do added k-fold
     classParam = dict(name='blmnii',proba=True)
 
     if len(sys.argv)!=4:
         print "python blmniisvm_experiment.py [DataSetCode] [evalMode] [PathDirectory]"
         return
-    #Pick data set
 
     dataset = sys.argv[1]
     evalMode = sys.argv[2]
     generalPath = sys.argv[3]
-    # Set path to data set
+
     dataPath  = generalPath
     outPath = generalPath+"/hasil"
-################# TO DO Change this section using util
+
     print "Building Data"
     connMat,comList,proList = yam.loadComProConnMat(dataset,dataPath+"/Adjacency")
     kernel = yam.loadKernel(dataset,dataPath)
@@ -54,8 +43,8 @@ def main():
     nComp = len(comList)
     nProtein = len(proList)
 
-    comSimMat = np.zeros((len(comList),len(comList)), dtype=float)
-    proSimMat = np.zeros((len(proList),len(proList)), dtype=float)
+    comSimMat = np.zeros((nComp,nComp), dtype=float)
+    proSimMat = np.zeros((nProtein,nProtein), dtype=float)
     for row,i in enumerate(comList):
         for col,j in enumerate(comList):
             comSimMat[row][col] = kernel[(i,j)]
@@ -64,7 +53,15 @@ def main():
         for col,j in enumerate(proList):
             proSimMat[row][col] = kernel[(i,j)]
 
-    # Build list of pair...
+    # TO DO: Check eigen value of each matrix and do the following
+    #     epsilon = .1;
+    # while sum(eig(comp) >= 0) < compLength || isreal(eig(comp))==0
+    #     comp = comp + epsilon*eye(compLength);
+    # end
+    # while sum(eig(target) >= 0) < targetLength || isreal(eig(target))==0
+    #     target = target + epsilon*eye(targetLength);
+    # endd
+
     pairData = []
     connList = []
     print "Split Dataset..."
@@ -105,8 +102,8 @@ def main():
     print "Predicting..."
     for ii,i in enumerate(comTestList):
         for jj,j in enumerate(proTestList):
-            sys.stdout.write("\r"+str(jj+1) +" of "+str(len(proTestList)) +
-                                "||" + str(ii+1) +" of "+str(len(comTestList)))
+            sys.stdout.write("\r%03d of %03d||%03d of %03d" %
+                                (jj+1, len(proTestList), ii+1,len(comTestList),))
             sys.stdout.flush()
 
             predictor = BLMNII(classParam, connMat, comSimMat, proSimMat,
@@ -119,12 +116,10 @@ def main():
 #####################################################################
 
     print "\nCalculate Performance"
-    key = 'PredictionUsingBLM_NII' #<-- May use other method for comparison
+    key = 'PredictionUsingBLM_NII'
     precision, recall, _ = precision_recall_curve(testData, predRes)
     prAUC = average_precision_score(testData, predRes, average='micro')
 
-    #### Debugging
-    ####
     print "Visualiation"
     lineType = 'k-.'
 

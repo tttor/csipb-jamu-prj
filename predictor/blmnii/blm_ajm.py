@@ -58,7 +58,10 @@ class BLMNII:
         else:
 
             # timer = time.time()
+
+            # TO DO: Find better method to generate dataset
             pairIdList = util.randData(query,self._nPair)
+            
             # print "This section is running for "+str(time.time()-timer)+" seconds"
 
 
@@ -217,6 +220,7 @@ class BLMNII:
 def test():
     pairQuery = [('COM00000020','PRO00001846')]
     predictorTest = BLMNII(blmniiConfig)
+
     testRes = predictorTest.predict(pairQuery)
 
 
