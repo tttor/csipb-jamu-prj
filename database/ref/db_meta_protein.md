@@ -23,3 +23,9 @@ http://string-db.org/
 
 - [ ] molgen <br />
 http://cpdb.molgen.mpg.de/ <br />
+
+- [ ] David Database <br />
+https://david.ncifcrf.gov/summary.jsp <br />
+
+- [ ] GWAS Catalog <br />
+https://www.ebi.ac.uk/gwas/ <br />
