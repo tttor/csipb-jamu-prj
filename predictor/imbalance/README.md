@@ -8,7 +8,7 @@
     * anomaly detection, one-class learning or novelty detection
 * data-level
   * active learning
-    * SVM-based
+    * SVM-based: select samples near the classifier boundary
       * Ertekin, S (2007)
       * Ho, C (2011)
       * S. Tong (2002)
