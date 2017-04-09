@@ -5,9 +5,15 @@ if [ "$#" -ne 10 ]; then
   exit 1
 fi
 
-IJAH_SERVER=ijah@ijahserver
-IJAH_DIR=/home/ijah/ijah/web
-IJAH_DIR_STR='/home/ijah/ijah/web'
+# IJAH_SERVER=ijah@ijahserver
+# IJAH_DIR=/home/ijah/ijah/web
+# IJAH_DIR_STR='/home/ijah/ijah/web'
+# PREDICTOR_DIR=/home/ijah/ijah-predictor/python
+# BACKUP_DIR_STR='/home/ijah/ijah-backup/ijah-web-backup_'
+
+IJAH_SERVER=ijah@agri.web.id
+IJAH_DIR=/home/ijah/web/ijah.agri.web.id/public_html
+IJAH_DIR_STR='/home/ijah/web/ijah.agri.web.id/public_html'
 PREDICTOR_DIR=/home/ijah/ijah-predictor/python
 BACKUP_DIR_STR='/home/ijah/ijah-backup/ijah-web-backup_'
 
