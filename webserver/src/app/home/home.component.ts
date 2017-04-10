@@ -16,7 +16,8 @@ declare var saveAs: any;
 })
 export class HomeComponent implements OnInit {
   // public baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  public baseAPI = 'http://localhost/ijah-api/';
+  // public baseAPI = 'http://localhost/ijah-api/';
+  public baseAPI = 'http://ijah.agri.web.id/api/';
 
   // count number of input rows
   public nPlaInputHolders = 0;
@@ -307,6 +308,11 @@ export class HomeComponent implements OnInit {
       }
     }
   }
+
+  // public deletePlant(){
+  //    let index: number = this.selectedPlants.indexOf(this.pla_id);
+  //    this.selectedPlants.splice(index, 1);
+  // }
 
   // SEARCH+PREDICT METHODS ////////////////////////////////////////////////////
   public searchAndPredictButtonCallback() {
