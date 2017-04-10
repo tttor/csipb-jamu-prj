@@ -24,6 +24,7 @@
       <button class="btn btn-success"(click)="exampleCallback('protein')">Example #3a</button>
       <button class="btn btn-success"(click)="exampleCallback('disease')">Example #3b</button>
     </p>
+  <div class="card card-3">
     <div class="col-md-6">
       <div class="row text-center">
         <h3>
@@ -56,23 +57,12 @@
                        placeholder="LatinName IndonesianName"
                        (focus)="focusPlant(p.index)">
                 <span class="input-group-btn">
-                  <button class="btn btn-secondary btn-danger" type="button" (click)="deletePlant(p.index)"><img src="app/home/cancel2.png"></button>
+                  <button class="btn btn-secondary" type="button" (click)="deletePlant(p.index)"><img src="app/home/cancel.png"></button>
                 </span>
               </div>
-              <!-- <input [(ngModel)]="p.value"
-                     [typeahead]="plantSearch"
-                     [typeaheadItemTemplate]="customTanaman"
-                     [typeaheadOptionField]="'search'"
-                     [typeaheadOptionsLimit]="10"
-                     (typeaheadOnSelect)="selectPlant($event, p.index)"
-                     (typeaheadNoResults)="changeTypeaheadNoResults($event, 1)"
-                     class="form-control verticalLine1 hasclear"
-                     placeholder="LatinName IndonesianName"
-                     (focus)="focusPlant(p.index)"> -->
                <div *ngIf="noResultPlant===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
                </div>
-               <!-- <span id="iconSpan"><img src="app/home/cancel.png" onclick="reset()"/></span> -->
             </div>
           </div>
         </div>
@@ -103,19 +93,9 @@
                        placeholder="CAS PubchemName IUPACName"
                        (focus)="focusCompound(c.index)">
                 <span class="input-group-btn">
-                  <button class="btn btn-secondary btn-danger" type="button" (click)="deleteCompound(p.index)"><img src="app/home/cancel2.png"></button>
+                  <button class="btn btn-secondary" type="button" (click)="deleteCompound(p.index)"><img src="app/home/cancel.png"></button>
                 </span>
               </div>
-              <!-- <input [(ngModel)]="c.value"
-                     [typeahead]="compoundSearch"
-                     [typeaheadItemTemplate]="customCompound"
-                     [typeaheadOptionField]="'search'"
-                     [typeaheadOptionsLimit]="10"
-                     (typeaheadOnSelect)="selectCompound($event, c.index)"
-                     (typeaheadNoResults)="changeTypeaheadNoResults($event, 2)"
-                     class="form-control verticalLine2"
-                     placeholder="CAS PubchemName IUPACName"
-                     (focus)="focusCompound(c.index)"> -->
                <div *ngIf="noResultCompound===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
                </div>
@@ -157,19 +137,9 @@
                        placeholder="UniprotID UniprotAbbrv UniprotName"
                        (focus)="focusProtein(p.index)">
                 <span class="input-group-btn">
-                  <button class="btn btn-secondary btn-danger" type="button" (click)="deleteProtein(p.index)"><img src="app/home/cancel2.png"></button>
+                  <button class="btn btn-secondary" type="button" (click)="deleteProtein(p.index)"><img src="app/home/cancel.png"></button>
                 </span>
               </div>
-              <!-- <input [(ngModel)]="p.value"
-                     [typeahead]="proteinSearch"
-                     [typeaheadItemTemplate]="customProtein"
-                     [typeaheadOptionField]="'search'"
-                     [typeaheadOptionsLimit]="10"
-                     (typeaheadOnSelect)="selectProtein($event, p.index)"
-                     (typeaheadNoResults)="changeTypeaheadNoResults($event, 3)"
-                     class="form-control verticalLine3"
-                     placeholder="UniprotID UniprotAbbrv UniprotName"
-                     (focus)="focusProtein(p.index)"> -->
                <div *ngIf="noResultProtein===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
                </div>
@@ -203,19 +173,9 @@
                        placeholder="OmimID OmimName"
                        (focus)="focusDisease(d.index)">
                 <span class="input-group-btn">
-                  <button class="btn btn-secondary btn-danger" type="button" (click)="deleteDisease(p.index)"><img src="app/home/cancel2.png"></button>
+                  <button class="btn btn-secondary" type="button" (click)="deleteDisease(p.index)"><img src="app/home/cancel.png"></button>
                 </span>
               </div>
-              <!-- <input [(ngModel)]="d.value"
-                     [typeahead]="diseaseSearch"
-                     [typeaheadItemTemplate]="customDisease"
-                     [typeaheadOptionField]="'search'"
-                     [typeaheadOptionsLimit]="10"
-                     (typeaheadOnSelect)="selectDisease($event, d.index)"
-                     (typeaheadNoResults)="changeTypeaheadNoResults($event, 4)"
-                     class="form-control verticalLine4"
-                     placeholder="OmimID OmimName"
-                     (focus)="focusDisease(d.index)"> -->
                <div *ngIf="noResultDisease===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
                </div>
@@ -226,6 +186,7 @@
 
     </div>
   </div>
+</div>
 
   <br />
 
@@ -241,6 +202,11 @@
     <div class="col-md-2 col-md-offset-5">
       <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
     </div>
+  </div>
+
+  <div class=" fab fab6">
+    <span class="icon"></span>
+    <span>Add Formula</span>
   </div>
 
   <div class="row" *ngIf="show">

@@ -70,7 +70,7 @@ template .right-input {
   color: #FFF;
   box-shadow:0px 0px 3px rgba(0,0,0,0.5),3px 3px 3px rgba(0,0,0,0.25);
   position: fixed;
-  font-size: 18px;
+  font-size: 10px;
   display: inline-block;
   cursor: default;
   z-index: 5;
@@ -186,20 +186,32 @@ template .right-input {
 }
 
 .fab6{
-  background: #03A9F4;
-  width: 100px;
+  background: #5cb85c;
+  width: 160px;
   height: 40px;
   bottom: 0;
   right: 0;
-  margin-bottom: 350px;
+  margin-bottom: 0px;
+  margin-left: 1040px;
   margin-right: 25px;
   text-align:center;
+  vertical-align: middle;
+  padding-top: 7px;
+  padding-left: 20px;
   color: #FFF;
   box-shadow:0px 0px 3px rgba(0,0,0,0.5),3px 3px 3px rgba(0,0,0,0.25);
-  position: fixed;
-  font-size: 18px;
+  position: relative;
+  font-size: 15px;
   display: inline-block;
   cursor: default;
+}
+
+.fab6 span.icon {
+    background: url(./home/add.png) no-repeat;
+    float: left;
+    width: 20px;
+    height: 40px;
+    margin-top: 5px;
 }
 
 .fab6 span{
