@@ -44,19 +44,35 @@
               <template #customTanaman let-model="item" let-index="index">
                 <h5>{{model.pla_name}} <span *ngIf="model.pla_idr_name">|</span> {{model.pla_idr_name}}</h5>
               </template>
-              <input [(ngModel)]="p.value"
+              <div class="input-group">
+                <input [(ngModel)]="p.value"
+                       [typeahead]="plantSearch"
+                       [typeaheadItemTemplate]="customTanaman"
+                       [typeaheadOptionField]="'search'"
+                       [typeaheadOptionsLimit]="10"
+                       (typeaheadOnSelect)="selectPlant($event, p.index)"
+                       (typeaheadNoResults)="changeTypeaheadNoResults($event, 1)"
+                       class="form-control verticalLine1 hasclear"
+                       placeholder="LatinName IndonesianName"
+                       (focus)="focusPlant(p.index)">
+                <span class="input-group-btn">
+                  <button class="btn btn-secondary btn-danger" type="button"><img src="app/home/cancel2.png"></button>
+                </span>
+              </div>
+              <!-- <input [(ngModel)]="p.value"
                      [typeahead]="plantSearch"
                      [typeaheadItemTemplate]="customTanaman"
                      [typeaheadOptionField]="'search'"
                      [typeaheadOptionsLimit]="10"
                      (typeaheadOnSelect)="selectPlant($event, p.index)"
                      (typeaheadNoResults)="changeTypeaheadNoResults($event, 1)"
-                     class="form-control verticalLine1"
+                     class="form-control verticalLine1 hasclear"
                      placeholder="LatinName IndonesianName"
-                     (focus)="focusPlant(p.index)">
+                     (focus)="focusPlant(p.index)"> -->
                <div *ngIf="noResultPlant===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
                </div>
+               <!-- <span id="iconSpan"><img src="app/home/cancel.png" onclick="reset()"/></span> -->
             </div>
           </div>
         </div>
@@ -75,7 +91,22 @@
               <template #customCompound let-model="item" let-index="index">
                 <h5>{{model.com_cas_id}} <span *ngIf="model.com_pubchem_name">|</span> {{model.com_pubchem_name}} <span *ngIf="model.com_iupac_name">|</span> {{model.com_iupac_name}}</h5>
               </template>
-              <input [(ngModel)]="c.value"
+              <div class="input-group">
+                <input [(ngModel)]="c.value"
+                       [typeahead]="compoundSearch"
+                       [typeaheadItemTemplate]="customCompound"
+                       [typeaheadOptionField]="'search'"
+                       [typeaheadOptionsLimit]="10"
+                       (typeaheadOnSelect)="selectCompound($event, c.index)"
+                       (typeaheadNoResults)="changeTypeaheadNoResults($event, 2)"
+                       class="form-control verticalLine2"
+                       placeholder="CAS PubchemName IUPACName"
+                       (focus)="focusCompound(c.index)">
+                <span class="input-group-btn">
+                  <button class="btn btn-secondary btn-danger" type="button"><img src="app/home/cancel2.png"></button>
+                </span>
+              </div>
+              <!-- <input [(ngModel)]="c.value"
                      [typeahead]="compoundSearch"
                      [typeaheadItemTemplate]="customCompound"
                      [typeaheadOptionField]="'search'"
@@ -84,7 +115,7 @@
                      (typeaheadNoResults)="changeTypeaheadNoResults($event, 2)"
                      class="form-control verticalLine2"
                      placeholder="CAS PubchemName IUPACName"
-                     (focus)="focusCompound(c.index)">
+                     (focus)="focusCompound(c.index)"> -->
                <div *ngIf="noResultCompound===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
                </div>
@@ -114,7 +145,22 @@
               <template #customProtein let-model="item" let-index="index">
                 <h5>{{model.pro_uniprot_id}} <span *ngIf="model.pro_uniprot_abbrv">|</span> {{model.pro_uniprot_abbrv}} <span *ngIf="model.pro_name">|</span> {{model.pro_name}}</h5>
               </template>
-              <input [(ngModel)]="p.value"
+              <div class="input-group">
+                <input [(ngModel)]="p.value"
+                       [typeahead]="proteinSearch"
+                       [typeaheadItemTemplate]="customProtein"
+                       [typeaheadOptionField]="'search'"
+                       [typeaheadOptionsLimit]="10"
+                       (typeaheadOnSelect)="selectProtein($event, p.index)"
+                       (typeaheadNoResults)="changeTypeaheadNoResults($event, 3)"
+                       class="form-control verticalLine3"
+                       placeholder="UniprotID UniprotAbbrv UniprotName"
+                       (focus)="focusProtein(p.index)">
+                <span class="input-group-btn">
+                  <button class="btn btn-secondary btn-danger" type="button"><img src="app/home/cancel2.png"></button>
+                </span>
+              </div>
+              <!-- <input [(ngModel)]="p.value"
                      [typeahead]="proteinSearch"
                      [typeaheadItemTemplate]="customProtein"
                      [typeaheadOptionField]="'search'"
@@ -123,7 +169,7 @@
                      (typeaheadNoResults)="changeTypeaheadNoResults($event, 3)"
                      class="form-control verticalLine3"
                      placeholder="UniprotID UniprotAbbrv UniprotName"
-                     (focus)="focusProtein(p.index)">
+                     (focus)="focusProtein(p.index)"> -->
                <div *ngIf="noResultProtein===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
                </div>
@@ -145,7 +191,22 @@
               <template #customDisease let-model="item" let-index="index" class="right-input">
                 <h5>{{model.dis_omim_id}} | {{model.dis_name}}</h5>
               </template>
-              <input [(ngModel)]="d.value"
+              <div class="input-group">
+                <input [(ngModel)]="d.value"
+                       [typeahead]="diseaseSearch"
+                       [typeaheadItemTemplate]="customDisease"
+                       [typeaheadOptionField]="'search'"
+                       [typeaheadOptionsLimit]="10"
+                       (typeaheadOnSelect)="selectDisease($event, d.index)"
+                       (typeaheadNoResults)="changeTypeaheadNoResults($event, 4)"
+                       class="form-control verticalLine4"
+                       placeholder="OmimID OmimName"
+                       (focus)="focusDisease(d.index)">
+                <span class="input-group-btn">
+                  <button class="btn btn-secondary btn-danger" type="button"><img src="app/home/cancel2.png"></button>
+                </span>
+              </div>
+              <!-- <input [(ngModel)]="d.value"
                      [typeahead]="diseaseSearch"
                      [typeaheadItemTemplate]="customDisease"
                      [typeaheadOptionField]="'search'"
@@ -154,7 +215,7 @@
                      (typeaheadNoResults)="changeTypeaheadNoResults($event, 4)"
                      class="form-control verticalLine4"
                      placeholder="OmimID OmimName"
-                     (focus)="focusDisease(d.index)">
+                     (focus)="focusDisease(d.index)"> -->
                <div *ngIf="noResultDisease===true" class="" style="">
                  <span style="color:red; font-size:13px">Sorry, unavailable, please try another input.</span>
                </div>
@@ -183,8 +244,11 @@
   </div>
 
   <div class="row" *ngIf="show">
-    <!-- The controls buttons on bottom -->
-    <div style="z-index:10000000; position: fixed" class="card-fixed" id="summary">
+    <!-- The control buttons on bottom -->
+    <div style="z-index:10000000; position: fixed" class="card-fixed" id="buttoncard">
+      <div style="z-index:500; position: relative" class="col-md-1">
+        <button class="btn btn-danger col-md-12 text-center"(click)="backButtonCallback()">Back</button>
+      </div>
       <div style="z-index:500; position: relative" class="col-md-2">
         <a style="color:white" pageScroll href="#metadataText" class="btn btn-info col-md-12 text-center">MetaText</a>
       </div>
@@ -200,11 +264,11 @@
       <div style="z-index:500; position: relative" class="col-md-2">
         <button class="btn btn-danger col-md-12 text-center"(click)="filter()">Filter {{filterThreshold}}</button>
       </div>
-      <div style="z-index:500; position: relative" class="col-md-2">
+      <div style="z-index:500; position: relative" class="col-md-1">
         <button class="btn btn-danger col-md-12 text-center"(click)="reset()">Reset</button>
       </div>
       <div *ngIf="(this.mode.indexOf('predict')!==-1)" style="z-index:500; position: relative; padding-top:8px" class="col-md-12">
-        <button class="btn btn-danger col-md-4 col-md-offset-4 text-center"(click)="predictMore()">Predict Again</button>
+        <button class="btn btn-danger col-md-4 col-md-offset-4 text-center"(click)="predictMore()">Predict More</button>
       </div>
     </div>
 
