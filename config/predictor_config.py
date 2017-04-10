@@ -14,5 +14,6 @@ blmniiConfig = dict(name='blmnii',weight=0.6,batchSize=1,
 ## Common params
 predictorConfig = dict()
 predictorConfig['maxElapsedTime'] = 7 # in seconds
-predictorConfig['methods'] = [kronRLSConfig,blmniiConfig,rndlyConfig]
+# predictorConfig['methods'] = [kronRLSConfig,blmniiConfig,rndlyConfig]
+predictorConfig['methods'] = [rndlyConfig]
 predictorConfig['trainingDataSources'] = ['drugbank.ca']

@@ -5,10 +5,16 @@ if [ "$#" -ne 10 ]; then
   exit 1
 fi
 
-IJAH_SERVER=ijah@ijahserver
-IJAH_DIR=/home/ijah/ijah/web
-IJAH_DIR_STR='/home/ijah/ijah/web'
-PREDICTOR_DIR=/home/ijah/ijah-predictor/python
+# IJAH_SERVER=ijah@ijahserver
+# IJAH_DIR=/home/ijah/ijah/web
+# IJAH_DIR_STR='/home/ijah/ijah/web'
+# PREDICTOR_DIR=/home/ijah/ijah-predictor/python
+# BACKUP_DIR_STR='/home/ijah/ijah-backup/ijah-web-backup_'
+
+IJAH_SERVER=ijah@agri.web.id
+IJAH_DIR=/home/ijah/ijahweb
+IJAH_DIR_STR='/home/ijah/ijahweb'
+PREDICTOR_DIR=/home/ijah/ijahpredictor
 BACKUP_DIR_STR='/home/ijah/ijah-backup/ijah-web-backup_'
 
 # backup
@@ -61,7 +67,7 @@ fi
 # predictor
 if [ $8 -ne 0 ]; then
   echo "#######################################################################"
-  echo 'Have you set the _DBlink_ at database_config.py? [0/1]'
+  echo 'Have you set the _DBlink_ at config/credential.py? [0/1]'
   read predictorConfigSet
   if [ "$predictorConfigSet" -ne 0 ]; then
     echo "deploying predictors ..."
