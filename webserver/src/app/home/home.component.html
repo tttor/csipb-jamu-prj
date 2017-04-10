@@ -56,7 +56,7 @@
                        placeholder="LatinName IndonesianName"
                        (focus)="focusPlant(p.index)">
                 <span class="input-group-btn">
-                  <button class="btn btn-secondary btn-danger" type="button"><img src="app/home/cancel2.png"></button>
+                  <button class="btn btn-secondary btn-danger" type="button" (click)="deletePlant(p.index)"><img src="app/home/cancel2.png"></button>
                 </span>
               </div>
               <!-- <input [(ngModel)]="p.value"
@@ -103,7 +103,7 @@
                        placeholder="CAS PubchemName IUPACName"
                        (focus)="focusCompound(c.index)">
                 <span class="input-group-btn">
-                  <button class="btn btn-secondary btn-danger" type="button"><img src="app/home/cancel2.png"></button>
+                  <button class="btn btn-secondary btn-danger" type="button" (click)="deleteCompound(p.index)"><img src="app/home/cancel2.png"></button>
                 </span>
               </div>
               <!-- <input [(ngModel)]="c.value"
@@ -157,7 +157,7 @@
                        placeholder="UniprotID UniprotAbbrv UniprotName"
                        (focus)="focusProtein(p.index)">
                 <span class="input-group-btn">
-                  <button class="btn btn-secondary btn-danger" type="button"><img src="app/home/cancel2.png"></button>
+                  <button class="btn btn-secondary btn-danger" type="button" (click)="deleteProtein(p.index)"><img src="app/home/cancel2.png"></button>
                 </span>
               </div>
               <!-- <input [(ngModel)]="p.value"
@@ -203,7 +203,7 @@
                        placeholder="OmimID OmimName"
                        (focus)="focusDisease(d.index)">
                 <span class="input-group-btn">
-                  <button class="btn btn-secondary btn-danger" type="button"><img src="app/home/cancel2.png"></button>
+                  <button class="btn btn-secondary btn-danger" type="button" (click)="deleteDisease(p.index)"><img src="app/home/cancel2.png"></button>
                 </span>
               </div>
               <!-- <input [(ngModel)]="d.value"
