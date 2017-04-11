@@ -15,7 +15,7 @@ export class DownloadComponent implements OnInit {
   constructor(public route: ActivatedRoute, private http: Http) {
     // this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
     // this.baseAPI = 'http://ijah.agri.web.id/api/';
-    this.baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
+    this.baseAPI = 'http://localhost/ijah-api/'; // Comment this if you run online!
   }
 
   public ngOnInit() {
