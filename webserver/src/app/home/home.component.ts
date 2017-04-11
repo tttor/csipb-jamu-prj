@@ -318,25 +318,25 @@ export class HomeComponent implements OnInit {
   }
 
   public deletePlant(index) {
-    console.log(index);
+    // console.log(index);
     this.selectedPlants.splice(index, 1);
     this.plaInputHolders.splice(index, 1);
   }
 
   public deleteCompound(index) {
-    console.log(index);
+    // console.log(index);
     this.selectedCompounds.splice(index, 1);
     this.comInputHolders.splice(index, 1);
   }
 
   public deleteProtein(index) {
-    console.log(index);
+    // console.log(index);
     this.selectedProteins.splice(index, 1);
     this.proInputHolders.splice(index, 1);
   }
 
   public deleteDisease(index) {
-    console.log(index);
+    // console.log(index);
     this.selectedDiseases.splice(index, 1);
     this.disInputHolders.splice(index, 1);
   }

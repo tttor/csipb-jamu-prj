@@ -102,7 +102,7 @@
                        [disabled]="comInputHoldersDisabled[c.index]"
                        >
                 <span class="input-group-btn">
-                  <button class="btn btn-secondary" type="button" (click)="deleteCompound(p.index)"><img src="assets/img/cancel.png"></button>
+                  <button class="btn btn-secondary" type="button" (click)="deleteCompound(c.index)"><img src="assets/img/cancel.png"></button>
                 </span>
               </div>
                <div *ngIf="noResultCompound===true" class="" style="">
@@ -186,7 +186,7 @@
                        [disabled]="disInputHoldersDisabled[d.index]"
                        >
                 <span class="input-group-btn">
-                  <button class="btn btn-secondary" type="button" (click)="deleteDisease(p.index)"><img src="assets/img/cancel.png"></button>
+                  <button class="btn btn-secondary" type="button" (click)="deleteDisease(d.index)"><img src="assets/img/cancel.png"></button>
                 </span>
               </div>
                <div *ngIf="noResultDisease===true" class="" style="">
