@@ -207,7 +207,7 @@ template .right-input {
 }
 
 .fab6 span.icon {
-    background: url(./home/add.png) no-repeat;
+    /*background: url(./home/add.png) no-repeat;*/
     float: left;
     width: 20px;
     height: 40px;
