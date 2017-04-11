@@ -25,6 +25,11 @@
       <button class="btn btn-success"(click)="exampleCallback('disease')">Example #3b</button>
     </p>
   <div class="card card-3">
+    <div class="row text-center">
+      <h3>
+        Formula 1
+      </h3>
+    </div>
     <div class="col-md-6">
       <div class="row text-center">
         <h3>
@@ -196,17 +201,19 @@
         <button class="form-control btn btn-success" (click)="searchAndPredictButtonCallback()"> Search <span *ngIf="(this.selectedPlants.length!==0 || this.selectedCompounds.length!==0) && (this.selectedProteins.length!==0 || this.selectedDiseases.length!==0)">and Predict</span></button>
       </a>
     </div>
+    <div class="col-md-2 col-md-offset-2" style="margin-right: 0px">
+      <!-- <div class="fab fab6"> -->
+      <button class="form-control btn btn-success">
+        <span class="glyphicon glyphicon-plus"></span>
+            More Formula
+    </button>
+    </div>
   </div>
   <br />
   <div class="row" *ngIf="!show">
     <div class="col-md-2 col-md-offset-5">
       <button class="form-control btn btn-danger" (click)="reset()">Reset</button>
     </div>
-  </div>
-
-  <div class=" fab fab6">
-    <span class="icon"></span>
-    <span>Add Formula</span>
   </div>
 
   <div class="row" *ngIf="show">
