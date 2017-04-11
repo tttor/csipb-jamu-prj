@@ -1016,6 +1016,10 @@ export class HomeComponent implements OnInit {
           { index: 2, value : 'Momordica charantia | Pare'},
           { index: 3, value : 'Zingiber officinale | Jahe'},
           { index: 4, value : ''}];
+          this.plaInputHoldersDisabled[0] = true;
+          this.plaInputHoldersDisabled[1] = true;
+          this.plaInputHoldersDisabled[2] = true;
+          this.plaInputHoldersDisabled[3] = true;
       this.selectedPlants =
           [{index: 0, value: 'PLA00003831'},
           {index: 1, value: 'PLA00000683'},
@@ -1029,6 +1033,9 @@ export class HomeComponent implements OnInit {
           { index: 1, value : '304800 | Diabetes insipidus, nephrogenic, X-linked'},
           { index: 2, value : '612227 | Diabetes mellitus, ketosis-prone'},
           { index: 3, value : ''}];
+          this.disInputHoldersDisabled[0] = true;
+          this.disInputHoldersDisabled[1] = true;
+          this.disInputHoldersDisabled[2] = true;
       this.selectedDiseases =
           [{ index: 0, value : 'DIS00000073'},
           { index: 1, value : 'DIS00000749'},
@@ -1046,6 +1053,10 @@ export class HomeComponent implements OnInit {
           { index: 2, value : 'Momordica charantia | Pare'},
           { index: 3, value : 'Zingiber officinale | Jahe'},
           { index: 4, value : ''}];
+          this.plaInputHoldersDisabled[0] = true;
+          this.plaInputHoldersDisabled[1] = true;
+          this.plaInputHoldersDisabled[2] = true;
+          this.plaInputHoldersDisabled[3] = true;
       this.selectedPlants =
           [{index: 0, value: 'PLA00003831'},
           {index: 1, value: 'PLA00000683'},
@@ -1059,6 +1070,9 @@ export class HomeComponent implements OnInit {
           { index: 1, value : 'P16410 | CTLA4_HUMAN | Cytotoxic T-lymphocyte protein 4'},
           { index: 2, value : 'O43316 | PAX4_HUMAN | Paired box protein Pax-4'},
           { index: 3, value : ''}];
+          this.proInputHoldersDisabled[0] = true;
+          this.proInputHoldersDisabled[1] = true;
+          this.proInputHoldersDisabled[2] = true;
       this.selectedProteins =
           [{ index: 0, value : 'PRO00000343'},
           { index: 1, value : 'PRO00000283'},
@@ -1076,6 +1090,10 @@ export class HomeComponent implements OnInit {
           { index: 2, value : '18446-73-6 | Tembetarine | (1S)-1-[(3-hydroxy-4-methoxyphenyl)methyl]-6-methoxy-2,2-dimethyl-3,4-dihydro-1H-isoquinolin-2-ium-7-ol'},  // tslint:disable-line
           { index: 3, value : '644-30-4 | Curcumene | 1-methyl-4-(6-methylhept-5-en-2-yl)benzene'},  // tslint:disable-line
           { index: 4, value : ''}];
+          this.comInputHoldersDisabled[0] = true;
+          this.comInputHoldersDisabled[1] = true;
+          this.comInputHoldersDisabled[2] = true;
+          this.comInputHoldersDisabled[3] = true;
       this.selectedCompounds =
           [{ index: 0, value : 'COM00008027'},
           { index: 1, value : 'COM00021005'},
@@ -1089,6 +1107,9 @@ export class HomeComponent implements OnInit {
           { index: 1, value : 'P20309 | Muscarinic acetylcholine receptor M3'},
           { index: 2, value : 'Q99720 | Sigma non-opioid intracellular receptor 1'},
           { index: 3, value : ''}];
+          this.proInputHoldersDisabled[0] = true;
+          this.proInputHoldersDisabled[1] = true;
+          this.proInputHoldersDisabled[2] = true;
       this.selectedProteins =
           [{ index: 0, value : 'PRO00000040'},
           { index: 1, value : 'PRO00000452'},
@@ -1106,7 +1127,15 @@ export class HomeComponent implements OnInit {
           { index: 2, value : '18446-73-6 | Tembetarine | (1S)-1-[(3-hydroxy-4-methoxyphenyl)methyl]-6-methoxy-2,2-dimethyl-3,4-dihydro-1H-isoquinolin-2-ium-7-ol'},  // tslint:disable-line
           { index: 3, value : '644-30-4 | Curcumene | 1-methyl-4-(6-methylhept-5-en-2-yl)benzene'},
           { index: 4, value : ''}];
-      this.selectedCompounds = [{ index: 1, value : 'COM00008027'}, { index: 2, value : 'COM00021005'}, { index: 3, value : 'COM00009696'}, { index: 4, value : 'COM00020511'}]; // tslint:disable-line
+          this.comInputHoldersDisabled[0] = true;
+          this.comInputHoldersDisabled[1] = true;
+          this.comInputHoldersDisabled[2] = true;
+          this.comInputHoldersDisabled[3] = true;
+      this.selectedCompounds =
+          [{ index: 1, value : 'COM00008027'},
+          { index: 2, value : 'COM00021005'},
+          { index: 3, value : 'COM00009696'},
+          { index: 4, value : 'COM00020511'}];
       this.nComInputHolders = 5;
 
       this.disInputHolders =
@@ -1114,6 +1143,9 @@ export class HomeComponent implements OnInit {
           { index: 1, value : '304800 | Diabetes insipidus, nephrogenic, X-linked'},
           { index: 2, value : '612227 | Diabetes mellitus, ketosis-prone'},
           { index: 3, value : ''}];
+          this.disInputHoldersDisabled[0] = true;
+          this.disInputHoldersDisabled[1] = true;
+          this.disInputHoldersDisabled[2] = true;
       this.selectedDiseases =
           [{ index: 0, value : 'DIS00000073'},
           { index: 1, value : 'DIS00000749'},
@@ -1132,6 +1164,11 @@ export class HomeComponent implements OnInit {
           { index: 3, value : 'Anacardium occidentale | Jambu monyet'},
           { index: 4, value : 'Cocos nucifera | Kelapa'},
           { index: 5, value : ''}];
+          this.plaInputHoldersDisabled[0] = true;
+          this.plaInputHoldersDisabled[1] = true;
+          this.plaInputHoldersDisabled[2] = true;
+          this.plaInputHoldersDisabled[3] = true;
+          this.plaInputHoldersDisabled[4] = true;
       this.selectedPlants =
           [{index: 0, value: 'PLA00000007'},
           {index: 1, value: 'PLA00001504'},
@@ -1151,6 +1188,10 @@ export class HomeComponent implements OnInit {
           { index: 2, value : '334-48-5 | Decanoic acid | decanoic acid'},
           { index: 3, value : '480-41-1 | Naringenin | (2S)-5,7-dihydroxy-2-(4-hydroxyphenyl)-2,3-dihydrochromen-4-one'},   // tslint:disable-line
           { index: 4, value : ''}];
+          this.comInputHoldersDisabled[0] = true;
+          this.comInputHoldersDisabled[1] = true;
+          this.comInputHoldersDisabled[2] = true;
+          this.comInputHoldersDisabled[3] = true;
       this.selectedCompounds =
           [{ index: 0, value : 'COM00004561'},
           { index: 1, value : 'COM00001997'},
@@ -1170,6 +1211,10 @@ export class HomeComponent implements OnInit {
           { index: 2, value : 'P02452 | CO1A1_HUMAN | Collagen alpha-1(I) chain'},
           { index: 3, value : 'Q9UHD2 | TBK1_HUMAN | Serine/threonine-protein kinase TBK1'},
           { index: 4, value : ''}];
+          this.proInputHoldersDisabled[0] = true;
+          this.proInputHoldersDisabled[1] = true;
+          this.proInputHoldersDisabled[2] = true;
+          this.proInputHoldersDisabled[3] = true;
       this.selectedProteins =
           [{ index: 0, value : 'PRO00002168'},
           { index: 1, value : 'PRO00000061'},
@@ -1189,7 +1234,11 @@ export class HomeComponent implements OnInit {
           { index: 2, value : '610551 | Herpes simplex encephalitis 1'},
           { index: 3, value : '156610 | Skin creases, congenital symmetric circumferential, 1'},
           { index: 4, value : '166710 | Osteoporosis'},
-          { index: 5, value : ''}];
+          { index: 5, value : ''}];this.disInputHoldersDisabled[0] = true;
+          this.disInputHoldersDisabled[1] = true;
+          this.disInputHoldersDisabled[2] = true;
+          this.disInputHoldersDisabled[3] = true;
+          this.disInputHoldersDisabled[4] = true;
       this.selectedDiseases =
           [{ index: 0, value : 'DIS00000470'},
           { index: 1, value : 'DIS00001061'},
