@@ -64,7 +64,7 @@
                        [disabled]="plaInputHoldersDisabled[p.index]"
                        >
                 <span class="input-group-btn">
-                  <button class="btn btn-secondary" type="button" (click)="deletePlant(p.index)"><img src="app/home/cancel.png"></button>
+                  <button class="btn btn-secondary" type="button" (click)="deletePlant(p.index)"><img src="assets/img/cancel.png"></button>
                 </span>
               </div>
                <div *ngIf="noResultPlant===true" class="" style="">
@@ -102,7 +102,7 @@
                        [disabled]="comInputHoldersDisabled[c.index]"
                        >
                 <span class="input-group-btn">
-                  <button class="btn btn-secondary" type="button" (click)="deleteCompound(p.index)"><img src="app/home/cancel.png"></button>
+                  <button class="btn btn-secondary" type="button" (click)="deleteCompound(p.index)"><img src="assets/img/cancel.png"></button>
                 </span>
               </div>
                <div *ngIf="noResultCompound===true" class="" style="">
@@ -148,7 +148,7 @@
                        [disabled]="proInputHoldersDisabled[p.index]"
                        >
                 <span class="input-group-btn">
-                  <button class="btn btn-secondary" type="button" (click)="deleteProtein(p.index)"><img src="app/home/cancel.png"></button>
+                  <button class="btn btn-secondary" type="button" (click)="deleteProtein(p.index)"><img src="assets/img/cancel.png"></button>
                 </span>
               </div>
                <div *ngIf="noResultProtein===true" class="" style="">
@@ -186,7 +186,7 @@
                        [disabled]="disInputHoldersDisabled[d.index]"
                        >
                 <span class="input-group-btn">
-                  <button class="btn btn-secondary" type="button" (click)="deleteDisease(p.index)"><img src="app/home/cancel.png"></button>
+                  <button class="btn btn-secondary" type="button" (click)="deleteDisease(p.index)"><img src="assets/img/cancel.png"></button>
                 </span>
               </div>
                <div *ngIf="noResultDisease===true" class="" style="">
@@ -212,8 +212,7 @@
     <div class="col-md-2 col-md-offset-2" style="margin-right: 0px">
       <!-- <div class="fab fab6"> -->
       <button class="form-control btn btn-success">
-        <span class="glyphicon glyphicon-plus"></span>
-            More Formula
+          +  More Formula
     </button>
     </div>
   </div>
