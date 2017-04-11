@@ -16,8 +16,8 @@ declare var saveAs: any;
 })
 export class HomeComponent implements OnInit {
   // public baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  // public baseAPI = 'http://ijah.agri.web.id/api/';
-  public baseAPI = 'http://localhost/ijah-api/';
+  public baseAPI = 'http://ijah.agri.web.id/api/';
+  // public baseAPI = 'http://localhost/ijah-api/';
 
   // count number of input rows
   public nPlaInputHolders = 0;
@@ -28,6 +28,10 @@ export class HomeComponent implements OnInit {
   public comInputHolders = [];
   public proInputHolders = [];
   public disInputHolders = [];
+  public plaInputHoldersDisabled = [];
+  public comInputHoldersDisabled = [];
+  public proInputHoldersDisabled = [];
+  public disInputHoldersDisabled = [];
 
   // active variable
   public activeTanaman = true;
@@ -241,27 +245,31 @@ export class HomeComponent implements OnInit {
   }
 
   // INPUT HANDLING METHODS ////////////////////////////////////////////////////
-  public selectPlant(e: any, index): void {
+  public selectPlant(e: any, index, ab): void {
     if (index !== this.nPlaInputHolders) {
       this.selectedPlants.push({ index: this.nPlaInputHolders, value : e.item.pla_id});
+      this.plaInputHoldersDisabled[index] = true;
     }
   }
 
   public selectCompound(e: any, index): void {
     if (index !== this.nComInputHolders) {
       this.selectedCompounds.push({ index: this.nComInputHolders, value : e.item.com_id});
+      this.comInputHoldersDisabled[index] = true;
     }
   }
 
   public selectProtein(e: any, index): void {
     if (index !== this.nProInputHolders) {
       this.selectedProteins.push({ index: this.nProInputHolders, value : e.item.pro_id});
+      this.proInputHoldersDisabled[index] = true;
     }
   }
 
   public selectDisease(e: any, index): void {
     if (index !== this.nDisInputHolders) {
       this.selectedDiseases.push({ index: this.nDisInputHolders, value : e.item.dis_id});
+      this.disInputHoldersDisabled[index] = true;
     }
   }
 
@@ -956,6 +964,10 @@ export class HomeComponent implements OnInit {
     this.comInputHolders = [{ index: this.nComInputHolders, value : ''}];
     this.proInputHolders = [{ index: this.nProInputHolders, value : ''}];
     this.disInputHolders = [{ index: this.nDisInputHolders, value : ''}];
+    this.plaInputHoldersDisabled = [];
+    this.comInputHoldersDisabled = [];
+    this.proInputHoldersDisabled = [];
+    this.disInputHoldersDisabled = [];
 
     this.selectedPlants = [];
     this.selectedCompounds = [];

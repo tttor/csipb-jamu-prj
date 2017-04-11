@@ -60,7 +60,9 @@
                        (typeaheadNoResults)="changeTypeaheadNoResults($event, 1)"
                        class="form-control verticalLine1 hasclear"
                        placeholder="LatinName IndonesianName"
-                       (focus)="focusPlant(p.index)">
+                       (focus)="focusPlant(p.index)"
+                       [disabled]="plaInputHoldersDisabled[p.index]"
+                       >
                 <span class="input-group-btn">
                   <button class="btn btn-secondary" type="button" (click)="deletePlant(p.index)"><img src="app/home/cancel.png"></button>
                 </span>
@@ -96,7 +98,9 @@
                        (typeaheadNoResults)="changeTypeaheadNoResults($event, 2)"
                        class="form-control verticalLine2"
                        placeholder="CAS PubchemName IUPACName"
-                       (focus)="focusCompound(c.index)">
+                       (focus)="focusCompound(c.index)"
+                       [disabled]="comInputHoldersDisabled[c.index]"
+                       >
                 <span class="input-group-btn">
                   <button class="btn btn-secondary" type="button" (click)="deleteCompound(p.index)"><img src="app/home/cancel.png"></button>
                 </span>
@@ -140,7 +144,9 @@
                        (typeaheadNoResults)="changeTypeaheadNoResults($event, 3)"
                        class="form-control verticalLine3"
                        placeholder="UniprotID UniprotAbbrv UniprotName"
-                       (focus)="focusProtein(p.index)">
+                       (focus)="focusProtein(p.index)"
+                       [disabled]="proInputHoldersDisabled[p.index]"
+                       >
                 <span class="input-group-btn">
                   <button class="btn btn-secondary" type="button" (click)="deleteProtein(p.index)"><img src="app/home/cancel.png"></button>
                 </span>
@@ -176,7 +182,9 @@
                        (typeaheadNoResults)="changeTypeaheadNoResults($event, 4)"
                        class="form-control verticalLine4"
                        placeholder="OmimID OmimName"
-                       (focus)="focusDisease(d.index)">
+                       (focus)="focusDisease(d.index)"
+                       [disabled]="disInputHoldersDisabled[d.index]"
+                       >
                 <span class="input-group-btn">
                   <button class="btn btn-secondary" type="button" (click)="deleteDisease(p.index)"><img src="app/home/cancel.png"></button>
                 </span>
