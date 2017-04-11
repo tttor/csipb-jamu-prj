@@ -1024,8 +1024,7 @@ export class HomeComponent implements OnInit {
           [{index: 0, value: 'PLA00003831'},
           {index: 1, value: 'PLA00000683'},
           {index: 2, value: 'PLA00002036'},
-          {index: 3, value: 'PLA00001034'},
-          { index: 4, value : ''}];
+          {index: 3, value: 'PLA00001034'}];
       this.nDisInputHolders = 5;
 
       this.disInputHolders =
@@ -1039,8 +1038,7 @@ export class HomeComponent implements OnInit {
       this.selectedDiseases =
           [{ index: 0, value : 'DIS00000073'},
           { index: 1, value : 'DIS00000749'},
-          { index: 2, value : 'DIS00000365'},
-          { index: 3, value : ''}];
+          { index: 2, value : 'DIS00000365'}];
       this.nDisInputHolders = 4;
 
       this.activeCompound = false;
@@ -1061,8 +1059,7 @@ export class HomeComponent implements OnInit {
           [{index: 0, value: 'PLA00003831'},
           {index: 1, value: 'PLA00000683'},
           {index: 2, value: 'PLA00002036'},
-          {index: 3, value: 'PLA00001034'},
-          { index: 4, value : ''}];
+          {index: 3, value: 'PLA00001034'}];
       this.nDisInputHolders = 5;
 
       this.proInputHolders =
@@ -1076,8 +1073,7 @@ export class HomeComponent implements OnInit {
       this.selectedProteins =
           [{ index: 0, value : 'PRO00000343'},
           { index: 1, value : 'PRO00000283'},
-          { index: 2, value : 'PRO00002960'},
-          { index: 3, value : ''}];
+          { index: 2, value : 'PRO00002960'}];
       this.nProInputHolders = 4;
 
       this.activeDisease = false;
@@ -1098,8 +1094,7 @@ export class HomeComponent implements OnInit {
           [{ index: 0, value : 'COM00008027'},
           { index: 1, value : 'COM00021005'},
           { index: 2, value : 'COM00009696'},
-          { index: 3, value : 'COM00020511'},
-          { index: 4, value : ''}];
+          { index: 3, value : 'COM00020511'}];
       this.nComInputHolders = 5;
 
       this.proInputHolders =
@@ -1113,8 +1108,7 @@ export class HomeComponent implements OnInit {
       this.selectedProteins =
           [{ index: 0, value : 'PRO00000040'},
           { index: 1, value : 'PRO00000452'},
-          { index: 2, value : 'PRO00000377'},
-          { index: 3, value : ''}];
+          { index: 2, value : 'PRO00000377'}];
       this.nProInputHolders = 4;
 
       this.activeTanaman = false;
@@ -1149,8 +1143,7 @@ export class HomeComponent implements OnInit {
       this.selectedDiseases =
           [{ index: 0, value : 'DIS00000073'},
           { index: 1, value : 'DIS00000749'},
-          { index: 2, value : 'DIS00000365'},
-          { index: 3, value : ''}];
+          { index: 2, value : 'DIS00000365'}];
       this.nDisInputHolders = 4;
 
       this.activeTanaman = false;
@@ -1174,8 +1167,7 @@ export class HomeComponent implements OnInit {
           {index: 1, value: 'PLA00001504'},
           {index: 2, value: 'PLA00001838'},
           {index: 3, value: 'PLA00004093'},
-          {index: 4, value: 'PLA00001600'},
-          { index: 5, value : ''}];
+          {index: 4, value: 'PLA00001600'}];
       this.nPlaInputHolders = 5;
 
       this.activeCompound = false;
@@ -1196,8 +1188,7 @@ export class HomeComponent implements OnInit {
           [{ index: 0, value : 'COM00004561'},
           { index: 1, value : 'COM00001997'},
           { index: 2, value : 'COM00000363'},
-          { index: 3, value : 'COM00003074'},
-          { index: 4, value : ''}];
+          { index: 3, value : 'COM00003074'}];
       this.nComInputHolders = 4;
 
       this.activeDisease = false;
@@ -1219,8 +1210,7 @@ export class HomeComponent implements OnInit {
           [{ index: 0, value : 'PRO00002168'},
           { index: 1, value : 'PRO00000061'},
           { index: 2, value : 'PRO00000261'},
-          { index: 3, value : 'PRO00001836'},
-          { index: 4, value : ''}];
+          { index: 3, value : 'PRO00001836'}];
       this.nProInputHolders = 4;
 
       this.activeDisease = false;
@@ -1245,8 +1235,7 @@ export class HomeComponent implements OnInit {
           { index: 1, value : 'DIS00001061'},
           { index: 2, value : 'DIS00000900'},
           { index: 3, value : 'DIS00001455'},
-          { index: 4, value : 'DIS00003892'},
-          { index: 5, value : ''}];
+          { index: 4, value : 'DIS00003892'}];
       this.nDisInputHolders = 5;
 
       this.activeProtein = false;
