@@ -1,0 +1,471 @@
+<div class="col-md-10 col-md-offset-1">
+<h1 class="text-center">Upload</h1><br />
+
+  <form (ngSubmit)="onSubmit()" class="ui form">
+    <div class="card card-4">
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="subject">Type:</label>
+        </div>
+        <div class="col-md-10">
+          Connectivity: <br />
+          <input type="radio"
+               id="typePlaCom"
+               value="plant_vs_compound"
+               [(ngModel)]="type"
+               name="subject" required> Plant-Compound
+          <input type="radio"
+               id="typeComPro"
+               value="compound_vs_protein"
+               [(ngModel)]="type"
+               name="subject" required> Compound-Protein
+          <input type="radio"
+               id="typeProDis"
+               value="protein_vs_disease"
+               [(ngModel)]="type"
+               name="subject" required> Protein-Disease
+               <br /> <br />
+          Metadata: <br />
+          <input type="radio"
+               id="typePla"
+               value="plant"
+               [(ngModel)]="type"
+               name="subject" required> Plant
+          <input type="radio"
+               id="typeCom"
+               value="compound"
+               [(ngModel)]="type"
+               name="subject" required> Compound
+          <input type="radio"
+               id="typePro"
+               value="protein"
+               [(ngModel)]="type"
+               name="subject" required> Protein
+          <input type="radio"
+               id="typeDis"
+               value="disease"
+               [(ngModel)]="type"
+               name="subject" required> Disease
+        </div>
+      </div>
+
+    <div *ngIf="type === 'plant_vs_compound'">
+      <br />
+      <h4> Add New Plant vs Compound Connectivity</h4>
+      <br />
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="contentPlaCom1">Plant Name:</label>
+        </div>
+        <div class="col-md-8">
+          <input type="text"
+                 id="contentPlaCom1"
+                 [(ngModel)]="content1"
+                 class="form-control"
+                 placeholder="Latin Name or Indonesian Name"
+                 name="content1" required>
+        </div>
+      </div>
+      <br />
+
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="contentPlaCom2">Compound Name:</label>
+        </div>
+        <div class="col-md-8">
+          <input type="text"
+                 id="contentPlaCom2"
+                 [(ngModel)]="content2"
+                 class="form-control"
+                 placeholder="CAS ID or Pubchem Name or IUPAC Name or Other Names"
+                 name="content2" required>
+        </div>
+      </div>
+      <br />
+
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="descriptionPlaCom">Connectivity Details:</label>
+        </div>
+        <div class="col-md-10">
+          <textarea type="text"
+               id="descriptionPlaCom"
+               [(ngModel)]="description"
+               class="form-control"
+               placeholder="More Plant-Compound Connectivity Description Here"
+               name="description" required
+               cols="50" rows="5">
+          </textarea>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="type === 'compound_vs_protein'">
+      <br />
+      <h4>Add New Compound vs Protein Connectivity</h4>
+      <br />
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="contentComPro1">Compound Name:</label>
+        </div>
+        <div class="col-md-8">
+          <input type="text"
+                 id="contentComPro1"
+                 [(ngModel)]="content1"
+                 class="form-control"
+                 placeholder="CAS ID or Pubchem Name or IUPAC Name or Other Names"
+                 name="content1" required>
+        </div>
+      </div>
+      <br />
+
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="contentComPro2">Protein Name:</label>
+        </div>
+        <div class="col-md-8">
+          <input type="text"
+                 id="contentComPro2"
+                 [(ngModel)]="content2"
+                 class="form-control"
+                 placeholder="Uniprot ID or Uniprot Abbreviation or Uniprot Name or Other Names"
+                 name="content2" required>
+        </div>
+      </div>
+      <br />
+
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="descriptionComPro">Connectivity Details:</label>
+        </div>
+        <div class="col-md-10">
+          <textarea type="text"
+               id="descriptionComPro"
+               [(ngModel)]="description"
+               class="form-control"
+               placeholder="More Compound-Protein Connectivity Description Here"
+               name="description" required
+               cols="50" rows="5">
+          </textarea>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="type === 'protein_vs_disease'">
+      <br />
+      <h4>Add New Protein vs Disease Connectivity</h4>
+      <br />
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="contentProDis1">Protein Name:</label>
+        </div>
+        <div class="col-md-8">
+          <input type="text"
+                 id="contentProDis1"
+                 [(ngModel)]="content1"
+                 class="form-control"
+                 placeholder="Uniprot ID or Uniprot Abbreviation or Uniprot Name or Other Names"
+                 name="content1" required>
+        </div>
+      </div>
+      <br />
+
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="contentProDis2">Disease Name:</label>
+        </div>
+        <div class="col-md-8">
+          <input type="text"
+                 id="contentProDis2"
+                 [(ngModel)]="content2"
+                 class="form-control"
+                 placeholder="OMIM ID or OMIM Name or Other Names"
+                 name="content2" required>
+        </div>
+      </div>
+      <br />
+
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="descriptionProDis">Connectivity Details:</label>
+        </div>
+        <div class="col-md-10">
+          <textarea type="text"
+               id="descriptionProDis"
+               [(ngModel)]="description"
+               class="form-control"
+               placeholder="More Protein-Disease Connectivity Description Here"
+               name="description" required
+               cols="50" rows="5">
+          </textarea>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="type === 'plant'">
+      <br />
+      <h4>Add New Plant Data</h4>
+      <br />
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="contentPlant">Plant Name:</label>
+        </div>
+        <div class="col-md-8">
+          <input type="text"
+                 id="contentPlant"
+                 [(ngModel)]="content1"
+                 class="form-control"
+                 placeholder="Latin Name or Indonesian Name"
+                 name="content1" required>
+        </div>
+      </div>
+      <br />
+
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="descriptionPlant">Plant Details:</label>
+        </div>
+        <div class="col-md-10">
+          <textarea type="text"
+               id="descriptionPlant"
+               [(ngModel)]="description"
+               class="form-control"
+               placeholder="More Plant Description Here"
+               name="description" required
+               cols="50" rows="5">
+          </textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <div *ngIf="type === 'compound'">
+      <br />
+      <h4>Add New Compound Data</h4>
+      <br />
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="contentCompound">Compound Name:</label>
+        </div>
+        <div class="col-md-8">
+          <input type="text"
+                 id="contentCompound"
+                 [(ngModel)]="content1"
+                 class="form-control"
+                 placeholder="CAS ID or Pubchem Name or IUPAC Name or Other Names"
+                 name="content1" required>
+        </div>
+      </div>
+      <br />
+
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="descriptionCompound">Compound Details:</label>
+        </div>
+        <div class="col-md-10">
+          <textarea type="text"
+               id="descriptionCompound"
+               [(ngModel)]="description"
+               class="form-control"
+               placeholder="More Compound Description Here"
+               name="description" required
+               cols="50" rows="5">
+          </textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <div *ngIf="type === 'protein'">
+      <br />
+      <h4>Add New Protein Data</h4>
+      <br />
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="contentProtein">Protein Name:</label>
+        </div>
+        <div class="col-md-8">
+          <input type="text"
+                 id="contentProtein"
+                 [(ngModel)]="content1"
+                 class="form-control"
+                 placeholder="Uniprot ID or Uniprot Abbreviation or Uniprot Name or Other Names"
+                 name="content1" required>
+        </div>
+      </div>
+      <br />
+
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="descriptionProtein">Protein Details:</label>
+        </div>
+        <div class="col-md-10">
+          <textarea type="text"
+               id="descriptionProtein"
+               [(ngModel)]="description"
+               class="form-control"
+               placeholder="More Protein Description Here"
+               name="description" required
+               cols="50" rows="5">
+          </textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <div *ngIf="type === 'disease'">
+      <br />
+      <h4>Add New Disease Data</h4>
+      <br />
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="contentDisease">Disease Name:</label>
+        </div>
+        <div class="col-md-8">
+          <input type="text"
+                 id="contentDisease"
+                 [(ngModel)]="content1"
+                 class="form-control"
+                 placeholder="OMIM ID or OMIM Name or Other Names"
+                 name="content1" required>
+        </div>
+      </div>
+      <br />
+
+      <div class="field" class="row">
+        <div class="col-md-2">
+          <label for="descriptionDisease">Disease Details:</label>
+        </div>
+        <div class="col-md-10">
+          <textarea type="text"
+               id="descriptionDisease"
+               [(ngModel)]="description"
+               class="form-control"
+               placeholder="More Disease Description Here"
+               name="description" required
+               cols="50" rows="5">
+          </textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-4">
+    <h4>Contributor Details</h4>
+    <br />
+    <div class="field" class="row">
+      <div class="col-md-2">
+        <label for="name">Name:</label>
+      </div>
+      <div class="col-md-6">
+        <input type="text"
+               id="name"
+               [(ngModel)]="name"
+               class="form-control"
+               placeholder="YourFirstName YourLastName"
+               name="name" required>
+      </div>
+    </div>
+    <br />
+
+    <div class="field" class="row">
+      <div class="col-md-2">
+        <label for="email">Email:</label>
+      </div>
+      <div class="col-md-6">
+        <input type="email"
+             id="email"
+             [(ngModel)]="email"
+             class="form-control"
+             placeholder="you@yourEmail"
+             name="email" required>
+      </div>
+    </div>
+    <br />
+
+    <div class="field" class="row">
+      <div class="col-md-2">
+        <label for="affiliation">Affiliation:</label>
+      </div>
+      <div class="col-md-6">
+        <input type="affiliation"
+             id="affiliation"
+             [(ngModel)]="affiliation"
+             class="form-control"
+             placeholder="Your university, organization, company, etc"
+             name="affiliation" required>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-4">
+    <h4>Publication Data</h4>
+    <br />
+
+    <div class="field" class="row">
+      <div class="col-md-2">
+        <label for="Title">Title:</label>
+      </div>
+      <div class="col-md-10">
+        <input type="text"
+               id="Title"
+               [(ngModel)]="publicationTitle"
+               class="form-control"
+               placeholder="Your Publication Title Here"
+               name="publicationTitle" required>
+      </div>
+    </div>
+    <br />
+
+    <div class="field" class="row">
+      <div class="col-md-2">
+        <label for="author">First Author:</label>
+      </div>
+      <div class="col-md-10">
+        <input type="text"
+             id="author"
+             [(ngModel)]="publicationAuthor"
+             class="form-control"
+             placeholder="First Author's Name"
+             name="publicationAuthor" required>
+      </div>
+    </div>
+    <br />
+
+    <div class="field" class="row">
+      <div class="col-md-2">
+        <label for="journal">Journal/Conference:</label>
+      </div>
+      <div class="col-md-10">
+        <input type="text"
+             id="journal"
+             [(ngModel)]="publicationJournal"
+             class="form-control"
+             placeholder="The Journal or Conference Where It Published"
+             name="publicationJournal" required>
+      </div>
+    </div>
+    <br />
+
+    <div class="field" class="row">
+      <div class="col-md-2">
+        <label for="link">DoI/Publication Link:</label>
+      </div>
+      <div class="col-md-10">
+        <input type="text"
+             id="link"
+             [(ngModel)]="publicationLink"
+             class="form-control"
+             placeholder="URL Of Your Publication"
+             name="publicationLink" required>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12 text-center">
+    <button type="submit" class="ui button btn btn-success">Submit</button>
+  </div>
+
+</form>
+
+</div>

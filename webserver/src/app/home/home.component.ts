@@ -16,8 +16,8 @@ declare var saveAs: any;
 })
 export class HomeComponent implements OnInit {
   // public baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  // public baseAPI = 'http://ijah.agri.web.id/api/';
-  public baseAPI = 'http://localhost/ijah-api/';
+  public baseAPI = 'http://ijah.agri.web.id/api/';
+  // public baseAPI = 'http://localhost/ijah-api/';
 
   // count number of input rows
   public nPlaInputHolders = 0;

@@ -25,6 +25,7 @@ import { AppState, InternalStateType } from './app.service';
 import { HomeComponent } from './home';
 import { ManualComponent } from './manual';
 import { DownloadComponent } from './download';
+import { UploadComponent } from './upload';
 import { HelpComponent } from './help';
 import { DisclaimerComponent } from './disclaimer';
 import { V1Component } from './v1';
@@ -53,6 +54,7 @@ type StoreType = {
     ManualComponent,
     HelpComponent,
     DownloadComponent,
+    UploadComponent,
     DisclaimerComponent,
     V1Component,
     ContactComponent,
