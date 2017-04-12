@@ -43,7 +43,7 @@
   $mail->FromName = 'Ijah Webserver';
   $mail->addAddress('vektor.dewanto@gmail.com');
   $mail->addCC('hzbarkan@gmail.com');
-  $mail->addCC('vlaatahzan@gmail.com');
+  $mail->addCC('w.ananta.kusuma@gmail.com');
 
   $mail->isHTML(false);
 
