@@ -110,7 +110,7 @@ export class DownloadComponent implements OnInit {
   private getFilename(type) {
     let prefix = 'ijah_all_';
     let suffix = '';
-    let ext = '.txt';
+    let ext = '.csv';
     let body = '';
     if (type === 'pla') {
       body = 'plant';
@@ -185,7 +185,7 @@ export class DownloadComponent implements OnInit {
           }
           txt = txt + '\n';
         }
-        let blob = new Blob([txt], {type: 'text/plain;charset=utf-8'});
+        let blob = new Blob([txt], {type: 'text/csv;charset=utf-8'});
         saveAs(blob, this.getFilename(type));
       });
   }
