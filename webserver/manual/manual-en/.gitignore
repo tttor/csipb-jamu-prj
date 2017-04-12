@@ -1,5 +1,2 @@
-*~
-*.aux
-*.bbl
-*.log
-*.blg
+build
+out

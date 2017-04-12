@@ -1,6 +1,9 @@
 # database_config.py
 from credential import *
 
+DB_MODE = 'server'
+# DB_MODE = 'local' # comment for running server
+
 DB_PASSWD = None
 DB_HOST = None
 if DB_MODE=='server':

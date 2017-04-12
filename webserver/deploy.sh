@@ -1,21 +1,21 @@
 #!/bin/bash
-if [ "$#" -ne 10 ]; then
+if [ "$#" -ne 12 ]; then
   echo "USAGE:"
-  echo "bash deploy.sh -bak [0/1] -web [0/1] -api [0/1] -predictor [0/1] -docker [0/1]"
+  echo "bash deploy.sh -bak [0/1] -web [0/1] -api [0/1] -pred [0/1] -rsc [0/1] -dock [0/1]"
   exit 1
 fi
 
-# IJAH_SERVER=ijah@ijahserver
-# IJAH_DIR=/home/ijah/ijah/web
-# IJAH_DIR_STR='/home/ijah/ijah/web'
-# PREDICTOR_DIR=/home/ijah/ijah-predictor/python
-# BACKUP_DIR_STR='/home/ijah/ijah-backup/ijah-web-backup_'
-
-IJAH_SERVER=ijah@agri.web.id
-IJAH_DIR=/home/ijah/ijahweb
-IJAH_DIR_STR='/home/ijah/ijahweb'
-PREDICTOR_DIR=/home/ijah/ijahpredictor
+SERVER=ijah@appcsserver
+WEB_DIR=/home/ijah/ijah/web
+WEB_DIR_STR='/home/ijah/ijah/web'
+PREDICTOR_DIR=/home/ijah/ijah-predictor/python
 BACKUP_DIR_STR='/home/ijah/ijah-backup/ijah-web-backup_'
+
+# SERVER=ijah@agri.web.id
+# WEB_DIR=/home/ijah/ijahweb
+# WEB_DIR_STR='/home/ijah/ijahweb'
+# PREDICTOR_DIR=/home/ijah/ijahpredictor
+# BACKUP_DIR_STR='/home/ijah/ijah-backup/ijah-web-backup_'
 
 # backup
 if [ $2 -ne 0 ]; then
@@ -23,22 +23,22 @@ if [ $2 -ne 0 ]; then
   echo "backing up _web_ only ..."
   stamp=`date +%Y-%m-%d-%H-%M-%S`
   copyCMD='cp -r'
-  cmd=$copyCMD' '$IJAH_DIR_STR' '$BACKUP_DIR_STR$stamp
-  ssh $IJAH_SERVER $cmd
+  cmd=$copyCMD' '$WEB_DIR_STR' '$BACKUP_DIR_STR$stamp
+  ssh $SERVER $cmd
 
   rmCMD='rm -rf'
-  arg1=$IJAH_DIR_STR'/main.*.bundle.js '
-  arg2=$IJAH_DIR_STR'/polyfills.*.bundle.js '
-  arg3=$IJAH_DIR_STR'/vendor.*.bundle.js '
-  arg4=$IJAH_DIR_STR'/main.*.bundle.map '
-  arg5=$IJAH_DIR_STR'/main.*.css '
+  arg1=$WEB_DIR_STR'/main.*.bundle.js '
+  arg2=$WEB_DIR_STR'/polyfills.*.bundle.js '
+  arg3=$WEB_DIR_STR'/vendor.*.bundle.js '
+  arg4=$WEB_DIR_STR'/main.*.bundle.map '
+  arg5=$WEB_DIR_STR'/main.*.css '
   cmd2=$rmCMD' '$arg1$arg2$arg3$arg4$arg5
-  ssh $IJAH_SERVER $cmd2
+  ssh $SERVER $cmd2
 fi
 
 # web: build the src in production stage
 if [ $4 -ne 0 ]; then
-  echo "#########################################################################"
+  echo "### WEB ###############################################################"
   echo 'Have you set the _version_ at app.component.html? [0/1]'
   read vSet
   echo 'Have you set the _baseAPI_ at home.component.ts _and_ download.component.ts? [0/1]'
@@ -47,20 +47,18 @@ if [ $4 -ne 0 ]; then
     echo 'Yeay, lets roll...'
     echo "building then deploying dist ..."
     npm run build:prod
-    scp -r dist/* $IJAH_SERVER:$IJAH_DIR
+    scp -r dist/* $SERVER:$WEB_DIR
   fi
 fi
 
 # api
 if [ $6 -ne 0 ]; then
-  echo "#######################################################################"
+  echo "#### API ##############################################################"
   echo 'Have you set the _DBlink_ at api/config.php? [0/1]'
   read dbLinkSet
   if [ "$dbLinkSet" -ne 0 ]; then
     echo "deploying APIs ..."
-    IJAH_MANUAL_ID=ijah_webserver_manual_id.pdf
-    cp manual/manual-id/out/$IJAH_MANUAL_ID api/$IJAH_MANUAL_ID
-    scp -r api/* $IJAH_SERVER:$IJAH_DIR/api
+    scp -r api/* $SERVER:$WEB_DIR/api
   fi
 fi
 
@@ -73,21 +71,30 @@ if [ $8 -ne 0 ]; then
     echo "deploying predictors ..."
 
     find ../predictor/ -name "*.pyc" -type f -delete
-    scp -r ../predictor/ $IJAH_SERVER:$PREDICTOR_DIR
+    scp -r ../predictor/ $SERVER:$PREDICTOR_DIR
 
     find ../utility/ -name "*.pyc" -type f -delete
-    scp -r ../utility/ $IJAH_SERVER:$PREDICTOR_DIR
+    scp -r ../utility/ $SERVER:$PREDICTOR_DIR
 
     find ../config/ -name "*.pyc" -type f -delete
-    scp -r ../config/ $IJAH_SERVER:$PREDICTOR_DIR
+    scp -r ../config/ $SERVER:$PREDICTOR_DIR
   fi
 fi
 
-# docker
+# resource
 if [ ${10} -ne 0 ]; then
-  echo "#######################################################################"
+  echo "### RSC ###############################################################"
+  echo "deploying resource files ..."
+  IJAH_MANUAL_ID=ijah_webserver_manual_id.pdf
+  cp manual/manual-id/out/$IJAH_MANUAL_ID rsc/$IJAH_MANUAL_ID
+  scp -r rsc/* $SERVER:$WEB_DIR/rsc
+fi
+
+# docker
+if [ ${12} -ne 0 ]; then
+  echo "### DOCKER ############################################################"
   echo "deploying docker files ..."
-  scp ../docker/sh/start.sh ../docker/sh/stop.sh ijah@ijahserver:/home/ijah/
-  # scp ../docker/dockerfile/webDockerfile ijah@ijahserver:/home/ijah/ijah/
-  # scp ../docker/dockerfile/predictorDockerfile ijah@ijahserver:/home/ijah/ijah-predictor
+  scp ../docker/sh/start.sh ../docker/sh/stop.sh $SERVER:/home/ijah/
+  # scp ../docker/dockerfile/webDockerfile $SERVER:/home/ijah/ijah/
+  # scp ../docker/dockerfile/predictorDockerfile $SERVER:/home/ijah/ijah-predictor
 fi

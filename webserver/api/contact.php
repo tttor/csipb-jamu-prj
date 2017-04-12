@@ -40,14 +40,14 @@
   $mail->Port = 465; // TCP port to connect, 465 for SSL, 587 for TLS
 
   $mail->From = 'ijahweb@gmail.com';
-  $mail->FromName = 'Ijah Webserver Feedback';
+  $mail->FromName = 'Ijah Webserver';
   $mail->addAddress('vektor.dewanto@gmail.com');
   $mail->addCC('hzbarkan@gmail.com');
-  $mail->addCC('vlaatahzan@gmail.com');
+  $mail->addCC('w.ananta.kusuma@gmail.com');
 
   $mail->isHTML(false);
 
-  $mail->Subject = "New Feedback from {$email}";
+  $mail->Subject = "ijahws: user-message: {$email}";
   $mail->Body    = "Name: {$name} \nE-mail: {$email} \nAffiliation: {$aff} \nFeedback Type: {$sbj} \n\nMessage: \n {$msg}";
 
   if(!$mail->send()) {

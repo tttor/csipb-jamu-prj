@@ -25,4 +25,25 @@ TCM-ID: http://bidd.nus.edu.sg/group/TCMsite/Default.aspx, <br />
 KTKP: http://www.koreantk.com, <br />
 KAMPO: http://www.kampo.ca.
 
+- [ ] Monograf biofarmaka untuk pengangan diabetes mellitus
+Author: Latifah K Darusman, et al  <br />
+Publisher: IPB Press
+
+- [ ] Daun jambu biji sebagai bahan baku obat
+Author:Sandra Aziz, Taopik Irawan <br />
+Publisher: IPB Press
+
+- [ ] Atlas Kromatografi Lapis Tipis Tumbuhan Obat Indonesia Vol 1
+Author: Mohamad Rafi, Rudi Heryanto, Deai Septaningsih <br />
+Publisher: IPB Press
+
+- [ ] Domestifikasi buah merah
+Author: Latifah K Darusman, et al  <br />
+Publisher: IPB Press
+
+- [ ] Taman terapi mandiri: diabetes melitus, jenis, fungsi, ...
+Author: Siti Sa'diyah et al <br />
+Publisher: IPB Press
+
+
 
