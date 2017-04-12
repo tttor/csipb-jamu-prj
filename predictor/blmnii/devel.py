@@ -22,16 +22,14 @@ import yamanishi_data_util as yam
 def main():
     classParam = dict(name='blmnii',proba=True)
 
-    if len(sys.argv)!=4:
-        print "python blmniisvm_experiment.py [DataSetCode] [evalMode] [PathDirectory]"
+    if len(sys.argv)!=5:
+        print "python blmniisvm_experiment.py [DataSetCode] [evalMode] [dataPath] [outPath]"
         return
 
     dataset = sys.argv[1]
     evalMode = sys.argv[2]
-    generalPath = sys.argv[3]
-
-    dataPath  = generalPath
-    outPath = generalPath+"/hasil"
+    dataPath = sys.argv[3]
+    outPath = sys.argv[4]
 
     print "Building Data"
     connMat,comList,proList = yam.loadComProConnMat(dataset,dataPath+"/Adjacency")
@@ -53,7 +51,7 @@ def main():
         for col,j in enumerate(proList):
             proSimMat[row][col] = kernel[(i,j)]
 
-    # TO DO: Check eigen value of each matrix and do the following
+    # TO DO: Check eigen value of each matrix by do the following:
     #     epsilon = .1;
     # while sum(eig(comp) >= 0) < compLength || isreal(eig(comp))==0
     #     comp = comp + epsilon*eye(compLength);
@@ -127,7 +125,7 @@ def main():
                  'lineType': lineType}
     perf2 = {'prAUC': prAUC, 'nTest': nComp*nProtein}
 
-    with open(outPath+'/'+ dataset +'_'+evalMode+'_perf.json', 'w') as fp:
+    with open(outPath+'perf_blmnii_'+evalMode+'_'+dataset+'_perf.json', 'w') as fp:
         json.dump(perf2, fp, indent=2, sort_keys=True)
 
     plt.clf()

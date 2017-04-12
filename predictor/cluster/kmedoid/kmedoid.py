@@ -11,7 +11,7 @@ import yamanishi_data_util as yam
 
 def main():
     if len(sys.argv)!=4:
-        print "Usage: python kmedoid.py [dataDir] [e|ic|gpcr|nr] [outputDir]"
+        print "Usage: python kmedoid.py [e|ic|gpcr|nr] [dataDir] [outputDir]"
         return
 
     dataPath = sys.argv[1]
@@ -22,9 +22,6 @@ def main():
     print "Preparing data"
     _,comList,proList = yam.loadComProConnMat(dataset,dataPath+"/Adjacency")
     kernel = yam.loadKernel(dataset,dataPath)
-
-    comListIdx = [i for i,_ in enumerate(comList)]
-    proListIdx = [i for i,_ in enumerate(proList)]
 
     nComp = len(comList)
     nProtein = len(proList)
@@ -76,10 +73,10 @@ def main():
     comCalinskiHarabaz = met.calinski_harabaz_score(comDisMat,comLabelList)
     proCalinskiHarabaz = met.calinski_harabaz_score(proDisMat,proLabelList)
 
-    print ("Silhouette score : Compound cluster = "+str(comSilhouette)+
+    print ("Silhouette score :\nCompound cluster = "+str(comSilhouette)+
             ",Protein cluster = "+str(proSilhouette))
 
-    print ("Calinski Harabaz score : Compound cluster = "+str(comCalinskiHarabaz)+
+    print ("Calinski Harabaz score :\nCompound cluster = "+str(comCalinskiHarabaz)+
             ", Protein cluster = "+str(proCalinskiHarabaz))
 
     print "Writing Output"
