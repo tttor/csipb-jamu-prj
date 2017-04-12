@@ -10,8 +10,8 @@ echo "Starting IJAH predictor server 0"
 
 serverId=0
 LBHostToListenFrom=0.0.0.0
-LBPortToListenFromLo=5010
-LBPortToListenFromHi=5050
+LBPortToListenFromLo=6010
+LBPortToListenFromHi=6050
 server=/ijah-predictor/predictor/server/server.py
 
 docker run --restart=always -d --name "ijah_predictor_0_daemon" -p $LBPortToListenFromLo-$LBPortToListenFromHi:$LBPortToListenFromLo-$LBPortToListenFromHi -v /home/ijah/ijah-predictor/python:/ijah-predictor ijahpredictor python -u $server $serverId $LBHostToListenFrom $LBPortToListenFromLo $LBPortToListenFromHi
@@ -55,9 +55,9 @@ echo "Starting IJAH load balancer..."
 
 phpApiHost=0.0.0.0
 phpApiPort=5000
-serverHost=172.18.79.22
-serverPortLo=5010 # must <= wrt smallest server port
-serverPortHi=5050 # must >= wrt biggest server port
+serverHost=172.18.31.115
+serverPortLo=6010 # must <= wrt smallest server port
+serverPortHi=6050 # must >= wrt biggest server port
 LB=/ijah-predictor/predictor/server/load_balancer.py
 
 docker run --restart=always -d --name "ijah_loadbalancer_daemon" -p $phpApiPort:$phpApiPort -v /home/ijah/ijah-predictor/python:/ijah-predictor ijahpredictor python -u $LB $phpApiHost $phpApiPort $serverHost $serverPortLo $serverPortHi

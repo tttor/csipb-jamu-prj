@@ -5,17 +5,17 @@ if [ "$#" -ne 10 ]; then
   exit 1
 fi
 
-# IJAH_SERVER=ijah@ijahserver
-# IJAH_DIR=/home/ijah/ijah/web
-# IJAH_DIR_STR='/home/ijah/ijah/web'
-# PREDICTOR_DIR=/home/ijah/ijah-predictor/python
-# BACKUP_DIR_STR='/home/ijah/ijah-backup/ijah-web-backup_'
-
-IJAH_SERVER=ijah@agri.web.id
-IJAH_DIR=/home/ijah/ijahweb
-IJAH_DIR_STR='/home/ijah/ijahweb'
-PREDICTOR_DIR=/home/ijah/ijahpredictor
+IJAH_SERVER=ijah@appcsserver
+IJAH_DIR=/home/ijah/ijah/web
+IJAH_DIR_STR='/home/ijah/ijah/web'
+PREDICTOR_DIR=/home/ijah/ijah-predictor/python
 BACKUP_DIR_STR='/home/ijah/ijah-backup/ijah-web-backup_'
+
+# IJAH_SERVER=ijah@agri.web.id
+# IJAH_DIR=/home/ijah/ijahweb
+# IJAH_DIR_STR='/home/ijah/ijahweb'
+# PREDICTOR_DIR=/home/ijah/ijahpredictor
+# BACKUP_DIR_STR='/home/ijah/ijah-backup/ijah-web-backup_'
 
 # backup
 if [ $2 -ne 0 ]; then
@@ -87,7 +87,7 @@ fi
 if [ ${10} -ne 0 ]; then
   echo "#######################################################################"
   echo "deploying docker files ..."
-  scp ../docker/sh/start.sh ../docker/sh/stop.sh ijah@ijahserver:/home/ijah/
-  # scp ../docker/dockerfile/webDockerfile ijah@ijahserver:/home/ijah/ijah/
-  # scp ../docker/dockerfile/predictorDockerfile ijah@ijahserver:/home/ijah/ijah-predictor
+  scp ../docker/sh/start.sh ../docker/sh/stop.sh $IJAH_SERVER:/home/ijah/
+  # scp ../docker/dockerfile/webDockerfile $IJAH_SERVER:/home/ijah/ijah/
+  # scp ../docker/dockerfile/predictorDockerfile $IJAH_SERVER:/home/ijah/ijah-predictor
 fi
