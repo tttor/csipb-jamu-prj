@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import { Http } from '@angular/http';
 import { AppState } from '../app.service';
+import { UserInput } from './userinput.interface';
 declare var saveAs: any;
 
 @Component({
@@ -18,6 +19,8 @@ export class HomeComponent implements OnInit {
   // public baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
   public baseAPI = 'http://ijah.agri.web.id/api/';
   // public baseAPI = 'http://localhost/ijah-api/';
+
+  public userinput: UserInput;
 
   // count number of input rows
   public nPlaInputHolders = 0;
@@ -89,6 +92,12 @@ export class HomeComponent implements OnInit {
   public elapsedTime = 0;
   public mode = 'unknown';
   public inputType = 'unknown';
+  public useCases = [
+    { value: 'default', display: '-- Select Usage Example --' },
+    { value: 'useCase1', display: 'Drug-side Input Only' },
+    { value: 'useCase2', display: 'Target-side Input Only' },
+    { value: 'useCase3', display: 'Both Drug-side and Target-side Input' }
+  ];
 
   public dataLocal = [];
   public typeaheadNoResults: boolean = false;
@@ -227,7 +236,9 @@ export class HomeComponent implements OnInit {
   }
 
   public ngOnInit() {
-    // Do nothing
+    this.userinput = {
+      useCase: 'default'
+    };
   }
 
   public changeTypeaheadNoResults(e: boolean, id): void {

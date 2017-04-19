@@ -14,16 +14,42 @@
 
 <div *ngIf="!click">
   <div class="row" *ngIf="!show">
-    <p class="contoh col-md-12 text-center">
-      <button class="btn btn-success"(click)="exampleCallback('plant_vs_disease')">Example #1a</button>
-      <button class="btn btn-success"(click)="exampleCallback('plant_vs_protein')">Example #1b</button>
-      <button class="btn btn-success"(click)="exampleCallback('compound_vs_protein')">Example #1c</button>
-      <button class="btn btn-success"(click)="exampleCallback('compound_vs_disease')">Example #1d</button>
-      <button class="btn btn-success"(click)="exampleCallback('plant')">Example #2a</button>
-      <button class="btn btn-success"(click)="exampleCallback('compound')">Example #2b</button>
-      <button class="btn btn-success"(click)="exampleCallback('protein')">Example #3a</button>
-      <button class="btn btn-success"(click)="exampleCallback('disease')">Example #3b</button>
-    </p>
+    <form class="form-horizontal">
+      <div class="form-group" style="width:60%; margin: 20px auto 20px auto;">
+        <label class="control-label col-md-2">Try Example:</label>
+        <div class="col-md-10">
+          <select name="useCase" class="form-control" [(ngModel)]="userinput.useCase">
+              <option *ngFor="let useCase of useCases" [value]="useCase.value">
+              {{useCase.display}}
+              </option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <div class="text-center" *ngIf="userinput.useCase === 'useCase1'">
+      <div class="btn-group">
+        <button type="button" class="btn btn-success"(click)="exampleCallback('plant')">Search from Plant Input</button>
+        <button type="button" class="btn btn-success"(click)="exampleCallback('compound')">Search from Compound Input</button>
+      </div>
+    </div>
+
+    <div class="text-center" *ngIf="userinput.useCase === 'useCase2'">
+      <div class="btn-group">
+        <button type="button" class="btn btn-success"(click)="exampleCallback('protein')">Search from Protein Input</button>
+        <button type="button" class="btn btn-success"(click)="exampleCallback('disease')">Search from Disease Input</button>
+      </div>
+    </div>
+
+    <div class="text-center" *ngIf="userinput.useCase === 'useCase3'">
+      <div class="btn-group">
+        <button type="button" class="btn btn-success"(click)="exampleCallback('plant_vs_disease')">Plant and Disease Input</button>
+        <button type="button" class="btn btn-success"(click)="exampleCallback('plant_vs_protein')">Plant and Protein Input</button>
+        <button type="button" class="btn btn-success"(click)="exampleCallback('compound_vs_protein')">Compound and Protein Input</button>
+        <button type="button" class="btn btn-success"(click)="exampleCallback('compound_vs_disease')">Compound and Disease Input</button>
+      </div>
+    </div>
+
   <div class="card card-3">
     <div class="row text-center">
       <h3>
