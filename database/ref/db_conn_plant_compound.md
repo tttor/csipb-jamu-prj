@@ -44,6 +44,3 @@ Publisher: IPB Press
 - [ ] Taman terapi mandiri: diabetes melitus, jenis, fungsi, ...
 Author: Siti Sa'diyah et al <br />
 Publisher: IPB Press
-
-
-
