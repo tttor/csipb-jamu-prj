@@ -10,6 +10,12 @@ import { Http
 import { ActivatedRoute
 } from '@angular/router';
 
+import { FileUploader
+} from 'ng2-file-upload';
+
+// const URL = 'https://evening-anchorage-3159.herokuapp.com/api/';
+const URL = 'http://localhost/ijah-api/';
+
 @Component({
   selector: 'upload',
   templateUrl: './upload.component.html',
@@ -28,12 +34,12 @@ export class UploadComponent implements OnInit {
   public publicationYear;
   public publicationJournal;
   public publicationLink;
-  public msg;
-  public subject;
+  public uploader: FileUploader = new FileUploader({url: URL});
+  public hasBaseDropZoneOver: boolean = false;
 
   // private baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  // private baseAPI ='http://localhost/ijah-api/';// Comment this if you run online!
-  private baseAPI = 'http://ijah.agri.web.id/api/';
+  private baseAPI = 'http://localhost/ijah-api/'; // Comment this if you run online!
+  // private baseAPI = 'http://ijah.agri.web.id/api/';
 
   constructor(public route: ActivatedRoute, private http: Http) {
     // Do nothing
@@ -49,8 +55,7 @@ export class UploadComponent implements OnInit {
                 description: this.description, name: this.name, email: this.email,
                 affiliation: this.affiliation, publication_detail: this.publicationTitle + ', '
                 + this.publicationAuthor + ', ' + this.publicationYear + ', '
-                + this.publicationJournal + ', ' + this.publicationLink,
-                message: this.msg, subject: this.subject};
+                + this.publicationJournal + ', ' + this.publicationLink};
     let dataStr = JSON.stringify(data);
     // console.log(dataStr);
 
@@ -73,8 +78,10 @@ export class UploadComponent implements OnInit {
     this.publicationYear = '';
     this.publicationJournal = '';
     this.publicationLink = '';
-    this.msg = '';
-    this.subject = '';
+  }
+
+  public fileOverBase(e: any): void {
+    this.hasBaseDropZoneOver = e;
   }
 
 }

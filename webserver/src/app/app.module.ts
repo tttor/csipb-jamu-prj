@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { TypeaheadModule } from 'ng2-bootstrap/typeahead';
 import { Ng2PageScrollModule } from 'ng2-page-scroll';
+import { FileUploadModule } from 'ng2-file-upload';
 import {
   NgModule,
   ApplicationRef
@@ -64,6 +65,7 @@ type StoreType = {
     BrowserModule,
     FormsModule,
     HttpModule,
+    FileUploadModule,
     Ng2PageScrollModule.forRoot(),
     TypeaheadModule.forRoot(),
     RouterModule.forRoot(ROUTES, { useHash: true, preloadingStrategy: PreloadAllModules })
