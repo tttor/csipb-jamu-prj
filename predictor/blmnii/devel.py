@@ -45,20 +45,16 @@ def main():
     proSimMat = np.zeros((nProtein,nProtein), dtype=float)
     for row,i in enumerate(comList):
         for col,j in enumerate(comList):
-            comSimMat[row][col] = kernel[(i,j)]
+            comSimMat[row][col] = (kernel[(i,j)]+kernel[(j,i)])/2
 
     for row,i in enumerate(proList):
         for col,j in enumerate(proList):
-            proSimMat[row][col] = kernel[(i,j)]
+            proSimMat[row][col] = (kernel[(i,j)]+kernel[(j,i)])/2
 
-    # TO DO: Check eigen value of each matrix by do the following:
-    #     epsilon = .1;
-    # while sum(eig(comp) >= 0) < compLength || isreal(eig(comp))==0
-    #     comp = comp + epsilon*eye(compLength);
-    # end
-    # while sum(eig(target) >= 0) < targetLength || isreal(eig(target))==0
-    #     target = target + epsilon*eye(targetLength);
-    # endd
+
+    comSimMat = regularizationKernel(comSimMat)
+    proSimMat = regularizationKernel(proSimMat)
+
 
     pairData = []
     connList = []
@@ -138,6 +134,21 @@ def main():
     plt.title('Precision-Recall Curve')
     plt.legend(loc="lower left")
     plt.savefig(outPath+'/'+ dataset +'_'+evalMode+'_pr_curve.png', bbox_inches='tight')
+
+# http://stackoverflow.com/questions/29644180/gram-matrix-kernel-in-svms-not-positive-semi-definite?rq=1
+def regularizationKernel(mat):
+    eps = 0.1
+    m,n = mat.shape
+    assert(m==n)
+    while isPSDKernel(mat) == False:
+        for i in range(m):
+            mat[i][i] = mat[i][i] + eps
+
+    return mat
+
+def isPSDKernel(mat,eps = 1e-8):
+  E,V = np.linalg.eigh(mat)
+  return np.all(E > -eps) and np.all(np.isreal(E))
 
 if __name__ == '__main__':
     main()

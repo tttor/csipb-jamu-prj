@@ -61,7 +61,7 @@ class BLMNII:
 
             # TO DO: Find better method to generate dataset
             pairIdList = util.randData(query,self._nPair)
-            
+
             # print "This section is running for "+str(time.time()-timer)+" seconds"
 
 
@@ -119,7 +119,6 @@ class BLMNII:
         nTrain = len(trainIndex)
         nTest = len(testIndex)
         nSource = len(sourceSim)
-
 
         intProfile = np.zeros(nTrain,dtype=float)
         neighbors = [j for i,j in enumerate(adjMatrix[sourceIndex]) if i in trainIndex]
