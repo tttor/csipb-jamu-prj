@@ -11,3 +11,6 @@ https://www.omim.org/entry/613347
 
 - [ ] ORPHA <br />
 http://www.orpha.net/consor/cgi-bin/index.php
+
+- [ ] others <br />
+focus on tropical diseases, e.g malaria

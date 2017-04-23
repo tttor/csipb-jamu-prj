@@ -16,6 +16,14 @@ http://www.theplantlist.org/  <br />
 http://www.ipni.org/index.html  <br />
 http://plants.jstor.org/
 
+- [ ] books <br />
+Buku Formularium Obat Asli Indonesia (Kementerian Kesehatan) <br />
+Materia Medika
+Farmakopi Herbal
+
 - [ ] others <br />
 bpom/farit raw data <br />
-sony's disertation
+sony's disertation <br />
+http://herbal-lawu.blogspot.co.id/2011/10/sembilan-tumbuhan-obat-unggulan.html <br />
+consider major,minor (percentage composition) compounds of a plant <br />
+focus on tropical plants

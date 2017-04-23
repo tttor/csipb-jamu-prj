@@ -2,6 +2,21 @@
 import numpy as np
 import sys
 
+def kernel2distanceMatrix(simMat,method):
+    # https://rdrr.io/cran/mmpp/man/k2d.html
+    m,n = simMat.shape
+    disMat = np.ones((m,n),dtype=float)
+
+    if method=='naive':
+        for i in range(m):
+            for j in range(n):
+                # d_n(x,y) = 1 - k(x,y)/sqrt{ k(x,x)k(y,y)},
+                disMat[i][j] = (1.0 - simMat[i][j])/np.sqrt(simMat[i][i]*simMat[j][j])
+    else:
+        assert False, 'FATAL: unkown method'
+
+    return disMat
+
 def getType(idStr):
     prefix1 = idStr[0:1]
     prefix1 = prefix1.upper()
