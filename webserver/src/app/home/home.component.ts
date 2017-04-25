@@ -237,7 +237,7 @@ export class HomeComponent implements OnInit {
 
   public ngOnInit() {
     this.userinput = {
-      useCase: 'default'
+      useCase: 'useCase3'
     };
   }
 

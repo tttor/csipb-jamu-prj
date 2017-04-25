@@ -196,7 +196,9 @@ Carousel
 	display: block;
 	clear: both;}
 
-
+	#inner {
+	  margin: 0 auto;
+	}
 
 /*Feature
 ==========================*/
