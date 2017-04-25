@@ -14,16 +14,36 @@
 
 <div *ngIf="!click">
   <div class="row" *ngIf="!show">
-    <p class="contoh col-md-12 text-center">
-      <button class="btn btn-success"(click)="exampleCallback('plant_vs_disease')">Example #1a</button>
-      <button class="btn btn-success"(click)="exampleCallback('plant_vs_protein')">Example #1b</button>
-      <button class="btn btn-success"(click)="exampleCallback('compound_vs_protein')">Example #1c</button>
-      <button class="btn btn-success"(click)="exampleCallback('compound_vs_disease')">Example #1d</button>
-      <button class="btn btn-success"(click)="exampleCallback('plant')">Example #2a</button>
-      <button class="btn btn-success"(click)="exampleCallback('compound')">Example #2b</button>
-      <button class="btn btn-success"(click)="exampleCallback('protein')">Example #3a</button>
-      <button class="btn btn-success"(click)="exampleCallback('disease')">Example #3b</button>
-    </p>
+    <form class="form-horizontal">
+      <div class="form-group" style="width:60%; margin: 20px auto 20px auto;">
+        <label class="control-label col-md-3">Select Example:</label>
+        <div class="col-md-8">
+          <select name="useCase" class="form-control" [(ngModel)]="userinput.useCase">
+              <option *ngFor="let useCase of useCases" [value]="useCase.value">
+              {{useCase.display}}
+              </option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <div class="text-center" *ngIf="userinput.useCase === 'useCase1'">
+      <button class="btn btn-success"(click)="exampleCallback('plant')">Plant Input</button>
+      <button class="btn btn-success"(click)="exampleCallback('compound')">Compound Input</button>
+    </div>
+
+    <div class="text-center" *ngIf="userinput.useCase === 'useCase2'">
+      <button class="btn btn-success"(click)="exampleCallback('protein')">Protein Input</button>
+      <button class="btn btn-success"(click)="exampleCallback('disease')">Disease Input</button>
+    </div>
+
+    <div class="text-center" *ngIf="userinput.useCase === 'useCase3'">
+      <button class="btn btn-success"(click)="exampleCallback('plant_vs_disease')">Plant and Disease Input</button>
+      <button class="btn btn-success"(click)="exampleCallback('plant_vs_protein')">Plant and Protein Input</button>
+      <button class="btn btn-success"(click)="exampleCallback('compound_vs_protein')">Compound and Protein Input</button>
+      <button class="btn btn-success"(click)="exampleCallback('compound_vs_disease')">Compound and Disease Input</button>
+    </div>
+
   <div class="card card-3">
     <div class="row text-center">
       <h3>
@@ -224,32 +244,45 @@
   </div>
 
   <div class="row" *ngIf="show">
-    <!-- The control buttons on bottom -->
-    <div style="z-index:10000000; position: fixed" class="card-fixed" id="buttoncard">
-      <div style="z-index:500; position: relative" class="col-md-1">
-        <button class="btn btn-danger col-md-12 text-center"(click)="backButtonCallback()">Back</button>
-      </div>
-      <div style="z-index:500; position: relative" class="col-md-2">
-        <a style="color:white" pageScroll href="#metadataText" class="btn btn-info col-md-12 text-center">MetaText</a>
-      </div>
-      <div style="z-index:500; position: relative" class="col-md-2">
-        <a style="color:white" pageScroll href="#connectivityText" class="btn btn-info col-md-12 text-center">ConnText</a>
-      </div>
-      <div style="z-index:500; position: relative" class="col-md-2">
-        <a style="color:white" pageScroll href="#connectivityGraph" class="btn btn-info col-md-12 text-center">ConnGraph</a>
-      </div>
-      <div style="z-index:500; position: relative" class="col-md-2">
-        <a style="color:white" pageScroll href="#top" class="btn btn-info col-md-12 text-center">Summary</a>
-      </div>
-      <div style="z-index:500; position: relative" class="col-md-2">
-        <button class="btn btn-danger col-md-12 text-center"(click)="filter()">Filter {{filterThreshold}}</button>
-      </div>
-      <div style="z-index:500; position: relative" class="col-md-1">
-        <button class="btn btn-danger col-md-12 text-center"(click)="reset()">Reset</button>
-      </div>
-      <div *ngIf="(this.mode.indexOf('predict')!==-1)" style="z-index:500; position: relative; padding-top:8px" class="col-md-12">
-        <button class="btn btn-danger col-md-4 col-md-offset-4 text-center"(click)="predictMore()">Predict More</button>
-      </div>
+    <!-- The control buttons on bottom ///////////////////////////////////// -->
+    <!-- First row ///////////////////////////////////////////////////////// -->
+      <div style="z-index:10000000; position: fixed" class="card-fixed" id="buttoncard">
+        <div class="row">
+          <div class="col-md-10 col-md-offset-1">
+            <div style="z-index:500; position: relative" class="col-md-3">
+              <a style="color:white" pageScroll href="#metadataText" class="btn btn-info col-md-12 text-center">MetaText</a>
+            </div>
+            <div style="z-index:500; position: relative" class="col-md-3">
+              <a style="color:white" pageScroll href="#connectivityText" class="btn btn-info col-md-12 text-center">ConnText</a>
+            </div>
+            <div style="z-index:500; position: relative" class="col-md-3">
+              <a style="color:white" pageScroll href="#connectivityGraph" class="btn btn-info col-md-12 text-center">ConnGraph</a>
+            </div>
+            <div style="z-index:500; position: relative" class="col-md-3">
+              <a style="color:white" pageScroll href="#top" class="btn btn-info col-md-12 text-center">Summary</a>
+            </div>
+          </div>
+        </div>
+      <!-- Second row ////////////////////////////////////////////////////// -->
+        <div class="row">
+          <div *ngIf="(this.mode.indexOf('predict')==-1)" style="z-index:500; position: relative; padding-top:8px"
+          class="col-md-8 col-md-offset-3">
+            <div class="btn-toolbar text-center">
+              <button class="btn btn-danger col-md-3 text-center"(click)="backButtonCallback()">Back</button>
+              <button class="btn btn-danger col-md-3 text-center"(click)="filter()">Filter {{filterThreshold}}</button>
+              <button class="btn btn-danger col-md-3 text-center"(click)="reset()">Reset</button>
+            </div>
+          </div>
+          <div *ngIf="(this.mode.indexOf('predict')!==-1)" style="z-index:500; position: relative; padding-top:8px;
+          margin-left:21.3%" class="col-md-8">
+            <div class="btn-toolbar text-center">
+              <button class="btn btn-danger col-md-2 text-center"(click)="backButtonCallback()">Back</button>
+              <button class="btn btn-danger col-md-3 text-center"(click)="filter()">Filter {{filterThreshold}}</button>
+              <button class="btn btn-danger col-md-3 text-center"(click)="predictMore()">Predict More</button>
+              <button class="btn btn-danger col-md-2 text-center"(click)="reset()">Reset</button>
+            </div>
+          </div>
+        </div>
     </div>
 
     <!-- The summary output //////////////////////////////////////////////// -->
@@ -267,14 +300,6 @@
         <pre [innerHTML]="summaryTxtOutput3" style="height:190px"></pre>
       </div>
       </div>
-
-<!--       <div>
-        <b>Jump to Outputs:</b>
-        1) <a pageScroll href="#connectivityGraph">Connectivity Graph</a> or
-        2) <a pageScroll href="#connectivityText">Connectivity Text</a> or
-        3) <a pageScroll href="#metadataText">Metadata Text</a>
-      </div>
-      <br /> -->
 
       <!-- The multi-partite graph output ////////////////////////////////// -->
       <div style="z-index:500; position: relative" class="card card-2" id="connectivityGraph">
@@ -364,7 +389,7 @@
       <br />
     </div>
 
-      <!-- Metadata Text Output /////////////////////////////////////////// -->
+      <!-- Metadata Text Output //////////////////////////////////////////// -->
       <div style="z-index:500; position: relative" class="card card-2" id="metadataText">
       <div class="text-center col-md-12">
         <h2><strong>Metadata Text</strong></h2>

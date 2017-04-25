@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { TypeaheadModule } from 'ng2-bootstrap/typeahead';
 import { Ng2PageScrollModule } from 'ng2-page-scroll';
+import { FileUploadModule } from 'ng2-file-upload';
 import {
   NgModule,
   ApplicationRef
@@ -23,8 +24,8 @@ import { AppComponent } from './app.component';
 import { APP_RESOLVER_PROVIDERS } from './app.resolver';
 import { AppState, InternalStateType } from './app.service';
 import { HomeComponent } from './home';
-import { ManualComponent } from './manual';
 import { DownloadComponent } from './download';
+import { UploadComponent } from './upload';
 import { HelpComponent } from './help';
 import { DisclaimerComponent } from './disclaimer';
 import { V1Component } from './v1';
@@ -50,9 +51,9 @@ type StoreType = {
   declarations: [
     AppComponent,
     HomeComponent,
-    ManualComponent,
     HelpComponent,
     DownloadComponent,
+    UploadComponent,
     DisclaimerComponent,
     V1Component,
     ContactComponent,
@@ -62,6 +63,7 @@ type StoreType = {
     BrowserModule,
     FormsModule,
     HttpModule,
+    FileUploadModule,
     Ng2PageScrollModule.forRoot(),
     TypeaheadModule.forRoot(),
     RouterModule.forRoot(ROUTES, { useHash: true, preloadingStrategy: PreloadAllModules })
