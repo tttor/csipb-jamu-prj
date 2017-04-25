@@ -1,55 +1,62 @@
 # cluster.py
+import os
 import sys
-
+import time
+import json
 import sklearn.metrics as met
 
 sys.path.append('../../utility')
+import util
 import yamanishi_data_util as yam
 
-def main(argv):
-	if len(argv)!=2:
-		print 'USAGE:'
-		print 'python cluster.py [method] [dataset] [dataDir] [outDir]'
-		return
+def main():
+    if len(sys.argv)!=5:
+        print 'USAGE:'
+        print 'python cluster.py [method] [dataset] [dataDir] [outDir]'
+        return
 
-	method = argv[1]
-	dataset = argv[2]
-	dataDir = argv[3]
-	outDir = argv[4]
+    method = sys.argv[1]
+    dataset = sys.argv[2]
+    dataDir = sys.argv[3]
+    outDir = sys.argv[4]
 
-	##
-	cls = None
-	if method=='kmedoid':
-		from kmedoid import kmedoid
-		cls = kmedoid
-	elif method=='dbscan':
-		from sklearn.cluster import DBSCAN
-		cls = DBSCAN(eps=0.3, min_samples=10)
-	else:
-		assert False, 'FATAL: unknown cluster method'
+    ##
+    cls = None
+    if method=='kmedoid':
+        from kmedoid import kmedoid
+        cls = kmedoid
+    elif method=='dbscan':
+        from sklearn.cluster import DBSCAN
+        cls = DBSCAN(eps=0.75,min_samples=1,metric='precomputed')
+    else:
+        assert False, 'FATAL: unknown cluster method'
 
-	##
-	yamDir=
-	_,comList,proList = yam.loadComProConnMat(dataset,dataPath+"/Adjacency")
-    kernel = yam.loadKernel(dataset,dataPath)
+    ##
+    _,comList,proList = yam.loadComProConnMat(dataset,os.path.join(dataDir,'ground-truth'))
+    kernelDict = yam.loadKernel(dataset,os.path.join(dataDir,'similarity-mat'))
+    comSimMat,proSimMat = util.makeKernelMatrix(kernelDict,comList,proList)
+    comDisMat,proDisMat = list(map(util.kernel2distanceMatrix,['naive']*2,[comSimMat,proSimMat]))
 
-    nComp = len(comList)
-    nProtein = len(proList)
+    ##
+    print 'clustering...'
+    comLabels,proLabels = list( map(cls.fit_predict,[comDisMat,proDisMat]) )
+    comLabels = comLabels.tolist(); proLabels = proLabels.tolist()
 
-    comSimMat = np.zeros((nComp,nComp), dtype=float)
-    proSimMat = np.zeros((nProtein,nProtein), dtype=float)
+    ##
+    print 'eval...'
+    comSil,proSil = list(map(met.silhouette_score,
+                            [comDisMat,proDisMat],[comLabels,proLabels],
+                            ['precomputed']*2))
+    comCal,proCal = list(map(met.calinski_harabaz_score,
+                            [comDisMat,proDisMat],[comLabels,proLabels]))
 
-    for row,i in enumerate(comList):
-        for col,j in enumerate(comList):
-            comSimMat[row][col] = kernel[(i,j)]
+    perf = dict(comCluster={'silhouette_score':comSil,'calinski_harabaz_score':comCal},
+            proCluster={'silhouette_score':proSil,'calinski_harabaz_score':proCal})
 
-    for row,i in enumerate(proList):
-        for col,j in enumerate(proList):
-            proSimMat[row][col] = kernel[(i,j)]
-
-    # convert similarity matrix to distance Matrix
-    proDisMat = simToDis(proSimMat)
-    comDisMat = simToDis(comSimMat)
+    with open(os.path.join(outDir+"perf.json"),'w') as f:
+        json.dump(perf,f,indent=2,sort_keys=True)
 
 if __name__ == '__main__':
-	main(sys.argv)
+    tic = time.time()
+    main()
+    print "main: "+str(time.time()-tic)+' seconds'
