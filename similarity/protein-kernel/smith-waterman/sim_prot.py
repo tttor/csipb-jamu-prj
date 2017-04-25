@@ -1,154 +1,121 @@
-#!/usr/bin/python
+import sys
+import time
+import csv
+import math
 
 import numpy as np
-import time
-import math
-import csv
-import sys
-
 from Bio import SeqIO
-from Bio import pairwise2
 from Bio.SubsMat.MatrixInfo import blosum62
 from multiprocessing import Pool
 
 def main():
-    if len(sys.argv)!=5:
-        print "python sim_Prot.py [rowStart] [rowEnd] [columnBatch] [poolNum]"
-    rowStart = int(sys.argv[1])
-    rowEnd = int(sys.argv[2])
-    step = int(sys.argv[3])
-    poolNum = int(sys.argv[4])
-    colStart = rowStart
-    colEnd = 3334
+    if len(sys.argv) !=7 and len(sys.argv) != 5:
+        print "Usage: python sim_prot.py 0 [listDir] [fastaDir] [indexList]"
+        print "   or: python sim_prot.py 1 [listDir] [fastaDir] [indexList] [poolNum] [lenBatch]"
+        return
 
-    nProtCol = colEnd-colStart
-    nProtRow = rowEnd-rowStart
+    mode = int(sys.argv[1])
+    listDir = sys.argv[2]
+    fastaDir = sys.argv[3]
+    jobListDir = sys.argv[4]
+    if mode==1:
+        poolNum = int(sys.argv[5])
+        step = int(sys.argv[6])
 
-    simMatProtNorm = np.zeros(nProtCol, dtype=float)
-    simMatProt = np.zeros(nProtCol, dtype=float)
-    fastaFileDir = "Fasta/"
-    listDir = "protein.csv"
-    OutDir = ""
+    # Open job list, Generate a job Queue
+    print "Opening Job List"
+    with open(jobListDir,'r') as jobListFile:
+        csvcontent = csv.reader(jobListFile,delimiter=",",quotechar="\"")
+        jobList = []
+        for row in (csvcontent):
+            jobList.append((int(row[0]),int(row[1])))
 
-    uniprotId = []
-    colSeq = []
-    colMeta = []
-    rowSeq = []
-    rowMeta = []
-    # rowProtein = []
-    # colProtein = []
-    # rowIndex = []
-    # colIndex = []
-
-    ### MultiProcessing ###
-    pool = Pool(processes=poolNum)
-    ###################
-
-    ###Parse uniprot ID from csv###
-    sys.stderr.write("Parsing input\n")
-    uniprotId = readProtList(listDir)
-
-    ###############################
-
-    ###Read file and parse (with library)###
-    sys.stderr.write("Load fasta file\n")
-    for i,name in enumerate(uniprotId):
-        fastaDir = fastaFileDir + name + ".fasta"
-        with open (fastaDir) as handle:
-            recTemp = SeqIO.read(handle, "fasta")
-        handle.close()
-        recTempMeta = str(recTemp.id)
-        recTempMeta = recTempMeta.split("|")
-        if i in range(colStart, colEnd):
-            colSeq.append(list(recTemp.seq))
-            colMeta.append(recTempMeta[1])
-        if i in range(rowStart,rowEnd):
-            rowSeq.append(list(recTemp.seq))
-            rowMeta.append(recTempMeta[1])
-    ###Cleanning sequance###
-    sys.stderr.write("Cleaning Sequance\n")
-    for i in range(nProtRow):
-        for j in range(len(rowSeq[i])):
-            if(rowSeq[i][j]=='U'):
-                rowSeq[i][j]='C'
-        rowSeq[i] = "".join(rowSeq[i])
-    for i in range(nProtCol):
-        for j in range(len(colSeq[i])):
-            if(colSeq[i][j]=='U'):
-                colSeq[i][j]='C'
-        colSeq[i] = "".join(colSeq[i])
-    ########################################
-    sys.stderr.write("Preparing output file\n")
-    outMatDir = OutDir+"RealProtKernel"+str(rowStart)+"_"+str(rowEnd)+".txt"
-    outMetaDir = OutDir+"MetaProtKernel"+str(rowStart)+"_"+str(rowEnd)+".txt"
-
-    listScore = []
-    simMatProt = [0.0 for k in range(colEnd)]
-    # Open file after batch
-
-    for i in range(nProtRow):
-        ###Preparing data for parallel mapping###
-        startBatch = colStart+i
-        while startBatch < colEnd:
-            if startBatch+step > colEnd:
-                batchLen = 3334 - startBatch
-            else:
-                batchLen = step
-            # for j in range(startBatch,startBatch+batchLen):
-            #     rowProtein.append(rowSeq[i])
-            #     rowIndex.append(i)
-            #     colProtein.append(colSeq[j-colStart])
-            #     colIndex.append(j)
-            ### Calculation ###
-            listScore = [pool.apply_async(alignprot,(rowSeq[i],
-                            colSeq[j+startBatch-colStart], i, j+startBatch-colStart,))
-                            for j in range(batchLen)]
-            for listS in listScore:
-                simMatProt[listS.get()[1]] = listS.get()[0]
-            #Reset value
-            # del rowProtein[:]
-            # del rowIndex[:]
-            # del colProtein[:]
-            # del colIndex[:]
-            del listScore[:]
-            startBatch += batchLen
-        sys.stderr.write("Writing output\n")
-        with open(outMatDir, 'a') as matF, open(outMetaDir, 'ayy') as metaF:
-            for j in range(colEnd):
-                if j>0:
-                    matF.write(",")
-                matF.write(str(simMatProt[j]))
-            matF.write("\n")
-            metaF.write(rowMeta[i]+"\n")
-        matF.close()
-        metaF.close()
-    sys.stderr.write("Closing file output\n")
-
-
-    ##################
-
-def alignprot(rowSeqProtein,colSeqProtein,rowIndex,colIndex):
-    sys.stderr.write("\rAligning "+str(rowIndex)+" "+str(colIndex)+",")
-    sys.stderr.flush()
-    alignres = pairwise2.align.localds(rowSeqProtein,colSeqProtein, blosum62, -1,-1,force_generic = 0, score_only = 1)
-    return [alignres, colIndex]
-
-def readProtList(path):
-    uniprotIdList = []
-    with open(path,'r') as f:
-        csvContent = csv.reader(f,  delimiter=',', quotechar='\"')
-        for it,row in enumerate(csvContent):
+    print "Building Id List"
+    with open(listDir,'r') as protFile:
+        csvcontent = csv.reader(protFile,delimiter=",",quotechar="\"")
+        uniprotIdList = []
+        for it,row in enumerate(csvcontent):
             if (it > 0):
                 uniprotIdList.append(row[2])
             else:
                 it = 1
-    f.close()
-    return uniprotIdList
+
+    print "Dumping sequance"
+    seqList = []
+    seqMeta = []
+    nProt = len(uniprotIdList)
+    for i,name in enumerate(uniprotIdList):
+        ffDir = fastaDir + name + ".fasta"
+        with open (ffDir) as handle:
+            recTemp = SeqIO.read(handle, "fasta")
+        recTempMeta = str(recTemp.id)
+        recTempMeta = recTempMeta.split("|")
+        if i in range(nProt):
+            seqList.append(list(recTemp.seq))
+            seqMeta.append(recTempMeta[1])
+
+    sys.stderr.write("Cleaning Sequance\n")
+    for i in range(nProt):
+        for j in range(len(seqList[i])):
+            if(seqList[i][j]=='U'):
+                seqList[i][j]='C'
+        seqList[i] = "".join(seqList[i])
+
+    print "Calculate S-W score and output"
+    if mode == 0:
+        singleProc(jobList,seqMeta,seqList)
+    elif mode==1:
+        parallelProc(poolNum,step,jobList,seqMeta,seqList)
+
+
+def singleProc(jobList,seqMeta,seqList):
+    with open("simprotList_%d.csv"%time.time(),'w') as simFile:
+        for idx,pairJob in enumerate(jobList):
+            simScore = selfLocalAlign(seqMeta[pairJob[0]],seqMeta[pairJob[1]],seqList[pairJob[0]],seqList[pairJob[1]],blosum62,-1)
+            simFile.write("%s,%s,%d\n"%(seqMeta[pairJob[0]],seqMeta[pairJob[1]],simScore))
+
+def parallelProc(poolNum,step,jobList,seqMeta,seqList):
+    pool= Pool(processes=poolNum)
+    stamp = int(time.time())
+    outDir = "home/ajmalkurnia/Dataset_skripsi/Experiment/simprotList_%d.csv"% (stamp)
+    with open("simprotList_%d.csv"%time.time(),'w') as simFile:
+        startBatch = 0
+        step = 100
+        while startBatch < len(jobList):
+            if startBatch+step > len(jobList):
+                batchLen = len(jobList) - startBatch
+            else:
+                batchLen = step
+            listScore = [pool.apply_async(selfLocalAlign,(seqMeta[jobList[startBatch+b][0]],
+                            seqMeta[jobList[startBatch+b][1]],seqList[jobList[startBatch+b][0]],
+                            seqList[jobList[startBatch+b][1]],blosum62,-1,))
+                            for b in range(batchLen)]
+            for listS in listScore:
+                simFile.write("%s,%s,%d\n"%(listS.get()[0],listS.get()[1],listS.get()[2]))
+            del listScore[:]
+            startBatch += batchLen
+
+def selfLocalAlign(metaS1,metaS2,seq1,seq2,subMat,gap):
+    sys.stderr.write("\r\tAligning %s and %s"%(metaS1,metaS2))
+    sys.stderr.flush()
+    m = len(seq1)
+    n = len(seq2)
+    dpTable = np.zeros((m+1,n+1))
+    for i,c1 in enumerate(seq1):
+        for j,c2 in enumerate(seq2):
+            if (c1,c2) in subMat:
+                diag = dpTable[i][j]+subMat[(c1,c2)]
+            else:
+                diag = dpTable[i][j]+subMat[(c2,c1)]
+            down = dpTable[i][j+1]+gap
+            right = dpTable[i+1][j]+gap
+
+            dpTable[i+1][j+1]=max(0,diag,down,right)
+
+    return metaS1,metaS2,np.max(dpTable)
 
 
 if __name__ == '__main__':
-    start = time.time()
+    startTime=time.time()
     main()
-    #############Debugging section#############
-    print "Runtime :"+ str(time.time()-start)
-    ###########################################
+    print "Program running for %s"%(time.time()-startTime)

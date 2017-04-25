@@ -83,8 +83,8 @@ class SELFBLM:
             return -1
         elif np.all(intVector != -1):
             intVector = np.array([i if i==1 else -1 for i in intVector])
-
         else:
+            # SELFBLM part
             while np.any(intVector == 0):
                 labInt = [i for i in intVector if i!=0]
 
@@ -105,8 +105,8 @@ class SELFBLM:
                 model.fit(uTrain, labInt)
                 uPred = model.predict(uTest)
                 uDist = model.decision_function(uTest)
-                # print ulabIdx,uDist
                 for r,i in enumerate(uPred):
+                    # The original paper used threshold = 1 But somehow it resulted on infinite loop on this implementation
                     if abs(uDist[r])>0:
                         intVector[ulabIdx[r]] = i
 
