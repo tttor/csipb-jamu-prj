@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './home';
-import { ManualComponent } from './manual';
 import { DownloadComponent } from './download';
 import { UploadComponent } from './upload';
 import { HelpComponent } from './help';
@@ -13,7 +12,6 @@ import { DataResolver } from './app.resolver';
 export const ROUTES: Routes = [
   { path: '',      component: HomeComponent },
   { path: 'home',  component: HomeComponent },
-  { path: 'manual',  component: ManualComponent },
   { path: 'downloads', component: DownloadComponent },
   { path: 'upload', component: UploadComponent },
   { path: 'help-faq', component: HelpComponent },

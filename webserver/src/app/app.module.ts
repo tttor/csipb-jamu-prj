@@ -24,7 +24,6 @@ import { AppComponent } from './app.component';
 import { APP_RESOLVER_PROVIDERS } from './app.resolver';
 import { AppState, InternalStateType } from './app.service';
 import { HomeComponent } from './home';
-import { ManualComponent } from './manual';
 import { DownloadComponent } from './download';
 import { UploadComponent } from './upload';
 import { HelpComponent } from './help';
@@ -52,7 +51,6 @@ type StoreType = {
   declarations: [
     AppComponent,
     HomeComponent,
-    ManualComponent,
     HelpComponent,
     DownloadComponent,
     UploadComponent,
