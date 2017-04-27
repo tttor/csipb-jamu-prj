@@ -7,9 +7,9 @@
 ## Commands
 
 ### login via psql (9.6.1)
-psql ijah  -h 127.0.0.1 -d ijah
+psql [username] -h 127.0.0.1 -d [dbname]
 
-### dump
+### export
 * tor@torpc:~$ sudo -u ijah pg_dump ijah > ijah.sql
 * ijah@compute-engine:~$ pg_dump ijah > ijah_20160322-1018.sql
 * ijah=> \copy protein to /home/tor/protein.csv csv header
@@ -18,13 +18,17 @@ psql ijah  -h 127.0.0.1 -d ijah
 ### import
 psql ijah  -h 127.0.0.1 -d ijah < ijah_201612141709.sql
 
-### apps.cs
-* sudo -u postgres psql mydb
-* sudo -u postgres createdb mydb
-* sudo -u postgres createuser tor
-* sudo -u postgres dropdb ijah
+### init db
+* sudo -u postgres createdb [dbname]
+* sudo -u postgres createuser [username]
 * sudo -u postgres psql
-* postgres=# \password [role]
+  * postgres=# \password [role/username]
+* sudo adduser [username]
+  * To log in with ident based authentication,
+  you'll need a Linux user with the same name as your Postgres role and database.
+
+### misc
+* sudo -u postgres dropdb [dname]
 
 ## Queries
 ```sql
