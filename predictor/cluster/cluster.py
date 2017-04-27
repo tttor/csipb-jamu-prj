@@ -4,6 +4,7 @@ import sys
 import time
 import json
 import sklearn.metrics as met
+from sklearn.model_selection import RandomizedSearchCV as rscv
 
 sys.path.append('../../utility')
 import util
@@ -38,6 +39,16 @@ def main():
     comDisMat,proDisMat = list(map(util.kernel2distanceMatrix,['naive']*2,[comSimMat,proSimMat]))
 
     ##
+    random_search = rscv(cls, param_distributions=param_dist,
+                                        n_iter=n_iter_search)
+
+start = time()
+random_search.fit(X, y)
+print("RandomizedSearchCV took %.2f seconds for %d candidates"
+      " parameter settings." % ((time() - start), n_iter_search))
+report(random_search.cv_results_)
+
+    ##
     print 'clustering...'
     comLabels,proLabels = list( map(cls.fit_predict,[comDisMat,proDisMat]) )
     comLabels = comLabels.tolist(); proLabels = proLabels.tolist()
@@ -51,7 +62,7 @@ def main():
                             [comDisMat,proDisMat],[comLabels,proLabels]))
 
     perf = dict(comCluster={'silhouette_score':comSil,'calinski_harabaz_score':comCal},
-            proCluster={'silhouette_score':proSil,'calinski_harabaz_score':proCal})
+                proCluster={'silhouette_score':proSil,'calinski_harabaz_score':proCal})
 
     with open(os.path.join(outDir+"perf.json"),'w') as f:
         json.dump(perf,f,indent=2,sort_keys=True)
