@@ -21,8 +21,11 @@
 * Silhouette Coefficient
 * Calinski-Harabaz Index
 
+## Libs
+* pyclustering >= 0.6.6
+* scikit-optimize >= 0.3
+
 ## Web references
-* http://scikit-learn.org/stable/modules/clustering.html
 * http://stats.stackexchange.com/questions/21807/evaluation-measure-of-clustering-without-having-truth-labels
 * plotting dendogram
   * https://joernhees.de/blog/2015/08/26/scipy-hierarchical-clustering-and-dendrogram-tutorial/
