@@ -4,6 +4,7 @@ import { HttpModule } from '@angular/http';
 import { TypeaheadModule } from 'ng2-bootstrap/typeahead';
 import { Ng2PageScrollModule } from 'ng2-page-scroll';
 import { FileUploadModule } from 'ng2-file-upload';
+import { ChartsModule } from 'ng2-charts';
 import {
   NgModule,
   ApplicationRef
@@ -34,6 +35,7 @@ import { AboutComponent } from './about';
 
 import '../styles/styles.scss';
 import '../styles/headings.css';
+import '../assets/js/chart.js/src/chart.js';
 
 const APP_PROVIDERS = [
   ...APP_RESOLVER_PROVIDERS,
@@ -64,6 +66,7 @@ type StoreType = {
     FormsModule,
     HttpModule,
     FileUploadModule,
+    ChartsModule,
     Ng2PageScrollModule.forRoot(),
     TypeaheadModule.forRoot(),
     RouterModule.forRoot(ROUTES, { useHash: true, preloadingStrategy: PreloadAllModules })

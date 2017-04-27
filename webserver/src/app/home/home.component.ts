@@ -5,6 +5,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import { Http } from '@angular/http';
+import { ChartsModule } from 'ng2-charts';
 import { AppState } from '../app.service';
 import { UserInput } from './userinput.interface';
 declare var saveAs: any;
@@ -53,6 +54,23 @@ export class HomeComponent implements OnInit {
   public nCompoundInDB;
   public nProteinInDB;
   public nDiseaseInDB;
+
+  // Items in summary
+  public totScore;
+
+  public plaComScore;
+  public comProScore;
+  public proDisScore;
+
+  public plaSum;
+  public comSum;
+  public proSum;
+  public disSum;
+
+  public plaMark;
+  public comMark;
+  public proMark;
+  public disMark;
 
   // Items selected by users
   public selectedPlants = [];
@@ -106,6 +124,17 @@ export class HomeComponent implements OnInit {
   public noResultCompound = false;
   public noResultProtein = false;
   public noResultDisease = false;
+
+  // Pie chart for summary
+  public pieChartLabels: string[] = ['Known by Experiment',
+  'Known by Prediction', 'Unknown', 'Undefined'];
+  public pieChartData: number[] = [];
+  public pieChartType: string = 'pie';
+
+  // PIE CHART LEGEND POSITIONING //////////////////////////////////////////////
+  public pieChartOptions: any = {
+    legend: {position: 'bottom'},
+  };
 
   // API URL addresses
   private interactionQueryAPI;
@@ -730,6 +759,7 @@ export class HomeComponent implements OnInit {
     if (this.inputType.indexOf(type) !== -1) {
       mark = ' (as inputs)';
     }
+    console.log(mark);
     return mark;
   }
 
@@ -1008,6 +1038,8 @@ export class HomeComponent implements OnInit {
     this.proSet_ = [];
     this.disSet_ = [];
 
+    this.pieChartData = [];
+
     this.filterThreshold = 0.0;
   }
 
@@ -1255,6 +1287,15 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  // events
+  public chartClicked(e: any): void {
+    console.log(e);
+  }
+
+  public chartHovered(e: any): void {
+    console.log(e);
+  }
+
   ///////////////////////////////////////////////////////////////////////////////////////
   private typeaheadOnSelect(e: any): void {
     // Do nothing
@@ -1419,6 +1460,15 @@ export class HomeComponent implements OnInit {
             let totConnScore = plaComConnScore + comProConnScore + proDisConnScore;
             let nDecimalDigits = 5;
 
+            this.totScore = totConnScore.toFixed(3);
+            this.plaComScore = plaComConnScore.toFixed(3);
+            this.comProScore = comProConnScore.toFixed(3);
+            this.proDisScore = proDisConnScore.toFixed(3);
+            this.plaSum = plaSet.length.toString();
+            this.comSum = comSet.length.toString();
+            this.proSum = proSet.length.toString();
+            this.disSum = disSet.length.toString();
+
             let nUnknownComProConn = 0;
             let nUndefinedComProConn = 0;
             let nKnownByExperimentComProConn = 0;
@@ -1443,6 +1493,16 @@ export class HomeComponent implements OnInit {
               nUnknownComProConn = (comSet.length * proSet.length)
               - (nKnownByPredictionComProConn + nKnownByExperimentComProConn);
             }
+
+            this.pieChartData.push(nKnownByExperimentComProConn);
+            this.pieChartData.push(nKnownByPredictionComProConn);
+            this.pieChartData.push(nUnknownComProConn);
+            this.pieChartData.push(nUndefinedComProConn);
+
+            this.plaMark = this.getInputMark('plant');
+            this.comMark = this.getInputMark('compound');
+            this.proMark = this.getInputMark('protein');
+            this.disMark = this.getInputMark('disease');
 
             this.summaryTxtOutput = 'Minimum Connectivity Weight To Display:\n';
             this.summaryTxtOutput += '   ' + this.filterThreshold.toFixed(nDecimalDigits) + '\n';
