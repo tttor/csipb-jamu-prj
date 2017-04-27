@@ -55,7 +55,7 @@ export class HomeComponent implements OnInit {
   public nProteinInDB;
   public nDiseaseInDB;
 
-  // Items in summary
+  // Items in summary output
   public totScore;
 
   public plaComScore;
@@ -130,8 +130,6 @@ export class HomeComponent implements OnInit {
   'Known by Prediction', 'Unknown', 'Undefined'];
   public pieChartData: number[] = [];
   public pieChartType: string = 'pie';
-
-  // PIE CHART LEGEND POSITIONING //////////////////////////////////////////////
   public pieChartOptions: any = {
     legend: {position: 'bottom'},
   };
@@ -266,7 +264,7 @@ export class HomeComponent implements OnInit {
 
   public ngOnInit() {
     this.userinput = {
-      useCase: 'useCase3'
+      useCase: 'default'
     };
   }
 
