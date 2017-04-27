@@ -285,21 +285,115 @@
         </div>
     </div>
 
-    <!-- The summary output //////////////////////////////////////////////// -->
+    <!-- The output handling /////////////////////////////////////////////// -->
     <div>
+    <!-- The new summary test //////////////////////////////////////////////// -->
       <div style="z-index:500; position: relative" class="card card-2" id="summary">
+        <div class="text-center col-md-12"><h2><strong>Summary</strong></h2></div>
 
-      <div class="text-center col-md-12"><h2><strong>Summary</strong></h2></div>
-      <div style="z-index:500; position: relative" class="col-md-4">
-        <pre [innerHTML]="summaryTxtOutput" style="height:190px"></pre>
+        <div style="z-index:500; position: relative" class="text-center col-md-4">
+          <h4>Total Connectivity Score:</h4> <br/>
+          <div class="totalConn">
+            {{totScore}}
+          </div>
+          <div class="row">
+            <div class="col-md-5 col-md-offset-1 text-left">Plant-Compound:</div>
+            <div class="col-md-6 text-left">{{plaComScore}}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-5 col-md-offset-1 text-left">Compound-Protein:</div>
+            <div class="col-md-6 text-left">{{comProScore}}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-5 col-md-offset-1 text-left">Protein-Disease:</div>
+            <div class="col-md-6 text-left">{{proDisScore}}</div>
+          </div>
+        </div>
+        <div class="col-md-4" style="padding-top: 10px">
+          <!-- 1st row -->
+          <div class="row">
+            <!-- Plant -->
+            <div class="col-md-6">
+              <div class="row text-center">Plant(s)</div>
+              <div class="row">
+                <div *ngIf="plaMark === ' (as inputs)'" class="uniquePla text-center">
+                  ({{plaSum}})
+                </div>
+                <div *ngIf="plaMark !== ' (as inputs)'" class="uniquePla text-center">
+                  {{plaSum}}
+                </div>
+              </div>
+            </div>
+            <!-- Compound -->
+            <div class="col-md-6">
+              <div class="row text-center">Compound(s)</div>
+              <div class="row">
+                <div *ngIf="comMark === ' (as inputs)'" class="uniqueCom text-center">
+                  ({{comSum}})
+                </div>
+                <div *ngIf="comMark !== ' (as inputs)'" class="uniqueCom text-center">
+                  {{comSum}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2nd row -->
+          <div class="row">
+            <!-- Protein -->
+            <div class="col-md-6">
+              <div class="row text-center">Protein(s)</div>
+              <div class="row">
+                <div *ngIf="proMark === ' (as inputs)'" class="uniquePro text-center">
+                  ({{proSum}})
+                </div>
+                <div *ngIf="proMark !== ' (as inputs)'" class="uniquePro text-center">
+                  {{proSum}}
+                </div>
+              </div>
+            </div>
+            <!-- Disease -->
+            <div class="col-md-6">
+              <div class="row text-center">Disease(s)</div>
+              <div class="row">
+                <div *ngIf="disMark === ' (as inputs)'" class="uniqueDis text-center">
+                  ({{disSum}})
+                </div>
+                <div *ngIf="disMark !== ' (as inputs)'" class="uniqueDis text-center">
+                  {{disSum}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="col-md-3 col-md-offset-1">
+          <div style="display: block">
+            <canvas baseChart
+              [data]="pieChartData"
+              [labels]="pieChartLabels"
+              [chartType]="pieChartType"
+              [options]="pieChartOptions"
+              (chartHover)="chartHovered($event)"
+              (chartClick)="chartClicked($event)">
+            </canvas>
+          </div>
+        </div>
       </div>
-      <div class="col-md-4">
-        <pre [innerHTML]="summaryTxtOutput2" style="height:190px"></pre>
-      </div>
-      <div class="col-md-4">
-        <pre [innerHTML]="summaryTxtOutput3" style="height:190px"></pre>
-      </div>
-      </div>
+
+    <!-- The summary output //////////////////////////////////////////////// -->
+      <!-- <div style="z-index:500; position: relative" class="card card-2" id="summary">
+        <div class="text-center col-md-12"><h2><strong>Summary</strong></h2></div>
+        <div style="z-index:500; position: relative" class="col-md-4">
+          <pre [innerHTML]="summaryTxtOutput" style="height:190px"></pre>
+        </div>
+        <div class="col-md-4">
+          <pre [innerHTML]="summaryTxtOutput2" style="height:190px"></pre>
+        </div>
+        <div class="col-md-4">
+          <pre [innerHTML]="summaryTxtOutput3" style="height:190px"></pre>
+        </div>
+      </div> -->
 
       <!-- The multi-partite graph output ////////////////////////////////// -->
       <div style="z-index:500; position: relative" class="card card-2" id="connectivityGraph">

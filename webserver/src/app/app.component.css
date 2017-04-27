@@ -58,6 +58,36 @@ template .right-input {
   margin-left: 5px;
 }
 
+.totalConn {
+  font-family: 'Roboto', sans-serif;
+	font-size:90px;
+  color:#008744;
+}
+
+.uniquePla {
+  font-family: 'Roboto', sans-serif;
+	font-size:70px;
+  color:#00b300;
+}
+
+.uniqueCom {
+  font-family: 'Roboto', sans-serif;
+	font-size:70px;
+  color:#ffa500;
+}
+
+.uniquePro {
+  font-family: 'Roboto', sans-serif;
+	font-size:70px;
+  color:#6666ff;
+}
+
+.uniqueDis {
+  font-family: 'Roboto', sans-serif;
+	font-size:70px;
+  color:#ff4d4d;
+}
+
 .fab{
   /*background: #03A9F4;*/
   width: 80px;
