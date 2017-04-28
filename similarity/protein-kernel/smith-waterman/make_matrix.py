@@ -56,7 +56,6 @@ def main():
             metaF.write(uniprotIdList[i]+"\n")
     metaF.close()
 
-
 if __name__ == '__main__':
     startTime = time.time()
     main()
