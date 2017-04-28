@@ -71,32 +71,34 @@ def main():
 def singleProc(jobList,seqMeta,seqList):
     with open("simprotList_%d.csv"%time.time(),'w') as simFile:
         for idx,pairJob in enumerate(jobList):
-            simScore = selfLocalAlign(seqMeta[pairJob[0]],seqMeta[pairJob[1]],seqList[pairJob[0]],seqList[pairJob[1]],blosum62,-1)
+            _,_,simScore = selfLocalAlign(seqMeta[pairJob[0]],seqMeta[pairJob[1]],seqList[pairJob[0]],seqList[pairJob[1]],blosum62,-1)
             simFile.write("%s,%s,%d\n"%(seqMeta[pairJob[0]],seqMeta[pairJob[1]],simScore))
 
 def parallelProc(poolNum,step,jobList,seqMeta,seqList):
-    pool= Pool(processes=poolNum)
-    stamp = int(time.time())
-    outDir = "home/ajmalkurnia/Dataset_skripsi/Experiment/simprotList_%d.csv"% (stamp)
-    with open("simprotList_%d.csv"%time.time(),'w') as simFile:
-        startBatch = 0
-        step = 100
-        while startBatch < len(jobList):
-            if startBatch+step > len(jobList):
-                batchLen = len(jobList) - startBatch
-            else:
-                batchLen = step
-            listScore = [pool.apply_async(selfLocalAlign,(seqMeta[jobList[startBatch+b][0]],
-                            seqMeta[jobList[startBatch+b][1]],seqList[jobList[startBatch+b][0]],
-                            seqList[jobList[startBatch+b][1]],blosum62,-1,))
-                            for b in range(batchLen)]
+    pool = Pool(processes=poolNum)
+    startBatch = 0
+    step = step
+    noBatch = 1
+    fileName = "simprot_list_%d.csv"%time.time()
+    while startBatch < len(jobList):
+        if startBatch+step > len(jobList):
+            batchLen = len(jobList) - startBatch
+        else:
+            batchLen = step
+        listScore = [pool.apply_async(selfLocalAlign,(seqMeta[jobList[startBatch+b][0]],
+                        seqMeta[jobList[startBatch+b][1]],seqList[jobList[startBatch+b][0]],
+                        seqList[jobList[startBatch+b][1]],blosum62,-1,))
+                        for b in range(batchLen)]
+        print "Batch %d finished"%noBatch
+        with open(fileName,'a') as simFile:
             for listS in listScore:
                 simFile.write("%s,%s,%d\n"%(listS.get()[0],listS.get()[1],listS.get()[2]))
-            del listScore[:]
-            startBatch += batchLen
+        del listScore[:]
+        startBatch += batchLen
+        noBatch += 1
 
 def selfLocalAlign(metaS1,metaS2,seq1,seq2,subMat,gap):
-    sys.stderr.write("\r\tAligning %s and %s"%(metaS1,metaS2))
+    sys.stderr.write("\rAligning %s and %s"%(metaS1,metaS2))
     sys.stderr.flush()
     m = len(seq1)
     n = len(seq2)

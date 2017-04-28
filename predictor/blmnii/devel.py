@@ -4,6 +4,7 @@ import numpy as np
 import json
 import time
 import sys
+from multiprocessing import Pool
 
 import matplotlib.pyplot as plt
 from blm_ajm import BLMNII
@@ -20,8 +21,8 @@ sys.path.append('../../utility')
 import yamanishi_data_util as yam
 
 def main():
+    global classParam,comSimMat,proSimMat,connMat
     classParam = dict(name='blmnii',proba=True)
-
     if len(sys.argv)!=5:
         print "python blmniisvm_experiment.py [DataSetCode] [evalMode] [dataPath] [outPath]"
         return
@@ -35,8 +36,8 @@ def main():
     connMat,comList,proList = yam.loadComProConnMat(dataset,dataPath+"/Adjacency")
     kernel = yam.loadKernel(dataset,dataPath)
 
-    comListIdx = [i for i,_ in enumerate(comList)]
     proListIdx = [i for i,_ in enumerate(proList)]
+    comListIdx = [i for i,_ in enumerate(comList)]
 
     nComp = len(comList)
     nProtein = len(proList)
@@ -91,26 +92,30 @@ def main():
         comTestList.append([i for i in testIndex])
         comTrainList.append([i for i in trainIndex])
 
-    predRes = []
-    testData = []
-    print "Predicting..."
+    predJob = []
+    # print "Predicting..."
+    print "Building Job List... "
+    # Parallel This
     for ii,i in enumerate(comTestList):
         for jj,j in enumerate(proTestList):
-            sys.stdout.write("\r%03d of %03d||%03d of %03d" %
-                                (jj+1, len(proTestList), ii+1,len(comTestList),))
-            sys.stdout.flush()
-
-            predictor = BLMNII(classParam, connMat, comSimMat, proSimMat,
-                            [comTrainList[ii],proTrainList[jj]],[i,j])
             for comp in i:
                 for prot in j:
-                    predRes.append(predictor.predict([(comp,prot)]))
-                    testData.append(connMat[comp][prot])
+                    predJob.append([(comp,prot),([comTrainList[ii],proTrainList[jj]],[i,j])])
+                    # testData.append(connMat[comp][prot])
+    pool = Pool(processes=4)
+    print "Run Prediction in parallel..."
+
+    testData = []
+    predRes = []
+    predParallel = [pool.apply_async(parallelWorkArround,(job,)) for job in predJob]
+    for pred in predParallel:
+        predRes.append(pred.get()[0])
+        testData.append(connMat[pred.get[1][0]][pred.get[1][1]])
 
 #####################################################################
 
     print "\nCalculate Performance"
-    key = 'PredictionUsingBLM_NII'
+    key = 'BLM-NII'
     precision, recall, _ = precision_recall_curve(testData, predRes)
     prAUC = average_precision_score(testData, predRes, average='micro')
 
@@ -149,6 +154,13 @@ def regularizationKernel(mat):
 def isPSDKernel(mat,eps = 1e-8):
   E,V = np.linalg.eigh(mat)
   return np.all(E > -eps) and np.all(np.isreal(E))
+
+def parallelWorkArround(job):
+    # print job[0]
+    predictor = BLMNII(classParam, connMat, comSimMat, proSimMat,
+                    job[1][0],job[1][1])
+    predictionResult = predictor.predict(job[0])
+    return predictionResult,job
 
 if __name__ == '__main__':
     main()
