@@ -24,7 +24,8 @@ def main():
     nIter = int(sys.argv[2])
     dataset = sys.argv[3]
     dataDir = sys.argv[4]
-    outDir = sys.argv[5]
+    outDir = os.path.join(sys.argv[5],'-'.join(['cluster',method,str(nIter),util.tag()]))
+    os.makedirs(outDir)
 
     ##
     _,comList,proList = yam.loadComProConnMat(dataset,os.path.join(dataDir,'ground-truth'))
