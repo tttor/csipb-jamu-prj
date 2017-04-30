@@ -1,6 +1,13 @@
 # util.py
 import numpy as np
 import sys
+import socket
+import datetime
+
+def tag():
+    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    hostname = socket.gethostname()
+    return hostname+'-'+timestamp
 
 def kernel2distanceMatrix(method,simMat):
     # https://rdrr.io/cran/mmpp/man/k2d.html
