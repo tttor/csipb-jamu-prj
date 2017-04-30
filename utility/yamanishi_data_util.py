@@ -46,28 +46,37 @@ def loadComProConnMat(mode,dpath):
     return (mat,comList,proList)
 
 def loadKernel(mode,dpath):
-    print 'loading yamanishi kernel...'
-    fnames = ['compound/simmat_dc_'+mode+'.txt','protein/simmat_dg_'+mode+'.txt']
+    comKernel = loadKernel2('compound',mode,dpath)
+    proKernel = loadKernel2('protein',mode,dpath)
 
-    kernel = dict()
-    for fname in fnames:
-        fpath = os.path.join(dpath,fname)
-        gotHeader = False
+    kernel = comKernel
+    kernel.update(proKernel)
 
-        colNames = []
-        rowNames = []
-        rowValues = []
-        with open(fpath,'r') as f:
-            for line in f:
-                if not(gotHeader):
-                    colNames = [i.strip() for i in line.split()]
-                    gotHeader = True
-                else:
-                    row = [i.strip() for i in line.split()]
-                    rowNames.append(row[0])
-                    rowValues.append(row[1:])
+    return kernel
 
-        for i,r in enumerate(rowNames):
-            for j,c in enumerate(colNames):
-                kernel[(r,c)] = float(rowValues[i][j])
+def loadKernel2(compro,mode,dpath):
+    fname = None
+    if compro=='compound':
+        fname = 'compound/simmat_dc_'+mode+'.txt'
+    elif compro=='protein':
+        fname = 'protein/simmat_dg_'+mode+'.txt'
+    else:
+        assert False
+
+    gotHeader = False
+    kernel = dict(); colNames = []; rowNames = []; rowValues = []
+    with open(os.path.join(dpath,fname),'r') as f:
+        for line in f:
+            if not(gotHeader):
+                colNames = [i.strip() for i in line.split()]
+                gotHeader = True
+            else:
+                row = [i.strip() for i in line.split()]
+                rowNames.append(row[0])
+                rowValues.append(row[1:])
+
+    for i,r in enumerate(rowNames):
+        for j,c in enumerate(colNames):
+            kernel[(r,c)] = float(rowValues[i][j])
+
     return kernel
