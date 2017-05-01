@@ -103,12 +103,12 @@ def main():
 
     ##
     print 'writing...'
-    fpath = os.path.join(tDir,'connMat.csv')
+    fpath = os.path.join(tDir,metric+'_connMat.csv')
     np.savetxt(fpath,connMat2,delimiter=',')
 
-    with open(os.path.join(tDir,"connDict.json"),'w') as f:
+    with open(os.path.join(tDir,metric+"_connDict.json"),'w') as f:
         json.dump(connDict,f,indent=2,sort_keys=True)
-    with open(os.path.join(tDir,"connDict2.json"),'w') as f:
+    with open(os.path.join(tDir,metric+"_connDict2.json"),'w') as f:
         json.dump(connDict2,f,indent=2,sort_keys=True)
 
     fig = plt.figure()
@@ -117,7 +117,7 @@ def main():
          labels=[i[0] for i in _], autopct='%1.2f%%',
          shadow=False, startangle=90)
     plt.axis('equal')
-    plt.savefig(os.path.join(tDir,'conn_pie.png'),
+    plt.savefig(os.path.join(tDir,metric+'_conn_pie.png'),
                 dpi=300,format='png',bbox_inches='tight')
     plt.close(fig)
 
