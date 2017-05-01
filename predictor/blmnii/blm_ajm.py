@@ -3,6 +3,7 @@ import psycopg2
 import sys
 import time
 
+from numpy import linalg as LA
 from sklearn import svm
 from sklearn.preprocessing import MinMaxScaler
 
@@ -17,7 +18,8 @@ class BLMNII:
     def __init__(self,params,connMat=None,comSimMat=None,proSimMat=None,
                     trainList=None,testList=None):
 
-
+        self._alpha = params['alpha']
+        self._gamma0 = params['gamma']
         self._name = params['name']
         self._proba = params['proba']
         self._connDB = psycopg2.connect(database=dcfg['name'],user=dcfg['user'],password=dcfg['passwd'],
@@ -44,9 +46,7 @@ class BLMNII:
     def predict(self,query):
         nQuery = len(query)
         # sys.stderr.write ("Processing Query.... \n")
-
         if self._develMode:
-
             queryIdx = [[i[0],i[1]] for i in query]
 
             comTrain = self._trainList[0]
@@ -60,10 +60,8 @@ class BLMNII:
             # timer = time.time()
 
             # TO DO: Find better method to generate dataset
+
             pairIdList = util.randData(query,self._nPair)
-
-            # print "This section is running for "+str(time.time()-timer)+" seconds"
-
 
             # sys.stderr.write ("Making kernel....\n")
             # timer = time.time()
@@ -94,6 +92,7 @@ class BLMNII:
 
         # timer = time.time()
         mergePred = []
+
         for i in queryIdx:
             comPred = self._predict(self._connMat,self._comSimMat,self._proSimMat,
                                     [proTest,proTrain],(i[0],i[1]),0)
@@ -107,7 +106,7 @@ class BLMNII:
         self._connDB.close()
 
     def _predict(self,adjMatrix,sourceSim,targetSim,dataSplit,dataQuery,mode):
-
+        #Adj matrix is sourceXtarget
         if mode == 1:
             adjMatrix = [[row[i] for row in adjMatrix] for i in range(len(adjMatrix[0]))]
 
@@ -119,6 +118,7 @@ class BLMNII:
         nTrain = len(trainIndex)
         nTest = len(testIndex)
         nSource = len(sourceSim)
+        nTarget = len(targetSim)
 
         intProfile = np.zeros(nTrain,dtype=float)
         neighbors = [j for i,j in enumerate(adjMatrix[sourceIndex]) if i in trainIndex]
@@ -146,14 +146,35 @@ class BLMNII:
             else:
                 prediction = [0.0]
         else:
-            gramTest = targetSim[targetIndex]
-            gramTrain = targetSim
+
+            #Compute Network Similarity Here
+            #GIP ?/  on Target Similarity
+            #compute gamma banddwith
+            netTargetSim = np.zeros((targetSim.shape),dtype=float)
+            for i in range(nTarget):
+                intpro1 = np.array([adjMatrix[k][i] for k in range(nSource)])
+                gamma = sum(intpro1**2)*self._gamma0/nTarget
+                for j in range(nTarget):
+                    # print "NetSim %d %d"%(i,j)
+                    intpro2 = np.array([adjMatrix[k][j] for k in range(nSource)])
+                    netTargetSim[j][i] = self._computeNetSim(intpro1,intpro2,gamma)
+                    netTargetSim[j][i] = (self._alpha*targetSim[j][i] +
+                                        (1-self._alpha)*netTargetSim[j][i])
+
+
+            #Combine both similarity measurement
+            if len(set([adjMatrix[i][targetIndex] for i in range(nSource)])) == 1:
+                gramTest = targetSim[targetIndex]
+            else:
+                gramTest = netTargetSim[targetIndex] #If target is new use the combined Similarity Else Use this
+            gramTrain = netTargetSim #Use combined Measurement...
             for i in reversed(sorted(testIndex)):
                 gramTest = np.delete(gramTest,i, 0)
                 gramTrain = np.delete(gramTrain,i, 0)
                 gramTrain = np.delete(gramTrain,i, 1)
             model = svm.SVC(kernel='precomputed', probability=True)
-            model.fit(gramTrain, intProfile)
+            model.fit(gramTrain, intProfile) # use combined for model
+
             if self._proba:
                 prediction = model.predict_proba(gramTest.reshape(1,-1))
             else:
@@ -163,6 +184,11 @@ class BLMNII:
             return (prediction[0][1],sourceIndex,targetIndex)
         else:
             return (float(prediction[0]),sourceIndex,targetIndex)
+
+    def _computeNetSim(self,profile1,profile2,gamma):
+        norm = LA.norm(profile1-profile2)
+        value = -((norm**2)*gamma)
+        return float(value)
 
     def _makeKernel(self,dataList,mode):
         dataList = list(set(dataList))

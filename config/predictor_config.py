@@ -9,7 +9,7 @@ kronRLSConfig = dict(name='kronrls',weight=0.6,
                      alphaCompoundKernel=0.5,alphaProteinKernel=0.5,
                      kernelBandwidth=1.0)
 blmniiConfig = dict(name='blmnii',weight=0.6,batchSize=1,
-                    maxTrainingDataSize=1000,proba=True)
+                    maxTrainingDataSize=200,proba=True,alpha=0.5,gamma=0.1)
 
 ## Common params
 predictorConfig = dict()
