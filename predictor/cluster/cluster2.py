@@ -5,6 +5,8 @@ import yaml
 import time
 import numpy as np
 from collections import defaultdict
+from scoop import futures as fu
+from scoop import shared as sh
 
 sys.path.append('../../utility')
 import yamanishi_data_util as yam
@@ -13,14 +15,17 @@ DATASET_DIR = '../../dataset/connectivity/compound_vs_protein'
 XPRMT_DIR = '../../xprmt/cluster'
 
 def main():
-    if len(sys.argv)!=4:
+    if len(sys.argv)!=3:
         print 'USAGE:'
-        print 'python cluster2.py [metric] [comClusterDir] [proClusterDir]'
+        print 'python cluster2.py [metric] [targetDir]'
         return
 
     metric = sys.argv[1]
-    comClusterDir = sys.argv[2]
-    proClusterDir = sys.argv[3]
+    tDir = sys.argv[2]
+
+    dirs = os.listdir(tDir); clusterDirs = {}
+    clusterDirs['compound'] = [i for i in dirs if ('compound' in i)and('cluster' in i)][0]
+    clusterDirs['protein'] = [i for i in dirs if ('protein' in i)and('cluster' in i)][0]
 
     if metric=='cal':
         metric = 'calinskiharabaz'
@@ -29,8 +34,8 @@ def main():
     else:
         assert False
 
-    dataset = comClusterDir.split('-')[2]
-    assert dataset==proClusterDir.split('-')[2]
+    dataset = clusterDirs['compound'].split('-')[2]
+    assert dataset==clusterDirs['protein'].split('-')[2]
 
     ##
     print 'loading connMat...'
@@ -43,8 +48,7 @@ def main():
     print 'loading cluster...'
     def _loadCluster(mode):
         fname = '_'.join(['cluster',mode,metric,'bestlabels.json'])
-        clusterDir = (comClusterDir if mode=='compound' else proClusterDir)
-        with open(os.path.join(XPRMT_DIR,clusterDir,fname),'r') as f:
+        with open(os.path.join(tDir,clusterDirs[mode],fname),'r') as f:
             cluster = yaml.load(f)
 
         cluster2 = defaultdict(list)
@@ -54,8 +58,8 @@ def main():
 
     comCluster,comCluster2 = _loadCluster('compound')
     proCluster,proCluster2 = _loadCluster('protein')
-    comList = comCluster.keys()
-    proList = proCluster.keys()
+    # comList = comCluster.keys()
+    # proList = proCluster.keys()
 
     ##
     print 'get clusterConn...'
@@ -70,7 +74,7 @@ def main():
     clusterConn = dict()
     for i in comCluster2.keys():
         for j in proCluster2.keys():
-            if (i==-1)or(j==-1): continue #outlier label
+            if (i==-1)or(j==-1): continue #outlier
             clusterConn[(i,j)] = _getClusterConnection(i,j)
 
     ##
@@ -80,17 +84,23 @@ def main():
     for i in range(connMat.shape[0]):
         for j in range(connMat.shape[1]):
             count += 1
-            print 'count= '+str(count)+'/'+str(connMat.size)
+            if (count%10000)==0:
+                print 'count= '+str(count)+'/'+str(connMat.size)
 
             if connMat[i][j]==1: continue
-
             comLabel = comCluster[ comList[i] ]
             proLabel = proCluster[ proList[j] ]
             if (comLabel==-1)or(proLabel==-1): continue #outlier label
 
-            clsConn = _getClusterConnection(comLabel,proLabel)
             if clusterConn[(comLabel,proLabel)]==0:
                 connMat2[i][j] = -1 # negative
+
+    ##
+    fpath = os.path.join(tDir,'connMat.csv')
+    np.savetxt(fpath,connMat2,delimiter=',')
+
+    # connDict = util.connMat2Dict(connMat2,)
+
 
 if __name__ == '__main__':
     tic = time.time()
