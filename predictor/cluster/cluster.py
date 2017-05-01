@@ -14,24 +14,35 @@ import yamanishi_data_util as yam
 
 # np.random.seed(0)
 
+DATASET_DIR = '../../dataset/connectivity/compound_vs_protein'
+XPRMT_DIR = '../../xprmt/cluster'
+
 def main():
-    if len(sys.argv)!=6:
+    if len(sys.argv)!=5:
         print 'USAGE:'
-        print 'python -m scoop cluster.py [method] [nIter] [dataset] [dataDir] [outDir]'
+        print 'python -m scoop cluster.py [method] [nIter] [dataset] [compound/protein]'
         return
 
     method = sys.argv[1]
     nIter = int(sys.argv[2])
     dataset = sys.argv[3]
-    dataDir = sys.argv[4]
-    outDir = os.path.join(sys.argv[5],'-'.join(['cluster',method,str(nIter),util.tag()]))
+    mode = sys.argv[4]
+
+    outDir = os.path.join(XPRMT_DIR,
+                          '-'.join(['cluster',method,mode,dataset,str(nIter),util.tag()]))
     os.makedirs(outDir)
 
     ##
-    _,comList,proList = yam.loadComProConnMat(dataset,os.path.join(dataDir,'ground-truth'))
-    kernelDict = yam.loadKernel(dataset,os.path.join(dataDir,'similarity-mat'))
-    comSimMat,proSimMat = util.makeKernelMatrix(kernelDict,comList,proList)
-    comDisMat,proDisMat = list(map(util.kernel2distanceMatrix,['naive']*2,[comSimMat,proSimMat]))
+    print 'loading data...'
+    datasetParam = dataset.split('-')
+    disMat = None; iList = None
+    if datasetParam[0]=='yamanishi':
+        dataDir = os.path.join(DATASET_DIR,datasetParam[0])
+        simDict = yam.loadKernel2(mode,datasetParam[1],os.path.join(dataDir,'similarity-mat'))
+        simMat,iList = util.makeKernelMatrix(simDict)
+        disMat = util.kernel2distanceMatrix('naive',simMat)
+    else:
+        assert False
 
     ##
     print 'clustering...'
@@ -39,21 +50,22 @@ def main():
     paramList = _elaborateParamSpace(paramSpace,nIter,method)
 
     sh.setConst(method=method)
-    sh.setConst(mat=comDisMat)
+    sh.setConst(mat=disMat)
 
-    comResList = list( fu.map(_cluster,paramList) )
-    bestResIdxCal = _getBestResultIdx(comResList,'calinski_harabaz_score')
-    bestResIdxSil = _getBestResultIdx(comResList,'silhouette_score')
+    resList = list( fu.map(_cluster,paramList) )
+    bestResIdxCal = _getBestResultIdx(resList,'calinski_harabaz_score')
+    bestResIdxSil = _getBestResultIdx(resList,'silhouette_score')
 
-    resDictCal = dict( zip(comList,comResList[bestResIdxCal][0]) )
-    resDictSil = dict( zip(comList,comResList[bestResIdxSil][0]) )
+    resDictCal = dict( zip(iList,resList[bestResIdxCal][0]) )
+    resDictSil = dict( zip(iList,resList[bestResIdxSil][0]) )
 
     bestParamCal = dict(param=paramList[bestResIdxCal],
-                        score=comResList[bestResIdxCal][1])
+                        score=resList[bestResIdxCal][1])
     bestParamSil = dict(param=paramList[bestResIdxSil],
-                        score=comResList[bestResIdxSil][1])
+                        score=resList[bestResIdxSil][1])
 
     ##
+    print 'writing result...'
     fname = method+"_"+'calinskiharabazscore'+"_clusterlabels.json"
     with open(os.path.join(outDir,fname),'w') as f:
         json.dump(resDictCal,f,indent=2,sort_keys=True)
