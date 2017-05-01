@@ -24,21 +24,18 @@ def kernel2distanceMatrix(method,simMat):
 
     return disMat
 
-def makeKernelMatrix(kernelDict,comList,proList):
-    nCom = len(comList); nPro = len(proList)
+def makeKernelMatrix(kernelDict,iList=list()):
+    if len(iList)==0:
+        iList = list(set([i[0] for i in kernelDict.keys()]))
 
-    comSimMat = np.zeros((nCom,nCom),dtype=float)
-    proSimMat = np.zeros((nPro,nPro),dtype=float)
+    n = len(iList)
+    simMat = np.zeros((n,n),dtype=float)
 
-    for row,i in enumerate(comList):
-        for col,j in enumerate(comList):
-            comSimMat[row][col] = kernelDict[(i,j)]
+    for row,i in enumerate(iList):
+        for col,j in enumerate(iList):
+            simMat[row][col] = kernelDict[(i,j)]
 
-    for row,i in enumerate(proList):
-        for col,j in enumerate(proList):
-            proSimMat[row][col] = kernelDict[(i,j)]
-
-    return (comSimMat,proSimMat)
+    return (simMat,iList)
 
 def getType(idStr):
     prefix1 = idStr[0:1]
