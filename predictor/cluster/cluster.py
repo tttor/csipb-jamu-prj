@@ -29,20 +29,21 @@ def main():
     mode = sys.argv[4]
 
     outDir = os.path.join(XPRMT_DIR,
-                          '-'.join(['cluster',method,dataset,mode,str(nIter),util.tag()]))
+                          '-'.join(['cluster',method+'#'+str(nIter),dataset,mode,
+                                    util.tag()]))
     os.makedirs(outDir)
 
     ##
     print 'loading data...'
-    datasetParam = dataset.split('-')
+    dParam = dataset.split('#')
     disMat = None; iList = None
-    if datasetParam[0]=='yamanishi':
-        dataDir = os.path.join(DATASET_DIR,datasetParam[0])
-        simDict = yam.loadKernel2(mode,datasetParam[1],os.path.join(dataDir,'similarity-mat'))
+    if dParam[0]=='yamanishi':
+        dataDir = os.path.join(DATASET_DIR,dParam[0])
+        simDict = yam.loadKernel2(mode,dParam[1],os.path.join(dataDir,'similarity-mat'))
         simMat,iList = util.makeKernelMatrix(simDict)
         disMat = util.kernel2distanceMatrix('naive',simMat)
     else:
-        assert False
+        assert False,'FATAL: unknown dataset'
 
     ##
     print 'clustering...'
@@ -67,7 +68,7 @@ def main():
     ##
     print 'writing result...'
     def _writeLabelAndParam(metric,resDict,paramDict):
-        fname = '_'.join([method,metric,dataset,mode])
+        fname = '_'.join(['cluster',mode,metric])
         with open(os.path.join(outDir,fname+"_bestlabels.json"),'w') as f:
             json.dump(resDict,f,indent=2,sort_keys=True)
         with open(os.path.join(outDir,fname+"_bestparams.json"),'w') as f:
