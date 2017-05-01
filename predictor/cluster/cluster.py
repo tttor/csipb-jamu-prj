@@ -29,7 +29,7 @@ def main():
     mode = sys.argv[4]
 
     outDir = os.path.join(XPRMT_DIR,
-                          '-'.join(['cluster',method,mode,dataset,str(nIter),util.tag()]))
+                          '-'.join(['cluster',method,dataset,mode,str(nIter),util.tag()]))
     os.makedirs(outDir)
 
     ##
@@ -66,21 +66,15 @@ def main():
 
     ##
     print 'writing result...'
-    fname = method+"_"+'calinskiharabazscore'+"_bestlabels.json"
-    with open(os.path.join(outDir,fname),'w') as f:
-        json.dump(resDictCal,f,indent=2,sort_keys=True)
+    def _writeLabelAndParam(metric,resDict,paramDict):
+        fname = '_'.join([method,metric,dataset,mode])
+        with open(os.path.join(outDir,fname+"_bestlabels.json"),'w') as f:
+            json.dump(resDict,f,indent=2,sort_keys=True)
+        with open(os.path.join(outDir,fname+"_bestparams.json"),'w') as f:
+            json.dump(paramDict,f,indent=2,sort_keys=True)
 
-    fname = method+"_"+'silhouettescore'+"_bestlabels.json"
-    with open(os.path.join(outDir,fname),'w') as f:
-        json.dump(resDictSil,f,indent=2,sort_keys=True)
-
-    fname = method+"_"+'calinskiharabazscore'+"_bestparam.json"
-    with open(os.path.join(outDir,fname),'w') as f:
-        json.dump(bestParamCal,f,indent=2,sort_keys=True)
-
-    fname = method+"_"+'silhouettescore'+"_bestparam.json"
-    with open(os.path.join(outDir,fname),'w') as f:
-        json.dump(bestParamSil,f,indent=2,sort_keys=True)
+    _writeLabelAndParam('calinskiharabaz',resDictCal,bestParamCal)
+    _writeLabelAndParam('silhouette',resDictSil,bestParamSil)
 
 def _cluster(params):
     cls = None
