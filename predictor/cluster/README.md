@@ -19,7 +19,14 @@
 
 ## Performance metrics
 * Silhouette Coefficient
+  * The best value is 1 and the worst value is -1.
+  * Values near 0 indicate overlapping clusters.
+  * Negative values generally indicate that
+    a sample has been assigned to the wrong cluster, as a different cluster is more similar.
+  * only defined if number of labels is 2 <= n_labels <= n_samples - 1.
 * Calinski-Harabaz Index
+  * the ratio of the between-clusters dispersion mean and the within-cluster dispersion
+  * higher when clusters are dense and well separated
 
 ## Libs
 * pyclustering >= 0.6.6
