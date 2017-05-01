@@ -66,11 +66,11 @@ def main():
 
     ##
     print 'writing result...'
-    fname = method+"_"+'calinskiharabazscore'+"_clusterlabels.json"
+    fname = method+"_"+'calinskiharabazscore'+"_bestlabels.json"
     with open(os.path.join(outDir,fname),'w') as f:
         json.dump(resDictCal,f,indent=2,sort_keys=True)
 
-    fname = method+"_"+'silhouettescore'+"_clusterlabels.json"
+    fname = method+"_"+'silhouettescore'+"_bestlabels.json"
     with open(os.path.join(outDir,fname),'w') as f:
         json.dump(resDictSil,f,indent=2,sort_keys=True)
 
