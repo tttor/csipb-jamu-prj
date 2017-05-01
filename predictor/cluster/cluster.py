@@ -20,7 +20,7 @@ XPRMT_DIR = '../../xprmt/cluster'
 def main():
     if len(sys.argv)!=5:
         print 'USAGE:'
-        print 'python -m scoop cluster.py [method] [nIter] [dataset] [compound/protein]'
+        print 'python -m scoop cluster.py [method] [nIter] [dataset#x] [compound/protein]'
         return
 
     method = sys.argv[1]
@@ -47,8 +47,18 @@ def main():
 
     ##
     print 'clustering...'
-    paramSpace = {"eps": [0.0,1.0],"min_samples":[1,5]}
-    paramList = _elaborateParamSpace(paramSpace,nIter,method)
+
+    paramList = []
+    if method=='dbscan':
+        epsMin,epsMax = [0.0,1.0]
+        nMin,nMax = [1,len(iList)]
+
+        for i in range(nIter):
+            eps = np.random.uniform(epsMin,epsMax,1)[0]
+            n = np.random.randint(nMin,nMax,1)[0]
+            paramList.append( dict(eps=eps,min_samples=n) )
+    else:
+        assert False
 
     sh.setConst(method=method)
     sh.setConst(mat=disMat)
@@ -104,21 +114,6 @@ def _cluster(params):
     perf = dict(silhouette_score=sil,calinski_harabaz_score=cal)
 
     return (labels,perf)
-
-def _elaborateParamSpace(paramSpace,nIter,method):
-    paramList = []
-    for i in range(nIter):
-        if method=='dbscan':
-            epsMin,epsMax = paramSpace['eps']
-            nMin,nMax = paramSpace['min_samples']
-
-            eps = np.random.uniform(epsMin,epsMax,1)[0]
-            n = np.random.randint(nMin,nMax,1)[0]
-            param = dict(eps=eps,min_samples=n)
-            paramList.append(param)
-        else:
-            assert False
-    return paramList
 
 def _getBestResultIdx(resList,metric):
     mets = [i[1][metric] for i in resList]
