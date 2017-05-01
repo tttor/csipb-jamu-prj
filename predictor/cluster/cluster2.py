@@ -5,6 +5,7 @@ import yaml
 import time
 import json
 import numpy as np
+import matplotlib.pyplot as plt
 from collections import defaultdict
 from scoop import futures as fu
 from scoop import shared as sh
@@ -109,6 +110,16 @@ def main():
         json.dump(connDict,f,indent=2,sort_keys=True)
     with open(os.path.join(tDir,"connDict2.json"),'w') as f:
         json.dump(connDict2,f,indent=2,sort_keys=True)
+
+    fig = plt.figure()
+    _ = [(k,v) for k,v in connDict2.iteritems()]
+    plt.pie([i[1] for i in _], explode=[0.3 if (i[0]==0) else 0.0 for i in _],
+         labels=[i[0] for i in _], autopct='%1.2f%%',
+         shadow=False, startangle=90)
+    plt.axis('equal')
+    plt.savefig(os.path.join(tDir,'conn_pie.png'),
+                dpi=300,format='png',bbox_inches='tight')
+    plt.close(fig)
 
 if __name__ == '__main__':
     tic = time.time()
