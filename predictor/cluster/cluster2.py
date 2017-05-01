@@ -3,6 +3,7 @@ import os
 import sys
 import yaml
 import time
+import json
 import numpy as np
 from collections import defaultdict
 from scoop import futures as fu
@@ -10,6 +11,7 @@ from scoop import shared as sh
 
 sys.path.append('../../utility')
 import yamanishi_data_util as yam
+import util
 
 DATASET_DIR = '../../dataset/connectivity/compound_vs_protein'
 XPRMT_DIR = '../../xprmt/cluster'
@@ -58,8 +60,6 @@ def main():
 
     comCluster,comCluster2 = _loadCluster('compound')
     proCluster,proCluster2 = _loadCluster('protein')
-    # comList = comCluster.keys()
-    # proList = proCluster.keys()
 
     ##
     print 'get clusterConn...'
@@ -95,12 +95,20 @@ def main():
             if clusterConn[(comLabel,proLabel)]==0:
                 connMat2[i][j] = -1 # negative
 
+    connDict = defaultdict(list); connDict2 = {}
+    connDictRaw = util.connMat2Dict(connMat2,comList,proList)
+    for k,v in connDictRaw.iteritems(): connDict[int(v)].append(k)
+    for k,v in connDict.iteritems(): connDict2[k] = len(v)
+
     ##
+    print 'writing...'
     fpath = os.path.join(tDir,'connMat.csv')
     np.savetxt(fpath,connMat2,delimiter=',')
 
-    # connDict = util.connMat2Dict(connMat2,)
-
+    with open(os.path.join(tDir,"connDict.json"),'w') as f:
+        json.dump(connDict,f,indent=2,sort_keys=True)
+    with open(os.path.join(tDir,"connDict2.json"),'w') as f:
+        json.dump(connDict2,f,indent=2,sort_keys=True)
 
 if __name__ == '__main__':
     tic = time.time()
