@@ -60,7 +60,7 @@ def randData(pairList,limit):
     idC = None
 
     nPair = len(pairList)
-    while nPair < 1000:
+    while nPair < limit:
         temp1 = np.random.randint(1,3334*17277)
         if temp1%3334 == 0:
             idP = 3334

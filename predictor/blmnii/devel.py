@@ -22,15 +22,16 @@ import yamanishi_data_util as yam
 
 def main():
     global classParam,comSimMat,proSimMat,connMat
-    classParam = dict(name='blmnii',proba=True)
-    if len(sys.argv)!=5:
-        print "python blmniisvm_experiment.py [DataSetCode] [evalMode] [dataPath] [outPath]"
+    classParam = dict(name='blmnii',alpha=0.5,gamma=0.1,proba=False)
+    if len(sys.argv)!=6:
+        print "python blmniisvm_experiment.py [numCore] [DataSetCode] [evalMode] [dataPath] [outPath]"
         return
 
-    dataset = sys.argv[1]
-    evalMode = sys.argv[2]
-    dataPath = sys.argv[3]
-    outPath = sys.argv[4]
+    core = int(sys.argv[1])
+    dataset = sys.argv[2]
+    evalMode = sys.argv[3]
+    dataPath = sys.argv[4]
+    outPath = sys.argv[5]
 
     print "Building Data"
     connMat,comList,proList = yam.loadComProConnMat(dataset,dataPath+"/Adjacency")
@@ -55,7 +56,6 @@ def main():
 
     comSimMat = regularizationKernel(comSimMat)
     proSimMat = regularizationKernel(proSimMat)
-
 
     pairData = []
     connList = []
@@ -92,26 +92,12 @@ def main():
         comTestList.append([i for i in testIndex])
         comTrainList.append([i for i in trainIndex])
 
-    predJob = []
-    # print "Predicting..."
-    print "Building Job List... "
-    # Parallel This
-    for ii,i in enumerate(comTestList):
-        for jj,j in enumerate(proTestList):
-            for comp in i:
-                for prot in j:
-                    predJob.append([(comp,prot),([comTrainList[ii],proTrainList[jj]],[i,j])])
-                    # testData.append(connMat[comp][prot])
-    pool = Pool(processes=4)
-    print "Run Prediction in parallel..."
-
-    testData = []
-    predRes = []
-    predParallel = [pool.apply_async(parallelWorkArround,(job,)) for job in predJob]
-    for pred in predParallel:
-        predRes.append(pred.get()[0])
-        testData.append(connMat[pred.get[1][0]][pred.get[1][1]])
-
+    if core == 1:
+        predRes,testData = singleProc(comTrainList,proTrainList,comTestList,proTestList)
+    elif core > 1:
+        predRes,testData = parallelProc(core,comTrainList,proTrainList,comTestList,proTestList)
+    else:
+        print "Error: Invalid core processor number"
 #####################################################################
 
     print "\nCalculate Performance"
@@ -138,8 +124,47 @@ def main():
     plt.ylabel('Precision')
     plt.title('Precision-Recall Curve')
     plt.legend(loc="lower left")
-    plt.savefig(outPath+'/'+ dataset +'_'+evalMode+'_pr_curve.png', bbox_inches='tight')
+    plt.savefig(outPath+'/'+ dataset +'_'+evalMode+'_pr_curve_'+str(time.time())+'.png', bbox_inches='tight')
 
+def parallelProc(core,comTrainList,proTrainList,comTestList,proTestList):
+    predJob = []
+    # print "Predicting..."
+    print "Building Job List... "
+
+    # Parallel This
+    for ii,i in enumerate(comTestList):
+        for jj,j in enumerate(proTestList):
+            for comp in i:
+                for prot in j:
+                    predJob.append(((comp,prot),comTrainList[ii],proTrainList[jj],[i,j]))
+                    # testData.append(connMat[comp][prot])
+    pool = Pool(processes=core)
+    print "Run Prediction in parallel..."
+    testData = []
+    predRes = []
+    predParallel = pool.map(parallelWorkArround,predJob)
+    # print predParallel
+    for pred in predParallel:
+        predRes.append(pred[0][0])
+        testData.append(connMat[pred[1][0][0]][pred[1][1][0]])
+    return predRes,testData
+
+def singleProc(comTrainList,proTrainList,comTestList,proTestList):
+    print "Predicting..."
+    testData = []
+    predRes = []
+
+    for ii,i in enumerate(comTestList):
+        for jj,j in enumerate(proTestList):
+            sys.stderr.write("\r%d/%d||%d/%d"%(ii,len(comTestList),jj,len(proTestList)))
+            sys.stderr.flush()
+            predictor = BLMNII(classParam, connMat, comSimMat, proSimMat,
+                            [comTrainList[ii],proTrainList[jj]],[i,j])
+            for comp in i:
+                for prot in j:
+                    predRes.append(predictor.predict([(comp,prot)]))
+                    testData.append(connMat[comp][prot])
+    return predRes,testData
 # http://stackoverflow.com/questions/29644180/gram-matrix-kernel-in-svms-not-positive-semi-definite?rq=1
 def regularizationKernel(mat):
     eps = 0.1
@@ -156,11 +181,10 @@ def isPSDKernel(mat,eps = 1e-8):
   return np.all(E > -eps) and np.all(np.isreal(E))
 
 def parallelWorkArround(job):
-    # print job[0]
     predictor = BLMNII(classParam, connMat, comSimMat, proSimMat,
-                    job[1][0],job[1][1])
-    predictionResult = predictor.predict(job[0])
-    return predictionResult,job
+                    [job[1],job[2]],job[3])
+    predictionResult = predictor.predict([job[0]])
+    return (predictionResult,job[3])
 
 if __name__ == '__main__':
     main()
