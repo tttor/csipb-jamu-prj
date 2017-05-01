@@ -4,6 +4,13 @@ import sys
 import socket
 import datetime
 
+def connMat2Dict(connMat,comList,proList):
+    connDict = {}
+    for i,com in enumerate(comList):
+        for j,pro in enumerate(proList):
+            connDict[(com,pro)] = connMat[i][j]
+    return connDict
+
 def tag():
     timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
     hostname = socket.gethostname()
