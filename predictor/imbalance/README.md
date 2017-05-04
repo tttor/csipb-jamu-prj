@@ -56,6 +56,14 @@
 * http://contrib.scikit-learn.org/imbalanced-learn/auto_examples/index.html
 * https://github.com/scikit-learn-contrib/imbalanced-learn
 
+## dealing with large-scale samples
+* Ensemble SVM: http://esat.kuleuven.be/stadius/ensemblesvm
+* active learning + SVM
+* SGD classifier (works on features, linear case)
+* incremental (online) learning machines (with concept drift?)
+
 ## misc
 * active learning for imbalanced and deceptive samples on drug-target prediction
 * benchmarking methods for imbalanced and deceptive samples on drug-target prediction
+* Ensembles of SMOTE-SVMs for imbalanced and large-scale drug-target prediction
+* SVM-based active learning for imbalanced and large-scale drug-target prediction
