@@ -51,11 +51,10 @@
 * receiver operating characteristic, area under roc (auroc)
 * F1-measure, F_{beta}-measure,
 
-## depedencies
-* imbalanced-learn >=0.21
-
 ## web resources
 * http://active-learning.net/
+* http://contrib.scikit-learn.org/imbalanced-learn/auto_examples/index.html
+* https://github.com/scikit-learn-contrib/imbalanced-learn
 
 ## misc
 * active learning for imbalanced and deceptive samples on drug-target prediction
