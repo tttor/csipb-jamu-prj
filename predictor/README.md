@@ -31,6 +31,9 @@
   * compound/chemical features/kernels
   * protein/biological/genomic features/kernels
   * compound-protein interaction/network/pharmacological features/kernels
+* big data (large-scale dataset)
+  * the number of compound-protein links is equal to `nCompound x nProtein`
+  * requires large-scale learning
 
 ## Supervised ML-based approaches
 * BLM (Bipartite Local Model)
