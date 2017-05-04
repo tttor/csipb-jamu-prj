@@ -4,6 +4,7 @@ import sys
 import yaml
 import time
 import json
+import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import defaultdict
@@ -108,6 +109,8 @@ def main():
 
     with open(os.path.join(tDir,metric+"_connDict.json"),'w') as f:
         json.dump(connDict,f,indent=2,sort_keys=True)
+    with open(os.path.join(tDir,metric+"_connDict.pkl"),'w') as f:
+        pickle.dump(connDict,f)
     with open(os.path.join(tDir,metric+"_connDict2.json"),'w') as f:
         json.dump(connDict2,f,indent=2,sort_keys=True)
 
