@@ -1,6 +1,14 @@
 # Clustering compounds and proteins
 
-## Notes
+## Objective
+To build highly credible samples for learning.
+After performing clustering on compound and protein sets,
+samples are classified into positive, negative and unknown samples.
+This is based on the following assumptions:
+* similar compounds are likely to target similar (target-)proteins
+* dissimilar compound are likely to target dissimilar (target-)proteins
+
+## Attention
 * **no** ground-truth cluster-label is available
 * large number of samples: >10K
 

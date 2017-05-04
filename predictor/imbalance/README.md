@@ -1,11 +1,10 @@
 # imbalanced/skewed learning
 
 ## approaches
-* problem-definition-level
-  * redefine the problem
-    * to focus on a subdomain or partition of the data,
-      where the degree of imbalance is lessened.
-    * anomaly detection, one-class learning or novelty detection
+* problem-definition-level, redefining the problem
+  * to focus on a subdomain or partition of the data,
+    where the degree of imbalance is lessened
+  * anomaly detection, one-class learning or novelty detection
 * data-level
   * active learning
     * SVM-based: select samples near the classifier boundary
@@ -34,15 +33,15 @@
     * naive bayes
     * hellinger distance decision trees (HDDTs)
 
-## dealing with imbalance in drug-target prediction
+## dealing with imbalance on drug-target prediction
 * credible negative samples
   * Liu (2015)
 * ensemble learners
-  * Ezzat, A (2016) (proposed ensemble learners)
-  * Niu, Y (2015) (RandomForest)
-  * Kumari, P (2014) (+SMOTE +ReliefF feature-selection)
-  * Li, Q (2009) (granular-SVM repetitive under sampling method (GSVM-RU))
-  * Radivojac, P (2004) (ensembles of neural networks)
+  * Ezzat, A (2016): proposed ensemble learners
+  * Niu, Y (2015): RandomForest
+  * Kumari, P (2014): +SMOTE +ReliefF feature-selection
+  * Li, Q (2009): granular-SVM repetitive under sampling method (GSVM-RU)
+  * Radivojac, P (2004): ensembles of neural networks
 * Weighted Tanimoto Extreme Learning Machine (T-WELM)
   * Czarnecki, W (2015)
 
@@ -52,12 +51,11 @@
 * receiver operating characteristic, area under roc (auroc)
 * F1-measure, F_{beta}-measure,
 
-## depedencies
-* imbalanced-learn >=0.21
-
 ## web resources
 * http://active-learning.net/
+* http://contrib.scikit-learn.org/imbalanced-learn/auto_examples/index.html
+* https://github.com/scikit-learn-contrib/imbalanced-learn
 
 ## misc
 * active learning for imbalanced and deceptive samples on drug-target prediction
-* benchmarking methods for dealing with imbalanced data on drug-target prediction
+* benchmarking methods for imbalanced and deceptive samples on drug-target prediction
