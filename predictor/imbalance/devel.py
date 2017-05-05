@@ -3,7 +3,9 @@ import os
 import sys
 import yaml
 import pickle
+import json
 import numpy as np
+from collections import defaultdict
 from sklearn import svm
 from sklearn.model_selection import train_test_split as tts
 from sklearn.metrics import cohen_kappa_score
@@ -14,7 +16,7 @@ sys.path.append('../../utility')
 import util
 import yamanishi_data_util as yam
 
-XPRMT_DIR = '../../xprmt'
+XPRMT_DIR = '../../xprmt/imbalance'
 DATASET_DIR = '../../dataset/connectivity/compound_vs_protein'
 
 def main():
@@ -27,6 +29,11 @@ def main():
     nClone = int(sys.argv[2])
     dataset = sys.argv[3]
     clusterDir = sys.argv[4]
+
+    outDir = os.path.join(XPRMT_DIR,
+                          '-'.join(['imbalance',method+'#'+str(nClone),dataset,
+                                    util.tag()]))
+    os.makedirs(outDir)
 
     ## Load data
     print 'loading data...'
@@ -55,47 +62,64 @@ def main():
     ydev = [yraw[i] for i in devIdx]
 
     ## DEVEL
-    nClone = 3
+    def _makeKernel(xtr1,xtr2):
+        mat = np.zeros( (len(xtr1),len(xtr2)) )
+        for i in range(mat.shape[0]):
+            for j in range(mat.shape[1]):
+                mat[i][j] = _getCompoundProteinSim(xtr1[i],xtr2[j])
+
+        return mat
+
+    def _getCompoundProteinSim(i,j):
+        comSim = _getCompoundSim(i[0],j[0])
+        proSim = _getProteinSim(i[1],j[1])
+
+        alpha = 0.5
+        sim = alpha*comSim + (1.0-alpha)*proSim
+
+        return sim
+
+    def _getCompoundSim(i,j):
+        return comSimDict[(i,j)]
+
+    def _getProteinSim(i,j):
+        return proSimDict[(i,j)]
+
+    results = []
     for i in range(nClone):
-        xtr,xte,ytr,yte = tts(xdev,ydev,test_size=0.20,random_state=42)
+        print 'devel clone= '+str(i+1)+'/'+str(nClone)
+        xtr,xte,ytr,yte = tts(xdev,ydev,
+                              test_size=0.20,random_state=None,stratify=None)
+
+        nTr = 1000
+        chosenIdx = np.random.randint(len(xtr),size=nTr)
+        xtr = [xtr[i] for i in chosenIdx]
+        ytr = [ytr[i] for i in chosenIdx]
 
         ## tuning
         clf = svm.SVC(kernel='precomputed')
 
         ## train
-        comList = list(set([i[0] for i in xtr]))
-        comSimMatTr,_ = util.makeKernelMatrix(comSimDict,comList)
-        proSimMatTr = None
-        phaSimMatTr = None
-        simMatTr = _mergeKernel(comSimMatTr,proSimMatTr,phaSimMatTr)
+        simMatTr = _makeKernel(xtr,xtr)
+        clf.fit(simMatTr,ytr)
 
-        print len(xtr)
-        print simMatTr.shape
+        ## test
+        simMatTe = _makeKernel(xte,xtr)
+        ypred = clf.predict(simMatTe)
 
-        n = 40000
-        mat = np.zeros((n,n))
-        print mat.shape
-        # clf.fit(simMatTr,ytr)
+        _ = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred}
+        results.append(_)
 
-        # ## test
-        # ypred = clf.predict(xte)
-        # cokaScore = cohen_kappa_score(yte, ypred)
+    # devel perf
+    perfs = defaultdict(list)
+    for r in results:
+        coka = cohen_kappa_score(r['yte'],r['ypred'])
+        aupr = average_precision_score(r['yte'],r['ypred'],average='micro')
+        perfs['cohen_kappa_score'].append(coka)
+        perfs['average_precision_score'].append(aupr)
 
-        # ## test eval
-        # print 'calculating aupr...'
-        # precision, recall, _ = precision_recall_curve(yte,ypred)
-        # aupr = average_precision_score(yte,ypred,average='micro')
-        # print aupr
-
-        return
-
-    ## devel perf
-
-def _mergeKernel(comSimMatTr,proSimMatTr,phaSimMatTr):
-    return comSimMatTr
-
-def _tune():
-    pass
+    fpath = os.path.join(outDir,'perfs.json')
+    with open(fpath,'w') as f: json.dump(perfs,f,indent=2,sort_keys=True)
 
 if __name__ == '__main__':
     main()
