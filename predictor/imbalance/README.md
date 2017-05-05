@@ -57,9 +57,18 @@
 * https://github.com/scikit-learn-contrib/imbalanced-learn
 
 ## dealing with large-scale samples
-* Ensemble SVM: http://esat.kuleuven.be/stadius/ensemblesvm
+* Ensembled/Parallel SVM
+  * http://esat.kuleuven.be/stadius/ensemblesvm
+  * http://scikit-learn.org/stable/modules/ensemble.html
+    * VotingClassifier
+    * Bagging classifier
+    * AdaBoost classifier
+  * LIBIRWLS: https://robedm.github.io/LIBIRWLS/
 * active learning + SVM
-* SGD classifier (works on features, linear case)
+* linear classifier (takes as input: `nSample x nFeature`)
+  * sklearn.linear_model.SGDClassifier
+  * sklearn.svm.LinearSVC
+  * LIBLINEAR: http://www.csie.ntu.edu.tw/~cjlin/liblinear/
 * incremental (online) learning machines (with concept drift?)
 
 ## misc
