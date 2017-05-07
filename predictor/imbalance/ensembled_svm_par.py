@@ -32,21 +32,29 @@ class EnsembledSVM:
         return ypred
 
     def _predict2(self,xte):
-        mode = sh.getConst('mode')
         svmList = sh.getConst('svmList')
-        ypred2 = [] # from all classifiers
-        for clf,xtr in svmList:
-            simMatTe = self._makeKernel(xte,xtr)
-            ypred2i = clf.predict(simMatTe) # remember: ypred2i is a vector
-            ypred2.append(ypred2i)
+        ypred2 = list(fu.map(self._predict3,svmList))
+
+        # ypred2 = [] # from all classifiers
+        # for clf,xtr in svmList:
+        #     simMatTe = self._makeKernel(xte,xtr)
+        #     ypred2i = clf.predict(simMatTe) # remember: ypred2i is a vector
+        #     ypred2.append(ypred2i)
 
         ypred3 = [] # ypred merged from all classifier
+        mode = sh.getConst('mode')
         for i in range(len(xte)):
             ypred3i = [ypred2[j][i] for j in range(len(ypred2))]
             ypred3i = self._merge(ypred3i,mode)
             ypred3.append(ypred3i)
 
         return ypred3
+
+    def _predict3(self,iclf):
+        clf,xtr = iclf
+        simMatTe = self._makeKernel(xte,xtr)
+        ypred2i = clf.predict(simMatTe) # remember: ypred2i is a vector
+        return ypred2i
 
     def _fit2(self,xtr,ytr):
         ## tuning
