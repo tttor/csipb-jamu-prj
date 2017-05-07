@@ -1,4 +1,6 @@
 # ensembled_svm.py
+import os
+import pickle
 import numpy as np
 from collections import Counter
 from sklearn.model_selection import StratifiedKFold
@@ -31,9 +33,13 @@ class EnsembledSVM:
         for i in ypredList: ypred += i; assert len(ypred)==len(ixte)
         return ypred
 
+    def writeSVM(self,outDir):
+        fpath = os.path.join(outDir,'esvm.pkl')
+        with open(fpath,'w') as f: pickle.dump(self._svmList,f)
+
     def _predict2(self,xte):
         svmList = sh.getConst('svmList')
-        ypred2 = list(fu.map(self._predict3,svmList))
+        ypred2 = list( fu.map(self._predict3,svmList,[xte]*len(svmList)) )
 
         # ypred2 = [] # from all classifiers
         # for clf,xtr in svmList:
@@ -50,7 +56,7 @@ class EnsembledSVM:
 
         return ypred3
 
-    def _predict3(self,iclf):
+    def _predict3(self,iclf,xte):
         clf,xtr = iclf
         simMatTe = self._makeKernel(xte,xtr)
         ypred2i = clf.predict(simMatTe) # remember: ypred2i is a vector

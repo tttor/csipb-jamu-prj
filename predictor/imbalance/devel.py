@@ -81,6 +81,7 @@ def main():
 
         print msg+': fitting...'
         esvm.fit(xtr,ytr)
+        esvm.writeSVM(outDir)
 
         print msg+': predicting...'
         ypred = esvm.predict(xte,mode)
