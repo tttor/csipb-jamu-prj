@@ -42,12 +42,6 @@ class EnsembledSVM:
         svmList = sh.getConst('svmList')
         ypred2 = list( fu.map(self._predict3,svmList,[xte]*len(svmList)) )
 
-        # ypred2 = [] # from all classifiers
-        # for clf,xtr in svmList:
-        #     simMatTe = self._makeKernel(xte,xtr)
-        #     ypred2i = clf.predict(simMatTe) # remember: ypred2i is a vector
-        #     ypred2.append(ypred2i)
-
         ypred3 = [] # ypred merged from all classifier
         mode = sh.getConst('mode')
         for i in range(len(xte)):
