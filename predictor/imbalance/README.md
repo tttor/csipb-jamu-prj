@@ -45,16 +45,11 @@
 * Weighted Tanimoto Extreme Learning Machine (T-WELM)
   * Czarnecki, W (2015)
 
-## metrics:
+## metrics on imbalanced learning:
 * cohen-kappa score
 * precision-recall curve, area under precision-recall (aupr)
 * receiver operating characteristic, area under roc (auroc)
 * F1-measure, F_{beta}-measure,
-
-## web resources
-* http://active-learning.net/
-* http://contrib.scikit-learn.org/imbalanced-learn/auto_examples/index.html
-* https://github.com/scikit-learn-contrib/imbalanced-learn
 
 ## dealing with large-scale samples
 * active learning + SVM
@@ -70,3 +65,11 @@
   * sklearn.linear_model.SGDClassifier
   * sklearn.svm.LinearSVC
   * LIBLINEAR: http://www.csie.ntu.edu.tw/~cjlin/liblinear/
+
+## web resources
+* http://active-learning.net/
+* http://contrib.scikit-learn.org/imbalanced-learn/auto_examples/index.html
+* https://github.com/scikit-learn-contrib/imbalanced-learn
+
+## lib for active learning
+* https://github.com/ntucllab/libact
