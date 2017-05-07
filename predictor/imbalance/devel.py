@@ -6,11 +6,12 @@ import pickle
 import json
 import numpy as np
 from collections import defaultdict
-from sklearn import svm
 from sklearn.model_selection import train_test_split as tts
 from sklearn.metrics import cohen_kappa_score
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import average_precision_score
+
+from ensembled_svm import EnsembledSVM as eSVM
 
 sys.path.append('../../utility')
 import util
@@ -62,53 +63,24 @@ def main():
     ydev = [yraw[i] for i in devIdx]
 
     ## DEVEL
-    def _makeKernel(xtr1,xtr2):
-        mat = np.zeros( (len(xtr1),len(xtr2)) )
-        for i in range(mat.shape[0]):
-            for j in range(mat.shape[1]):
-                mat[i][j] = _getCompoundProteinSim(xtr1[i],xtr2[j])
-
-        return mat
-
-    def _getCompoundProteinSim(i,j):
-        comSim = _getCompoundSim(i[0],j[0])
-        proSim = _getProteinSim(i[1],j[1])
-
-        alpha = 0.5
-        sim = alpha*comSim + (1.0-alpha)*proSim
-
-        return sim
-
-    def _getCompoundSim(i,j):
-        return comSimDict[(i,j)]
-
-    def _getProteinSim(i,j):
-        return proSimDict[(i,j)]
+    MAX_SAMPLES = 1000
+    BOOTSTRAP = True
+    mode = 'hard'
 
     results = []
     for i in range(nClone):
-        print 'devel clone= '+str(i+1)+'/'+str(nClone)
+        msg = 'devel clone: '+str(i+1)+'/'+str(nClone)
+        print msg
         xtr,xte,ytr,yte = tts(xdev,ydev,
-                              test_size=0.20,random_state=None,stratify=None)
+                              test_size=0.20,random_state=None,stratify=ydev)
 
-        nTr = 1000
-        chosenIdx = np.random.randint(len(xtr),size=nTr)
-        xtr = [xtr[i] for i in chosenIdx]
-        ytr = [ytr[i] for i in chosenIdx]
+        esvm = eSVM(MAX_SAMPLES,BOOTSTRAP,
+                    {'com':comSimDict,'pro':proSimDict},msg)
 
-        ## tuning
-        clf = svm.SVC(kernel='precomputed')
-
-        ## train
-        simMatTr = _makeKernel(xtr,xtr)
-        clf.fit(simMatTr,ytr)
-
-        ## test
-        simMatTe = _makeKernel(xte,xtr)
-        ypred = clf.predict(simMatTe)
-
-        _ = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred}
-        results.append(_)
+        esvm.fit(xtr,ytr)
+        ypred = esvm.predict(xte,mode)
+        results.append( {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred} )
+        break
 
     # devel perf
     perfs = defaultdict(list)

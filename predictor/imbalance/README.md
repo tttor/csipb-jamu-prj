@@ -57,19 +57,20 @@
 * https://github.com/scikit-learn-contrib/imbalanced-learn
 
 ## dealing with large-scale samples
+* active learning + SVM
+* incremental (online) learning machines (with concept drift?)
 * Ensembled/Parallel SVM
   * http://esat.kuleuven.be/stadius/ensemblesvm
-  * http://scikit-learn.org/stable/modules/ensemble.html
+  * LIBIRWLS: https://robedm.github.io/LIBIRWLS/
+  * http://scikit-learn.org/stable/modules/ensemble.html (`X: [n_samples, n_features]`)
     * VotingClassifier
     * Bagging classifier
     * AdaBoost classifier
-  * LIBIRWLS: https://robedm.github.io/LIBIRWLS/
-* active learning + SVM
-* linear classifier (takes as input: `nSample x nFeature`)
+* linear classifier (`X: [n_samples, n_features]`)
   * sklearn.linear_model.SGDClassifier
   * sklearn.svm.LinearSVC
   * LIBLINEAR: http://www.csie.ntu.edu.tw/~cjlin/liblinear/
-* incremental (online) learning machines (with concept drift?)
+
 
 ## misc
 * active learning for imbalanced and deceptive samples on drug-target prediction
