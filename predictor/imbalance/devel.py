@@ -74,7 +74,7 @@ def main():
         msg = 'devel clone: '+str(i+1)+'/'+str(nClone)
         print msg
         xtr,xte,ytr,yte = tts(xdev,ydev,
-                              test_size=0.90,random_state=None,stratify=ydev)
+                              test_size=0.20,random_state=None,stratify=ydev)
 
         esvm = eSVM(MAX_TRAINING_SAMPLES,MAX_TESTING_SAMPLES,BOOTSTRAP,
                     {'com':comSimDict,'pro':proSimDict},msg)
@@ -85,7 +85,7 @@ def main():
         esvm.writeSVM(outDir)
 
         ##
-        chosenIdx = np.random.randint(len(xtr),size=100)
+        chosenIdx = np.random.randint(len(xte),size=100)
         xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
 
         print msg+': predicting nTe= '+str(len(yte))
