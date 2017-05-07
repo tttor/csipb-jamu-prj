@@ -77,15 +77,18 @@ class EnsembledSVM:
         return y
 
     def _divideSamples(self,x,y,maxSamples):
-        # we abusely use StratifiedKFold, taking only the testIdx
         nSplits = int(len(x)/maxSamples) + 1
-        if y is None:
-            cv = KFold(n_splits=nSplits)
-            idxesList = [testIdx for  _, testIdx in cv.split(x) ]
-        else:
-            cv = StratifiedKFold(n_splits=nSplits,shuffle=True)
-            idxesList = [testIdx for  _, testIdx in cv.split(x,y) ]
+        if nSplits==1:# take all
+            idxesList = [range(len(x))]
+        else:# abusely use StratifiedKFold, taking only the testIdx
+            if y is None:
+                cv = KFold(n_splits=nSplits)
+                idxesList = [testIdx for  _, testIdx in cv.split(x) ]
+            else:
+                cv = StratifiedKFold(n_splits=nSplits,shuffle=True)
+                idxesList = [testIdx for  _, testIdx in cv.split(x,y) ]
 
+        ##
         xyList = []
         for idxes in idxesList:
             xList = [x[i] for i in idxes]
