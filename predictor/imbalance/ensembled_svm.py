@@ -4,6 +4,8 @@ from collections import Counter
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import KFold
 from sklearn import svm
+from scoop import futures as fu
+from scoop import shared as sh
 
 class EnsembledSVM:
     _maxSamples = 0
@@ -21,9 +23,9 @@ class EnsembledSVM:
     def fit(self,ixtr,iytr):
         xyTrList = self._divideSamples(ixtr,iytr)
 
-        c = 0
-        for xtr,ytr in xyTrList:
-            print self._msg+': fitting: '+str(c+1)+'/'+str(len(xyTrList))
+        for i,_ in enumerate((xyTrList)):
+            xtr,ytr = _
+            print self._msg+': fitting: '+str(i+1)+'/'+str(len(xyTrList))
 
             ## tuning
             clf = svm.SVC(kernel='precomputed')
@@ -33,14 +35,14 @@ class EnsembledSVM:
             clf.fit(simMatTr,ytr)
 
             self._svmList.append( (clf,xtr) )
-            c += 1
 
     def predict(self,ixte,mode):
         xTeList = self._divideSamples(ixte)
 
-        ypred = []; c = 0
-        for xte,_ in xTeList:
-            print self._msg+': predicting: '+str(c+1)+'/'+str(len(xTeList))
+        ypred = [];
+        for i,_  in enumerate(xTeList):
+            xte,_ = _
+            print self._msg+': predicting: '+str(i+1)+'/'+str(len(xTeList))
 
             ypred2 = [] # from all classifiers
             for clf,xtr in self._svmList:
@@ -55,7 +57,6 @@ class EnsembledSVM:
                 ypred3.append(ypred3i)
 
             ypred += ypred3
-            c += 1
 
         assert len(ypred)==len(ixte)
         return ypred
