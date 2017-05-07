@@ -76,5 +76,5 @@ http://prediction.charite.de
 - [ ] DINIES <br />
 http://www.genome.jp/tools/dinies/
 
-- [ ] iGPCR-Drug <br />
-http://www.jci-bioinfo.cn/iGPCR-Drug/
+- [ ] iDrug-Target <br />
+http://www.jci-bioinfo.cn/iDrug-Target/
