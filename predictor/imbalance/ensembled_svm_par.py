@@ -7,7 +7,6 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import KFold
 from sklearn import svm
 from scoop import futures as fu
-from scoop import shared as sh
 
 class EnsembledSVM:
     def __init__(self,imaxTrSamples,imaxTeSamples,ibootstrap,isimDict,imsg):
@@ -16,18 +15,21 @@ class EnsembledSVM:
         self._boostrap = ibootstrap
         self._simDict = isimDict
         self._msg = imsg
+        self._svmList = []
 
     def fit(self,ixtr,iytr):
         xyTrList = self._divideSamples(ixtr,iytr,self._maxTrainingSamples)
         self._svmList = list( fu.map(self._fit2,
                                      [xytr[0] for xytr in xyTrList],
                                      [xytr[1] for xytr in xyTrList]) )
+        assert len(self._svmList)!=0,'empty _svmList in fit()'
 
     def predict(self,ixte,mode):
-        sh.setConst(mode=mode)
-        sh.setConst(svmList=self._svmList)
-        xTeList = self._divideSamples(ixte,None,self._maxTestingSamples)
-        ypredList = list( fu.map(self._predict2,[i[0] for i in xTeList]) )
+        assert len(self._svmList)!=0,'empty _svmList in predict()'
+        xyTeList = self._divideSamples(ixte,None,self._maxTestingSamples)
+        xTeList = [i[0] for i in xyTeList]; n = len(xTeList)
+        ypredList = list( fu.map(self._predict2,
+                                 xTeList,[mode]*n,[self._svmList]*n) )
 
         ypred = [];
         for i in ypredList: ypred += i
@@ -38,12 +40,11 @@ class EnsembledSVM:
         fpath = os.path.join(outDir,'esvm.pkl')
         with open(fpath,'w') as f: pickle.dump(self._svmList,f)
 
-    def _predict2(self,xte):
-        svmList = sh.getConst('svmList')
-        ypred2 = list( fu.map(self._predict3,svmList,[xte]*len(svmList)) )
+    def _predict2(self,xte,mode,svmList):
+        ypred2 = list( fu.map(self._predict3,
+                              svmList,[xte]*len(svmList)) )
 
         ypred3 = [] # ypred merged from all classifier
-        mode = sh.getConst('mode')
         for i in range(len(xte)):
             ypred3i = [ypred2[j][i] for j in range(len(ypred2))]
             ypred3i = self._merge(ypred3i,mode)

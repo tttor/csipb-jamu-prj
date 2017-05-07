@@ -92,7 +92,6 @@ def main():
         ypred = esvm.predict(xte,mode)
 
         results.append( {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred} )
-        break
 
     # devel perfs
     print 'getting perfs...'
