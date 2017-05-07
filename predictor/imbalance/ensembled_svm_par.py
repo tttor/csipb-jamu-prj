@@ -30,7 +30,8 @@ class EnsembledSVM:
         ypredList = list( fu.map(self._predict2,[i[0] for i in xTeList]) )
 
         ypred = [];
-        for i in ypredList: ypred += i; assert len(ypred)==len(ixte)
+        for i in ypredList: ypred += i
+        assert len(ypred)==len(ixte),str(len(ypred))+'!='+str(len(ixte))
         return ypred
 
     def writeSVM(self,outDir):

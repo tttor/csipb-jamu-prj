@@ -79,14 +79,16 @@ def main():
         esvm = eSVM(MAX_TRAINING_SAMPLES,MAX_TESTING_SAMPLES,BOOTSTRAP,
                     {'com':comSimDict,'pro':proSimDict},msg)
 
-        print msg+': fitting...'
+        ##
+        print msg+': fitting nTr= '+str(len(ytr))
         esvm.fit(xtr,ytr)
         esvm.writeSVM(outDir)
 
-        print msg+': predicting...'
+        ##
         chosenIdx = np.random.randint(len(xtr),size=100)
-        xte = [xte[i] for i in chosenIdx]
-        yte = [yte[i] for i in chosenIdx]
+        xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
+
+        print msg+': predicting nTe= '+str(len(yte))
         ypred = esvm.predict(xte,mode)
 
         results.append( {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred} )
