@@ -8,23 +8,45 @@ from scoop import futures as fu
 from scoop import shared as sh
 
 class EnsembledSVM:
-    _maxSamples = 0
-    _boostrap = True
-    _simDict = {}
-    _svmList = []
-    _msg = ''
-
-    def __init__(self,imaxSamples,ibootstrap,isimDict,imsg):
-        self._maxSamples = imaxSamples
+    def __init__(self,imaxTrSamples,imaxTeSamples,ibootstrap,isimDict,imsg):
+        self._maxTrainingSamples = imaxTrSamples
+        self._maxTestingSamples = imaxTeSamples
         self._boostrap = ibootstrap
         self._simDict = isimDict
         self._msg = imsg
 
     def fit(self,ixtr,iytr):
-        xyTrList = self._divideSamples(ixtr,iytr)
+        xyTrList = self._divideSamples(ixtr,iytr,self._maxTrainingSamples)
         self._svmList = list( fu.map(self._fit2,
                                      [xytr[0] for xytr in xyTrList],
                                      [xytr[1] for xytr in xyTrList]) )
+
+    def predict(self,ixte,mode):
+        sh.setConst(mode=mode)
+        sh.setConst(svmList=self._svmList)
+        xTeList = self._divideSamples(ixte,None,self._maxTestingSamples)
+        ypredList = list( fu.map(self._predict2,[i[0] for i in xTeList]) )
+
+        ypred = [];
+        for i in ypredList: ypred += i; assert len(ypred)==len(ixte)
+        return ypred
+
+    def _predict2(self,xte):
+        mode = sh.getConst('mode')
+        svmList = sh.getConst('svmList')
+        ypred2 = [] # from all classifiers
+        for clf,xtr in svmList:
+            simMatTe = self._makeKernel(xte,xtr)
+            ypred2i = clf.predict(simMatTe) # remember: ypred2i is a vector
+            ypred2.append(ypred2i)
+
+        ypred3 = [] # ypred merged from all classifier
+        for i in range(len(xte)):
+            ypred3i = [ypred2[j][i] for j in range(len(ypred2))]
+            ypred3i = self._merge(ypred3i,mode)
+            ypred3.append(ypred3i)
+
+        return ypred3
 
     def _fit2(self,xtr,ytr):
         ## tuning
@@ -36,31 +58,6 @@ class EnsembledSVM:
 
         return (clf,xtr)
 
-    def predict(self,ixte,mode):
-        xTeList = self._divideSamples(ixte)
-
-        ypred = [];
-        for i,_  in enumerate(xTeList):
-            xte,_ = _
-            print self._msg+': predicting: '+str(i+1)+'/'+str(len(xTeList))
-
-            ypred2 = [] # from all classifiers
-            for clf,xtr in self._svmList:
-                simMatTe = self._makeKernel(xte,xtr)
-                ypred2i = clf.predict(simMatTe) # remember: ypred2i is a vector
-                ypred2.append(ypred2i)
-
-            ypred3 = [] # ypred merged from all classifier
-            for i in range(len(xte)):
-                ypred3i = [ypred2[j][i] for j in range(len(ypred2))]
-                ypred3i = self._merge(ypred3i,mode)
-                ypred3.append(ypred3i)
-
-            ypred += ypred3
-
-        assert len(ypred)==len(ixte)
-        return ypred
-
     def _merge(self,yList,mode):
         y = None
         if mode=='hard':
@@ -69,9 +66,9 @@ class EnsembledSVM:
             assert False,'FATAL: unkown mode'
         return y
 
-    def _divideSamples(self,x,y=None):
+    def _divideSamples(self,x,y,maxSamples):
         # we abusely use StratifiedKFold, taking only the testIdx
-        nSplits = int(len(x)/self._maxSamples) + 1
+        nSplits = int(len(x)/maxSamples) + 1
         if y is None:
             cv = KFold(n_splits=nSplits)
             idxesList = [testIdx for  _, testIdx in cv.split(x) ]

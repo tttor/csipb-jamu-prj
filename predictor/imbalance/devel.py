@@ -4,6 +4,7 @@ import sys
 import yaml
 import pickle
 import json
+import time
 import numpy as np
 from collections import defaultdict
 from sklearn.model_selection import train_test_split as tts
@@ -63,7 +64,8 @@ def main():
     ydev = [yraw[i] for i in devIdx]
 
     ## DEVEL
-    MAX_SAMPLES = 1000
+    MAX_TRAINING_SAMPLES = 1000
+    MAX_TESTING_SAMPLES = 100
     BOOTSTRAP = True
     mode = 'hard'
 
@@ -74,15 +76,20 @@ def main():
         xtr,xte,ytr,yte = tts(xdev,ydev,
                               test_size=0.20,random_state=None,stratify=ydev)
 
-        esvm = eSVM(MAX_SAMPLES,BOOTSTRAP,
+        esvm = eSVM(MAX_TRAINING_SAMPLES,MAX_TESTING_SAMPLES,BOOTSTRAP,
                     {'com':comSimDict,'pro':proSimDict},msg)
 
+        print msg+': fitting...'
         esvm.fit(xtr,ytr)
+
+        print msg+': predicting...'
         ypred = esvm.predict(xte,mode)
+
         results.append( {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred} )
         break
 
-    # devel perf
+    # devel perfs
+    print 'getting perfs...'
     perfs = defaultdict(list)
     for r in results:
         coka = cohen_kappa_score(r['yte'],r['ypred'])
@@ -94,4 +101,6 @@ def main():
     with open(fpath,'w') as f: json.dump(perfs,f,indent=2,sort_keys=True)
 
 if __name__ == '__main__':
+    tic = time.time()
     main()
+    print "main took: "+str(time.time()-tic)+' seconds'
