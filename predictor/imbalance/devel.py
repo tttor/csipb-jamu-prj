@@ -86,17 +86,21 @@ def main():
 
         results.append( {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred} )
 
-    # devel perfs
-    print 'getting perfs...'
-    perfs = defaultdict(list)
+    # devel perf
+    print 'getting perf...'
+    perf = defaultdict(list)
     for r in results:
         coka = cohen_kappa_score(r['yte'],r['ypred'])
         aupr = average_precision_score(r['yte'],r['ypred'],average='micro')
-        perfs['cohen_kappa_score'].append(coka)
-        perfs['average_precision_score'].append(aupr)
+        perf['cohen_kappa_score'].append(coka)
+        perf['average_precision_score'].append(aupr)
 
-    fpath = os.path.join(outDir,'perfs.json')
-    with open(fpath,'w') as f: json.dump(perfs,f,indent=2,sort_keys=True)
+    fpath = os.path.join(outDir,'perf.json')
+    with open(fpath,'w') as f: json.dump(perf,f,indent=2,sort_keys=True)
+
+    perfAvg = {}; fpath = os.path.join(outDir,'perf_avg.json')
+    for k,v in perf.iteritems(): perfAvg[k] = [np.mean(v),np.std(v)]
+    with open(fpath,'w') as f: json.dump(perfAvg,f,indent=2,sort_keys=True)
 
 if __name__ == '__main__':
     tic = time.time()
