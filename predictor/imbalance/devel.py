@@ -18,40 +18,31 @@ sys.path.append('../../utility')
 import util
 import yamanishi_data_util as yam
 
-XPRMT_DIR = '../../xprmt/imbalance'
-DATASET_DIR = '../../dataset/connectivity/compound_vs_protein'
+from devel_config import config as cfg
 
 def main():
-    if len(sys.argv)!=8:
+    if len(sys.argv)!=1:
         print 'USAGE:'
-        print '''python -m scoop devel.py
-                 [method] [nClone] [maxTr/batch] [maxTe/batch] [maxTe]
-                 [dataset#x] [clusterDir]'''
+        print 'python -m scoop devel.py'
+        print 'see devel_config.py'
         return
 
-    method = sys.argv[1]
-    nClone = int(sys.argv[2])
-    maxTrainingSamplesPerBatch = int(sys.argv[3])
-    maxTestingSamplesPerBatch = int(sys.argv[4])
-    maxTestingSamples = int(sys.argv[5])
-    dataset = sys.argv[6]
-    clusterDir = sys.argv[7]
-
-    outDir = os.path.join(XPRMT_DIR,
-                          '-'.join(['imbalance',method+'#'+str(nClone),dataset,
-                                    util.tag()]))
+    outDir = os.path.join(cfg['xprmtDir'],
+                          '-'.join(['imbalance',
+                                    cfg['method']+'#'+str(cfg['nClone']),
+                                    cfg['dataset'],util.tag()]))
     os.makedirs(outDir)
 
     ## Load data
     print 'loading data...'
-    dParam = dataset.split('#')
+    dParam = cfg['dataset'].split('#')
     disMat = None; iList = None
     if dParam[0]=='yamanishi':
-        connFpath = os.path.join(clusterDir,'calinskiharabaz_connDict.pkl')
+        connFpath = os.path.join(cfg['clusterDir'],'calinskiharabaz_connDict.pkl')
         with open(connFpath,'r') as f:
             data = pickle.load(f)
 
-        simDir = os.path.join(DATASET_DIR,dParam[0],'similarity-mat')
+        simDir = os.path.join(cfg['datasetDir'],dParam[0],'similarity-mat')
         comSimDict = yam.loadKernel2('compound',dParam[1],simDir)
         proSimDict = yam.loadKernel2('protein',dParam[1],simDir)
     else:
@@ -74,13 +65,13 @@ def main():
     MODE = 'hard'
 
     results = []
-    for i in range(nClone):
-        msg = 'devel clone: '+str(i+1)+'/'+str(nClone)
+    for i in range(cfg['nClone']):
+        msg = 'devel clone: '+str(i+1)+'/'+str(cfg['nClone'])
         print msg
-        xtr,xte,ytr,yte = tts(xdev,ydev,
-                              test_size=0.20,random_state=None,stratify=ydev)
+        xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
+                              random_state=None,stratify=ydev)
 
-        esvm = eSVM(maxTrainingSamplesPerBatch,maxTestingSamplesPerBatch,BOOTSTRAP,
+        esvm = eSVM(cfg['maxTrainingSamplesPerBatch'],cfg['maxTestingSamplesPerBatch'],BOOTSTRAP,
                     {'com':comSimDict,'pro':proSimDict},msg)
 
         ##
@@ -89,7 +80,7 @@ def main():
         esvm.writeSVM(outDir)
 
         ##
-        chosenIdx = np.random.randint(len(xte),size=maxTestingSamples)
+        chosenIdx = np.random.randint(len(xte),size=cfg['maxTestingSamples'])
         xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
 
         print msg+': predicting nTe= '+str(len(yte))
