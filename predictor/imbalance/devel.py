@@ -1,4 +1,4 @@
-# deploy.py
+# devel.py
 import os
 import sys
 import yaml
@@ -12,7 +12,7 @@ from sklearn.metrics import cohen_kappa_score
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import average_precision_score
 
-from ensembled_svm_par import EnsembledSVM as eSVM
+from ensembled_svm import EnsembledSVM as eSVM
 
 sys.path.append('../../utility')
 import util
