@@ -22,17 +22,20 @@ XPRMT_DIR = '../../xprmt/imbalance'
 DATASET_DIR = '../../dataset/connectivity/compound_vs_protein'
 
 def main():
-    if len(sys.argv)!=7:
+    if len(sys.argv)!=8:
         print 'USAGE:'
-        print 'python -m scoop devel.py [method] [nClone] [maxTr] [maxTe] [dataset#x] [clusterDir]'
+        print '''python -m scoop devel.py
+                 [method] [nClone] [maxTr/batch] [maxTe/batch] [maxTe]
+                 [dataset#x] [clusterDir]'''
         return
 
     method = sys.argv[1]
     nClone = int(sys.argv[2])
-    maxTrainingSamples = int(sys.argv[3])
-    maxTestingSamples = int(sys.argv[4])
-    dataset = sys.argv[5]
-    clusterDir = sys.argv[6]
+    maxTrainingSamplesPerBatch = int(sys.argv[3])
+    maxTestingSamplesPerBatch = int(sys.argv[4])
+    maxTestingSamples = int(sys.argv[5])
+    dataset = sys.argv[6]
+    clusterDir = sys.argv[7]
 
     outDir = os.path.join(XPRMT_DIR,
                           '-'.join(['imbalance',method+'#'+str(nClone),dataset,
@@ -77,7 +80,7 @@ def main():
         xtr,xte,ytr,yte = tts(xdev,ydev,
                               test_size=0.20,random_state=None,stratify=ydev)
 
-        esvm = eSVM(maxTrainingSamples,maxTestingSamples,BOOTSTRAP,
+        esvm = eSVM(maxTrainingSamplesPerBatch,maxTestingSamplesPerBatch,BOOTSTRAP,
                     {'com':comSimDict,'pro':proSimDict},msg)
 
         ##
@@ -86,7 +89,7 @@ def main():
         esvm.writeSVM(outDir)
 
         ##
-        chosenIdx = np.random.randint(len(xte),size=100)
+        chosenIdx = np.random.randint(len(xte),size=maxTestingSamples)
         xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
 
         print msg+': predicting nTe= '+str(len(yte))
