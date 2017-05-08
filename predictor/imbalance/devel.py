@@ -61,9 +61,6 @@ def main():
     print 'nDevel: '+str(len(devIdx))+'/'+str(len(yraw))
 
     ## DEVEL
-    BOOTSTRAP = True
-    MODE = 'hard'
-
     results = []
     for i in range(cfg['nClone']):
         msg = 'devel clone: '+str(i+1)+'/'+str(cfg['nClone'])
@@ -71,20 +68,21 @@ def main():
         xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
                               random_state=None,stratify=ydev)
 
-        esvm = eSVM(cfg['maxTrainingSamplesPerBatch'],cfg['maxTestingSamplesPerBatch'],BOOTSTRAP,
+        esvm = eSVM(cfg['maxTrainingSamplesPerBatch'],
+                    cfg['maxTestingSamplesPerBatch'],
+                    cfg['bootstrap'],
                     {'com':comSimDict,'pro':proSimDict},msg)
 
         ##
         print msg+': fitting nTr= '+str(len(ytr))
         esvm.fit(xtr,ytr)
-        esvm.writeSVM(outDir)
 
         ##
         chosenIdx = np.random.randint(len(xte),size=cfg['maxTestingSamples'])
         xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
 
         print msg+': predicting nTe= '+str(len(yte))
-        ypred = esvm.predict(xte,MODE)
+        ypred = esvm.predict(xte,cfg['mode'])
 
         results.append( {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred} )
 
