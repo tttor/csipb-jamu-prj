@@ -1,65 +1,72 @@
 # ensembled_svm.py
+import os
+import pickle
 import numpy as np
 from collections import Counter
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import KFold
 from sklearn import svm
 from scoop import futures as fu
-from scoop import shared as sh
 
 class EnsembledSVM:
-    _maxSamples = 0
-    _boostrap = True
-    _simDict = {}
-    _svmList = []
-    _msg = ''
-
-    def __init__(self,imaxSamples,ibootstrap,isimDict,imsg):
-        self._maxSamples = imaxSamples
+    def __init__(self,imaxTrSamples,imaxTeSamples,ibootstrap,isimDict,imsg):
+        self._maxTrainingSamples = imaxTrSamples
+        self._maxTestingSamples = imaxTeSamples
         self._boostrap = ibootstrap
         self._simDict = isimDict
         self._msg = imsg
+        self._svmList = []
 
     def fit(self,ixtr,iytr):
-        xyTrList = self._divideSamples(ixtr,iytr)
-
-        for i,_ in enumerate((xyTrList)):
-            xtr,ytr = _
-            print self._msg+': fitting: '+str(i+1)+'/'+str(len(xyTrList))
-
-            ## tuning
-            clf = svm.SVC(kernel='precomputed')
-
-            ## train
-            simMatTr = self._makeKernel(xtr,xtr)
-            clf.fit(simMatTr,ytr)
-
-            self._svmList.append( (clf,xtr) )
+        xyTrList = self._divideSamples(ixtr,iytr,self._maxTrainingSamples)
+        self._svmList = list( fu.map(self._fit2,
+                                     [xytr[0] for xytr in xyTrList],
+                                     [xytr[1] for xytr in xyTrList]) )
+        assert len(self._svmList)!=0,'empty _svmList in fit()'
 
     def predict(self,ixte,mode):
-        xTeList = self._divideSamples(ixte)
+        assert len(self._svmList)!=0,'empty _svmList in predict()'
+        xyTeList = self._divideSamples(ixte,None,self._maxTestingSamples)
+        xTeList = [i[0] for i in xyTeList]; n = len(xTeList)
+        ypredList = list( fu.map(self._predict2,
+                                 xTeList,[mode]*n,[self._svmList]*n) )
 
         ypred = [];
-        for i,_  in enumerate(xTeList):
-            xte,_ = _
-            print self._msg+': predicting: '+str(i+1)+'/'+str(len(xTeList))
-
-            ypred2 = [] # from all classifiers
-            for clf,xtr in self._svmList:
-                simMatTe = self._makeKernel(xte,xtr)
-                ypred2i = clf.predict(simMatTe) # remember: ypred2i is a vector
-                ypred2.append(ypred2i)
-
-            ypred3 = [] # ypred merged from all classifier
-            for i in range(len(xte)):
-                ypred3i = [ypred2[j][i] for j in range(len(ypred2))]
-                ypred3i = self._merge(ypred3i,mode)
-                ypred3.append(ypred3i)
-
-            ypred += ypred3
-
-        assert len(ypred)==len(ixte)
+        for i in ypredList: ypred += i
+        assert len(ypred)==len(ixte),str(len(ypred))+'!='+str(len(ixte))
         return ypred
+
+    def writeSVM(self,outDir):
+        fpath = os.path.join(outDir,'esvm.pkl')
+        with open(fpath,'w') as f: pickle.dump(self._svmList,f)
+
+    def _predict2(self,xte,mode,svmList):
+        ypred2 = list( fu.map(self._predict3,
+                              svmList,[xte]*len(svmList)) )
+
+        ypred3 = [] # ypred merged from all classifier
+        for i in range(len(xte)):
+            ypred3i = [ypred2[j][i] for j in range(len(ypred2))]
+            ypred3i = self._merge(ypred3i,mode)
+            ypred3.append(ypred3i)
+
+        return ypred3
+
+    def _predict3(self,iclf,xte):
+        clf,xtr = iclf
+        simMatTe = self._makeKernel(xte,xtr)
+        ypred2i = clf.predict(simMatTe) # remember: ypred2i is a vector
+        return ypred2i
+
+    def _fit2(self,xtr,ytr):
+        ## tuning
+        clf = svm.SVC(kernel='precomputed')
+
+        ## train
+        simMatTr = self._makeKernel(xtr,xtr)
+        clf.fit(simMatTr,ytr)
+
+        return (clf,xtr)
 
     def _merge(self,yList,mode):
         y = None
@@ -69,16 +76,19 @@ class EnsembledSVM:
             assert False,'FATAL: unkown mode'
         return y
 
-    def _divideSamples(self,x,y=None):
-        # we abusely use StratifiedKFold, taking only the testIdx
-        nSplits = int(len(x)/self._maxSamples) + 1
-        if y is None:
-            cv = KFold(n_splits=nSplits)
-            idxesList = [testIdx for  _, testIdx in cv.split(x) ]
-        else:
-            cv = StratifiedKFold(n_splits=nSplits,shuffle=True)
-            idxesList = [testIdx for  _, testIdx in cv.split(x,y) ]
+    def _divideSamples(self,x,y,maxSamples):
+        nSplits = int(len(x)/maxSamples) + 1
+        if nSplits==1:# take all
+            idxesList = [range(len(x))]
+        else:# abusely use StratifiedKFold, taking only the testIdx
+            if y is None:
+                cv = KFold(n_splits=nSplits)
+                idxesList = [testIdx for  _, testIdx in cv.split(x) ]
+            else:
+                cv = StratifiedKFold(n_splits=nSplits,shuffle=True)
+                idxesList = [testIdx for  _, testIdx in cv.split(x,y) ]
 
+        ##
         xyList = []
         for idxes in idxesList:
             xList = [x[i] for i in idxes]

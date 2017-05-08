@@ -22,15 +22,17 @@ XPRMT_DIR = '../../xprmt/imbalance'
 DATASET_DIR = '../../dataset/connectivity/compound_vs_protein'
 
 def main():
-    if len(sys.argv)!=5:
+    if len(sys.argv)!=7:
         print 'USAGE:'
-        print 'python -m scoop devel.py [method] [nClone] [dataset#x] [clusterDir]'
+        print 'python -m scoop devel.py [method] [nClone] [maxTr] [maxTe] [dataset#x] [clusterDir]'
         return
 
     method = sys.argv[1]
     nClone = int(sys.argv[2])
-    dataset = sys.argv[3]
-    clusterDir = sys.argv[4]
+    maxTrainingSamples = int(sys.argv[3])
+    maxTestingSamples = int(sys.argv[4])
+    dataset = sys.argv[5]
+    clusterDir = sys.argv[6]
 
     outDir = os.path.join(XPRMT_DIR,
                           '-'.join(['imbalance',method+'#'+str(nClone),dataset,
@@ -62,12 +64,11 @@ def main():
     devIdx = [i for i in range(len(xraw)) if yraw[i]!=0]
     xdev = [xraw[i] for i in devIdx]
     ydev = [yraw[i] for i in devIdx]
+    print 'nDevel: '+str(len(devIdx))+'/'+str(len(yraw))
 
     ## DEVEL
-    MAX_TRAINING_SAMPLES = 1000
-    MAX_TESTING_SAMPLES = 100
     BOOTSTRAP = True
-    mode = 'hard'
+    MODE = 'hard'
 
     results = []
     for i in range(nClone):
@@ -76,7 +77,7 @@ def main():
         xtr,xte,ytr,yte = tts(xdev,ydev,
                               test_size=0.20,random_state=None,stratify=ydev)
 
-        esvm = eSVM(MAX_TRAINING_SAMPLES,MAX_TESTING_SAMPLES,BOOTSTRAP,
+        esvm = eSVM(maxTrainingSamples,maxTestingSamples,BOOTSTRAP,
                     {'com':comSimDict,'pro':proSimDict},msg)
 
         ##
@@ -89,7 +90,7 @@ def main():
         xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
 
         print msg+': predicting nTe= '+str(len(yte))
-        ypred = esvm.predict(xte,mode)
+        ypred = esvm.predict(xte,MODE)
 
         results.append( {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred} )
 
