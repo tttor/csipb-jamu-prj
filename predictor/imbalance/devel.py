@@ -78,8 +78,9 @@ def main():
         esvm.fit(xtr,ytr)
 
         ##
-        chosenIdx = np.random.randint(len(xte),size=cfg['maxTestingSamples'])
-        xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
+        if cfg['maxTestingSamples']>0:
+            chosenIdx = np.random.randint(len(xte),size=cfg['maxTestingSamples'])
+            xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
 
         print msg+': predicting nTe= '+str(len(yte))
         ypred = esvm.predict(xte,cfg['mode'])
