@@ -9,18 +9,17 @@ from Bio.SubsMat.MatrixInfo import blosum62
 from multiprocessing import Pool
 
 def main():
-    if len(sys.argv) !=7 and len(sys.argv) != 5:
-        print "Usage: python sim_prot.py 0 [listDir] [fastaDir] [indexList]"
-        print "   or: python sim_prot.py 1 [listDir] [fastaDir] [indexList] [poolNum] [lenBatch]"
+    if len(sys.argv) !=5 or len(sys.argv) !=6:
+        print "Usage: python sim_prot.py [numCore] [listDir] [fastaDir] [jobList] [lenBatch]"
         return
 
-    mode = int(sys.argv[1])
+    core = int(sys.argv[1])
     listDir = sys.argv[2]
     fastaDir = sys.argv[3]
     jobListDir = sys.argv[4]
-    if mode==1:
-        poolNum = int(sys.argv[5])
-        step = int(sys.argv[6])
+    if core > 1:
+        poolNum = core
+        step = int(sys.argv[5])
 
     # Open job list, Generate a job Queue
     print "Opening Job List"
@@ -62,14 +61,13 @@ def main():
         seqList[i] = "".join(seqList[i])
 
     print "Calculate S-W score and output"
-    if mode == 0:
+    if core == 1:
         singleProc(jobList,seqMeta,seqList)
-    elif mode==1:
+    elif mode > 1:
         parallelProc(poolNum,step,jobList,seqMeta,seqList)
 
-
 def singleProc(jobList,seqMeta,seqList):
-    with open("simprotList_%d.csv"%time.time(),'w') as simFile:
+    with open("simprot_list.csv"%time.time(),'w') as simFile:
         for idx,pairJob in enumerate(jobList):
             _,_,simScore = selfLocalAlign(seqMeta[pairJob[0]],seqMeta[pairJob[1]],seqList[pairJob[0]],seqList[pairJob[1]],blosum62,-1)
             simFile.write("%s,%s,%d\n"%(seqMeta[pairJob[0]],seqMeta[pairJob[1]],simScore))
@@ -85,11 +83,12 @@ def parallelProc(poolNum,step,jobList,seqMeta,seqList):
             batchLen = len(jobList) - startBatch
         else:
             batchLen = step
+        print "%d of %d batch"%(noBatch,len(jobList)/step)
         listScore = [pool.apply_async(selfLocalAlign,(seqMeta[jobList[startBatch+b][0]],
                         seqMeta[jobList[startBatch+b][1]],seqList[jobList[startBatch+b][0]],
                         seqList[jobList[startBatch+b][1]],blosum62,-1,))
                         for b in range(batchLen)]
-        print "Batch %d finished"%noBatch
+
         with open(fileName,'a') as simFile:
             for listS in listScore:
                 simFile.write("%s,%s,%d\n"%(listS.get()[0],listS.get()[1],listS.get()[2]))
@@ -115,7 +114,6 @@ def selfLocalAlign(metaS1,metaS2,seq1,seq2,subMat,gap):
             dpTable[i+1][j+1]=max(0,diag,down,right)
 
     return metaS1,metaS2,np.max(dpTable)
-
 
 if __name__ == '__main__':
     startTime=time.time()

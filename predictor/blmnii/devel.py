@@ -20,11 +20,15 @@ from sklearn.preprocessing import MinMaxScaler
 sys.path.append('../../utility')
 import yamanishi_data_util as yam
 
+sys.path.append('../../config')
+from predictor_config import blmniiConfig
+
 def main():
-    global classParam,comSimMat,proSimMat,connMat
-    classParam = dict(name='blmnii',alpha=0.5,gamma=0.1,proba=False)
+    global classParam,comSimMat,proSimMat,connMat,comNetSim,proNetSim
+    classParam = blmniiConfig
+    classParam["proba"] = False
     if len(sys.argv)!=6:
-        print "python blmniisvm_experiment.py [numCore] [DataSetCode] [evalMode] [dataPath] [outPath]"
+        print "python devel.py [numCore] [DataSetCode] [evalMode] [dataPath] [outPath]"
         return
 
     core = int(sys.argv[1])
@@ -92,6 +96,7 @@ def main():
         comTestList.append([i for i in testIndex])
         comTrainList.append([i for i in trainIndex])
 
+
     if core == 1:
         predRes,testData = singleProc(comTrainList,proTrainList,comTestList,proTestList)
     elif core > 1:
@@ -126,12 +131,35 @@ def main():
     plt.legend(loc="lower left")
     plt.savefig(outPath+'/'+ dataset +'_'+evalMode+'_pr_curve_'+str(time.time())+'.png', bbox_inches='tight')
 
+def singleProc(comTrainList,proTrainList,comTestList,proTestList):
+    print "Predicting..."
+    testData = []
+    predRes = []
+    predictor = BLMNII(classParam)
+    predictor.modParameter(proSimMat=proSimMat,comSimMat=comSimMat,
+                            connMat=connMat,develMode=True)
+    for ii,i in enumerate(comTestList):
+        for jj,j in enumerate(proTestList):
+            sys.stderr.write("\r%d/%d||%d/%d"%(ii,len(comTestList),jj,len(proTestList)))
+            sys.stderr.flush()
+            predictor.modParameter(trainList=[comTrainList[ii],proTrainList[jj]],
+                                    testList=[i,j])
+            for comp in i:
+                for prot in j:
+                    predRes.append(predictor.predict([(comp,prot)]))
+                    testData.append(connMat[comp][prot])
+    return predRes,testData
+
 def parallelProc(core,comTrainList,proTrainList,comTestList,proTestList):
     predJob = []
-    # print "Predicting..."
     print "Building Job List... "
-
+    # We still Have to precomput
     # Parallel This
+    tempMat = [[row[i] for row in connMat] for i in range(len(connMat[0]))]
+    comNetSim = BLMNII._makeNetSim("parallel",comNetSim,classParam["gamma"],
+                                    classParam["alpha"])
+    proNetSim = BLMNII._makeNetSim("parallel",proNetSim,classParam["gamma"],
+                                    classParam["alpha"])
     for ii,i in enumerate(comTestList):
         for jj,j in enumerate(proTestList):
             for comp in i:
@@ -149,22 +177,14 @@ def parallelProc(core,comTrainList,proTrainList,comTestList,proTestList):
         testData.append(connMat[pred[1][0][0]][pred[1][1][0]])
     return predRes,testData
 
-def singleProc(comTrainList,proTrainList,comTestList,proTestList):
-    print "Predicting..."
-    testData = []
-    predRes = []
+def parallelWorkArround(job):
+    predictor = BLMNII(classParam)
+    predictor.modParameter(adjMatrix=connMat, comSimMat=comSimMat, proSimMat=proSimMat,
+                    trainList=[job[1],job[2]],testList=job[3],
+                    netSim=(comNetSim,proNetSim))
+    predictionResult = predictor.predict([job[0]])
+    return (predictionResult,job[3])
 
-    for ii,i in enumerate(comTestList):
-        for jj,j in enumerate(proTestList):
-            sys.stderr.write("\r%d/%d||%d/%d"%(ii,len(comTestList),jj,len(proTestList)))
-            sys.stderr.flush()
-            predictor = BLMNII(classParam, connMat, comSimMat, proSimMat,
-                            [comTrainList[ii],proTrainList[jj]],[i,j])
-            for comp in i:
-                for prot in j:
-                    predRes.append(predictor.predict([(comp,prot)]))
-                    testData.append(connMat[comp][prot])
-    return predRes,testData
 # http://stackoverflow.com/questions/29644180/gram-matrix-kernel-in-svms-not-positive-semi-definite?rq=1
 def regularizationKernel(mat):
     eps = 0.1
@@ -173,18 +193,14 @@ def regularizationKernel(mat):
     while isPSDKernel(mat) == False:
         for i in range(m):
             mat[i][i] = mat[i][i] + eps
-
     return mat
 
 def isPSDKernel(mat,eps = 1e-8):
   E,V = np.linalg.eigh(mat)
   return np.all(E > -eps) and np.all(np.isreal(E))
 
-def parallelWorkArround(job):
-    predictor = BLMNII(classParam, connMat, comSimMat, proSimMat,
-                    [job[1],job[2]],job[3])
-    predictionResult = predictor.predict([job[0]])
-    return (predictionResult,job[3])
 
 if __name__ == '__main__':
+    startTime = time.time()
     main()
+    print "Program is running for %f seconds"%(time.time()-startTime)

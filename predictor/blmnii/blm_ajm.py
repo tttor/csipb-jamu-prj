@@ -15,8 +15,7 @@ sys.path.append('../../utility')
 import util
 
 class BLMNII:
-    def __init__(self,params,connMat=None,comSimMat=None,proSimMat=None,
-                    trainList=None,testList=None):
+    def __init__(self,params):
 
         self._alpha = params['alpha']
         self._gamma0 = params['gamma']
@@ -28,20 +27,14 @@ class BLMNII:
 
         self._comSimMat = None
         self._proSimMat = None
+        self._comNetSim = None
+        self._proNetSim = None
         self._connMat = None
         self._develMode = False
         self._trainList = None
         self._testList = None
 
-        if connMat is not None:
-            self._comSimMat = comSimMat
-            self._proSimMat = proSimMat
-            self._connMat = connMat
-            self._develMode = True
-            self._trainList = trainList
-            self._testList = testList
-        else:
-            self._nPair = params['maxTrainingDataSize']
+        self._nPair = params['maxTrainingDataSize']
 
     def predict(self,query):
         nQuery = len(query)
@@ -56,15 +49,8 @@ class BLMNII:
             proTest = self._testList[1]
 
         else:
-
-            # timer = time.time()
-
             # TO DO: Find better method to generate dataset
-
             pairIdList = util.randData(query,self._nPair)
-
-            # sys.stderr.write ("Making kernel....\n")
-            # timer = time.time()
 
             comList = [i[0] for i in pairIdList]
             comMeta, self._comSimMat = self._makeKernel(comList,"com")
@@ -80,33 +66,25 @@ class BLMNII:
 
             queryIdx = ([[comMeta[pair[0]],proMeta[pair[1]]] for ii,pair
                         in enumerate(query) if ii<nQuery])
-            # print "This section is running for "+str(time.time()-timer)+" seconds"
 
-
-            # sys.stderr.write ("Building connectivity data...\n")
-            # timer = time.time()
             self._connMat = self._makeAdjMat(comMeta,proMeta)
-            # print "This section is running for "+str(time.time()-timer)+" seconds"
 
-            # sys.stderr.write ("Running BLM-NII...\n")
+            self._comNetSim = self._makeNetSim("com")
+            self._proNetSim = self._makeNetSim("pro")
 
-        # timer = time.time()
         mergePred = []
-
         for i in queryIdx:
             comPred = self._predict(self._connMat,self._comSimMat,self._proSimMat,
-                                    [proTest,proTrain],(i[0],i[1]),0)
+                                    self._proNetSim,[proTest,proTrain],(i[0],i[1]),0)
             proPred = self._predict(self._connMat,self._proSimMat,self._comSimMat,
-                                    [comTest,comTrain],(i[1],i[0]),1)
+                                    self._comNetSim,[comTest,comTrain],(i[1],i[0]),1)
             mergePred.append(max(comPred[0],proPred[0]))
-        # print "This section is running for "+str(time.time()-timer)+" seconds"
         return mergePred
 
     def close(self):
         self._connDB.close()
 
-    def _predict(self,adjMatrix,sourceSim,targetSim,dataSplit,dataQuery,mode):
-        #Adj matrix is sourceXtarget
+    def _predict(self,adjMatrix,sourceSim,targetSim,netSim,dataSplit,dataQuery,mode):
         if mode == 1:
             adjMatrix = [[row[i] for row in adjMatrix] for i in range(len(adjMatrix[0]))]
 
@@ -128,12 +106,11 @@ class BLMNII:
                 for jj,j in enumerate(trainIndex):
                     intProfile[jj] += sourceSim [sourceIndex][i] * adjMatrix[i][j]
 
-            #Scale I[0,1]
             scale = MinMaxScaler((0,1))
             intProfile = intProfile.reshape(-1,1)
             intProfile = scale.fit_transform(intProfile)
             intProfile = [i[0] for i in intProfile.tolist()]
-            threshold = 0.5 #Rounding
+            threshold = 0.5
             intProfile = [int(i>=threshold) for i in intProfile]
 
         else:
@@ -146,34 +123,17 @@ class BLMNII:
             else:
                 prediction = [0.0]
         else:
-
-            #Compute Network Similarity Here
-            #GIP ?/  on Target Similarity
-            #compute gamma banddwith
-            netTargetSim = np.zeros((targetSim.shape),dtype=float)
-            for i in range(nTarget):
-                intpro1 = np.array([adjMatrix[k][i] for k in range(nSource)])
-                gamma = sum(intpro1**2)*self._gamma0/nTarget
-                for j in range(nTarget):
-                    # print "NetSim %d %d"%(i,j)
-                    intpro2 = np.array([adjMatrix[k][j] for k in range(nSource)])
-                    netTargetSim[j][i] = self._computeNetSim(intpro1,intpro2,gamma)
-                    netTargetSim[j][i] = (self._alpha*targetSim[j][i] +
-                                        (1-self._alpha)*netTargetSim[j][i])
-
-
-            #Combine both similarity measurement
             if len(set([adjMatrix[i][targetIndex] for i in range(nSource)])) == 1:
                 gramTest = targetSim[targetIndex]
             else:
-                gramTest = netTargetSim[targetIndex] #If target is new use the combined Similarity Else Use this
-            gramTrain = netTargetSim #Use combined Measurement...
+                gramTest = netSim[targetIndex]
+            gramTrain = netSim
             for i in reversed(sorted(testIndex)):
                 gramTest = np.delete(gramTest,i, 0)
                 gramTrain = np.delete(gramTrain,i, 0)
                 gramTrain = np.delete(gramTrain,i, 1)
             model = svm.SVC(kernel='precomputed', probability=True)
-            model.fit(gramTrain, intProfile) # use combined for model
+            model.fit(gramTrain, intProfile)
 
             if self._proba:
                 prediction = model.predict_proba(gramTest.reshape(1,-1))
@@ -184,6 +144,50 @@ class BLMNII:
             return (prediction[0][1],sourceIndex,targetIndex)
         else:
             return (float(prediction[0]),sourceIndex,targetIndex)
+
+    def modParameter(self,proSimMat=None,comSimMat=None,connMat=None,develMode=False,
+                        trainList=None,testList=None,netSim=None):
+        if comSimMat is not None:
+            self._comSimMat = comSimMat
+        if proSimMat is not None:
+            self._proSimMat = proSimMat
+        if connMat is not None:
+            self._connMat = connMat
+        if develMode:
+            self._develMode = develMode
+        if trainList is not None:
+            self._trainList = trainList
+        if testList is not None:
+            self._testList = testList
+        if (self._connMat is not None and self._comSimMat is not None) and (netSim is None):
+            self._comNetSim = self._makeNetSim("com")
+            self._proNetSim = self._makeNetSim("pro")
+        else:
+            self._comNetSim = netSim[0]
+            self._proNetSim = netSim[1]
+
+    def _makeNetSim(self,mode,targetSim=None,gamma0=None,alpha=None):
+        # makeNetSim already combined 2 similarity Measurement
+        if mode == "com":
+            targetSim = self._comSimMat
+            adjMatrix = [[row[i] for row in self._connMat] for i in range(len(self._connMat[0]))]
+            gamma0 = self._gamma0
+            alpha = self._alpha
+        elif mode == "pro":
+            targetSim = self._proSimMat
+            adjMatrix = self._connMat
+            gamma0 = self._gamma0
+            alpha = self._alpha
+        nTarget = len(targetSim)
+        netSim = np.zeros((targetSim.shape),dtype=float)
+        for i in range(nTarget):
+            intpro1 = np.array([adjMatrix[k][i] for k in range(len(adjMatrix))])
+            gamma = sum(intpro1**2)*gamma0/nTarget
+            for j in range(nTarget):
+                intpro2 = np.array([adjMatrix[k][j] for k in range(len(adjMatrix))])
+                netSim[j][i] = self._computeNetSim(intpro1,intpro2,gamma)
+                netSim[j][i] = (alpha*targetSim[j][i] + (1-alpha)*netSim[j][i])
+        return netSim
 
     def _computeNetSim(self,profile1,profile2,gamma):
         norm = LA.norm(profile1-profile2)
@@ -245,11 +249,52 @@ class BLMNII:
 def test():
     pairQuery = [('COM00000020','PRO00001846')]
     predictorTest = BLMNII(blmniiConfig)
-
     testRes = predictorTest.predict(pairQuery)
+
+def fullTesting(numData):
+    # generate Pair List of Query
+    testPairList = util.randData([],10000)
+# Take True value from DB
+    # Make cursor
+    testData = []
+    predRes = []
+    predictor = BLMNII(blmniiConfig)
+    for pair in testPairList:
+        # testData.append(use doesExist() on posgresqlUtil function)
+    # Predict all Pair
+        predRes.append(predictor(pair))
+
+    print "\nCalculate Performance"
+    key = 'Navie implementation BLM-NII'
+    precision, recall, _ = precision_recall_curve(testData, predRes)
+    prAUC = average_precision_score(testData, predRes, average='micro')
+
+    print "Visualiation"
+    lineType = 'k-.'
+
+    perf = {'precision': precision, 'recall': recall, 'prAUC': prAUC,
+                 'lineType': lineType}
+    perf2 = {'prAUC': prAUC, 'nTest': numData}
+
+    with open(outPath+'perf_blmnii_ijah_perf.json', 'w') as fp:
+        json.dump(perf2, fp, indent=2, sort_keys=True)
+
+    plt.clf()
+    plt.figure()
+    plt.plot(perf['recall'], perf['precision'], perf['lineType'], label= key+' (area = %0.2f)' % perf['prAUC'], lw=2)
+    plt.ylim([-0.05, 1.05])
+    plt.xlim([-0.05, 1.05])
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title('Precision-Recall Curve')
+    plt.legend(loc="lower left")
+    plt.savefig(outPath+'/ijah_pr_curve_'+str(time.time())+'.png', bbox_inches='tight')
 
 
 if __name__=='__main__':
     startTime = time.time()
+    # if sys.argv[1] == 'full':
+    #     fullTesting(sys.argv[2])
+    # else:
     test()
     print "Program is running for "+str(time.time()-startTime)+" seconds"
