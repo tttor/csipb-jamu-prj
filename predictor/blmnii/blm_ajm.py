@@ -250,51 +250,9 @@ def test():
     pairQuery = [('COM00000020','PRO00001846')]
     predictorTest = BLMNII(blmniiConfig)
     testRes = predictorTest.predict(pairQuery)
-
-def fullTesting(numData):
-    # generate Pair List of Query
-    testPairList = util.randData([],10000)
-# Take True value from DB
-    # Make cursor
-    testData = []
-    predRes = []
-    predictor = BLMNII(blmniiConfig)
-    for pair in testPairList:
-        # testData.append(use doesExist() on posgresqlUtil function)
-    # Predict all Pair
-        predRes.append(predictor(pair))
-
-    print "\nCalculate Performance"
-    key = 'Navie implementation BLM-NII'
-    precision, recall, _ = precision_recall_curve(testData, predRes)
-    prAUC = average_precision_score(testData, predRes, average='micro')
-
-    print "Visualiation"
-    lineType = 'k-.'
-
-    perf = {'precision': precision, 'recall': recall, 'prAUC': prAUC,
-                 'lineType': lineType}
-    perf2 = {'prAUC': prAUC, 'nTest': numData}
-
-    with open(outPath+'perf_blmnii_ijah_perf.json', 'w') as fp:
-        json.dump(perf2, fp, indent=2, sort_keys=True)
-
-    plt.clf()
-    plt.figure()
-    plt.plot(perf['recall'], perf['precision'], perf['lineType'], label= key+' (area = %0.2f)' % perf['prAUC'], lw=2)
-    plt.ylim([-0.05, 1.05])
-    plt.xlim([-0.05, 1.05])
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
-    plt.title('Precision-Recall Curve')
-    plt.legend(loc="lower left")
-    plt.savefig(outPath+'/ijah_pr_curve_'+str(time.time())+'.png', bbox_inches='tight')
-
+    predictorTest.close()
 
 if __name__=='__main__':
     startTime = time.time()
-    # if sys.argv[1] == 'full':
-    #     fullTesting(sys.argv[2])
-    # else:
     test()
     print "Program is running for "+str(time.time()-startTime)+" seconds"

@@ -100,6 +100,14 @@ def main():
     if core == 1:
         predRes,testData = singleProc(comTrainList,proTrainList,comTestList,proTestList)
     elif core > 1:
+        tempMat = [[row[i] for row in connMat] for i in range(len(connMat[0]))]
+        tempPred = BLMNII(classParam)
+        tempPred.modParameter(proSimMat=proSimMat,comSimMat=comSimMat,
+                                connMat=connMat,netSim=[None,None])
+        comNetSim = tempPred._makeNetSim("com",comSimMat,classParam["gamma"],
+                                        classParam["alpha"])
+        proNetSim = tempPred._makeNetSim("pro",proSimMat,classParam["gamma"],
+                                        classParam["alpha"])
         predRes,testData = parallelProc(core,comTrainList,proTrainList,comTestList,proTestList)
     else:
         print "Error: Invalid core processor number"
@@ -151,15 +159,11 @@ def singleProc(comTrainList,proTrainList,comTestList,proTestList):
     return predRes,testData
 
 def parallelProc(core,comTrainList,proTrainList,comTestList,proTestList):
-    predJob = []
     print "Building Job List... "
     # We still Have to precomput
     # Parallel This
-    tempMat = [[row[i] for row in connMat] for i in range(len(connMat[0]))]
-    comNetSim = BLMNII._makeNetSim("parallel",comNetSim,classParam["gamma"],
-                                    classParam["alpha"])
-    proNetSim = BLMNII._makeNetSim("parallel",proNetSim,classParam["gamma"],
-                                    classParam["alpha"])
+
+    predJob = []
     for ii,i in enumerate(comTestList):
         for jj,j in enumerate(proTestList):
             for comp in i:
@@ -179,11 +183,11 @@ def parallelProc(core,comTrainList,proTrainList,comTestList,proTestList):
 
 def parallelWorkArround(job):
     predictor = BLMNII(classParam)
-    predictor.modParameter(adjMatrix=connMat, comSimMat=comSimMat, proSimMat=proSimMat,
+    predictor.modParameter(connMat=connMat, comSimMat=comSimMat, proSimMat=proSimMat,
                     trainList=[job[1],job[2]],testList=job[3],
-                    netSim=(comNetSim,proNetSim))
+                    netSim=(comNetSim,proNetSim),develMode=True)
     predictionResult = predictor.predict([job[0]])
-    return (predictionResult,job[3])
+    return [predictionResult,job[3]]
 
 # http://stackoverflow.com/questions/29644180/gram-matrix-kernel-in-svms-not-positive-semi-definite?rq=1
 def regularizationKernel(mat):

@@ -9,7 +9,7 @@ from Bio.SubsMat.MatrixInfo import blosum62
 from multiprocessing import Pool
 
 def main():
-    if len(sys.argv) !=5 or len(sys.argv) !=6:
+    if len(sys.argv) !=6:
         print "Usage: python sim_prot.py [numCore] [listDir] [fastaDir] [jobList] [lenBatch]"
         return
 
@@ -63,11 +63,12 @@ def main():
     print "Calculate S-W score and output"
     if core == 1:
         singleProc(jobList,seqMeta,seqList)
-    elif mode > 1:
+    elif core > 1:
         parallelProc(poolNum,step,jobList,seqMeta,seqList)
 
 def singleProc(jobList,seqMeta,seqList):
-    with open("simprot_list.csv"%time.time(),'w') as simFile:
+    timestamp = time.strftime("%a,_%d_%b_%Y_%H:%M:%S", time.gmtime())
+    with open("simprot_list_%s.csv"%timestamp,'w') as simFile:
         for idx,pairJob in enumerate(jobList):
             _,_,simScore = selfLocalAlign(seqMeta[pairJob[0]],seqMeta[pairJob[1]],seqList[pairJob[0]],seqList[pairJob[1]],blosum62,-1)
             simFile.write("%s,%s,%d\n"%(seqMeta[pairJob[0]],seqMeta[pairJob[1]],simScore))
@@ -77,7 +78,8 @@ def parallelProc(poolNum,step,jobList,seqMeta,seqList):
     startBatch = 0
     step = step
     noBatch = 1
-    fileName = "simprot_list_%d.csv"%time.time()
+    timestamp = time.strftime("%a,_%d_%b_%Y_%H:%M:%S", time.gmtime())
+    fileName = "simprot_list_%s.csv"%timestamp
     while startBatch < len(jobList):
         if startBatch+step > len(jobList):
             batchLen = len(jobList) - startBatch
