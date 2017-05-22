@@ -13,9 +13,7 @@ import util
 import yamanishi_data_util as yam
 
 # np.random.seed(0)
-
 DATASET_DIR = '../../dataset/connectivity/compound_vs_protein'
-XPRMT_DIR = '../../xprmt/cluster'
 
 def main():
     if len(sys.argv)!=5:
@@ -28,7 +26,7 @@ def main():
     dataset = sys.argv[3]
     mode = sys.argv[4]
 
-    outDir = os.path.join(XPRMT_DIR,
+    outDir = os.path.join('./output',
                           '-'.join(['cluster',method+'#'+str(nIter),dataset,mode,
                                     util.tag()]))
     os.makedirs(outDir)
