@@ -22,24 +22,27 @@ def main():
     if len(sys.argv)!=3:
         print 'USAGE:'
         print 'python cluster2.py [metric] [targetDir]'
+        print '/param metric: cal, sil'
+        print '/param targetDir: dir containing compound and protein clustering results'
         return
 
     metric = sys.argv[1]
     tDir = sys.argv[2]
 
     dirs = os.listdir(tDir); clusterDirs = {}
-    clusterDirs['compound'] = [i for i in dirs if ('compound' in i)and('cluster' in i)][0]
-    clusterDirs['protein'] = [i for i in dirs if ('protein' in i)and('cluster' in i)][0]
+    clusterDirs['compound'] = [i for i in dirs if ('compound' in i)and('cluster' in i)]
+    clusterDirs['protein'] = [i for i in dirs if ('protein' in i)and('cluster' in i)]
 
-    if metric=='cal':
-        metric = 'calinskiharabaz'
-    elif metric=='sil':
-        metric = 'silhouette'
-    else:
-        assert False
+    # For now, take only the first cluster dir
+    clusterDirs['compound'] = clusterDirs['compound'][0]
+    clusterDirs['protein'] = clusterDirs['protein'][0]
 
     dataset = clusterDirs['compound'].split('-')[2]
     assert dataset==clusterDirs['protein'].split('-')[2]
+
+    if metric=='cal': metric = 'calinskiharabaz'
+    elif metric=='sil': metric = 'silhouette'
+    else: assert False
 
     ##
     print 'loading connMat...'
