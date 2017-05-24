@@ -13,3 +13,5 @@
 * angular2 webpack:
   * https://github.com/AngularClass/angular2-webpack-starter
   * sudo npm install webpack-dev-server rimraf webpack -g
+
+* npm install node-sass sass-loader raw-loader --save-dev
