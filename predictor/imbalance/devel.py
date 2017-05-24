@@ -58,7 +58,7 @@ def main():
     devIdx = [i for i in range(len(xraw)) if yraw[i]!=0]
     xdev = [xraw[i] for i in devIdx]
     ydev = [yraw[i] for i in devIdx]
-    print 'nDevel: '+str(len(devIdx))+'/'+str(len(yraw))
+    print 'nDevel: '+str(len(devIdx))+'/'+str(len(yraw))+' = '+str(float(len(devIdx))/len(yraw))
 
     ## DEVEL
     results = []
