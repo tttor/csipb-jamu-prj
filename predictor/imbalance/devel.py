@@ -86,6 +86,7 @@ def main():
         ypred = esvm.predict(xte,cfg['mode'])
 
         results.append( {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred} )
+        with open(os.path.join(outDir,"results.pkl"),'w') as f: pickle.dump(results,f)
 
     # devel perf
     print 'getting perf...'
