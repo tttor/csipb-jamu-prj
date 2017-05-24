@@ -10,6 +10,9 @@ http://kanaya.naist.jp/knapsack_jsp/result.jsp?sname=organism&word=Rhinacanthus%
 http://www.medicinehunter.com/ethnobotanical-databases <br />
 https://phytochem.nal.usda.gov/phytochem/search
 
+- [ ] Basis data tanaman obat indonesia UI <br />
+http://herbaldb.farmasi.ui.ac.id/
+
 - [ ] StreptomeDB <br />
 http://www.pharmaceutical-bioinformatics.de/streptomedb2/
 

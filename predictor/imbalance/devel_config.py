@@ -4,6 +4,6 @@ config = dict(method='esvm',mode='hard',bootstrap=True,
               maxTrainingSamplesPerBatch=100,
               maxTestingSamplesPerBatch=100,maxTestingSamples=100,
               dataset='yamanishi#e',
-              clusterDir='../cluster/output/cluster-root-3',
+              clusterDir='../cluster/output/cluster-3',
               datasetDir='../../dataset/connectivity/compound_vs_protein'
               )

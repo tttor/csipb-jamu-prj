@@ -16,17 +16,16 @@ import yamanishi_data_util as yam
 DATASET_DIR = '../../dataset/connectivity/compound_vs_protein'
 
 def main():
-    if len(sys.argv)!=5:
+    if len(sys.argv)!=6:
         print 'USAGE:'
-        print 'python -m scoop cluster.py [method] [nIter] [dataset#x] [compound/protein]'
+        print 'python -m scoop cluster.py [method] [nIter] [dataset#x] [compound/protein] [outDir]'
         return
 
     method = sys.argv[1]
     nIter = int(sys.argv[2])
     dataset = sys.argv[3]
     mode = sys.argv[4]
-
-    outDir = os.path.join('./output',
+    outDir = os.path.join('./output',sys.argv[5],
                           '-'.join(['cluster',method+'#'+str(nIter),dataset,mode,
                                     util.tag()]))
     os.makedirs(outDir)
@@ -45,12 +44,10 @@ def main():
 
     ##
     print 'clustering...'
-
     paramList = []
     if method=='dbscan':
         epsMin,epsMax = [0.0,1.0]
         nMin,nMax = [1,len(iList)]
-
         for i in range(nIter):
             eps = np.random.uniform(epsMin,epsMax,1)[0]
             n = np.random.randint(nMin,nMax,1)[0]
