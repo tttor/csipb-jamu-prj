@@ -19,6 +19,8 @@
     negative results are rarely published (the positive results bias)
   * negative samples that actually positive may fool the learning machine;
     they are negative because their true interactions are simply unknown/not-tested
+  * datasets used for analysis contain only true-positive interactions, and
+    experimentally validated negative samples are unavailable.
   * solutions:
     * BLM, as above, to help reducing irrelevant training data wrt the testing data
     * unsupervised learning: positive vs unlabeled interactions
@@ -73,8 +75,20 @@
   * Jin, G (2014)
 
 ## Semi-supervised ML-based approaches
+* NormMulInf
+  * Peng, L (2016)
+* PUCPI
+  * Cheng, Z (2016)
+* NetCBP
+  * Chen, H (2013)
 * NetLapRLS
   * Xia, Z (2010)
+
+## Semi-supervised libs
+* http://scikit-learn.org/stable/modules/label_propagation.html
+* http://pages.cs.wisc.edu/~jerryzhu/ssl/software.html
+* https://github.com/sslh/sslh/
+* https://github.com/tmadl/semisup-learn
 
 ## Benchmarking datasets for development
 * Yamanishi (2008):

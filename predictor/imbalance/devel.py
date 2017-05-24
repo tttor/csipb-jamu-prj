@@ -27,7 +27,7 @@ def main():
         print 'see devel_config.py'
         return
 
-    outDir = os.path.join(cfg['xprmtDir'],
+    outDir = os.path.join('./output',
                           '-'.join(['imbalance',
                                     cfg['method']+'#'+str(cfg['nClone']),
                                     cfg['dataset'],util.tag()]))
