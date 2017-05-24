@@ -34,8 +34,8 @@ def main():
     clusterDirs['protein'] = [i for i in dirs if ('protein' in i)and('cluster' in i)]
 
     # For now, take only the first cluster dir
-    assert len(clusterDirs['compound'][0])==1
-    assert len(clusterDirs['protein'][0])==1
+    assert len(clusterDirs['compound'])==1
+    assert len(clusterDirs['protein'])==1
     clusterDirs['compound'] = clusterDirs['compound'][0]
     clusterDirs['protein'] = clusterDirs['protein'][0]
 
