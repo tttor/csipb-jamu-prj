@@ -68,8 +68,6 @@
 
 ## web resources
 * http://active-learning.net/
+* https://github.com/ntucllab/libact
 * http://contrib.scikit-learn.org/imbalanced-learn/auto_examples/index.html
 * https://github.com/scikit-learn-contrib/imbalanced-learn
-
-## lib for active learning
-* https://github.com/ntucllab/libact
