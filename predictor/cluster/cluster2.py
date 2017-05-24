@@ -19,15 +19,17 @@ DATASET_DIR = '../../dataset/connectivity/compound_vs_protein'
 XPRMT_DIR = '../../xprmt/cluster'
 
 def main():
-    if len(sys.argv)!=3:
+    if len(sys.argv)!=4:
         print 'USAGE:'
-        print 'python cluster2.py [metric] [targetDir]'
+        print 'python cluster2.py [metric] [targetDir] [graphic]'
         print '/param metric: cal, sil'
         print '/param targetDir: dir containing compound and protein clustering results'
+        print '/param graphic: 0 or 1, whether to write any graphic plots'
         return
 
     metric = sys.argv[1]
     tDir = sys.argv[2]
+    graphic = (sys.argv[3]=='1')
 
     dirs = os.listdir(tDir); clusterDirs = {}
     clusterDirs['compound'] = [i for i in dirs if ('compound' in i)and('cluster' in i)]
@@ -102,10 +104,11 @@ def main():
             if clusterConn[(comLabel,proLabel)]==0:
                 connMat2[i][j] = -1 # negative
 
-    connDict = defaultdict(list); connDict2 = {}
+    connDict = defaultdict(list); connDict2 = {}; connDict3 = {}
     connDictRaw = util.connMat2Dict(connMat2,comList,proList)
     for k,v in connDictRaw.iteritems(): connDict[int(v)].append(k)
     for k,v in connDict.iteritems(): connDict2[k] = len(v)
+    for k,v in connDict2.iteritems(): connDict3[k] = float(v)/sum(connDict2.values())
 
     ##
     print 'writing...'
@@ -118,16 +121,19 @@ def main():
         pickle.dump(connDict,f)
     with open(os.path.join(tDir,metric+"_connDict2.json"),'w') as f:
         json.dump(connDict2,f,indent=2,sort_keys=True)
+    with open(os.path.join(tDir,metric+"_connDict3.json"),'w') as f:
+        json.dump(connDict3,f,indent=2,sort_keys=True)
 
-    fig = plt.figure()
-    _ = [(k,v) for k,v in connDict2.iteritems()]
-    plt.pie([i[1] for i in _], explode=[0.3 if (i[0]==0) else 0.0 for i in _],
-         labels=[i[0] for i in _], autopct='%1.2f%%',
-         shadow=False, startangle=90)
-    plt.axis('equal')
-    plt.savefig(os.path.join(tDir,metric+'_conn_pie.png'),
-                dpi=300,format='png',bbox_inches='tight')
-    plt.close(fig)
+    if (graphic):
+        fig = plt.figure()
+        _ = [(k,v) for k,v in connDict2.iteritems()]
+        plt.pie([i[1] for i in _], explode=[0.3 if (i[0]==0) else 0.0 for i in _],
+             labels=[i[0] for i in _], autopct='%1.2f%%',
+             shadow=False, startangle=90)
+        plt.axis('equal')
+        plt.savefig(os.path.join(tDir,metric+'_conn_pie.png'),
+                    dpi=300,format='png',bbox_inches='tight')
+        plt.close(fig)
 
 if __name__ == '__main__':
     tic = time.time()
