@@ -104,25 +104,22 @@ def main():
             if clusterConn[(comLabel,proLabel)]==0:
                 connMat2[i][j] = -1 # negative
 
-    connDict = defaultdict(list); connDict2 = {}; connDict3 = {}
+    connDict = defaultdict(list); connDict2 = defaultdict(list)
     connDictRaw = util.connMat2Dict(connMat2,comList,proList)
     for k,v in connDictRaw.iteritems(): connDict[int(v)].append(k)
-    for k,v in connDict.iteritems(): connDict2[k] = len(v)
-    for k,v in connDict2.iteritems(): connDict3[k] = float(v)/sum(connDict2.values())
+    for k,v in connDict.iteritems(): connDict2[k].append(len(v))
+    summ = sum([v[0] for v in connDict2.values()])
+    for k,v in connDict2.iteritems(): connDict2[k].append(float(v[0])/summ)
 
     ##
     print 'writing...'
-    fpath = os.path.join(tDir,metric+'_connMat.csv')
-    np.savetxt(fpath,connMat2,delimiter=',')
-
-    with open(os.path.join(tDir,metric+"_connDict.json"),'w') as f:
-        json.dump(connDict,f,indent=2,sort_keys=True)
-    with open(os.path.join(tDir,metric+"_connDict.pkl"),'w') as f:
+    # np.savetxt(os.path.join(tDir,metric+'_connMat.csv'),connMat2,delimiter=',')
+    # with open(os.path.join(tDir,metric+"labels.json"),'w') as f:
+    #     json.dump(connDict,f,indent=2,sort_keys=True)
+    with open(os.path.join(tDir,metric+"_labels.pkl"),'w') as f:
         pickle.dump(connDict,f)
-    with open(os.path.join(tDir,metric+"_connDict2.json"),'w') as f:
+    with open(os.path.join(tDir,metric+"_labels_stat.json"),'w') as f:
         json.dump(connDict2,f,indent=2,sort_keys=True)
-    with open(os.path.join(tDir,metric+"_connDict3.json"),'w') as f:
-        json.dump(connDict3,f,indent=2,sort_keys=True)
 
     if (graphic):
         fig = plt.figure()
