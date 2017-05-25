@@ -1,16 +1,16 @@
 #!/bin/bash
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 3 ]; then
   echo "USAGE:"
-  echo "bash run.sh [dataset] [outDirPrefix]"
+  echo "bash run.sh [nIter] [dataset] [outDirPrefix]"
   exit 1
 fi
 
-N_ITER=10
+N_ITER=$1
 METHOD=dbscan
 GRAPHIC=0
 
-DATASET=$1
-OUTDIR=output/$2-$DATASET
+DATASET=$2
+OUTDIR=output/$3-$DATASET
 rm -rf $OUTDIR
 mkdir $OUTDIR
 
