@@ -30,8 +30,7 @@ def main():
 
     dataset = cfg['clusterDir'].split('/')[-1].split('-')[-1]
     outDir = os.path.join('./output',
-                          '-'.join(['imbalance',
-                                    cfg['method']+'#'+str(cfg['nClone']),
+                          '-'.join([cfg['method']+'#'+str(cfg['nClone']),
                                     dataset,cfg['clusterMetric'],util.tag()]))
     os.makedirs(outDir)
     shutil.copy2('devel_config.py',outDir)
