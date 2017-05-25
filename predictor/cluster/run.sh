@@ -7,7 +7,6 @@ fi
 
 N_ITER=$1
 METHOD=dbscan
-GRAPHIC=0
 
 DATASET=$2
 OUTDIR=output/$3-$DATASET
@@ -21,5 +20,5 @@ echo '### cluster protein #####################################################'
 python -m scoop cluster.py $METHOD $N_ITER $DATASET protein $OUTDIR
 
 echo '### cluster into neg,pos,unlabel #########################################'
-python cluster2.py cal $OUTDIR $GRAPHIC
-python cluster2.py sil $OUTDIR $GRAPHIC
+python cluster2.py cal $OUTDIR
+python cluster2.py sil $OUTDIR

@@ -28,8 +28,7 @@ def main():
     mode = sys.argv[4]
     outDir = sys.argv[5]
     outDir = os.path.join(outDir,
-                          '-'.join(['cluster',method+'#'+str(nIter),dataset,mode,
-                                    util.tag()]))
+                          '-'.join([method+'#'+str(nIter),dataset,mode,util.tag()]))
     os.makedirs(outDir)
 
     ##
@@ -81,7 +80,7 @@ def main():
         summ = sum([v[0] for v in resDict3.values()])
         for k,v in resDict3.iteritems(): resDict3[k].append(float(v[0])/summ)
 
-        fname = '_'.join(['cluster',mode,metric])
+        fname = '_'.join([mode,metric])
         with open(os.path.join(outDir,fname+"_bestlabels.json"),'w') as f:
             json.dump(resDict,f,indent=2,sort_keys=True)
         with open(os.path.join(outDir,fname+"_bestlabels_stat.json"),'w') as f:
