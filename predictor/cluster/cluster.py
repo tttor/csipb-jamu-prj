@@ -25,7 +25,8 @@ def main():
     nIter = int(sys.argv[2])
     dataset = sys.argv[3]
     mode = sys.argv[4]
-    outDir = os.path.join('./output',sys.argv[5],
+    outDir = sys.argv[5]
+    outDir = os.path.join(outDir,
                           '-'.join(['cluster',method+'#'+str(nIter),dataset,mode,
                                     util.tag()]))
     os.makedirs(outDir)
