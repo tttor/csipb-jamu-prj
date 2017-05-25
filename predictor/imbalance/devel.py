@@ -38,7 +38,7 @@ def main():
     dParam = cfg['dataset'].split('#')
     disMat = None; iList = None
     if dParam[0]=='yamanishi':
-        connFpath = os.path.join(cfg['clusterDir'],'calinskiharabaz_connDict.pkl')
+        connFpath = os.path.join(cfg['clusterDir'],cfg['clusterMetric']+'_connDict.pkl')
         with open(connFpath,'r') as f:
             data = pickle.load(f)
 
