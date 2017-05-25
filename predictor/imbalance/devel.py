@@ -5,6 +5,7 @@ import yaml
 import pickle
 import json
 import time
+import shutil
 import numpy as np
 from collections import defaultdict
 from sklearn.model_selection import train_test_split as tts
@@ -47,6 +48,8 @@ def main():
         proSimDict = yam.loadKernel2('protein',dParam[1],simDir)
     else:
         assert False,'FATAL: unknown dataset'
+
+    shutil.copy2('devel_config.py',outDir)
 
     print 'getting devel data...'
     xraw = []; yraw = []
