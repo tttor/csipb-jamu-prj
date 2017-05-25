@@ -113,9 +113,7 @@ def main():
 
     ##
     print 'writing...'
-    fpath = os.path.join(tDir,metric+'_connMat.csv')
-    np.savetxt(fpath,connMat2,delimiter=',')
-
+    # np.savetxt(os.path.join(tDir,metric+'_connMat.csv'),connMat2,delimiter=',')
     # with open(os.path.join(tDir,metric+"labels.json"),'w') as f:
     #     json.dump(connDict,f,indent=2,sort_keys=True)
     with open(os.path.join(tDir,metric+"_labels.pkl"),'w') as f:

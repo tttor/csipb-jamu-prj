@@ -28,18 +28,20 @@ def main():
         print 'see devel_config.py'
         return
 
+    dataset = cfg['clusterDir'].split('/')[-1].split('-')[-1]
     outDir = os.path.join('./output',
                           '-'.join(['imbalance',
                                     cfg['method']+'#'+str(cfg['nClone']),
-                                    cfg['dataset'],util.tag()]))
+                                    dataset,cfg['clusterMetric'],util.tag()]))
     os.makedirs(outDir)
+    shutil.copy2('devel_config.py',outDir)
 
     ## Load data
     print 'loading data...'
-    dParam = cfg['dataset'].split('#')
+    dParam = dataset.split('#')
     disMat = None; iList = None
     if dParam[0]=='yamanishi':
-        connFpath = os.path.join(cfg['clusterDir'],cfg['clusterMetric']+'_connDict.pkl')
+        connFpath = os.path.join(cfg['clusterDir'],cfg['clusterMetric']+'_labels.pkl')
         with open(connFpath,'r') as f:
             data = pickle.load(f)
 
@@ -48,8 +50,6 @@ def main():
         proSimDict = yam.loadKernel2('protein',dParam[1],simDir)
     else:
         assert False,'FATAL: unknown dataset'
-
-    shutil.copy2('devel_config.py',outDir)
 
     print 'getting devel data...'
     xraw = []; yraw = []
