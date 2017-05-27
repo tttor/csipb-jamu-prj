@@ -33,11 +33,13 @@ def main():
       perfs['aupr_score'].append( average_precision_score(ytrue,yscore,average='macro') )
       cms.append( confusion_matrix(ytrue,ypred) )
 
+   print 'writing perfs...'
    perfAvg = {}
    for m,v in perfs.iteritems(): perfAvg[m+'_avg'] = ( np.mean(v),np.std(v) )
    with open(os.path.join(odir,'perfs.json'),'w') as f: json.dump(perfs,f,indent=2,sort_keys=True)
    with open(os.path.join(odir,'perfAvg.json'),'w') as f: json.dump(perfAvg,f,indent=2,sort_keys=True)
 
+   print 'writing cm...'
    def _getBestIdx(metric):
       idx = perfs[metric].index( max(perfs[metric]) )
       return idx
