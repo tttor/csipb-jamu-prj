@@ -9,12 +9,11 @@ from sklearn import svm
 from scoop import futures as fu
 
 class EnsembledSVM:
-    def __init__(self,imaxTrSamples,imaxTeSamples,ibootstrap,isimDict,imsg):
+    def __init__(self,imaxTrSamples,imaxTeSamples,ibootstrap,isimDict):
         self._maxTrainingSamples = imaxTrSamples
         self._maxTestingSamples = imaxTeSamples
         self._boostrap = ibootstrap
         self._simDict = isimDict
-        self._msg = imsg
         self._svmList = []
 
     def fit(self,ixtr,iytr):
@@ -31,10 +30,12 @@ class EnsembledSVM:
         ypredList = list( fu.map(self._predict2,
                                  xTeList,[mode]*n,[self._svmList]*n) )
 
-        ypred = [];
-        for i in ypredList: ypred += i
-        assert len(ypred)==len(ixte),str(len(ypred))+'!='+str(len(ixte))
-        return ypred
+        ypredMerged = []; yscoreMerged = [];
+        for i in ypredList:
+            ypredMerged += [j[0] for j in i]
+            yscoreMerged += [j[1] for j in i]
+        assert len(ypredMerged)==len(ixte),str(len(ypredMerged))+'!='+str(len(ixte))
+        return (ypredMerged,yscoreMerged)
 
     def writeSVM(self,outDir):
         fpath = os.path.join(outDir,'esvm.pkl')
@@ -69,12 +70,15 @@ class EnsembledSVM:
         return (clf,xtr)
 
     def _merge(self,yList,mode):
-        y = None
+        y = None; yscore = None
         if mode=='hard':
-            y = Counter(yList).most_common(1)[0][0]
+            labels = list(set(yList)); counters = [0]*len(labels)
+            for i in yList: counters[ labels.index(i) ] += 1; assert sum(counters)==len(yList)
+            y = labels[ counters.index(max(counters)) ]
+            yscore = max(counters)/float(sum(counters))
         else:
             assert False,'FATAL: unkown mode'
-        return y
+        return (y,yscore)
 
     def _divideSamples(self,x,y,maxSamples):
         nSplits = int(len(x)/maxSamples) + 1
