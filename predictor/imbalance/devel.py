@@ -94,9 +94,9 @@ def main():
         xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
 
     print msg+': predicting nTe= '+str(len(yte))
-    ypred = esvm.predict(xte,cfg['mode'])
+    ypred,yscore = esvm.predict(xte,cfg['mode'])
 
-    result = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred}
+    result = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred,'yscore':yscore}
     with open(os.path.join(outDir,"result.pkl"),'w') as f: pickle.dump(result,f)
 
 if __name__ == '__main__':
