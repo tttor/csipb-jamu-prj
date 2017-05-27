@@ -72,10 +72,11 @@ def main():
     log['nDevel(+)'] = len( [i for i in ydev if i==1] )
     log['nDevel(-)'] = len( [i for i in ydev if i==-1] )
     log['nDevel'] = len(devIdx); log['nData'] = len(yraw)
-    log['rDevel'] = float(len(devIdx))/len(yraw)
-    log['rDevel(+)'] = float(log['nDevel(+)'])/log['nDevel']
-    log['rDevel(-)'] = float(log['nDevel(-)'])/log['nDevel']
-    print 'nDevel: '+str(log['nDevel'])+'/'+str(log['nData'])+' = '+str(log['rDevel'])
+    log['rDevel:Data'] = float(len(devIdx))/len(yraw)
+    log['rDevel(+):Devel'] = float(log['nDevel(+)'])/log['nDevel']
+    log['rDevel(-):Devel'] = float(log['nDevel(-)'])/log['nDevel']
+    log['rDevel(+):(-)'] = float(log['nDevel(+)'])/float(log['nDevel(-)'])
+    print 'nDevel: '+str(log['nDevel'])+'/'+str(log['nData'])+' = '+str(log['rDevel:Data'])
     with open(os.path.join(outDir,'log.json'),'w') as f: json.dump(log,f,indent=2,sort_keys=True)
 
     ## DEVEL
