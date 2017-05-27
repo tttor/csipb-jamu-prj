@@ -22,31 +22,39 @@ import yamanishi_data_util as yam
 from devel_config import config as cfg
 
 def main():
-    if len(sys.argv)!=1:
+    if len(sys.argv)!=3:
         print 'USAGE:'
-        print 'python -m scoop devel.py'
+        print 'python -m scoop devel.py [clusterDir] [cloneID]'
         print 'see devel_config.py'
         return
 
-    dataset = cfg['clusterDir'].split('/')[-1].split('-')[-1]
+    clusterDir = sys.argv[1]# assume: ended with '/'
+    cloneID = sys.argv[2]
+
+    dataset = clusterDir.split('/')[-2].split('-')[-1]
     outDir = os.path.join('./output',
-                          '-'.join([cfg['method']+'#'+str(cfg['nClone']),
-                                    dataset,cfg['clusterMetric'],util.tag()]))
+                          '-'.join([cfg['method']+'#'+cloneID,dataset,util.tag()]))
     os.makedirs(outDir)
     shutil.copy2('devel_config.py',outDir)
+    log = {}
 
     ## Load data
     print 'loading data...'
-    dParam = dataset.split('#')
-    disMat = None; iList = None
-    if dParam[0]=='yamanishi':
-        connFpath = os.path.join(cfg['clusterDir'],cfg['clusterMetric']+'_labels.pkl')
-        with open(connFpath,'r') as f:
-            data = pickle.load(f)
+    datasetParams = dataset.split('#')
+    if datasetParams[0]=='yamanishi':
+        nUnlabels = []
+        statFnames = [i for i in os.listdir(clusterDir) if 'labels_stat.json' in i]
+        for i in statFnames:
+            with open(os.path.join(clusterDir,i),'r') as f: stat = yaml.load(f)
+            nUnlabels.append(stat['0'])
+        metric = '_'.join(statFnames[ nUnlabels.index(min(nUnlabels)) ].split('_')[0:2])
+        log['metric'] = metric
 
-        simDir = os.path.join(cfg['datasetDir'],dParam[0],'similarity-mat')
-        comSimDict = yam.loadKernel2('compound',dParam[1],simDir)
-        proSimDict = yam.loadKernel2('protein',dParam[1],simDir)
+        connFpath = os.path.join(clusterDir,metric+'_labels.pkl')
+        with open(connFpath,'r') as f: data = pickle.load(f)
+        simDir = os.path.join(cfg['datasetDir'],datasetParams[0],'similarity-mat')
+        comSimDict = yam.loadKernel2('compound',datasetParams[1],simDir)
+        proSimDict = yam.loadKernel2('protein',datasetParams[1],simDir)
     else:
         assert False,'FATAL: unknown dataset'
 
@@ -60,51 +68,51 @@ def main():
     devIdx = [i for i in range(len(xraw)) if yraw[i]!=0]
     xdev = [xraw[i] for i in devIdx]
     ydev = [yraw[i] for i in devIdx]
-    print 'nDevel: '+str(len(devIdx))+'/'+str(len(yraw))+' = '+str(float(len(devIdx))/len(yraw))
+
+    log['nDevel(+)'] = len( [i for i in ydev if i==1] )
+    log['nDevel(-)'] = len( [i for i in ydev if i==-1] )
+    log['nDevel'] = len(devIdx); log['nData'] = len(yraw)
+    log['rDevel'] = float(len(devIdx))/len(yraw)
+    log['rDevel(+)'] = float(log['nDevel(+)'])/log['nDevel']
+    log['rDevel(-)'] = float(log['nDevel(-)'])/log['nDevel']
+    print 'nDevel: '+str(log['nDevel'])+'/'+str(log['nData'])+' = '+str(log['rDevel'])
+    with open(os.path.join(outDir,'log.json'),'w') as f: json.dump(log,f,indent=2,sort_keys=True)
 
     ## DEVEL
-    results = []
-    for i in range(cfg['nClone']):
-        msg = 'devel clone: '+str(i+1)+'/'+str(cfg['nClone'])
-        print msg
-        xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
-                              random_state=None,stratify=ydev)
+    msg = 'devel '+dataset+' '+cloneID
+    xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
+                          random_state=None,stratify=ydev)
 
-        esvm = eSVM(cfg['maxTrainingSamplesPerBatch'],
-                    cfg['maxTestingSamplesPerBatch'],
-                    cfg['bootstrap'],
-                    {'com':comSimDict,'pro':proSimDict},msg)
+    esvm = eSVM(cfg['maxTrainingSamplesPerBatch'],
+                cfg['maxTestingSamplesPerBatch'],
+                cfg['bootstrap'],
+                {'com':comSimDict,'pro':proSimDict})
 
-        ##
-        print msg+': fitting nTr= '+str(len(ytr))
-        esvm.fit(xtr,ytr)
+    ##
+    print msg+': fitting nTr= '+str(len(ytr))
+    esvm.fit(xtr,ytr)
 
-        ##
-        if cfg['maxTestingSamples']>0:
-            chosenIdx = np.random.randint(len(xte),size=cfg['maxTestingSamples'])
-            xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
+    ##
+    if cfg['maxTestingSamples']>0:
+        chosenIdx = np.random.randint(len(xte),size=cfg['maxTestingSamples'])
+        xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
 
-        print msg+': predicting nTe= '+str(len(yte))
-        ypred = esvm.predict(xte,cfg['mode'])
+    print msg+': predicting nTe= '+str(len(yte))
+    ypred = esvm.predict(xte,cfg['mode'])
 
-        results.append( {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred} )
-        with open(os.path.join(outDir,"results.pkl"),'w') as f: pickle.dump(results,f)
+    result = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred}
+    with open(os.path.join(outDir,"result.pkl"),'w') as f: pickle.dump(result,f)
 
-    # devel perf
-    print 'getting perf...'
-    perf = defaultdict(list)
-    for r in results:
-        coka = cohen_kappa_score(r['yte'],r['ypred'])
-        aupr = average_precision_score(r['yte'],r['ypred'],average='micro')
-        perf['cohen_kappa_score'].append(coka)
-        perf['average_precision_score'].append(aupr)
+    ##
+    print msg+': getting perf...'
+    perf = {}
+    coka = cohen_kappa_score(result['yte'],result['ypred'])
+    aupr = average_precision_score(result['yte'],result['ypred'],average='micro')
+    perf['cohen_kappa_score'] = coka
+    perf['average_precision_score'] = aupr
 
     fpath = os.path.join(outDir,'perf.json')
     with open(fpath,'w') as f: json.dump(perf,f,indent=2,sort_keys=True)
-
-    perfAvg = {}; fpath = os.path.join(outDir,'perf_avg.json')
-    for k,v in perf.iteritems(): perfAvg[k] = [np.mean(v),np.std(v)]
-    with open(fpath,'w') as f: json.dump(perfAvg,f,indent=2,sort_keys=True)
 
 if __name__ == '__main__':
     tic = time.time()

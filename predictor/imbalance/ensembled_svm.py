@@ -9,12 +9,11 @@ from sklearn import svm
 from scoop import futures as fu
 
 class EnsembledSVM:
-    def __init__(self,imaxTrSamples,imaxTeSamples,ibootstrap,isimDict,imsg):
+    def __init__(self,imaxTrSamples,imaxTeSamples,ibootstrap,isimDict):
         self._maxTrainingSamples = imaxTrSamples
         self._maxTestingSamples = imaxTeSamples
         self._boostrap = ibootstrap
         self._simDict = isimDict
-        self._msg = imsg
         self._svmList = []
 
     def fit(self,ixtr,iytr):
