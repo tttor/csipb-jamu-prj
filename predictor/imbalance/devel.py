@@ -64,9 +64,9 @@ def main():
     xdev = [xraw[i] for i in devIdx]
     ydev = [yraw[i] for i in devIdx]
 
-    log['nDevel(+)'] = len( [i for i in ydev if i==1] )
-    log['nDevel(-)'] = len( [i for i in ydev if i==-1] )
     log['nDevel'] = len(devIdx); log['nData'] = len(yraw)
+    log['nDevel(+)'] = len( [i for i in ydev if i==1] ); assert log['nDevel(+)']!=0
+    log['nDevel(-)'] = len( [i for i in ydev if i==-1] ); assert log['nDevel(-)']!=0
     log['rDevel:Data'] = float(len(devIdx))/len(yraw)
     log['rDevel(+):Devel'] = float(log['nDevel(+)'])/log['nDevel']
     log['rDevel(-):Devel'] = float(log['nDevel(-)'])/log['nDevel']

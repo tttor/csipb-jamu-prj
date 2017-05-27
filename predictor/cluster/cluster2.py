@@ -42,7 +42,7 @@ def main():
         dname = [i for i in os.listdir(tdir) if (mode in i)][0]
         dpath = os.path.join(tdir,dname); assert os.path.isdir(dpath)
         item2clusterlabel = dict(); clusterlabel2item = defaultdict(list)
-        fname = '_'.join(['cluster',mode,metric,'bestlabels.json'])
+        fname = '_'.join([mode,metric,'bestlabels.json'])
         with open(os.path.join(dpath,fname),'r') as f: item2clusterlabel = yaml.load(f)
         for k,v in item2clusterlabel.iteritems(): clusterlabel2item[v].append(k)
         return {'item2clusterlabel':item2clusterlabel,'clusterlabel2item':clusterlabel2item}
