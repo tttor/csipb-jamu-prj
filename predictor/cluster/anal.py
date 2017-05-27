@@ -47,21 +47,28 @@ def _scatter(tdir,odir):
       plt.close(fig)
 
 def _pie(tdir,odir):
-   for d in [i for i in os.listdir(tdir) if not('anal' in i)]:
-      tag = d.split('-')[-1]; print d
-      for m in metrics:
-         with open(os.path.join(tdir,d,m+'_labels_stat.json')) as f:
-            data = yaml.load(f); keys = data.keys()
+   odir = os.path.join(odir,'pie')
+   if not os.path.exists(odir): os.makedirs(odir)
 
-            fig = plt.figure()
-            plt.pie([data[k][0] for k in keys],
-                     explode=[0.3 if (k=='0') else 0.0 for k in keys],labels=keys,autopct='%1.2f%%',
-                     colors=['g' if (k=='1') else 'b' if (k=='-1') else 'r' for k in keys],
-                     shadow=False, startangle=90)
-            plt.axis('equal')
-            plt.savefig(os.path.join(odir,tag+'_'+m+'_pie.png'),
-                        dpi=300,format='png',bbox_inches='tight')
-            plt.close(fig)
+   for d in [i for i in os.listdir(tdir) if not('anal' in i)]:
+      print d
+      odir2 = os.path.join(odir,d)
+      if not os.path.exists(odir2): os.makedirs(odir2)
+
+      for comMet in metrics:
+         for proMet in metrics:
+            with open(os.path.join(tdir,d,comMet+'_'+proMet+'_labels_stat.json')) as f:
+               data = yaml.load(f); keys = data.keys()
+
+               fig = plt.figure()
+               plt.pie([data[k][0] for k in keys],
+                        explode=[0.3 if (k=='0') else 0.0 for k in keys],labels=keys,autopct='%1.2f%%',
+                        colors=['g' if (k=='1') else 'b' if (k=='-1') else 'r' for k in keys],
+                        shadow=False, startangle=90)
+               plt.axis('equal')
+               plt.savefig(os.path.join(odir2,'_'.join([d.split('-')[-1],comMet,proMet,'pie.png'])),
+                           dpi=300,format='png',bbox_inches='tight')
+               plt.close(fig)
 
 if __name__ == '__main__':
    main()
