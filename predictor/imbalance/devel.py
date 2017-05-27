@@ -7,12 +7,7 @@ import json
 import time
 import shutil
 import numpy as np
-from collections import defaultdict
 from sklearn.model_selection import train_test_split as tts
-from sklearn.metrics import cohen_kappa_score
-from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import average_precision_score
-
 from ensembled_svm import EnsembledSVM as eSVM
 
 sys.path.append('../../utility')
@@ -103,17 +98,6 @@ def main():
 
     result = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred}
     with open(os.path.join(outDir,"result.pkl"),'w') as f: pickle.dump(result,f)
-
-    ##
-    print msg+': getting perf...'
-    perf = {}
-    coka = cohen_kappa_score(result['yte'],result['ypred'])
-    aupr = average_precision_score(result['yte'],result['ypred'],average='micro')
-    perf['cohen_kappa_score'] = coka
-    perf['average_precision_score'] = aupr
-
-    fpath = os.path.join(outDir,'perf.json')
-    with open(fpath,'w') as f: json.dump(perf,f,indent=2,sort_keys=True)
 
 if __name__ == '__main__':
     tic = time.time()
