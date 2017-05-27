@@ -17,8 +17,8 @@ def main():
    odir = os.path.join(tdir,'anal')
    if not os.path.exists(odir): os.makedirs(odir)
 
-   # _pie(tdir,odir)
-   _scatter(tdir,odir)
+   _pie(tdir,odir)
+   # _scatter(tdir,odir)
 
 def _scatter(tdir,odir):
    odir = os.path.join(odir,'scatter')

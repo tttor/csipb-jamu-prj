@@ -35,7 +35,6 @@ def main():
     dParam = dataset.split('#')
     dpath = os.path.join(DATASET_DIR,dParam[0],'ground-truth')
     connMat,comList,proList = yam.loadComProConnMat(dParam[1],dpath)
-    nCom = len(comList); nPro = len(proList)
 
     ##
     print 'loading compound and protein clusters...'
