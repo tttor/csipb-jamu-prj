@@ -20,5 +20,4 @@ echo '### cluster protein #####################################################'
 python -m scoop cluster.py $METHOD $N_ITER $DATASET protein $OUTDIR
 
 echo '### cluster into neg,pos,unlabel #########################################'
-python cluster2.py cal $OUTDIR
-python cluster2.py sil $OUTDIR
+python cluster2.py $OUTDIR
