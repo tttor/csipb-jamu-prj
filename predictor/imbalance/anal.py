@@ -5,11 +5,15 @@ import pickle
 import json
 import itertools
 import numpy as np
+import matplotlib.pyplot as plt
 from collections import defaultdict as ddict
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import average_precision_score
-import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import cohen_kappa_score
+from sklearn.metrics import fbeta_score
+from sklearn.metrics import matthews_corrcoef
 
 def main():
    if len(sys.argv)!=3:
@@ -31,6 +35,10 @@ def main():
       ytrue = result['yte']; ypred = result['ypred']; yscore = result['yscore']; labels = list(set(ytrue))
       perfs['roc_auc_score'].append( roc_auc_score(ytrue,yscore,average='macro') )
       perfs['aupr_score'].append( average_precision_score(ytrue,yscore,average='macro') )
+      perfs['accuracy_score'].append( accuracy_score(ytrue,ypred) )
+      perfs['cohen_kappa_score'].append( cohen_kappa_score(ytrue,ypred) )
+      perfs['fbeta_score'].append( fbeta_score(ytrue,ypred,average='macro',beta=0.5) )
+      perfs['matthews_corrcoef'].append( matthews_corrcoef(ytrue,ypred) )
       cms.append( confusion_matrix(ytrue,ypred) )
 
    print 'writing perfs...'
@@ -44,7 +52,7 @@ def main():
       idx = perfs[metric].index( max(perfs[metric]) )
       return idx
 
-   for m in perfs.keys():
+   for m in [i for i in perfs.keys() if ('roc_auc' in i) or ('aupr' in i)]:
       for n in ['normalized','unnormalized']:
          _plotCM(cms[_getBestIdx(m)],labels,n,os.path.join(odir,'cm_best_'+m+'_'+n+'.png'))
 
