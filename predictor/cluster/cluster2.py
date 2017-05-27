@@ -80,7 +80,7 @@ def main():
                 for j in range(connMat.shape[1]):
                     if connMat[i][j]==1: continue # because of known positive interaction
                     comCluster = clusterData[('compound',comMet)]['item2clusterlabel'][ comList[i] ]
-                    proCluster = clusterData[('protein',proMet)]['item2clusterlabel'][ proList[i] ]
+                    proCluster = clusterData[('protein',proMet)]['item2clusterlabel'][ proList[j] ]
                     if (comCluster==-1)or(proCluster==-1): continue # because of outlier cluster label
                     if connAmongComProClusters[(comMet,proMet)]==0: connMat2[i][j] = -1
 
