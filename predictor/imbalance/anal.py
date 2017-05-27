@@ -36,11 +36,15 @@ def main():
       idx = perfs[metric].index( max(perfs[metric]) )
       return idx
 
+
    for m in perfs.keys():
       for n in ['normalized','unnormalized']:
          _plotCM(cms[_getBestIdx(m)],labels,n,os.path.join(odir,'cm_best_'+m+'_'+n+'.png'))
 
+   perfAvg = {}
+   for m,v in perfs.iteritems(): perfAvg[m+'_avg'] = ( np.mean(v),np.std(v) )
    with open(os.path.join(odir,'perfs.json'),'w') as f: json.dump(perfs,f,indent=2,sort_keys=True)
+   with open(os.path.join(odir,'perfAvg.json'),'w') as f: json.dump(perfAvg,f,indent=2,sort_keys=True)
 
 def _plotCM(cm,classes,normalized,fpath):
    """
