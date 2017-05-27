@@ -54,16 +54,18 @@ def main():
 
     ##
     def _getNumberOfConnBetweenComProClusters(comMetric,proMetric):
-        nConn = 0
+        nConnDict = {}
         for comCluster in clusterData[('compound',comMetric)]['clusterlabel2item']:
             if (comCluster==-1): continue
             for proCluster in clusterData[('protein',proMetric)]['clusterlabel2item']:
                 if (proCluster==-1): continue
+                nConn = 0
                 for com in clusterData[('compound',comMetric)]['clusterlabel2item'][comCluster]:
                     for pro in clusterData[('protein',proMetric)]['clusterlabel2item'][proCluster]:
                         conn = int( connMat[comList.index(com)][proList.index(pro)] )
                         if conn==1: nConn += 1
-        return nConn
+                nConnDict[(comCluster,proCluster)] = nConn
+        return nConnDict
 
     connAmongComProClusters = dict()
     for comMet in metrics:
@@ -82,7 +84,8 @@ def main():
                     comCluster = clusterData[('compound',comMet)]['item2clusterlabel'][ comList[i] ]
                     proCluster = clusterData[('protein',proMet)]['item2clusterlabel'][ proList[j] ]
                     if (comCluster==-1)or(proCluster==-1): continue # because of outlier cluster label
-                    if connAmongComProClusters[(comMet,proMet)]==0: connMat2[i][j] = -1
+                    if connAmongComProClusters[(comMet,proMet)][(comCluster,proCluster)]==0:
+                        connMat2[i][j] = -1
 
             connDict = defaultdict(list); connDict2 = defaultdict(list)
             connDictRaw = util.connMat2Dict(connMat2,comList,proList)
