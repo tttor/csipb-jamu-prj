@@ -26,7 +26,7 @@ def main():
       with open(os.path.join(tdir,d,'result.pkl'),'r') as f: result = pickle.load(f)
       ytrue = result['yte']; ypred = result['ypred']; yscore = result['yscore']
       perfs['roc_auc_score'].append( roc_auc_score(ytrue,yscore,average='macro') )
-      perfs['average_precision_score'].append( average_precision_score(ytrue,yscore,average='macro') )
+      perfs['aupr_score'].append( average_precision_score(ytrue,yscore,average='macro') )
       cms.append( confusion_matrix(ytrue,ypred) )
 
    with open(os.path.join(odir,'perfs.json'),'w') as f: json.dump(perfs,f,indent=2,sort_keys=True)
