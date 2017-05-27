@@ -25,26 +25,26 @@ def main():
 
    perfs = ddict(list); cms = []
    dirs = [i for i in os.listdir(tdir) if (tag in i)and('anal' not in i)]; assert len(dirs)>0
-   for d in dirs:
+   for i,d in enumerate(dirs):
+      print 'anal on '+d+' '+str(i+1)+'/'+str(len(dirs))
       with open(os.path.join(tdir,d,'result.pkl'),'r') as f: result = pickle.load(f)
       ytrue = result['yte']; ypred = result['ypred']; yscore = result['yscore']; labels = list(set(ytrue))
       perfs['roc_auc_score'].append( roc_auc_score(ytrue,yscore,average='macro') )
       perfs['aupr_score'].append( average_precision_score(ytrue,yscore,average='macro') )
       cms.append( confusion_matrix(ytrue,ypred) )
 
-   def _getBestIdx(metric):
-      idx = perfs[metric].index( max(perfs[metric]) )
-      return idx
-
-
-   for m in perfs.keys():
-      for n in ['normalized','unnormalized']:
-         _plotCM(cms[_getBestIdx(m)],labels,n,os.path.join(odir,'cm_best_'+m+'_'+n+'.png'))
-
    perfAvg = {}
    for m,v in perfs.iteritems(): perfAvg[m+'_avg'] = ( np.mean(v),np.std(v) )
    with open(os.path.join(odir,'perfs.json'),'w') as f: json.dump(perfs,f,indent=2,sort_keys=True)
    with open(os.path.join(odir,'perfAvg.json'),'w') as f: json.dump(perfAvg,f,indent=2,sort_keys=True)
+
+   def _getBestIdx(metric):
+      idx = perfs[metric].index( max(perfs[metric]) )
+      return idx
+
+   for m in perfs.keys():
+      for n in ['normalized','unnormalized']:
+         _plotCM(cms[_getBestIdx(m)],labels,n,os.path.join(odir,'cm_best_'+m+'_'+n+'.png'))
 
 def _plotCM(cm,classes,normalized,fpath):
    """
