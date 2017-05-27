@@ -24,13 +24,12 @@ def _pie(tdir,odir):
       tag = d.split('-')[-1]; print d
       for m in metrics:
          with open(os.path.join(tdir,d,m+'_labels_stat.json')) as f:
-            data = yaml.load(f)
-            keys = sorted(data.keys())
+            data = yaml.load(f); keys = data.keys()
 
             fig = plt.figure()
             plt.pie([data[k][0] for k in keys],
-                     explode=[0.3 if (k=='0') else 0.0 for k in keys],
-                     labels=keys, autopct='%1.2f%%', colors=['g','r','b'],
+                     explode=[0.3 if (k=='0') else 0.0 for k in keys],labels=keys,autopct='%1.2f%%',
+                     colors=['g' if (k=='1') else 'b' if (k=='-1') else 'r' for k in keys],
                      shadow=False, startangle=90)
             plt.axis('equal')
             plt.savefig(os.path.join(odir,tag+'_'+m+'_pie.png'),
