@@ -26,6 +26,9 @@ def main():
     clusterDir = sys.argv[1]# assume: ended with '/'
     cloneID = sys.argv[2]
 
+    seed = util.seed()
+    np.random.seed(seed)
+
     dataset = clusterDir.split('/')[-2].split('-')[-1]
     outDir = os.path.join('./output',
                           '-'.join([cfg['method']+'#'+cloneID,dataset,util.tag()]))
@@ -64,6 +67,7 @@ def main():
     xdev = [xraw[i] for i in devIdx]
     ydev = [yraw[i] for i in devIdx]
 
+    log['seed'] = seed
     log['nDevel'] = len(devIdx); log['nData'] = len(yraw)
     log['nDevel(+)'] = len( [i for i in ydev if i==1] ); assert log['nDevel(+)']!=0
     log['nDevel(-)'] = len( [i for i in ydev if i==-1] ); assert log['nDevel(-)']!=0
@@ -77,7 +81,7 @@ def main():
     ## DEVEL
     msg = 'devel '+dataset+' '+cloneID
     xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
-                          random_state=None,stratify=ydev)
+                          random_state=seed,stratify=ydev)
 
     esvm = eSVM(cfg['maxTrainingSamplesPerBatch'],
                 cfg['maxTestingSamplesPerBatch'],

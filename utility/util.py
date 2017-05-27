@@ -16,6 +16,10 @@ def tag():
     hostname = socket.gethostname()
     return hostname+'-'+timestamp
 
+def seed():
+    timestamp = datetime.datetime.now().strftime("%M%S%f")
+    return int(timestamp)
+
 def kernel2distanceMatrix(method,simMat):
     # https://rdrr.io/cran/mmpp/man/k2d.html
     m,n = simMat.shape
