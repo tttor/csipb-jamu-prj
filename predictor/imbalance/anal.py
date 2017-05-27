@@ -62,16 +62,14 @@ def _plotCM(cm,classes,normalized,fpath):
    Normalization can be applied by setting `normalize=True`.
    """
    fig = plt.figure()
-   plt.imshow(cm, interpolation='nearest',cmap=plt.cm.Blues)
-   plt.colorbar()
    tick_marks = np.arange(len(classes))
    plt.xticks(tick_marks, classes, rotation=45)
    plt.yticks(tick_marks, classes)
    if normalized=='normalized': cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+   plt.imshow(cm, interpolation='nearest',cmap=plt.cm.Blues); plt.colorbar()
    thresh = cm.max() / 2.
    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-     plt.text(j, i, cm[i, j],
-              horizontalalignment="center",
+     plt.text(j, i, cm[i, j], horizontalalignment="center",
               color="white" if cm[i, j] > thresh else "black")
    plt.ylabel('True label')
    plt.xlabel('Predicted label')
