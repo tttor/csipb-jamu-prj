@@ -73,7 +73,8 @@ class EnsembledSVM:
         y = None; yscore = None
         if mode=='hard':
             labels = list(set(yList)); counters = [0]*len(labels)
-            for i in yList: counters[ labels.index(i) ] += 1; assert sum(counters)==len(yList)
+            for i in yList: counters[ labels.index(i) ] += 1
+            assert sum(counters)==len(yList),'sum(counters)!=len(yList)'
             y = labels[ counters.index(max(counters)) ]
             yscore = max(counters)/float(sum(counters))
         else:
