@@ -26,15 +26,16 @@ def main():
     clusterDir = sys.argv[1]# assume: ended with '/'
     cloneID = sys.argv[2]
 
-    seed = util.seed()
+    log = {}
+    seed = util.seed(); log['seed'] = seed
     np.random.seed(seed)
 
-    dataset = clusterDir.split('/')[-2].split('-')[-1]
+    dataset = clusterDir.split('/')[-2].split('-')[-1]; log['dataset'] = dataset
     outDir = os.path.join('./output',
                           '-'.join([cfg['method']+'#'+cloneID,dataset,util.tag()]))
     os.makedirs(outDir)
     shutil.copy2('devel_config.py',outDir)
-    log = {}
+
 
     ## Load data
     print 'loading data...'
@@ -67,16 +68,14 @@ def main():
     xdev = [xraw[i] for i in devIdx]
     ydev = [yraw[i] for i in devIdx]
 
-    log['seed'] = seed
     log['nDevel'] = len(devIdx); log['nData'] = len(yraw)
+    log['rDevel:Data'] = log['nDevel']/float(log['nData'])
     log['nDevel(+)'] = len( [i for i in ydev if i==1] ); assert log['nDevel(+)']!=0
     log['nDevel(-)'] = len( [i for i in ydev if i==-1] ); assert log['nDevel(-)']!=0
-    log['rDevel:Data'] = float(len(devIdx))/len(yraw)
     log['rDevel(+):Devel'] = float(log['nDevel(+)'])/log['nDevel']
     log['rDevel(-):Devel'] = float(log['nDevel(-)'])/log['nDevel']
     log['rDevel(+):(-)'] = float(log['nDevel(+)'])/float(log['nDevel(-)'])
     print 'nDevel: '+str(log['nDevel'])+'/'+str(log['nData'])+' = '+str(log['rDevel:Data'])
-    with open(os.path.join(outDir,'log.json'),'w') as f: json.dump(log,f,indent=2,sort_keys=True)
 
     ## DEVEL
     msg = 'devel '+dataset+' '+cloneID
@@ -87,6 +86,18 @@ def main():
                 cfg['maxTestingSamplesPerBatch'],
                 cfg['bootstrap'],
                 {'com':comSimDict,'pro':proSimDict})
+
+    log['nTraining'] = len(xtr)
+    log['nTraining(+)'] = len([i for i in ytr if i==1])
+    log['nTraining(-)'] = len([i for i in ytr if i==-1])
+    log['rTraining(+):(-)'] = log['nTraining(+)']/float(log['nTraining(-)'])
+    log['rTraining:Devel'] = log['nTraining']/float(log['nDevel'])
+
+    log['nTesting'] = len(xte)
+    log['nTesting(+)'] = len([i for i in yte if i==1])
+    log['nTesting(-)'] = len([i for i in yte if i==-1])
+    log['rTesting(+):(-)'] = log['nTesting(+)']/float(log['nTesting(-)'])
+    log['rTesting:Devel'] = log['nTesting']/float(log['nDevel'])
 
     ##
     print msg+': fitting nTr= '+str(len(ytr))
@@ -102,6 +113,7 @@ def main():
 
     result = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred,'yscore':yscore}
     with open(os.path.join(outDir,"result.pkl"),'w') as f: pickle.dump(result,f)
+    with open(os.path.join(outDir,'log.json'),'w') as f: json.dump(log,f,indent=2,sort_keys=True)
 
 if __name__ == '__main__':
     tic = time.time()
