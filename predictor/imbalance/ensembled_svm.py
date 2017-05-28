@@ -2,7 +2,6 @@
 import os
 import pickle
 import numpy as np
-from collections import Counter
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import KFold
 from sklearn import svm
@@ -15,6 +14,10 @@ class EnsembledSVM:
         self._boostrap = ibootstrap
         self._simDict = isimDict
         self._svmList = []
+
+    def writeSVM(self,outDir):
+        fpath = os.path.join(outDir,'esvm.pkl')
+        with open(fpath,'w') as f: pickle.dump(self._svmList,f)
 
     def fit(self,ixtr,iytr):
         xyTrList = self._divideSamples(ixtr,iytr,self._maxTrainingSamples)
@@ -37,18 +40,17 @@ class EnsembledSVM:
         assert len(ypredMerged)==len(ixte),str(len(ypredMerged))+'!='+str(len(ixte))
         return (ypredMerged,yscoreMerged)
 
-    def writeSVM(self,outDir):
-        fpath = os.path.join(outDir,'esvm.pkl')
-        with open(fpath,'w') as f: pickle.dump(self._svmList,f)
-
     def _predict2(self,xte,mode,svmList):
         ypred2 = list( fu.map(self._predict3,
                               svmList,[xte]*len(svmList)) )
 
-        ypred3 = [] # ypred merged from all classifier
-        for i in range(len(xte)):
-            ypred3i = [ypred2[j][i] for j in range(len(ypred2))]
-            ypred3i = self._merge(ypred3i,mode)
+        labels = svmList[0][0].classes_.tolist()
+        for svm in svmList: assert svm[0].classes_.tolist()==labels
+
+        ypred3 = [] # ypred merged from all classifiers
+        for i in range(len(xte)):# for each member/sample of the vector xte
+            ypred3i = [ypred2[j][i] for j in range(len(svmList))]# of each sample from all classifiers
+            ypred3i = self._merge(ypred3i,mode,labels)
             ypred3.append(ypred3i)
 
         return ypred3
@@ -56,30 +58,42 @@ class EnsembledSVM:
     def _predict3(self,iclf,xte):
         clf,xtr = iclf
         simMatTe = self._makeKernel(xte,xtr)
-        ypred2i = clf.predict(simMatTe) # remember: ypred2i is a vector
+
+        ypred2iRaw = clf.predict(simMatTe) # remember: ypred2i is a vector
+        ypredproba2iRaw = clf.predict_proba(simMatTe)
+        ypred2i = zip(ypred2iRaw,ypredproba2iRaw)
+
         return ypred2i
+
+    def _merge(self,yListRaw,mode,labels):
+        y = None; yscore = None
+        yList,yprobaList = zip(*yListRaw)
+
+        if mode=='hard':
+            counters = [0]*len(labels)
+            for i in yList: counters[ labels.index(i) ] += 1
+            assert sum(counters)==len(yList),'sum(counters)!=len(yList)'
+            y = labels[ counters.index(max(counters)) ]
+            yscore = max(counters)/float(sum(counters))
+        elif mode=='soft':
+            avgProbaList = [] # from all labels, averaged over all classifiers
+            for i in range(len(labels)): avgProbaList.append(np.mean([ j[i] for j in yprobaList ]))
+            yscore = max(avgProbaList)
+            y = labels[ avgProbaList.index(yscore) ]
+        else:
+            assert False,'FATAL: unkown mode'
+
+        return (y,yscore)
 
     def _fit2(self,xtr,ytr):
         ## tuning
-        clf = svm.SVC(kernel='precomputed')
+        clf = svm.SVC(kernel='precomputed',probability=True)
 
         ## train
         simMatTr = self._makeKernel(xtr,xtr)
         clf.fit(simMatTr,ytr)
 
         return (clf,xtr)
-
-    def _merge(self,yList,mode):
-        y = None; yscore = None
-        if mode=='hard':
-            labels = list(set(yList)); counters = [0]*len(labels)
-            for i in yList: counters[ labels.index(i) ] += 1
-            assert sum(counters)==len(yList),'sum(counters)!=len(yList)'
-            y = labels[ counters.index(max(counters)) ]
-            yscore = max(counters)/float(sum(counters))
-        else:
-            assert False,'FATAL: unkown mode'
-        return (y,yscore)
 
     def _divideSamples(self,x,y,maxSamples):
         nSplits = int(len(x)/maxSamples) + 1

@@ -1,5 +1,5 @@
 # devel_config.py
-config = dict(method='esvm',mode='hard',bootstrap=True,
+config = dict(method='esvm',mode='soft',bootstrap=True,
               testSize=0.30,
               maxTrainingSamplesPerBatch=10000,
               maxTestingSamplesPerBatch=100,
