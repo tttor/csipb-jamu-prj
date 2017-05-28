@@ -17,8 +17,14 @@ def tag():
     return hostname+'-'+timestamp
 
 def seed():
-    timestamp = datetime.datetime.now().strftime("%M%S%f")
-    return int(timestamp)
+    y = int(datetime.datetime.now().strftime("%Y"))
+    m = int(datetime.datetime.now().strftime("%m"))
+    d = int(datetime.datetime.now().strftime("%d"))
+    H = int(datetime.datetime.now().strftime("%H"))
+    M = int(datetime.datetime.now().strftime("%M"))
+    S = int(datetime.datetime.now().strftime("%S"))
+    f = int(datetime.datetime.now().strftime("%f"))
+    return y+m+d+H+M+S+f
 
 def kernel2distanceMatrix(method,simMat):
     # https://rdrr.io/cran/mmpp/man/k2d.html
