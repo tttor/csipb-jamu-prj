@@ -1,17 +1,18 @@
 #!/bin/bash
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 3 ]; then
   echo "USAGE:"
-  echo "bash run.sh [clusterDir] [nClones]"
+  echo "bash run.sh [clusterDir] [cloneIDFrom] [cloneIDTo]"
   exit 1
 fi
 
 CLUSTERDIR=$1
-NCLONES=$2
+CLONEIDFROM=$2
+CLONEIDTO=$3
 
-CLONES=($(seq 1 1 ${NCLONES}))
+CLONES=($(seq ${CLONEIDFROM} 1 ${CLONEIDTO}))
 for i in ${CLONES[@]};
 do
-   echo '### DEVEL  '$i'/'$NCLONES' ###############################################################'
+   echo '### DEVEL '$CLUSTERDIR' => '$i' TO '$CLONEIDTO' ##########################################'
    python -m scoop devel.py $CLUSTERDIR $i
 done
 
