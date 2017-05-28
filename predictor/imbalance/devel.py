@@ -36,7 +36,6 @@ def main():
     os.makedirs(outDir)
     shutil.copy2('devel_config.py',outDir)
 
-
     ## Load data
     print 'loading data...'
     datasetParams = dataset.split('#')
@@ -102,6 +101,7 @@ def main():
     ##
     print msg+': fitting nTr= '+str(len(ytr))
     esvm.fit(xtr,ytr)
+    esvm.writeLabels(outDir)
 
     ##
     if cfg['maxTestingSamples']>0:

@@ -1,6 +1,7 @@
 # ensembled_svm.py
 import os
 import pickle
+import json
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import KFold
@@ -14,10 +15,16 @@ class EnsembledSVM:
         self._boostrap = ibootstrap
         self._simDict = isimDict
         self._svmList = []
+        self._labels = []
 
     def writeSVM(self,outDir):
         fpath = os.path.join(outDir,'esvm.pkl')
         with open(fpath,'w') as f: pickle.dump(self._svmList,f)
+
+    def writeLabels(self,outDir):
+        assert len(self._labels)!=0
+        fpath = os.path.join(outDir,'esvm_labels.json')
+        with open(fpath,'w') as f: json.dump(self._labels,f)
 
     def fit(self,ixtr,iytr):
         xyTrList = self._divideSamples(ixtr,iytr,self._maxTrainingSamples)
@@ -26,12 +33,15 @@ class EnsembledSVM:
                                      [xytr[1] for xytr in xyTrList]) )
         assert len(self._svmList)!=0,'empty _svmList in fit()'
 
+        self._labels = self._svmList[0][0].classes_.tolist()
+        for svm in self._svmList: assert svm[0].classes_.tolist()==self._labels
+
     def predict(self,ixte,mode):
         assert len(self._svmList)!=0,'empty _svmList in predict()'
         xyTeList = self._divideSamples(ixte,None,self._maxTestingSamples)
         xTeList = [i[0] for i in xyTeList]; n = len(xTeList)
         ypredList = list( fu.map(self._predict2,
-                                 xTeList,[mode]*n,[self._svmList]*n) )
+                                 xTeList,[mode]*n,[self._svmList]*n,[self._labels]*n) )
 
         ypredMerged = []; yscoreMerged = [];
         for i in ypredList:
@@ -40,12 +50,9 @@ class EnsembledSVM:
         assert len(ypredMerged)==len(ixte),str(len(ypredMerged))+'!='+str(len(ixte))
         return (ypredMerged,yscoreMerged)
 
-    def _predict2(self,xte,mode,svmList):
+    def _predict2(self,xte,mode,svmList,labels):
         ypred2 = list( fu.map(self._predict3,
                               svmList,[xte]*len(svmList)) )
-
-        labels = svmList[0][0].classes_.tolist()
-        for svm in svmList: assert svm[0].classes_.tolist()==labels
 
         ypred3 = [] # ypred merged from all classifiers
         for i in range(len(xte)):# for each member/sample of the vector xte

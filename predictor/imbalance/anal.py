@@ -3,6 +3,7 @@ import os
 import sys
 import pickle
 import json
+import yaml
 import itertools
 import numpy as np
 import matplotlib.pyplot as plt
@@ -32,6 +33,7 @@ def main():
    for i,d in enumerate(dirs):
       print 'anal on '+d+' '+str(i+1)+'/'+str(len(dirs))
       with open(os.path.join(tdir,d,'result.pkl'),'r') as f: result = pickle.load(f)
+      with open(os.path.join(tdir,d,'esvm_labels.json'),'r') as f: labels = yaml.load(f)
       ytrue = result['yte']; ypred = result['ypred']; yscore = result['yscore']; labels = list(set(ytrue))
       perfs['roc_auc_score'].append( roc_auc_score(ytrue,yscore,average='macro') )
       perfs['aupr_score'].append( average_precision_score(ytrue,yscore,average='macro') )
@@ -39,7 +41,7 @@ def main():
       perfs['cohen_kappa_score'].append( cohen_kappa_score(ytrue,ypred) )
       perfs['fbeta_score'].append( fbeta_score(ytrue,ypred,average='macro',beta=0.5) )
       perfs['matthews_corrcoef'].append( matthews_corrcoef(ytrue,ypred) )
-      cms.append( confusion_matrix(ytrue,ypred) )
+      cms.append( confusion_matrix(ytrue,ypred,labels) )
 
    print 'writing perfs...'
    perfAvg = {}
