@@ -49,7 +49,7 @@
 * cohen-kappa score
 * precision-recall curve, area under precision-recall (aupr)
 * receiver operating characteristic, area under roc (auroc)
-* F1-measure, F_{beta}-measure,
+* F_{beta}-measure
 
 ## dealing with large-scale samples
 * active learning + SVM
@@ -66,8 +66,12 @@
   * sklearn.svm.LinearSVC
   * LIBLINEAR: http://www.csie.ntu.edu.tw/~cjlin/liblinear/
 
-## web resources
+## lib/tool/resources
+### imbalanced learning
+* https://github.com/scikit-learn-contrib/imbalanced-learn
+  * imblearn.over_sampling.SMOTE
+    * mode:  regular, borderline1, borderline2, svm
+    * fit_sample(X, y), where X : ndarray, shape (n_samples, n_features)
+### active learning
 * http://active-learning.net/
 * https://github.com/ntucllab/libact
-* http://contrib.scikit-learn.org/imbalanced-learn/auto_examples/index.html
-* https://github.com/scikit-learn-contrib/imbalanced-learn
