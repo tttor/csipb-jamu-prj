@@ -78,3 +78,6 @@ http://www.genome.jp/tools/dinies/
 
 - [ ] iDrug-Target <br />
 http://www.jci-bioinfo.cn/iDrug-Target/
+
+- [ ] TargetNet <br />
+http://targetnet.org/
