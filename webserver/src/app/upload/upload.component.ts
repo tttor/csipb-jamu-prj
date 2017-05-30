@@ -1,21 +1,12 @@
-import { Component, OnInit, Inject, ElementRef, ViewChild
-} from '@angular/core';
-
-import { FormControl, FormGroup, FormBuilder, Validators
-} from '@angular/forms';
-
-import { Http
-} from '@angular/http';
-
-import { ActivatedRoute
-} from '@angular/router';
-
-import { FileUploader
-} from 'ng2-file-upload';
+import { Component, OnInit, Inject, ElementRef, ViewChild } from '@angular/core';
+import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Http, Headers } from '@angular/http';
+import { ActivatedRoute } from '@angular/router';
+import { FileUploader } from 'ng2-file-upload';
 
 // const URL = 'https://evening-anchorage-3159.herokuapp.com/api/';
 // const URL = 'http://localhost/ijah-api/';
-const URL = 'http://localhost:10000/';
+const uploadURL = 'http://localhost:9001/api_upload/upload';
 
 @Component({
   selector: 'upload',
@@ -35,7 +26,7 @@ export class UploadComponent implements OnInit {
   public publicationYear;
   public publicationJournal;
   public publicationLink;
-  public uploader: FileUploader = new FileUploader({url: URL});
+  public uploader: FileUploader = new FileUploader({url: uploadURL});
   public hasBaseDropZoneOver: boolean = false;
 
   // private baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
@@ -47,7 +38,7 @@ export class UploadComponent implements OnInit {
   }
 
   public ngOnInit() {
-    // Do nothing
+    this.uploader.onAfterAddingFile = (file) => { file.withCredentials = false; };
   }
 
   public onSubmit(): void {
