@@ -13,10 +13,10 @@ declare const alertify: any;
 
 @Injectable()
 export class ProductTreeviewConfig extends TreeviewConfig {
-    isShowAllCheckBox = true;
-    isShowFilter = true;
-    isShowCollapseExpand = false;
-    maxHeight = 500;
+    public isShowAllCheckBox = true;
+    public isShowFilter = true;
+    public isShowCollapseExpand = false;
+    public maxHeight = 500;
 }
 
 @Component({
@@ -34,19 +34,8 @@ export class ProductTreeviewConfig extends TreeviewConfig {
 export class TestComponent implements OnInit {
 
   @ViewChild(TreeviewComponent) treeviewComponent: TreeviewComponent;
-    items: TreeviewItem[];
-    rows: string[];
-
-  public settings: Ng2TreeSettings = {
-    rootIsVisible: false
-  };
-
-  public ijahtree: TreeModel;
-
-  private static logEvent(e: NodeEvent, message: string): void {
-    console.log(e);
-    alertify.message(`${message}: ${e.node.value}`);
-  }
+    public items: TreeviewItem[];
+    public rows: string[];
 
   private localState;
   constructor(public route: ActivatedRoute, private service: TreeService) {
@@ -56,34 +45,6 @@ export class TestComponent implements OnInit {
   public ngOnInit(): void {
 
     this.items = this.service.getProducts();
-
-    this.ijahtree = {
-      value: 'From Plants',
-      children: [
-          { value: 'Plant 3',
-          loadChildren: (callback) => {
-            setTimeout(() => {
-              callback([
-                {value: 'Compound 3.1',
-                  loadChildren: (callback) => {
-                    setTimeout(() => {
-                      callback([
-                        {value: 'Protein 3.1.1'},
-                        {value: 'Protein 3.1.2'},
-                      ]);
-                    }, 100);
-                  }
-                },
-                {value: 'Compound 3.2'},
-                {value: 'Compound 3.3'},
-                {value: 'Compound 3.4'},
-                {value: 'Compound 3.5'},
-              ]);
-            }, 100);
-          }
-          },
-      ]
-    };
   }
 
   onItemCheckedChange(item: TreeviewItem) {
@@ -105,62 +66,6 @@ export class TestComponent implements OnInit {
           const row = `${reverseTexts.join(' -> ')} : ${value}`;
           this.rows.push(row);
       });
-  }
-
-  removeItem(item: TreeviewItem) {
-      TreeviewHelper.removeItem(item, this.items);
-      this.treeviewComponent.raiseSelectedChange();
-  }
-
-  // DON'T DELETE - will be used again later ///////////////////////////////////
-  // public treeTest1() {
-  //   this.ijahtree = {
-  //     value: 'From Plants',
-  //     children: [
-  //         { value: 'Plant 3',
-  //         loadChildren: (callback) => {
-  //           setTimeout(() => {
-  //             callback([
-  //               {value: 'Compound 3.1',
-  //                 loadChildren: (callback) => {
-  //                   setTimeout(() => {
-  //                     callback([
-  //                       {value: 'Protein 3.1.1'},
-  //                       {value: 'Protein 3.1.2'},
-  //                     ]);
-  //                   }, 100);
-  //                 }
-  //               },
-  //               {value: 'Compound 3.2'},
-  //               {value: 'Compound 3.3'},
-  //               {value: 'Compound 3.4'},
-  //               {value: 'Compound 3.5'},
-  //             ]);
-  //           }, 100);
-  //         }
-  //         },
-  //     ]
-  //   };
-  // }
-
-  public onNodeRemoved(e: NodeEvent): void {
-    TestComponent.logEvent(e, 'Removed');
-  }
-
-  public onNodeMoved(e: NodeEvent): void {
-    TestComponent.logEvent(e, 'Moved');
-  }
-
-  public onNodeRenamed(e: NodeEvent): void {
-    TestComponent.logEvent(e, 'Renamed');
-  }
-
-  public onNodeCreated(e: NodeEvent): void {
-    TestComponent.logEvent(e, 'Created');
-  }
-
-  public onNodeSelected(e: NodeEvent): void {
-    TestComponent.logEvent(e, 'Name');
   }
 
 }

@@ -7,6 +7,7 @@ import { DisclaimerComponent } from './disclaimer';
 import { V1Component } from './v1';
 import { ContactComponent } from './contact';
 import { AboutComponent } from './about';
+import { TestComponent } from './test';
 import { DataResolver } from './app.resolver';
 
 export const ROUTES: Routes = [
@@ -19,4 +20,5 @@ export const ROUTES: Routes = [
   { path: 'ijahv1', component: V1Component },
   { path: 'contact', component: ContactComponent },
   { path: 'about', component: AboutComponent },
+  { path: 'test', component: TestComponent },
 ];
