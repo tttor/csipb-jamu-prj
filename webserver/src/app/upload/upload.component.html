@@ -513,22 +513,22 @@
         <table class="table">
             <thead>
             <tr>
-                <th width="50%">Name</th>
-                <th>Size</th>
-                <th>Progress</th>
+                <th width="60%">Name</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th>Action</th>
+                <!-- <th>Status</th>
+                <th>Actions</th> -->
             </tr>
             </thead>
             <tbody>
             <tr *ngFor="let item of uploader.queue">
                 <td><strong>{{ item?.file?.name }}</strong></td>
-                <td *ngIf="uploader.isHTML5" nowrap>{{ item?.file?.size/1024/1024 | number:'.2' }} MB</td>
+                <!-- <td *ngIf="uploader.isHTML5" nowrap>{{ item?.file?.size/1024/1024 | number:'.2' }} MB</td>
                 <td *ngIf="uploader.isHTML5">
                     <div class="progress" style="margin-bottom: 0;">
                         <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': item.progress + '%' }"></div>
                     </div>
-                </td>
+                </td> -->
                 <td class="text-center">
                     <span *ngIf="item.isSuccess"><i class="fa fa-check"></i></span>
                     <span *ngIf="item.isCancel"><i class="fa fa-ban"></i></span>
