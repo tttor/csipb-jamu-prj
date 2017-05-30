@@ -15,9 +15,6 @@ main <- function() {
    from <- as.numeric(args[2])
    to <- as.numeric(args[3])
 
-   # smiFpath <- '../dataset/connectivity/compound_vs_protein/yamanishi/smiles/smiles-nr/D00496.smi'
-   # odir <- '../dataset/connectivity/compound_vs_protein/yamanishi/fingerprint/klekotaroth-nr'
-
    ydir <- '../dataset/connectivity/compound_vs_protein/yamanishi'
 
    message("loading comList ...")
