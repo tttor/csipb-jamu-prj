@@ -1,6 +1,4 @@
 # extract_fp.r
-# mol = readMolFromSmi(smi, type = 'mol')[[1]]
-# fp = extractDrugKRComplete(mol)
 
 main <- function() {
    args = commandArgs(trailingOnly=TRUE)
@@ -14,7 +12,6 @@ main <- function() {
    yamType <- args[1]
    from <- as.numeric(args[2])
    to <- as.numeric(args[3])
-
    ydir <- '../dataset/connectivity/compound_vs_protein/yamanishi'
 
    message("loading comList ...")
@@ -27,7 +24,7 @@ main <- function() {
 
    for (i in from:to) {
       com <- comList[i]
-      message("extract_fp... ",com," ",i,"/",to-from+1)
+      message("extract_fp... ",com," ",i,"/",to)
 
       sfname <- paste(com,'.smi',sep='')
       sfpath <- file.path(sdir,sfname)
