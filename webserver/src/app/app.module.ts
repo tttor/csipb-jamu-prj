@@ -5,6 +5,7 @@ import { TypeaheadModule } from 'ng2-bootstrap/typeahead';
 import { Ng2PageScrollModule } from 'ng2-page-scroll';
 import { FileUploadModule } from 'ng2-file-upload';
 import { ChartsModule } from 'ng2-charts';
+import { DropdownTreeviewModule } from 'ng2-dropdown-treeview';
 import {
   NgModule,
   ApplicationRef
@@ -32,6 +33,7 @@ import { DisclaimerComponent } from './disclaimer';
 import { V1Component } from './v1';
 import { ContactComponent } from './contact';
 import { AboutComponent } from './about';
+import { TestComponent } from './test';
 
 import '../styles/styles.scss';
 import '../styles/headings.css';
@@ -59,7 +61,8 @@ type StoreType = {
     DisclaimerComponent,
     V1Component,
     ContactComponent,
-    AboutComponent
+    AboutComponent,
+    TestComponent
   ],
   imports: [
     BrowserModule,
@@ -69,6 +72,7 @@ type StoreType = {
     ChartsModule,
     Ng2PageScrollModule.forRoot(),
     TypeaheadModule.forRoot(),
+    DropdownTreeviewModule.forRoot(),
     RouterModule.forRoot(ROUTES, { useHash: true, preloadingStrategy: PreloadAllModules })
   ],
   providers: [
