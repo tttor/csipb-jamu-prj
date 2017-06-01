@@ -26,6 +26,9 @@ class EnsembledSVM:
         fpath = os.path.join(outDir,'esvm_labels.json')
         with open(fpath,'w') as f: json.dump(self._labels,f)
 
+    def nSVM(self):
+        return len(self._svmList)
+
     def fit(self,ixtr,iytr):
         xyTrList = self._divideSamples(ixtr,iytr,self._maxTrainingSamples)
         self._svmList = list( fu.map(self._fit2,

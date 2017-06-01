@@ -102,6 +102,7 @@ def main():
     print msg+': fitting nTr= '+str(len(ytr))
     esvm.fit(xtr,ytr)
     esvm.writeLabels(outDir)
+    log['nSVM'] = esvm.nSVM()
 
     ##
     if cfg['maxTestingSamples']>0:
