@@ -7,12 +7,14 @@ import json
 import time
 import shutil
 import numpy as np
+from sklearn import svm
 from sklearn.model_selection import train_test_split as tts
 from ensembled_svm import EnsembledSVM as eSVM
 
 sys.path.append('../../utility')
 import util
 import yamanishi_data_util as yam
+import classifier_util as cutil
 
 from devel_config import config as cfg
 
@@ -26,17 +28,23 @@ def main():
     clusterDir = sys.argv[1]# assume: ended with '/'
     cloneID = sys.argv[2]
 
+    method = cfg['method']['name']
+    if method not in ['esvm','psvm']:
+        print 'FATAL: unknown method'
+        return
+    print 'method: '+method
+
     log = {}
     seed = util.seed(); log['seed'] = seed
     np.random.seed(seed)
 
     dataset = clusterDir.split('/')[-2].split('-')[-1]; log['dataset'] = dataset
     outDir = os.path.join('./output',
-                          '-'.join([cfg['method']['name']+'#'+cloneID,dataset,util.tag()]))
+                          '-'.join([method+'#'+cloneID,dataset,util.tag()]))
     os.makedirs(outDir)
     shutil.copy2('devel_config.py',outDir)
 
-    ## Load data
+    ## Load data ###################################################################################
     print 'loading data...'
     datasetParams = dataset.split('#')
     if datasetParams[0]=='yamanishi':
@@ -76,16 +84,14 @@ def main():
     log['rDevel(+):(-)'] = float(log['nDevel(+)'])/float(log['nDevel(-)'])
     print 'nDevel: '+str(log['nDevel'])+'/'+str(log['nData'])+' = '+str(log['rDevel:Data'])
 
-    ## DEVEL
+    ## DEVEL #######################################################################################
     msg = 'devel '+dataset+' '+cloneID
     xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
                           random_state=seed,stratify=ydev)
 
-    esvm = eSVM(cfg['method']['mode'],
-                cfg['method']['maxTrainingSamplesPerBatch'],
-                cfg['method']['maxTestingSamplesPerBatch'],
-                cfg['method']['bootstrap'],
-                {'com':comSimDict,'pro':proSimDict})
+    if cfg['maxTestingSamples']>0:
+        chosenIdx = np.random.randint(len(xte),size=cfg['maxTestingSamples'])
+        xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
 
     log['nTraining'] = len(xtr)
     log['nTraining(+)'] = len([i for i in ytr if i==1])
@@ -100,18 +106,34 @@ def main():
     log['rTesting:Devel'] = log['nTesting']/float(log['nDevel'])
 
     ##
-    print msg+': fitting nTr= '+str(len(ytr))
-    esvm.fit(xtr,ytr)
-    esvm.writeLabels(outDir)
-    log['nSVM'] = esvm.nSVM()
+    clf = None
+    if method=='esvm':
+        clf  = eSVM(cfg['method']['mode'],
+                    cfg['method']['maxTrainingSamplesPerBatch'],
+                    cfg['method']['maxTestingSamplesPerBatch'],
+                    cfg['method']['bootstrap'],
+                    {'com':comSimDict,'pro':proSimDict})
+    elif method=='psvm':
+        clf = svm.SVC(kernel='precomputed',probability=True)
 
     ##
-    if cfg['maxTestingSamples']>0:
-        chosenIdx = np.random.randint(len(xte),size=cfg['maxTestingSamples'])
-        xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
+    print msg+': fitting nTr= '+str(len(ytr))
+    if method=='esvm':
+        clf.fit(xtr,ytr)
+        clf.writeLabels(outDir)
+        log['nSVM'] = clf.nSVM()
+    elif method=='psvm':
+        simMatTr = cutil.makeKernel(xtr,xtr,{'com':comSimDict,'pro':proSimDict})
+        clf.fit(simMatTr,ytr)
 
+    ##
     print msg+': predicting nTe= '+str(len(yte))
-    ypred,yscore = esvm.predict(xte)
+    if method=='esvm':
+        ypred,yscore = clf.predict(xte)
+    elif method=='psvm':
+        simMatTe = cutil.makeKernel(xte,xtr,{'com':comSimDict,'pro':proSimDict})
+        ypred = clf.predict(simMatTe)
+        yscore = clf.predict_proba(simMatTe)
 
     result = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred,'yscore':yscore}
     with open(os.path.join(outDir,"result.pkl"),'w') as f: pickle.dump(result,f)
