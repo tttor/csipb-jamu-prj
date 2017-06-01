@@ -9,7 +9,8 @@ from sklearn import svm
 from scoop import futures as fu
 
 class EnsembledSVM:
-    def __init__(self,imaxTrSamples,imaxTeSamples,ibootstrap,isimDict):
+    def __init__(self,imode,imaxTrSamples,imaxTeSamples,ibootstrap,isimDict):
+        self._mode = imode
         self._maxTrainingSamples = imaxTrSamples
         self._maxTestingSamples = imaxTeSamples
         self._boostrap = ibootstrap
@@ -26,6 +27,9 @@ class EnsembledSVM:
         fpath = os.path.join(outDir,'esvm_labels.json')
         with open(fpath,'w') as f: json.dump(self._labels,f)
 
+    def nSVM(self):
+        return len(self._svmList)
+
     def fit(self,ixtr,iytr):
         xyTrList = self._divideSamples(ixtr,iytr,self._maxTrainingSamples)
         self._svmList = list( fu.map(self._fit2,
@@ -36,12 +40,12 @@ class EnsembledSVM:
         self._labels = self._svmList[0][0].classes_.tolist()
         for svm in self._svmList: assert svm[0].classes_.tolist()==self._labels
 
-    def predict(self,ixte,mode):
+    def predict(self,ixte):
         assert len(self._svmList)!=0,'empty _svmList in predict()'
         xyTeList = self._divideSamples(ixte,None,self._maxTestingSamples)
         xTeList = [i[0] for i in xyTeList]; n = len(xTeList)
         ypredList = list( fu.map(self._predict2,
-                                 xTeList,[mode]*n,[self._svmList]*n,[self._labels]*n) )
+                                 xTeList,[self._mode]*n,[self._svmList]*n,[self._labels]*n) )
 
         ypredMerged = []; yscoreMerged = [];
         for i in ypredList:
