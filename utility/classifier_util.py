@@ -1,10 +1,10 @@
 # classifier_util.py
 import numpy as np
 
-def makeKernel(xtr1,xtr2,simDict):
-   mat = np.zeros( (len(xtr1),len(xtr2)) )
-   for i,ii in enumerate(xtr1):
-      for j,jj in enumerate(xtr2):
+def makeKernel(x1,x2,simDict):
+   mat = np.zeros( (len(x1),len(x2)) )
+   for i,ii in enumerate(x1):
+      for j,jj in enumerate(x2):
          comSim = simDict['com'][ (ii[0],jj[0]) ]
          proSim = simDict['pro'][ (ii[1],jj[1]) ]
          mat[i][j] = mergeComProKernel( comSim,proSim )
