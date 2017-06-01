@@ -125,6 +125,7 @@ def main():
     elif method=='psvm':
         simMatTr = cutil.makeKernel(xtr,xtr,{'com':comSimDict,'pro':proSimDict})
         clf.fit(simMatTr,ytr)
+        log['labels'] = clf.classes_.tolist()
 
     ##
     print msg+': predicting nTe= '+str(len(yte))
@@ -134,6 +135,7 @@ def main():
         simMatTe = cutil.makeKernel(xte,xtr,{'com':comSimDict,'pro':proSimDict})
         ypred = clf.predict(simMatTe)
         yscore = clf.predict_proba(simMatTe)
+        yscore = [max(i.tolist()) for i in yscore]
 
     result = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred,'yscore':yscore}
     with open(os.path.join(outDir,"result.pkl"),'w') as f: pickle.dump(result,f)
