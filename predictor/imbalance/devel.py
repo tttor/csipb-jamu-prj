@@ -94,7 +94,7 @@ def main():
     xdevf = cutil.loadFeature(xdev,comFeaDir,proFeaDir)
 
     print ('smote...')
-    sm = SMOTE(random_state=seed)
+    sm = SMOTE(kind='svm',random_state=seed)
     xdevfr,ydevr = sm.fit_sample(xdevf,ydev)
     xdev = xdevfr
     ydev = ydevr
