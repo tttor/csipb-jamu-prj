@@ -10,6 +10,7 @@ import numpy as np
 from sklearn import svm
 from sklearn.model_selection import train_test_split as tts
 from ensembled_svm import EnsembledSVM as eSVM
+from imblearn.over_sampling import SMOTE
 
 sys.path.append('../../utility')
 import util
@@ -84,6 +85,23 @@ def main():
     log['rDevel(+):(-)'] = float(log['nDevel(+)'])/float(log['nDevel(-)'])
     print 'nDevel: '+str(log['nDevel'])+'/'+str(log['nData'])+' = '+str(log['rDevel:Data'])
 
+    #
+    print ('loading feature...')
+    comFeaDir = '../../dataset/connectivity/compound_vs_protein/yamanishi/fingerprint'
+    proFeaDir = '../../dataset/connectivity/compound_vs_protein/yamanishi/amino-acid-composition'
+    comFeaDir = os.path.join(comFeaDir,'klekotaroth-'+datasetParams[1])
+    proFeaDir = os.path.join(proFeaDir,'aac-'+datasetParams[1])
+    xdevf = cutil.loadFeature(xdev,comFeaDir,proFeaDir)
+
+    print len(xdev)
+    print len(xdev[0])
+    print len(xdevf)
+    print len(xdevf[0])
+    print len(ydev)
+    sm = SMOTE(random_state=seed)
+    xdevfr,ydevr = sm.fit_sample(xdevf,ydev)
+
+    return
     ## DEVEL #######################################################################################
     msg = 'devel '+dataset+' '+cloneID
     xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
