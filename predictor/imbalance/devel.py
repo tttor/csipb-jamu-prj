@@ -32,7 +32,7 @@ def main():
 
     dataset = clusterDir.split('/')[-2].split('-')[-1]; log['dataset'] = dataset
     outDir = os.path.join('./output',
-                          '-'.join([cfg['method']+'#'+cloneID,dataset,util.tag()]))
+                          '-'.join([cfg['method']['name']+'#'+cloneID,dataset,util.tag()]))
     os.makedirs(outDir)
     shutil.copy2('devel_config.py',outDir)
 
@@ -81,9 +81,9 @@ def main():
     xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
                           random_state=seed,stratify=ydev)
 
-    esvm = eSVM(cfg['maxTrainingSamplesPerBatch'],
-                cfg['maxTestingSamplesPerBatch'],
-                cfg['bootstrap'],
+    esvm = eSVM(cfg['method']['maxTrainingSamplesPerBatch'],
+                cfg['method']['maxTestingSamplesPerBatch'],
+                cfg['method']['bootstrap'],
                 {'com':comSimDict,'pro':proSimDict})
 
     log['nTraining'] = len(xtr)
@@ -110,7 +110,7 @@ def main():
         xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
 
     print msg+': predicting nTe= '+str(len(yte))
-    ypred,yscore = esvm.predict(xte,cfg['mode'])
+    ypred,yscore = esvm.predict(xte,cfg['method']['mode'])
 
     result = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred,'yscore':yscore}
     with open(os.path.join(outDir,"result.pkl"),'w') as f: pickle.dump(result,f)
