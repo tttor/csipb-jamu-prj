@@ -23,18 +23,31 @@ def main():
       return
 
    tdir = sys.argv[1]
-   tag = sys.argv[2]
+   tags = sys.argv[2].split('*'); assert(len(tags)!=0)
 
-   odir = os.path.join(tdir,'anal_'+tag)
+   odir = os.path.join(tdir,'-'.join(['anal']+tags))
    if not os.path.exists(odir): os.makedirs(odir)
 
    perfs = ddict(list); cms = []
-   dirs = [i for i in os.listdir(tdir) if (tag in i)and('anal' not in i)]; assert len(dirs)>0
+   dirs = []
+   for i in os.listdir(tdir):
+      if 'anal' in i: continue
+      insert = True
+      for t in tags:
+         if t not in i:
+            insert = False
+            break
+      if insert:
+         dirs.append(i)
+   assert len(dirs)>0
+
    for i,d in enumerate(dirs):
       print 'anal on '+d+' '+str(i+1)+'/'+str(len(dirs))
+
       with open(os.path.join(tdir,d,'result.pkl'),'r') as f: result = pickle.load(f)
-      with open(os.path.join(tdir,d,'esvm_labels.json'),'r') as f: labels = yaml.load(f)
-      ytrue = result['yte']; ypred = result['ypred']; yscore = result['yscore']; labels = list(set(ytrue))
+      with open(os.path.join(tdir,d,'log.json'),'r') as f: log = yaml.load(f)
+      ytrue = result['yte']; ypred = result['ypred']; yscore = result['yscore']; labels = log['labels']
+
       perfs['roc_auc_score'].append( roc_auc_score(ytrue,yscore,average='macro') )
       perfs['aupr_score'].append( average_precision_score(ytrue,yscore,average='macro') )
       perfs['accuracy_score'].append( accuracy_score(ytrue,ypred) )
@@ -44,10 +57,10 @@ def main():
       cms.append( confusion_matrix(ytrue,ypred,labels) )
 
    print 'writing perfs...'
-   perfAvg = {}
+   perfAvg = {};
    for m,v in perfs.iteritems(): perfAvg[m+'_avg'] = ( np.mean(v),np.std(v) )
-   with open(os.path.join(odir,'perfs.json'),'w') as f: json.dump(perfs,f,indent=2,sort_keys=True)
-   with open(os.path.join(odir,'perfAvg.json'),'w') as f: json.dump(perfAvg,f,indent=2,sort_keys=True)
+   with open(os.path.join(odir,'_'.join(['perfs']+tags)+'.json'),'w') as f: json.dump(perfs,f,indent=2,sort_keys=True)
+   with open(os.path.join(odir,'_'.join(['perfAvg']+tags)+'.json'),'w') as f: json.dump(perfAvg,f,indent=2,sort_keys=True)
 
    print 'writing cm...'
    def _getBestIdx(metric):
