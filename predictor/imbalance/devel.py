@@ -96,8 +96,19 @@ def main():
     print ('smote...')
     sm = SMOTE(random_state=seed)
     xdevfr,ydevr = sm.fit_sample(xdevf,ydev)
+    xdev = xdevfr
+    ydev = ydevr
 
-    return
+    log['nDevelResampled'] = len(ydevr)
+    log['rDevelResampled:Data'] = log['nDevelResampled']/float(log['nData'])
+    log['nDevelResampled(+)'] = len( [i for i in ydevr if i==1] )
+    log['nDevelResampled(-)'] = len( [i for i in ydevr if i==-1] )
+    log['rDevelResampled(+):DevelResampled'] = log['nDevelResampled(+)']/float(log['nDevelResampled'])
+    log['rDevelResampled(-):DevelResampled'] = log['nDevelResampled(-)']/float(log['nDevelResampled'])
+    log['rDevelResampled(+):(-)'] = log['nDevelResampled(+)']/float(log['nDevelResampled(-)'])
+    print 'nDevelResampled: '+str(log['nDevelResampled'])+'/'+str(log['nData'])+' = '+str(log['rDevelResampled:Data'])
+    with open(os.path.join(outDir,'log.json'),'w') as f: json.dump(log,f,indent=2,sort_keys=True)
+
     ## DEVEL #######################################################################################
     msg = 'devel '+dataset+' '+cloneID
     xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
@@ -128,7 +139,8 @@ def main():
                     cfg['method']['bootstrap'],
                     {'com':comSimDict,'pro':proSimDict})
     elif method=='psvm':
-        clf = svm.SVC(kernel='precomputed',probability=True)
+        # clf = svm.SVC(kernel='precomputed',probability=True)
+        clf = svm.SVC(probability=True)
 
     ##
     print msg+': fitting nTr= '+str(len(ytr))
@@ -137,8 +149,9 @@ def main():
         clf.writeLabels(outDir)
         log['nSVM'] = clf.nSVM()
     elif method=='psvm':
-        simMatTr = cutil.makeKernel(xtr,xtr,{'com':comSimDict,'pro':proSimDict})
-        clf.fit(simMatTr,ytr)
+        # simMatTr = cutil.makeKernel(xtr,xtr,{'com':comSimDict,'pro':proSimDict})
+        # clf.fit(simMatTr,ytr)
+        clf.fit(xtr,ytr)
         log['labels'] = clf.classes_.tolist()
 
     ##
@@ -146,9 +159,11 @@ def main():
     if method=='esvm':
         ypred,yscore = clf.predict(xte)
     elif method=='psvm':
-        simMatTe = cutil.makeKernel(xte,xtr,{'com':comSimDict,'pro':proSimDict})
-        ypred = clf.predict(simMatTe)
-        yscore = clf.predict_proba(simMatTe)
+        # simMatTe = cutil.makeKernel(xte,xtr,{'com':comSimDict,'pro':proSimDict})
+        # ypred = clf.predict(simMatTe)
+        # yscore = clf.predict_proba(simMatTe)
+        ypred = clf.predict(xte)
+        yscore = clf.predict_proba(xte)
         yscore = [max(i.tolist()) for i in yscore]
 
     result = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred,'yscore':yscore}
