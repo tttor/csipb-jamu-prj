@@ -81,7 +81,8 @@ def main():
     xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
                           random_state=seed,stratify=ydev)
 
-    esvm = eSVM(cfg['method']['maxTrainingSamplesPerBatch'],
+    esvm = eSVM(cfg['method']['mode'],
+                cfg['method']['maxTrainingSamplesPerBatch'],
                 cfg['method']['maxTestingSamplesPerBatch'],
                 cfg['method']['bootstrap'],
                 {'com':comSimDict,'pro':proSimDict})
@@ -110,7 +111,7 @@ def main():
         xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
 
     print msg+': predicting nTe= '+str(len(yte))
-    ypred,yscore = esvm.predict(xte,cfg['method']['mode'])
+    ypred,yscore = esvm.predict(xte)
 
     result = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred,'yscore':yscore}
     with open(os.path.join(outDir,"result.pkl"),'w') as f: pickle.dump(result,f)
