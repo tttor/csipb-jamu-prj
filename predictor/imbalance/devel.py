@@ -93,11 +93,7 @@ def main():
     proFeaDir = os.path.join(proFeaDir,'aac-'+datasetParams[1])
     xdevf = cutil.loadFeature(xdev,comFeaDir,proFeaDir)
 
-    print len(xdev)
-    print len(xdev[0])
-    print len(xdevf)
-    print len(xdevf[0])
-    print len(ydev)
+    print ('smote...')
     sm = SMOTE(random_state=seed)
     xdevfr,ydevr = sm.fit_sample(xdevf,ydev)
 

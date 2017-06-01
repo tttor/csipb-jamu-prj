@@ -1,14 +1,22 @@
 # classifier_util.py
 import os
 import numpy as np
+from scoop import futures as fu
+from scoop import shared as sh
 
 def loadFeature(x,comFeaDir,proFeaDir):
-   xf = []
-   for com,pro in x:
-      comFea = loadKlekotaroth(com,comFeaDir).tolist()
-      proFea = loadAAC(pro,proFeaDir).tolist()
-      xf.append( mergeComProFea(comFea,proFea) )
+   sh.setConst(comFeaDir=comFeaDir)
+   sh.setConst(proFeaDir=proFeaDir)
+   xf = list(fu.map(_loadFeature,x))
    return xf
+
+def _loadFeature(x):
+   com,pro = x
+   comFeaDir = sh.getConst('comFeaDir')
+   proFeaDir = sh.getConst('proFeaDir')
+   comFea = loadKlekotaroth(com,comFeaDir).tolist()
+   proFea = loadAAC(pro,proFeaDir).tolist()
+   return mergeComProFea(comFea,proFea)
 
 def mergeComProFea(comFea,proFea):
    return comFea+proFea
