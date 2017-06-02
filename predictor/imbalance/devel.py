@@ -41,8 +41,7 @@ def main():
 
     dataset = clusterDir.split('/')[-2].split('-')[-1]; log['dataset'] = dataset
     outDir = os.path.join(cfg['outputDir'],'-'.join([method+'#'+cloneID,dataset,util.tag()]))
-    os.makedirs(outDir)
-    shutil.copy2('devel_config.py',outDir)
+    os.makedirs(outDir); shutil.copy2('devel_config.py',outDir)
 
     ## Load data ###################################################################################
     print 'loading data...'
@@ -85,7 +84,6 @@ def main():
     print 'nDevel: '+str(log['nDevel'])+'/'+str(log['nData'])+' = '+str(log['rDevel:Data'])
 
     ##
-
     comFeaDir = '../../dataset/connectivity/compound_vs_protein/yamanishi/fingerprint'
     proFeaDir = '../../dataset/connectivity/compound_vs_protein/yamanishi/amino-acid-composition'
     feaPickleFpath = os.path.join(cfg['outputDir'],'_'.join(['xdef','xdevf']+datasetParams)+'.pkl')
@@ -119,7 +117,7 @@ def main():
     print 'nDevelResampled: '+str(log['nDevelResampled'])+'/'+str(log['nData'])+' = '+str(log['rDevelResampled:Data'])
     with open(os.path.join(outDir,'log.json'),'w') as f: json.dump(log,f,indent=2,sort_keys=True)
 
-    ## DEVEL #######################################################################################
+    ## TUNE+TRAIN+TEST #############################################################################
     msg = 'devel '+dataset+' '+cloneID
     xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
                           random_state=seed,stratify=ydev)
@@ -133,7 +131,6 @@ def main():
     log['nTraining(-)'] = len([i for i in ytr if i==-1])
     log['rTraining(+):(-)'] = log['nTraining(+)']/float(log['nTraining(-)'])
     log['rTraining:Devel'] = log['nTraining']/float(log['nDevel'])
-
     log['nTesting'] = len(xte)
     log['nTesting(+)'] = len([i for i in yte if i==1])
     log['nTesting(-)'] = len([i for i in yte if i==-1])
