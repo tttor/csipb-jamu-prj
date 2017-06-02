@@ -26,7 +26,7 @@ def main():
         print 'see devel_config.py'
         return
 
-    clusterDir = sys.argv[1]# assume: ended with '/'
+    clusterDir = sys.argv[1]; assert clusterDir[-1]=='/',"should be ended with '/'"
     cloneID = sys.argv[2]
 
     method = cfg['method']['name']
@@ -40,8 +40,7 @@ def main():
     np.random.seed(seed)
 
     dataset = clusterDir.split('/')[-2].split('-')[-1]; log['dataset'] = dataset
-    outDir = os.path.join('./output',
-                          '-'.join([method+'#'+cloneID,dataset,util.tag()]))
+    outDir = os.path.join(cfg['outputDir'],'-'.join([method+'#'+cloneID,dataset,util.tag()]))
     os.makedirs(outDir)
     shutil.copy2('devel_config.py',outDir)
 
@@ -85,14 +84,25 @@ def main():
     log['rDevel(+):(-)'] = float(log['nDevel(+)'])/float(log['nDevel(-)'])
     print 'nDevel: '+str(log['nDevel'])+'/'+str(log['nData'])+' = '+str(log['rDevel:Data'])
 
-    #
-    print ('loading feature...')
+    ##
+
     comFeaDir = '../../dataset/connectivity/compound_vs_protein/yamanishi/fingerprint'
     proFeaDir = '../../dataset/connectivity/compound_vs_protein/yamanishi/amino-acid-composition'
-    comFeaDir = os.path.join(comFeaDir,'klekotaroth-'+datasetParams[1])
-    proFeaDir = os.path.join(proFeaDir,'aac-'+datasetParams[1])
-    xdevf = cutil.loadFeature(xdev,comFeaDir,proFeaDir)
+    feaPickleFpath = os.path.join(cfg['outputDir'],'_'.join(['xdef','xdevf']+datasetParams)+'.pkl')
+    if os.path.isfile(feaPickleFpath):
+        print 'loading feature... from previous!'
+        with open(feaPickleFpath,'r') as f:
+            xdevPrev,xdevf = pickle.load(f)
+            assert xdev == xdevPrev
+    else:
+        print 'loading feature... FRESH!'
+        comFeaDir = os.path.join(comFeaDir,'klekotaroth-'+datasetParams[1])
+        proFeaDir = os.path.join(proFeaDir,'aac-'+datasetParams[1])
+        xdevf = cutil.loadFeature(xdev,comFeaDir,proFeaDir)
+        with open(feaPickleFpath,'w') as f:
+            pickle.dump((xdev,xdevf),f)
 
+    ##
     print ('smote...')
     sm = SMOTE(kind='svm',random_state=seed)
     xdevfr,ydevr = sm.fit_sample(xdevf,ydev)
@@ -130,7 +140,7 @@ def main():
     log['rTesting(+):(-)'] = log['nTesting(+)']/float(log['nTesting(-)'])
     log['rTesting:Devel'] = log['nTesting']/float(log['nDevel'])
 
-    ##
+    ## tuning
     clf = None
     if method=='esvm':
         clf  = eSVM(cfg['method']['mode'],
@@ -142,7 +152,7 @@ def main():
         # clf = svm.SVC(kernel='precomputed',probability=True)
         clf = svm.SVC(probability=True)
 
-    ##
+    ## training
     print msg+': fitting nTr= '+str(len(ytr))
     if method=='esvm':
         clf.fit(xtr,ytr)
@@ -154,7 +164,7 @@ def main():
         clf.fit(xtr,ytr)
         log['labels'] = clf.classes_.tolist()
 
-    ##
+    ## testing
     print msg+': predicting nTe= '+str(len(yte))
     if method=='esvm':
         ypred,yscore = clf.predict(xte)
