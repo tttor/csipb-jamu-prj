@@ -8,10 +8,21 @@
     * Agarwal, S. (2010)
 
 ## protein features
-* PROFEAT (Protein Feature Server): http://bidd2.nus.edu.sg/cgi-bin/prof2015/prof_home.cgi
-  * **Rao et al. (2011)**
-
-* protein-domains via PFAM database
+* Amino acid composition
+  * Amino acid composition (AAC)
+  * Dipeptide composition (DPC)
+  * Tripeptide composition (TPC)
+* autocorrelation
+  * Normalized Moreau-Broto autocorrelation
+  * Moran autocorrelation
+  * Geary autocorrelation
+* Composition, Transition, Distribution (CTD)
+* Conjoint Triad
+* Sequence-order-coupling number
+* Quasi-sequence-order descriptors
+* Pseudo-amino acid composition
+* Amphiphilic pseudo-amino acid composition
+* protein-domains via PFAM database: http://pfam.xfam.org/
   * **Punta et al. (2012)**
 
 ## pharmacological features
@@ -45,3 +56,5 @@
 * RDKit: Open-Source Cheminformatics Software
   * http://rdkit.readthedocs.io/en/latest/GettingStartedInPython.html#fingerprinting-and-molecular-similarity
   * http://rdkit.readthedocs.io/en/latest/GettingStartedInPython.html#chemical-features-and-pharmacophores
+* PROFEAT (Protein Feature Server)
+  * http://bidd2.nus.edu.sg/cgi-bin/prof2015/prof_home.cgi
