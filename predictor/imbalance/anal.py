@@ -41,6 +41,7 @@ def main():
          dirs.append(i)
    assert len(dirs)>0
 
+   dirs = sorted(dirs)
    for i,d in enumerate(dirs):
       print 'anal on '+d+' '+str(i+1)+'/'+str(len(dirs))
 
@@ -57,19 +58,21 @@ def main():
       cms.append( confusion_matrix(ytrue,ypred,labels) )
 
    print 'writing perfs...'
-   perfAvg = {};
+   perfAvg = {}
    for m,v in perfs.iteritems(): perfAvg[m+'_avg'] = ( np.mean(v),np.std(v) )
-   with open(os.path.join(odir,'_'.join(['perfs']+tags)+'.json'),'w') as f: json.dump(perfs,f,indent=2,sort_keys=True)
    with open(os.path.join(odir,'_'.join(['perfAvg']+tags)+'.json'),'w') as f: json.dump(perfAvg,f,indent=2,sort_keys=True)
+
+   perfs['dirs'] = dirs
+   with open(os.path.join(odir,'_'.join(['perfs']+tags)+'.json'),'w') as f: json.dump(perfs,f,indent=2,sort_keys=True)
 
    print 'writing cm...'
    def _getBestIdx(metric):
       idx = perfs[metric].index( max(perfs[metric]) )
       return idx
 
-   for m in [i for i in perfs.keys() if ('roc_auc' in i) or ('aupr' in i)]:
-      for n in ['normalized','unnormalized']:
-         _plotCM(cms[_getBestIdx(m)],labels,n,os.path.join(odir,'cm_best_'+m+'_'+n+'.png'))
+   m = 'aupr_score'
+   for n in ['normalized','unnormalized']:
+      _plotCM(cms[_getBestIdx(m)],labels,n,os.path.join(odir,'cm_best_'+m+'_'+n+'.png'))
 
 def _plotCM(cm,classes,normalized,fpath):
    """
