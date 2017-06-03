@@ -28,32 +28,39 @@ def divideSamples(x,y,maxSamplesPerBatch):
 
    return xyList
 
-def loadFeature(x,comFeaDir,proFeaDir):
-   sh.setConst(comFeaDir=comFeaDir)
-   sh.setConst(proFeaDir=proFeaDir)
-   xf = list(fu.map(_loadFeature,x))
-   return xf
+def _loadKlekotaroth(keggComID):
+   dpath = sh.getConst('comFeaDir')
+   fea = np.loadtxt(os.path.join(dpath,keggComID+'.fpkr'), delimiter=",")
+   return fea
 
-def _loadFeature(x):
-   com,pro = x
-   comFeaDir = sh.getConst('comFeaDir')
-   proFeaDir = sh.getConst('proFeaDir')
-   comFea = loadKlekotaroth(com,comFeaDir)
-   proFea = loadAAC(pro,proFeaDir)
-   return mergeComProFea(comFea,proFea)
+def _loadAAC(keggProID):
+   dpath = sh.getConst('proFeaDir')
+   fea = np.loadtxt(os.path.join(dpath,keggProID+'.aac'), delimiter=",")
+   return fea
 
-def mergeComProFea(comFea,proFea):
+def _mergeComProFea(comFea,proFea):
    fea = np.append(comFea,proFea)
    fea = fea.tolist()
    return fea
 
-def loadKlekotaroth(keggComID,dpath):
-   fea = np.loadtxt(os.path.join(dpath,keggComID+'.fpkr'), delimiter=",")
-   return fea
+def loadFeature(x,comFeaDir,proFeaDir):
+   comList = [i[0] for i in x]
+   proList = [i[1] for i in x]
+   sh.setConst(comFeaDir=comFeaDir)
+   sh.setConst(proFeaDir=proFeaDir)
 
-def loadAAC(keggProID,dpath):
-   fea = np.loadtxt(os.path.join(dpath,keggProID+'.aac'), delimiter=",")
-   return fea
+   print 'comFeaList...'
+   comFeaList = list( fu.map(_loadKlekotaroth,comList) )
+
+   print 'proFeaList...'
+   proFeaList = list( fu.map(_loadAAC,proList) )
+
+   print 'merge...'
+   comFeaDict = dict( zip(comList,comFeaList) )
+   proFeaDict = dict( zip(proList,proFeaList) )
+   xf = [_mergeComProFea(comFeaDict[com],proFeaDict[pro]) for com,pro in x ]
+
+   return xf
 
 def makeKernel(x1,x2,simDict):
    mat = np.zeros( (len(x1),len(x2)) )
