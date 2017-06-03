@@ -4,6 +4,7 @@ import sys
 import pickle
 import json
 import yaml
+import h5py
 import itertools
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,37 +18,30 @@ from sklearn.metrics import fbeta_score
 from sklearn.metrics import matthews_corrcoef
 
 def main():
-   if len(sys.argv)!=3:
+   if len(sys.argv)!=2:
       print 'USAGE:'
-      print 'python anal.py [targetDir] [tag]'
+      print 'python anal.py [targetDir]'
       return
 
-   tdir = sys.argv[1]
-   tags = sys.argv[2].split('*'); assert(len(tags)!=0)
+   bdir = sys.argv[1]
 
-   odir = os.path.join(tdir,'-'.join(['anal']+tags))
+   tdir = os.path.join(bdir,'devel')
+   odir = os.path.join(bdir,'anal')
    if not os.path.exists(odir): os.makedirs(odir)
 
    perfs = ddict(list); cms = []
-   dirs = []
-   for i in os.listdir(tdir):
-      if 'anal' in i: continue
-      insert = True
-      for t in tags:
-         if t not in i:
-            insert = False
-            break
-      if insert:
-         dirs.append(i)
-   assert len(dirs)>0
+   tags = [i.split('.')[0].replace('result_','') for i in os.listdir(tdir) if 'result' in i]
+   tags = sorted(tags)
 
-   dirs = sorted(dirs)
-   for i,d in enumerate(dirs):
-      print 'anal on '+d+' '+str(i+1)+'/'+str(len(dirs))
+   with open(os.path.join(tdir,'devLog_'+tags[0]+'.json'),'r') as f:
+      labels = yaml.load(f)['labels']
 
-      with open(os.path.join(tdir,d,'result.pkl'),'r') as f: result = pickle.load(f)
-      with open(os.path.join(tdir,d,'log.json'),'r') as f: log = yaml.load(f)
-      ytrue = result['yte']; ypred = result['ypred']; yscore = result['yscore']; labels = log['labels']
+   for i,tag in enumerate(tags):
+      print 'anal on '+tag+' '+str(i+1)+'/'+str(len(tags))
+
+      rfpath = os.path.join(tdir,'result_'+tag+'.h5')
+      with h5py.File(rfpath,'r') as f:
+         ytrue = f['yte'][:]; ypred = f['ypred'][:]; yscore = f['yscore'][:]
 
       perfs['roc_auc_score'].append( roc_auc_score(ytrue,yscore,average='macro') )
       perfs['aupr_score'].append( average_precision_score(ytrue,yscore,average='macro') )
@@ -60,10 +54,12 @@ def main():
    print 'writing perfs...'
    perfAvg = {}
    for m,v in perfs.iteritems(): perfAvg[m+'_avg'] = ( np.mean(v),np.std(v) )
-   with open(os.path.join(odir,'_'.join(['perfAvg']+tags)+'.json'),'w') as f: json.dump(perfAvg,f,indent=2,sort_keys=True)
+   with open(os.path.join(odir,'perfAvg.json'),'w') as f:
+      json.dump(perfAvg,f,indent=2,sort_keys=True)
 
-   perfs['dirs'] = dirs
-   with open(os.path.join(odir,'_'.join(['perfs']+tags)+'.json'),'w') as f: json.dump(perfs,f,indent=2,sort_keys=True)
+   perfs['tags'] = tags
+   with open(os.path.join(odir,'perfs.json'),'w') as f:
+      json.dump(perfs,f,indent=2,sort_keys=True)
 
    print 'writing cm...'
    def _getBestIdx(metric):
