@@ -23,14 +23,18 @@ import classifier_util as cutil
 from devel_config import config as cfg
 
 def main():
-    if len(sys.argv)!=3:
+    if len(sys.argv)!=4:
         print 'USAGE:'
-        print 'python -m scoop devel.py [clusterDir] [cloneID]'
+        print 'python -m scoop devel.py [cloneID] [clusterDir] [outputDir]'
         print 'see devel_config.py'
         return
 
-    clusterDir = sys.argv[1]; assert clusterDir[-1]=='/',"should be ended with '/'"
-    cloneID = sys.argv[2]
+    cloneID = sys.argv[1]
+    clusterDir = sys.argv[2]; assert clusterDir[-1]=='/',"should be ended with '/'"
+    baseOutDir = sys.argv[3]
+
+    if not(os.path.isdir(baseOutDir)):
+        os.makedirs(baseOutDir)
 
     method = cfg['method']['name']
     if method not in ['esvm','psvm']:
@@ -43,7 +47,7 @@ def main():
     np.random.seed(seed)
 
     dataset = clusterDir.split('/')[-2].split('-')[-1]; log['dataset'] = dataset
-    outDir = os.path.join(cfg['outputDir'],'-'.join([method+'#'+cloneID,dataset,util.tag()]))
+    outDir = os.path.join(baseOutDir,'-'.join([method+'#'+cloneID,dataset,util.tag()]))
     os.makedirs(outDir); shutil.copy2('devel_config.py',outDir)
 
     ## Load data ###################################################################################
@@ -109,7 +113,7 @@ def main():
     xdevf = list( fu.map(cutil.extractComProFea,xdev) )
 
     print 'writing...'
-    ofpath = os.path.join(cfg['outputDir'],'_'.join(['xdevf']+datasetParams)+'.h5')
+    ofpath = os.path.join(baseOutDir,'_'.join(['xdevf','ydev']+datasetParams)+'.h5')
     with h5py.File(ofpath,'w') as f:
         f.create_dataset('xdevf',data=xdevf,dtype=np.float32)
         f.create_dataset('ydev',data=ydev,dtype=np.int8)
