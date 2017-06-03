@@ -113,7 +113,7 @@ def main():
         xdevf = list( fu.map(cutil.extractComProFea,xdev) )
 
         ##
-        print 'writing...'
+        print 'writing (com,pro) feature......'
         shutil.copy2('devel_config.py',baseOutDir)
 
         with h5py.File(xyDevFpath,'w') as f:
@@ -139,7 +139,7 @@ def main():
         with open(dataLogFpath,'r') as f:
             dataLog = yaml.load(f)
     else:
-        print ('ensembled smote freshly...')
+        print 'ensembled smote freshly...'
         xyDevList = cutil.divideSamples(xdevf,ydev,cfg['smoteBatchSize'])
         smoteSeed = util.seed(); dataLog['smoteSeed'] = smoteSeed
         sh.setConst(smoteSeed=smoteSeed)
@@ -152,6 +152,7 @@ def main():
         assert len(xdevfr)==len(ydevr),'len(xdevfr)!=len(ydevr)'
 
         ##
+        print 'writing ensembled smote...'
         with h5py.File(xyDevResFpath,'w') as f:
             f.create_dataset('xdevfr',data=xdevfr,dtype=np.float32)
             f.create_dataset('ydevr',data=ydevr,dtype=np.int8)
