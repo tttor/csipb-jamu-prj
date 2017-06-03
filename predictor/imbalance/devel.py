@@ -235,10 +235,18 @@ def main():
             ypred = clf.predict(xte)
             yscore = clf.predict_proba(xte)
             yscore = [max(i.tolist()) for i in yscore]
+    result = {'yte':yte,'ypred':ypred,'yscore':yscore}
 
-    result = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred,'yscore':yscore}
-    with open(os.path.join(outDir,'result_'+tag+'.pkl'),'w') as f: pickle.dump(result,f)
-    with open(os.path.join(outDir,'devLog_'+tag+'.json'),'w') as f: json.dump(devLog,f,indent=2,sort_keys=True)
+    ##
+    print 'writing prediction...'
+    with h5py.File(os.path.join(outDir,'result_'+tag+'.h5'),'w') as f:
+        for k,v in result.iteritems():
+            dt = np.float32
+            if k in ['ytr','yte','ypred']: dt = np.int8
+            f.create_dataset(k,data=v,dtype=dt)
+
+    with open(os.path.join(outDir,'devLog_'+tag+'.json'),'w') as f:
+        json.dump(devLog,f,indent=2,sort_keys=True)
 
 if __name__ == '__main__':
     tic = time.time()
