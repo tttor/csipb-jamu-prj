@@ -13,13 +13,13 @@ sys.path.append('../../utility')
 import classifier_util as cutil
 
 class EnsembledSVM:
-    def __init__(self,ikernel,imode,imaxTrSamples,imaxTeSamples,ibootstrap,isimDict):
+    def __init__(self,ikernel,imode,imaxTrSamples,imaxTeSamples,ibootstrap,isimMat):
         self._kernel = ikernel
         self._mode = imode
         self._maxTrainingSamples = imaxTrSamples
         self._maxTestingSamples = imaxTeSamples
         self._boostrap = ibootstrap
-        self._simDict = isimDict
+        self._simMat = isimMat
         self._svmList = []
         self._labels = []
 
@@ -51,7 +51,7 @@ class EnsembledSVM:
 
         ## train
         if self._kernel=='precomputed':
-            simMatTr = cutil.makeKernel(xtr,xtr,self._simDict)
+            simMatTr = cutil.makeComProKernelMatFromSimMat(xtr,xtr,self._simMat)
             clf.fit(simMatTr,ytr)
         else:
             clf.fit(xtr,ytr)
@@ -89,7 +89,7 @@ class EnsembledSVM:
         clf,xtr = iclf
 
         if self._kernel=='precomputed':
-            simMatTe = cutil.makeKernel(xte,xtr,self._simDict)
+            simMatTe = cutil.makeComProKernelMatFromSimMat(xte,xtr,self._simMat)
             ypred2iRaw = clf.predict(simMatTe) # remember: ypred2i is a vector
             ypredproba2iRaw = clf.predict_proba(simMatTe)
         else:

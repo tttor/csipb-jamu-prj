@@ -23,12 +23,6 @@ import classifier_util as cutil
 
 from devel_config import config as cfg
 
-def ensembleSmote(xydev):
-    xdevf,ydev = xydev
-    sm = SMOTE(kind='svm',random_state=sh.getConst('smoteSeed'))
-    xdevfr,ydevr = sm.fit_sample(xdevf,ydev)
-    return (xdevfr,ydevr)
-
 def main():
     if len(sys.argv)!=4:
         print 'USAGE:'
@@ -55,21 +49,29 @@ def main():
     datasetParams = dataset.split('#')
 
     xyDevFpath = os.path.join(baseOutDir,'_'.join(['xdev','ydev']+datasetParams)+'.h5')
-    comSimDictFpath = os.path.join(baseOutDir,'_'.join(['comSimDict']+datasetParams)+'.pkl')
-    proSimDictFpath = os.path.join(baseOutDir,'_'.join(['proSimDict']+datasetParams)+'.pkl')
+    comSimMatFpath = os.path.join(baseOutDir,'_'.join(['comSimMat']+datasetParams)+'.h5')
+    proSimMatFpath = os.path.join(baseOutDir,'_'.join(['proSimMat']+datasetParams)+'.h5')
 
-    if os.path.exists(xyDevFpath) and os.path.exists(comSimDictFpath) and os.path.exists(comSimDictFpath):
-        print 'loading data from previous...'
+    if os.path.exists(xyDevFpath) and os.path.exists(comSimMatFpath) and os.path.exists(proSimMatFpath):
+        print 'loading data from PREVIOUS...'
 
         with h5py.File(xyDevFpath,'r') as f:
             xdev = f['xdev'][:]
             ydev = f['ydev'][:]
 
-        with open(comSimDictFpath,'r') as f: comSimDict = pickle.load(f)
-        with open(proSimDictFpath,'r') as f: proSimDict = pickle.load(f)
-        with open(dataLogFpath,'r') as f: dataLog = yaml.load(f)
+        with h5py.File(comSimMatFpath,'r') as f:
+            comSimMat = f['comSimMat'][:]
+
+        with h5py.File(proSimMatFpath,'r') as f:
+            proSimMat = f['proSimMat'][:]
+
+        with open(dataLogFpath,'r') as f:
+            dataLog = yaml.load(f)
+
     else:
-        print 'loading data freshly...'
+        print 'loading data FRESHLY...'
+
+        print 'loading cluster result...'
         if datasetParams[0]=='yamanishi':
             nUnlabels = []
             statFnames = [i for i in os.listdir(clusterDir) if 'labels_stat.json' in i]
@@ -84,6 +86,7 @@ def main():
         else:
             assert False,'FATAL: unknown dataset'
 
+        ##
         print 'getting devel data...'
         xraw = []; yraw = []
         for k,v in data.iteritems():
@@ -102,14 +105,13 @@ def main():
         aacFpath = os.path.join(cfg['datasetDir'],datasetParams[0],'feature',
                                 'amino-acid-composition','amino-acid-composition-'+datasetParams[1]+'.h5')
 
-        comList = list( set([i[0] for i in xdev]) )
-        proList = list( set([i[1] for i in xdev]) )
-
         krDict = {}; aacDict = {}
         with h5py.File(krFpath, 'r') as f:
-            for com in comList: krDict[com] = f[com][:]
+            for com in [str(i) for i in f.keys()]:
+                krDict[com] = f[com][:]
         with h5py.File(aacFpath, 'r') as f:
-            for pro in proList: aacDict[pro] = f[pro][:]
+            for pro in [str(i) for i in f.keys()]:
+                aacDict[pro] = f[pro][:]
 
         ##
         print 'extract (com,pro) feature...'
@@ -118,24 +120,7 @@ def main():
         xdevf = list( fu.map(cutil.extractComProFea,xdev) )
 
         ##
-        print 'writing (com,pro) feature...'
-        shutil.copy2('devel_config.py',outDir)
-
-        # with h5py.File(xyDevFpath,'w') as f:
-        #     f.create_dataset('xdevf',data=xdevf,dtype=np.float32)
-        #     f.create_dataset('ydev',data=ydev,dtype=np.int8)
-
-        dataLog['nDevel'] = len(devIdx); dataLog['nData'] = len(yraw)
-        dataLog['rDevel:Data'] = dataLog['nDevel']/float(dataLog['nData'])
-        dataLog['nDevel(+)'] = len( [i for i in ydev if i==1] ); assert dataLog['nDevel(+)']!=0
-        dataLog['nDevel(-)'] = len( [i for i in ydev if i==-1] ); assert dataLog['nDevel(-)']!=0
-        dataLog['rDevel(+):Devel'] = float(dataLog['nDevel(+)'])/dataLog['nDevel']
-        dataLog['rDevel(-):Devel'] = float(dataLog['nDevel(-)'])/dataLog['nDevel']
-        dataLog['rDevel(+):(-)'] = float(dataLog['nDevel(+)'])/float(dataLog['nDevel(-)'])
-        with open(dataLogFpath,'w') as f: json.dump(dataLog,f,indent=2,sort_keys=True)
-
-        ## Smote
-        print 'ensembled smote freshly...'
+        print 'Resampling via Smote FRESHLY...'
         xyDevList = cutil.divideSamples(xdevf,ydev,cfg['smoteBatchSize'])
         smoteSeed = util.seed(); dataLog['smoteSeed'] = smoteSeed
         sh.setConst(smoteSeed=smoteSeed)
@@ -148,27 +133,7 @@ def main():
         assert len(xdevfr)==len(ydevr),'len(xdevfr)!=len(ydevr)'
 
         ##
-        print 'writing ensembled smote...'
-        # with h5py.File(xyDevResFpath,'w') as f:
-        #     f.create_dataset('xdevfr',data=xdevfr,dtype=np.float32)
-        #     f.create_dataset('ydevr',data=ydevr,dtype=np.int8)
-
-        dataLog['nSmote'] = len(xyDevList)
-        dataLog['nDevelResampled'] = len(ydevr)
-        dataLog['rDevelResampled:Data'] = dataLog['nDevelResampled']/float(dataLog['nData'])
-        dataLog['nDevelResampled(+)'] = len( [i for i in ydevr if i==1] )
-        dataLog['nDevelResampled(-)'] = len( [i for i in ydevr if i==-1] )
-        dataLog['rDevelResampled(+):DevelResampled'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled'])
-        dataLog['rDevelResampled(-):DevelResampled'] = dataLog['nDevelResampled(-)']/float(dataLog['nDevelResampled'])
-        dataLog['rDevelResampled(+):(-)'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled(-)'])
-        with open(dataLogFpath,'w') as f: json.dump(dataLog,f,indent=2,sort_keys=True)
-
-        ##
-        # simDir = os.path.join(cfg['datasetDir'],datasetParams[0],'similarity-mat')
-        # comSimDict = yam.loadKernel2('compound',datasetParams[1],simDir)
-        # proSimDict = yam.loadKernel2('protein',datasetParams[1],simDir)
-
-        print 'get sets of com,pro...'
+        print 'getting sets of resampled com,pro...'
         comFeaLen = 4860
         proFeaLen = 20
         assert (comFeaLen+proFeaLen) == len(xdevfr[0])
@@ -182,34 +147,54 @@ def main():
         fea2ProMap = dict( zip(proFeaList,range(len(proFeaList))) )
 
         print 'compute kernel of com...'
-        comSimDict = {}
         comSimMat = rbf_kernel(comFeaList,comFeaList)
-        for i,icom in enumerate(comFeaList):
-            for j,jcom in enumerate(comFeaList):
-                icomID = fea2ComMap[icom]
-                jcomID = fea2ComMap[jcom]
-                comSimDict[(icomID,jcomID)] = comSimMat[i][j]
+        with h5py.File(comSimMatFpath,'w') as f:
+            f.create_dataset('comSimMat',data=comSimMat,dtype=np.float32)
 
         print 'compute kernel of pro...'
-        proSimDict = {}
         proSimMat = rbf_kernel(proFeaList,proFeaList)
-        for i,ipro in enumerate(proFeaList):
-            for j,jpro in enumerate(proFeaList):
-                iproID = fea2ProMap[ipro]
-                jproID = fea2ProMap[jpro]
-                proSimDict[(iproID,jproID)] = proSimMat[i][j]
+        with h5py.File(proSimMatFpath,'w') as f:
+            f.create_dataset('proSimMat',data=proSimMat,dtype=np.float32)
+
+        ##
+        print 'mapping xdev to newIdx...'
+
+        sh.setConst(comFeaLen=comFeaLen)
+        sh.setConst(fea2ComMap=fea2ComMap)
+        sh.setConst(fea2ProMap=fea2ProMap)
+        xdevm = list( fu.map(mapToIdx,xdevfr) )
+
+        ##
+        print 'writing dataLog...'
+
+        dataLog['nDevel'] = len(devIdx); dataLog['nData'] = len(yraw)
+        dataLog['rDevel:Data'] = dataLog['nDevel']/float(dataLog['nData'])
+        dataLog['nDevel(+)'] = len( [i for i in ydev if i==1] ); assert dataLog['nDevel(+)']!=0
+        dataLog['nDevel(-)'] = len( [i for i in ydev if i==-1] ); assert dataLog['nDevel(-)']!=0
+        dataLog['rDevel(+):Devel'] = float(dataLog['nDevel(+)'])/dataLog['nDevel']
+        dataLog['rDevel(-):Devel'] = float(dataLog['nDevel(-)'])/dataLog['nDevel']
+        dataLog['rDevel(+):(-)'] = float(dataLog['nDevel(+)'])/float(dataLog['nDevel(-)'])
+
+        dataLog['nSmote'] = len(xyDevList)
+        dataLog['nDevelResampled'] = len(ydevr)
+        dataLog['rDevelResampled:Data'] = dataLog['nDevelResampled']/float(dataLog['nData'])
+        dataLog['nDevelResampled(+)'] = len( [i for i in ydevr if i==1] )
+        dataLog['nDevelResampled(-)'] = len( [i for i in ydevr if i==-1] )
+        dataLog['rDevelResampled(+):DevelResampled'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled'])
+        dataLog['rDevelResampled(-):DevelResampled'] = dataLog['nDevelResampled(-)']/float(dataLog['nDevelResampled'])
+        dataLog['rDevelResampled(+):(-)'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled(-)'])
+
+        dataLog['nCom'] = len(krDict)
+        dataLog['nPro'] = len(aacDict)
+        dataLog['nComResampled'] = len(comFeaList)
+        dataLog['nProResampled'] = len(proFeaList)
+
+        shutil.copy2('devel_config.py',outDir)
+        with open(dataLogFpath,'w') as f:
+            json.dump(dataLog,f,indent=2,sort_keys=True)
 
         ##
         print 'update xdev,ydev...'
-
-        xdevm = []
-        for x in xdevfr:
-            comFea = tuple( x[0:comFeaLen] )
-            proFea = tuple( x[comFeaLen:] )
-            comID = fea2ComMap[comFea]
-            proID = fea2ProMap[proFea]
-            xdevm.append( (comID,proID) )
-
         xdev = xdevm[:]
         ydev = ydevr[:]
 
@@ -217,13 +202,6 @@ def main():
         with h5py.File(xyDevFpath,'w') as f:
             f.create_dataset('xdev',data=xdev,dtype=np.float32)
             f.create_dataset('ydev',data=ydev,dtype=np.int8)
-
-        print 'writing simDict...'
-        with open(comSimDictFpath,'wb') as f:
-            pickle.dump(comSimDict,f)
-
-        with open(proSimDictFpath,'wb') as f:
-            pickle.dump(proSimDict,f)
 
     ## TUNE+TRAIN+TEST #############################################################################
     devLog = {}
@@ -234,6 +212,8 @@ def main():
     msg = 'devel '+dataset+' '+cloneID
     xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
                           random_state=devSeed,stratify=ydev)
+
+    simMat = {'com':comSimMat,'pro':proSimMat}
 
     if cfg['maxTestingSamples']>0:
         chosenIdx = np.random.randint(len(xte),size=cfg['maxTestingSamples'])
@@ -257,7 +237,7 @@ def main():
                     cfg['method']['maxTrainingSamplesPerBatch'],
                     cfg['method']['maxTestingSamplesPerBatch'],
                     cfg['method']['bootstrap'],
-                    {'com':comSimDict,'pro':proSimDict})
+                    simMat)
     elif method=='psvm':
         clf = svm.SVC(kernel=cfg['method']['kernel'],probability=True)
 
@@ -269,7 +249,7 @@ def main():
         devLog['nSVM'] = clf.nSVM()
     elif method=='psvm':
         if cfg['method']['kernel']=='precomputed':
-            simMatTr = cutil.makeKernel(xtr,xtr,{'com':comSimDict,'pro':proSimDict})
+            simMatTr = cutil.makeComProKernelMatFromSimMat(xtr,xtr,simMat)
             clf.fit(simMatTr,ytr)
         else:
             clf.fit(xtr,ytr)
@@ -281,7 +261,7 @@ def main():
         ypred,yscore = clf.predict(xte)
     elif method=='psvm':
         if cfg['method']['kernel']=='precomputed':
-            simMatTe = cutil.makeKernel(xte,xtr,{'com':comSimDict,'pro':proSimDict})
+            simMatTe = cutil.makeComProKernelMatFromSimMat(xte,xtr,simMat)
             ypred = clf.predict(simMatTe)
             yscore = clf.predict_proba(simMatTe)
         else:
@@ -300,6 +280,19 @@ def main():
 
     with open(os.path.join(outDir,'devLog_'+tag+'.json'),'w') as f:
         json.dump(devLog,f,indent=2,sort_keys=True)
+
+def ensembleSmote(xydev):
+    xdevf,ydev = xydev
+    sm = SMOTE(kind='svm',random_state=sh.getConst('smoteSeed'))
+    xdevfr,ydevr = sm.fit_sample(xdevf,ydev)
+    return (xdevfr,ydevr)
+
+def mapToIdx(x):
+    comFea = tuple( x[0:sh.getConst('comFeaLen')] )
+    proFea = tuple( x[sh.getConst('comFeaLen'):] )
+    comIdx = sh.getConst('fea2ComMap')[comFea]
+    proIdx = sh.getConst('fea2ProMap')[proFea]
+    return (comIdx,proIdx)
 
 if __name__ == '__main__':
     tic = time.time()
