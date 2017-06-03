@@ -126,19 +126,6 @@ def main():
         xdevf = list( fu.map(cutil.extractComProFea,xdev) )
 
         ##
-        print 'writing dataLog...'
-
-        dataLog['nDevel'] = len(devIdx); dataLog['nData'] = len(yraw)
-        dataLog['rDevel:Data'] = dataLog['nDevel']/float(dataLog['nData'])
-        dataLog['nDevel(+)'] = len( [i for i in ydev if i==1] ); assert dataLog['nDevel(+)']!=0
-        dataLog['nDevel(-)'] = len( [i for i in ydev if i==-1] ); assert dataLog['nDevel(-)']!=0
-        dataLog['rDevel(+):Devel'] = float(dataLog['nDevel(+)'])/dataLog['nDevel']
-        dataLog['rDevel(-):Devel'] = float(dataLog['nDevel(-)'])/dataLog['nDevel']
-        dataLog['rDevel(+):(-)'] = float(dataLog['nDevel(+)'])/float(dataLog['nDevel(-)'])
-        with open(dataLogFpath,'w') as f: json.dump(dataLog,f,indent=2,sort_keys=True)
-        shutil.copy2('devel_config.py',outDir)
-
-        ##
         print 'Resampling via Smote FRESHLY...'
         xyDevList = cutil.divideSamples(xdevf,ydev,cfg['smoteBatchSize'])
         smoteSeed = util.seed(); dataLog['smoteSeed'] = smoteSeed
@@ -150,19 +137,6 @@ def main():
             for x in xdevfri: xdevfr.append(x.tolist())
             for y in ydevri: ydevr.append(y)
         assert len(xdevfr)==len(ydevr),'len(xdevfr)!=len(ydevr)'
-
-        ##
-        print 'writing ensembled smote...'
-
-        dataLog['nSmote'] = len(xyDevList)
-        dataLog['nDevelResampled'] = len(ydevr)
-        dataLog['rDevelResampled:Data'] = dataLog['nDevelResampled']/float(dataLog['nData'])
-        dataLog['nDevelResampled(+)'] = len( [i for i in ydevr if i==1] )
-        dataLog['nDevelResampled(-)'] = len( [i for i in ydevr if i==-1] )
-        dataLog['rDevelResampled(+):DevelResampled'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled'])
-        dataLog['rDevelResampled(-):DevelResampled'] = dataLog['nDevelResampled(-)']/float(dataLog['nDevelResampled'])
-        dataLog['rDevelResampled(+):(-)'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled(-)'])
-        with open(dataLogFpath,'w') as f: json.dump(dataLog,f,indent=2,sort_keys=True)
 
         ##
         print 'getting sets of resampled com,pro...'
@@ -197,6 +171,35 @@ def main():
             comID = fea2ComMap[comFea]
             proID = fea2ProMap[proFea]
             xdevm.append( (comID,proID) )
+
+        ##
+        print 'writing dataLog...'
+
+        dataLog['nDevel'] = len(devIdx); dataLog['nData'] = len(yraw)
+        dataLog['rDevel:Data'] = dataLog['nDevel']/float(dataLog['nData'])
+        dataLog['nDevel(+)'] = len( [i for i in ydev if i==1] ); assert dataLog['nDevel(+)']!=0
+        dataLog['nDevel(-)'] = len( [i for i in ydev if i==-1] ); assert dataLog['nDevel(-)']!=0
+        dataLog['rDevel(+):Devel'] = float(dataLog['nDevel(+)'])/dataLog['nDevel']
+        dataLog['rDevel(-):Devel'] = float(dataLog['nDevel(-)'])/dataLog['nDevel']
+        dataLog['rDevel(+):(-)'] = float(dataLog['nDevel(+)'])/float(dataLog['nDevel(-)'])
+
+        dataLog['nSmote'] = len(xyDevList)
+        dataLog['nDevelResampled'] = len(ydevr)
+        dataLog['rDevelResampled:Data'] = dataLog['nDevelResampled']/float(dataLog['nData'])
+        dataLog['nDevelResampled(+)'] = len( [i for i in ydevr if i==1] )
+        dataLog['nDevelResampled(-)'] = len( [i for i in ydevr if i==-1] )
+        dataLog['rDevelResampled(+):DevelResampled'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled'])
+        dataLog['rDevelResampled(-):DevelResampled'] = dataLog['nDevelResampled(-)']/float(dataLog['nDevelResampled'])
+        dataLog['rDevelResampled(+):(-)'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled(-)'])
+
+        dataLog['nCom'] = len(krDict)
+        dataLog['nPro'] = len(aacDict)
+        dataLog['nComResampled'] = len(comFeaList)
+        dataLog['nProResampled'] = len(proFeaList)
+
+        shutil.copy2('devel_config.py',outDir)
+        with open(dataLogFpath,'w') as f:
+            json.dump(dataLog,f,indent=2,sort_keys=True)
 
         ##
         print 'update xdev,ydev...'
