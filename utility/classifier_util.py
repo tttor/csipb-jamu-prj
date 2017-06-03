@@ -38,12 +38,14 @@ def _loadFeature(x):
    com,pro = x
    comFeaDir = sh.getConst('comFeaDir')
    proFeaDir = sh.getConst('proFeaDir')
-   comFea = loadKlekotaroth(com,comFeaDir).tolist()
-   proFea = loadAAC(pro,proFeaDir).tolist()
+   comFea = loadKlekotaroth(com,comFeaDir)
+   proFea = loadAAC(pro,proFeaDir)
    return mergeComProFea(comFea,proFea)
 
 def mergeComProFea(comFea,proFea):
-   return comFea+proFea
+   fea = np.append(comFea,proFea)
+   fea = fea.tolist()
+   return fea
 
 def loadKlekotaroth(keggComID,dpath):
    fea = np.loadtxt(os.path.join(dpath,keggComID+'.fpkr'), delimiter=",")
