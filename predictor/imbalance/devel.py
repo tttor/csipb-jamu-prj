@@ -39,8 +39,9 @@ def main():
     clusterDir = sys.argv[2]; assert clusterDir[-1]=='/',"should be ended with '/'"
     baseOutDir = sys.argv[3]
 
-    if not(os.path.isdir(baseOutDir)):
-        os.makedirs(baseOutDir)
+    outDir = os.path.join(baseOutDir,'devel')
+    if not(os.path.isdir(baseOutDir)): os.makedirs(baseOutDir)
+    if not(os.path.isdir(outDir)): os.makedirs(outDir)
 
     method = cfg['method']['name']
     if method not in ['esvm','psvm']:
@@ -48,9 +49,13 @@ def main():
         return
 
     ## Load data ###################################################################################
-    dataLog = {}; dataLogFpath = os.path.join(baseOutDir,'data_log.json')
+    dataLog = {}; dataLogFpath = os.path.join(outDir,'data_log.json')
     dataset = clusterDir.split('/')[-2].split('-')[-1]; dataLog['dataset'] = dataset
     datasetParams = dataset.split('#')
+
+    simDir = os.path.join(cfg['datasetDir'],datasetParams[0],'similarity-mat')
+    comSimDict = yam.loadKernel2('compound',datasetParams[1],simDir)
+    proSimDict = yam.loadKernel2('protein',datasetParams[1],simDir)
 
     xyDevFpath = os.path.join(baseOutDir,'_'.join(['xdevf','ydev']+datasetParams)+'.h5')
     if os.path.exists(xyDevFpath):
@@ -73,9 +78,6 @@ def main():
 
             connFpath = os.path.join(clusterDir,metric+'_labels.pkl')
             with open(connFpath,'r') as f: data = pickle.load(f)
-            simDir = os.path.join(cfg['datasetDir'],datasetParams[0],'similarity-mat')
-            comSimDict = yam.loadKernel2('compound',datasetParams[1],simDir)
-            proSimDict = yam.loadKernel2('protein',datasetParams[1],simDir)
         else:
             assert False,'FATAL: unknown dataset'
 
@@ -114,7 +116,7 @@ def main():
 
         ##
         print 'writing (com,pro) feature...'
-        shutil.copy2('devel_config.py',baseOutDir)
+        shutil.copy2('devel_config.py',outDir)
 
         with h5py.File(xyDevFpath,'w') as f:
             f.create_dataset('xdevf',data=xdevf,dtype=np.float32)
@@ -167,12 +169,9 @@ def main():
         dataLog['rDevelResampled(+):(-)'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled(-)'])
         with open(dataLogFpath,'w') as f: json.dump(dataLog,f,indent=2,sort_keys=True)
 
-    return
-
     ## TUNE+TRAIN+TEST #############################################################################
     devLog = {}
     devSeed = util.seed(); dataLog['devSeed'] = devSeed
-    outDir = baseOutDir
     tag = '_'.join([method+'#'+cloneID,dataset,util.tag()])
 
     xdev = xdevfr
@@ -191,35 +190,36 @@ def main():
     devLog['nTraining(+)'] = len([i for i in ytr if i==1])
     devLog['nTraining(-)'] = len([i for i in ytr if i==-1])
     devLog['rTraining(+):(-)'] = devLog['nTraining(+)']/float(devLog['nTraining(-)'])
-    devLog['rTraining:Devel'] = devLog['nTraining']/float(devLog['nDevel'])
+    devLog['rTraining:Devel'] = devLog['nTraining']/float(dataLog['nDevelResampled'])
     devLog['nTesting'] = len(xte)
     devLog['nTesting(+)'] = len([i for i in yte if i==1])
     devLog['nTesting(-)'] = len([i for i in yte if i==-1])
     devLog['rTesting(+):(-)'] = devLog['nTesting(+)']/float(devLog['nTesting(-)'])
-    devLog['rTesting:Devel'] = devLog['nTesting']/float(devLog['nDevel'])
+    devLog['rTesting:Devel'] = devLog['nTesting']/float(dataLog['nDevelResampled'])
 
     ## tuning
     clf = None
     if method=='esvm':
-        clf  = eSVM(cfg['method']['mode'],
+        clf  = eSVM(cfg['method']['kernel'],cfg['method']['mode'],
                     cfg['method']['maxTrainingSamplesPerBatch'],
                     cfg['method']['maxTestingSamplesPerBatch'],
                     cfg['method']['bootstrap'],
                     {'com':comSimDict,'pro':proSimDict})
     elif method=='psvm':
-        # clf = svm.SVC(kernel='precomputed',probability=True)
-        clf = svm.SVC(probability=True)
+        clf = svm.SVC(kernel=cfg['method']['kernel'],probability=True)
 
     ## training
     print msg+': fitting nTr= '+str(len(ytr))
     if method=='esvm':
         clf.fit(xtr,ytr)
-        clf.writeLabels(outDir)
+        devLog['labels'] = clf.labels()
         devLog['nSVM'] = clf.nSVM()
     elif method=='psvm':
-        # simMatTr = cutil.makeKernel(xtr,xtr,{'com':comSimDict,'pro':proSimDict})
-        # clf.fit(simMatTr,ytr)
-        clf.fit(xtr,ytr)
+        if cfg['method']['kernel']=='precomputed':
+            simMatTr = cutil.makeKernel(xtr,xtr,{'com':comSimDict,'pro':proSimDict})
+            clf.fit(simMatTr,ytr)
+        else:
+            clf.fit(xtr,ytr)
         devLog['labels'] = clf.classes_.tolist()
 
     ## testing
@@ -227,16 +227,26 @@ def main():
     if method=='esvm':
         ypred,yscore = clf.predict(xte)
     elif method=='psvm':
-        # simMatTe = cutil.makeKernel(xte,xtr,{'com':comSimDict,'pro':proSimDict})
-        # ypred = clf.predict(simMatTe)
-        # yscore = clf.predict_proba(simMatTe)
-        ypred = clf.predict(xte)
-        yscore = clf.predict_proba(xte)
-        yscore = [max(i.tolist()) for i in yscore]
+        if cfg['method']['kernel']=='precomputed':
+            simMatTe = cutil.makeKernel(xte,xtr,{'com':comSimDict,'pro':proSimDict})
+            ypred = clf.predict(simMatTe)
+            yscore = clf.predict_proba(simMatTe)
+        else:
+            ypred = clf.predict(xte)
+            yscore = clf.predict_proba(xte)
+            yscore = [max(i.tolist()) for i in yscore]
+    result = {'yte':yte,'ypred':ypred,'yscore':yscore}
 
-    result = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred,'yscore':yscore}
-    with open(os.path.join(outDir,'result_'+tag+'.pkl'),'w') as f: pickle.dump(result,f)
-    with open(os.path.join(outDir,'devLog_'+tag+'.json'),'w') as f: json.dump(devLog,f,indent=2,sort_keys=True)
+    ##
+    print 'writing prediction...'
+    with h5py.File(os.path.join(outDir,'result_'+tag+'.h5'),'w') as f:
+        for k,v in result.iteritems():
+            dt = np.float32
+            if k in ['ytr','yte','ypred']: dt = np.int8
+            f.create_dataset(k,data=v,dtype=dt)
+
+    with open(os.path.join(outDir,'devLog_'+tag+'.json'),'w') as f:
+        json.dump(devLog,f,indent=2,sort_keys=True)
 
 if __name__ == '__main__':
     tic = time.time()
