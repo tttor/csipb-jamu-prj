@@ -42,24 +42,22 @@ def main():
         return
     print 'method: '+method
 
-    log = {}
-    seed = util.seed(); log['seed'] = seed
-    np.random.seed(seed)
-
     # outDir = os.path.join(baseOutDir,'-'.join([method+'#'+cloneID,dataset,util.tag()]))
     # os.makedirs(outDir);
 
     ## Load data ###################################################################################
-    dataLog = {}
+    dataLog = {}; dataLogFpath = os.path.join(baseOutDir,'data_log.json')
     dataset = clusterDir.split('/')[-2].split('-')[-1]; dataLog['dataset'] = dataset
     datasetParams = dataset.split('#')
 
-    xydevFpath = os.path.join(baseOutDir,'_'.join(['xdevf','ydev']+datasetParams)+'.h5')
-    if os.path.exists(xydevFpath):
+    xyDevFpath = os.path.join(baseOutDir,'_'.join(['xdevf','ydev']+datasetParams)+'.h5')
+    if os.path.exists(xyDevFpath):
         print 'loading data from previous...'
-        with h5py.File(xydevFpath,'r') as f:
+        with h5py.File(xyDevFpath,'r') as f:
             xdevf = f['xdevf'][:]
             ydev = f['ydev'][:]
+        with open(dataLogFpath,'r') as f:
+            dataLog = yaml.load(f)
     else:
         print 'loading data freshly...'
         if datasetParams[0]=='yamanishi':
@@ -69,7 +67,7 @@ def main():
                 with open(os.path.join(clusterDir,i),'r') as f: stat = yaml.load(f)
                 nUnlabels.append(stat['0'])
             metric = '_'.join(statFnames[ nUnlabels.index(min(nUnlabels)) ].split('_')[0:2])
-            log['metric'] = metric
+            dataLog['metric'] = metric
 
             connFpath = os.path.join(clusterDir,metric+'_labels.pkl')
             with open(connFpath,'r') as f: data = pickle.load(f)
@@ -116,7 +114,7 @@ def main():
         print 'writing...'
         shutil.copy2('devel_config.py',baseOutDir)
 
-        with h5py.File(xydevFpath,'w') as f:
+        with h5py.File(xyDevFpath,'w') as f:
             f.create_dataset('xdevf',data=xdevf,dtype=np.float32)
             f.create_dataset('ydev',data=ydev,dtype=np.int8)
 
@@ -127,34 +125,45 @@ def main():
         dataLog['rDevel(+):Devel'] = float(dataLog['nDevel(+)'])/dataLog['nDevel']
         dataLog['rDevel(-):Devel'] = float(dataLog['nDevel(-)'])/dataLog['nDevel']
         dataLog['rDevel(+):(-)'] = float(dataLog['nDevel(+)'])/float(dataLog['nDevel(-)'])
-        print 'nDevel: '+str(dataLog['nDevel'])+'/'+str(dataLog['nData'])+' = '+str(dataLog['rDevel:Data'])
-        with open(os.path.join(baseOutDir,'data_log.json'),'w') as f:
-            json.dump(dataLog,f,indent=2,sort_keys=True)
+        with open(dataLogFpath,'w') as f: json.dump(dataLog,f,indent=2,sort_keys=True)
+
+    ##
+    xyDevResFpath = os.path.join(baseOutDir,'_'.join(['xdevf','ydev','resampled']+datasetParams)+'.h5')
+    if (os.path.exists(xyDevResFpath)):
+        print ('ensembled smote from previous...')
+        with h5py.File(xyDevResFpath,'r') as f:
+            xdevfr = f['xdevfr'][:]
+            ydevr = f['ydevr'][:]
+        with open(dataLogFpath,'r') as f:
+            dataLog = yaml.load(f)
+    else:
+        print ('ensembled smote freshly...')
+        xyDevList = cutil.divideSamples(xdevf,ydev,cfg['smoteBatchSize'])
+        smoteSeed = util.seed(); dataLog['smoteSeed'] = smoteSeed
+
+        xdevfr = []; ydevr = []
+        for xdevfi,ydevi in xyDevList:
+            sm = SMOTE(kind='svm',random_state=smoteSeed)
+            xdevfri,ydevri = sm.fit_sample(xdevfi,ydevi)
+            for x in xdevfri: xdevfr.append(x.tolist())
+            for y in ydevri: ydevr.append(y)
+        assert len(xdevfr)==len(ydevr),'len(xdevfr)!=len(ydevr)'
+
+        ##
+        with h5py.File(xyDevResFpath,'w') as f:
+            f.create_dataset('xdevfr',data=xdevfr,dtype=np.float32)
+            f.create_dataset('ydevr',data=ydevr,dtype=np.int8)
+
+        dataLog['nDevelResampled'] = len(ydevr)
+        dataLog['rDevelResampled:Data'] = dataLog['nDevelResampled']/float(dataLog['nData'])
+        dataLog['nDevelResampled(+)'] = len( [i for i in ydevr if i==1] )
+        dataLog['nDevelResampled(-)'] = len( [i for i in ydevr if i==-1] )
+        dataLog['rDevelResampled(+):DevelResampled'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled'])
+        dataLog['rDevelResampled(-):DevelResampled'] = dataLog['nDevelResampled(-)']/float(dataLog['nDevelResampled'])
+        dataLog['rDevelResampled(+):(-)'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled(-)'])
+        with open(dataLogFpath,'w') as f: json.dump(dataLog,f,indent=2,sort_keys=True)
 
     return
-
-    # ##
-    # print ('ensembled smote...')
-    # n = 100
-    # xyList = cutil.divideSamples(xdevf,ydev,n)
-    # print len(xyList)
-
-    # for xdevfi,ydevi in xyList:
-    #     sm = SMOTE(kind='svm',random_state=seed)
-    #     xdevfri,ydevri = sm.fit_sample(xdevfi,ydevi)
-    #     break
-
-    # log['nDevelResampled'] = len(ydevr)
-    # log['rDevelResampled:Data'] = log['nDevelResampled']/float(log['nData'])
-    # log['nDevelResampled(+)'] = len( [i for i in ydevr if i==1] )
-    # log['nDevelResampled(-)'] = len( [i for i in ydevr if i==-1] )
-    # log['rDevelResampled(+):DevelResampled'] = log['nDevelResampled(+)']/float(log['nDevelResampled'])
-    # log['rDevelResampled(-):DevelResampled'] = log['nDevelResampled(-)']/float(log['nDevelResampled'])
-    # log['rDevelResampled(+):(-)'] = log['nDevelResampled(+)']/float(log['nDevelResampled(-)'])
-    # print 'nDevelResampled: '+str(log['nDevelResampled'])+'/'+str(log['nData'])+' = '+str(log['rDevelResampled:Data'])
-    # with open(os.path.join(outDir,'log.json'),'w') as f: json.dump(log,f,indent=2,sort_keys=True)
-
-    # return
 
     # ##
     # xdev = xdevfr
