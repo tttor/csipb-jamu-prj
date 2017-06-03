@@ -23,12 +23,6 @@ import classifier_util as cutil
 
 from devel_config import config as cfg
 
-def ensembleSmote(xydev):
-    xdevf,ydev = xydev
-    sm = SMOTE(kind='svm',random_state=sh.getConst('smoteSeed'))
-    xdevfr,ydevr = sm.fit_sample(xdevf,ydev)
-    return (xdevfr,ydevr)
-
 def main():
     if len(sys.argv)!=4:
         print 'USAGE:'
@@ -164,13 +158,11 @@ def main():
 
         ##
         print 'mapping xdev to newIdx...'
-        xdevm = []
-        for x in xdevfr:
-            comFea = tuple( x[0:comFeaLen] )
-            proFea = tuple( x[comFeaLen:] )
-            comID = fea2ComMap[comFea]
-            proID = fea2ProMap[proFea]
-            xdevm.append( (comID,proID) )
+
+        sh.setConst(comFeaLen=comFeaLen)
+        sh.setConst(fea2ComMap=fea2ComMap)
+        sh.setConst(fea2ProMap=fea2ProMap)
+        xdevm = list( fu.map(mapToIdx,xdevfr) )
 
         ##
         print 'writing dataLog...'
@@ -288,6 +280,19 @@ def main():
 
     with open(os.path.join(outDir,'devLog_'+tag+'.json'),'w') as f:
         json.dump(devLog,f,indent=2,sort_keys=True)
+
+def ensembleSmote(xydev):
+    xdevf,ydev = xydev
+    sm = SMOTE(kind='svm',random_state=sh.getConst('smoteSeed'))
+    xdevfr,ydevr = sm.fit_sample(xdevf,ydev)
+    return (xdevfr,ydevr)
+
+def mapToIdx(x):
+    comFea = tuple( x[0:sh.getConst('comFeaLen')] )
+    proFea = tuple( x[sh.getConst('comFeaLen'):] )
+    comIdx = sh.getConst('fea2ComMap')[comFea]
+    proIdx = sh.getConst('fea2ProMap')[proFea]
+    return (comIdx,proIdx)
 
 if __name__ == '__main__':
     tic = time.time()
