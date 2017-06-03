@@ -55,11 +55,20 @@ def main():
     datasetParams = dataset.split('#')
 
     xyDevFpath = os.path.join(baseOutDir,'_'.join(['xdevf','ydev']+datasetParams)+'.h5')
-    if os.path.exists(xyDevFpath):
+    xyDevResFpath = os.path.join(baseOutDir,'_'.join(['xdevf','ydev','resampled']+datasetParams)+'.h5')
+
+    if os.path.exists(xyDevFpath) and os.path.exists(xyDevResFpath):
         print 'loading data from previous...'
         with h5py.File(xyDevFpath,'r') as f:
             xdevf = f['xdevf'][:]
             ydev = f['ydev'][:]
+        with open(dataLogFpath,'r') as f:
+            dataLog = yaml.load(f)
+
+        print ('ensembled smote from previous...')
+        with h5py.File(xyDevResFpath,'r') as f:
+            xdevfr = f['xdevfr'][:]
+            ydevr = f['ydevr'][:]
         with open(dataLogFpath,'r') as f:
             dataLog = yaml.load(f)
     else:
@@ -128,16 +137,7 @@ def main():
         dataLog['rDevel(+):(-)'] = float(dataLog['nDevel(+)'])/float(dataLog['nDevel(-)'])
         with open(dataLogFpath,'w') as f: json.dump(dataLog,f,indent=2,sort_keys=True)
 
-    ##
-    xyDevResFpath = os.path.join(baseOutDir,'_'.join(['xdevf','ydev','resampled']+datasetParams)+'.h5')
-    if (os.path.exists(xyDevResFpath)):
-        print ('ensembled smote from previous...')
-        with h5py.File(xyDevResFpath,'r') as f:
-            xdevfr = f['xdevfr'][:]
-            ydevr = f['ydevr'][:]
-        with open(dataLogFpath,'r') as f:
-            dataLog = yaml.load(f)
-    else:
+        ## Smote
         print 'ensembled smote freshly...'
         xyDevList = cutil.divideSamples(xdevf,ydev,cfg['smoteBatchSize'])
         smoteSeed = util.seed(); dataLog['smoteSeed'] = smoteSeed
