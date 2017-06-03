@@ -55,6 +55,7 @@ def main():
     datasetParams = dataset.split('#')
 
     xyDevFpath = os.path.join(baseOutDir,'_'.join(['xdevf','ydev']+datasetParams)+'.h5')
+    xyDevFpath2 = os.path.join(baseOutDir,'_'.join(['xdevf','ydev','b']+datasetParams)+'.h5')
     xyDevResFpath = os.path.join(baseOutDir,'_'.join(['xdevf','ydev','resampled']+datasetParams)+'.h5')
 
     if os.path.exists(xyDevFpath) and os.path.exists(xyDevResFpath):
@@ -216,6 +217,12 @@ def main():
     xdev = xdevm[:]
     ydev = ydevr[:]
 
+    print 'writing updated xdev,ydev...'
+    with h5py.File(xyDevFpath2,'w') as f:
+        f.create_dataset('xdev',data=xdev,dtype=np.float32)
+        f.create_dataset('ydev',data=ydev,dtype=np.int8)
+
+    return
     ## TUNE+TRAIN+TEST #############################################################################
     devLog = {}
     devSeed = util.seed(); dataLog['devSeed'] = devSeed
