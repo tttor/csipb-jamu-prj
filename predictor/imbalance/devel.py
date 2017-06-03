@@ -154,6 +154,7 @@ def main():
             f.create_dataset('xdevfr',data=xdevfr,dtype=np.float32)
             f.create_dataset('ydevr',data=ydevr,dtype=np.int8)
 
+        dataLog['nSmote'] = len(xyDevList)
         dataLog['nDevelResampled'] = len(ydevr)
         dataLog['rDevelResampled:Data'] = dataLog['nDevelResampled']/float(dataLog['nData'])
         dataLog['nDevelResampled(+)'] = len( [i for i in ydevr if i==1] )
