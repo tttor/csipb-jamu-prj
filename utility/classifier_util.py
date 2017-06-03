@@ -28,12 +28,16 @@ def divideSamples(x,y,maxSamplesPerBatch):
 
    return xyList
 
-def makeKernel(x1,x2,simDict):
+def makeComProKernelMatFromSimMat(x1,x2,simMat):
+   comSimMat = simMat['com']
+   proSimMat = simMat['pro']
    mat = np.zeros( (len(x1),len(x2)) )
    for i,ii in enumerate(x1):
       for j,jj in enumerate(x2):
-         comSim = simDict['com'][ (ii[0],jj[0]) ]
-         proSim = simDict['pro'][ (ii[1],jj[1]) ]
+         icom,ipro = [int(k) for k in ii]
+         jcom,jpro = [int(k) for k in jj]
+         comSim = comSimMat[icom][jcom]
+         proSim = simMat['pro'][ipro][jpro]
          mat[i][j] = mergeComProKernel( comSim,proSim )
    return mat
 
@@ -45,8 +49,6 @@ def extractComProFea(compro):
    com,pro = compro
    comFea = sh.getConst('krDict')[com]
    proFea = sh.getConst('aacDict')[pro]
-
    fea = np.append(comFea,proFea)
    fea = fea.tolist()
-
    return fea

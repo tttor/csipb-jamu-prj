@@ -211,7 +211,6 @@ def main():
             f.create_dataset('xdev',data=xdev,dtype=np.float32)
             f.create_dataset('ydev',data=ydev,dtype=np.int8)
 
-    return
     ## TUNE+TRAIN+TEST #############################################################################
     devLog = {}
     devSeed = util.seed(); dataLog['devSeed'] = devSeed
@@ -221,6 +220,8 @@ def main():
     msg = 'devel '+dataset+' '+cloneID
     xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
                           random_state=devSeed,stratify=ydev)
+
+    simMat = {'com':comSimMat,'pro':proSimMat}
 
     if cfg['maxTestingSamples']>0:
         chosenIdx = np.random.randint(len(xte),size=cfg['maxTestingSamples'])
@@ -244,7 +245,7 @@ def main():
                     cfg['method']['maxTrainingSamplesPerBatch'],
                     cfg['method']['maxTestingSamplesPerBatch'],
                     cfg['method']['bootstrap'],
-                    {'com':comSimDict,'pro':proSimDict})
+                    simMat)
     elif method=='psvm':
         clf = svm.SVC(kernel=cfg['method']['kernel'],probability=True)
 
@@ -256,7 +257,7 @@ def main():
         devLog['nSVM'] = clf.nSVM()
     elif method=='psvm':
         if cfg['method']['kernel']=='precomputed':
-            simMatTr = cutil.makeKernel(xtr,xtr,{'com':comSimDict,'pro':proSimDict})
+            simMatTr = cutil.makeComProKernelMatFromSimMat(xtr,xtr,simMat)
             clf.fit(simMatTr,ytr)
         else:
             clf.fit(xtr,ytr)
@@ -268,7 +269,7 @@ def main():
         ypred,yscore = clf.predict(xte)
     elif method=='psvm':
         if cfg['method']['kernel']=='precomputed':
-            simMatTe = cutil.makeKernel(xte,xtr,{'com':comSimDict,'pro':proSimDict})
+            simMatTe = cutil.makeComProKernelMatFromSimMat(xte,xtr,simMat)
             ypred = clf.predict(simMatTe)
             yscore = clf.predict_proba(simMatTe)
         else:
