@@ -52,6 +52,10 @@ def main():
     dataset = clusterDir.split('/')[-2].split('-')[-1]; dataLog['dataset'] = dataset
     datasetParams = dataset.split('#')
 
+    simDir = os.path.join(cfg['datasetDir'],datasetParams[0],'similarity-mat')
+    comSimDict = yam.loadKernel2('compound',datasetParams[1],simDir)
+    proSimDict = yam.loadKernel2('protein',datasetParams[1],simDir)
+
     xyDevFpath = os.path.join(baseOutDir,'_'.join(['xdevf','ydev']+datasetParams)+'.h5')
     if os.path.exists(xyDevFpath):
         print 'loading data from previous...'
@@ -73,9 +77,6 @@ def main():
 
             connFpath = os.path.join(clusterDir,metric+'_labels.pkl')
             with open(connFpath,'r') as f: data = pickle.load(f)
-            simDir = os.path.join(cfg['datasetDir'],datasetParams[0],'similarity-mat')
-            comSimDict = yam.loadKernel2('compound',datasetParams[1],simDir)
-            proSimDict = yam.loadKernel2('protein',datasetParams[1],simDir)
         else:
             assert False,'FATAL: unknown dataset'
 
@@ -167,8 +168,6 @@ def main():
         dataLog['rDevelResampled(+):(-)'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled(-)'])
         with open(dataLogFpath,'w') as f: json.dump(dataLog,f,indent=2,sort_keys=True)
 
-    return
-
     ## TUNE+TRAIN+TEST #############################################################################
     devLog = {}
     devSeed = util.seed(); dataLog['devSeed'] = devSeed
@@ -191,35 +190,36 @@ def main():
     devLog['nTraining(+)'] = len([i for i in ytr if i==1])
     devLog['nTraining(-)'] = len([i for i in ytr if i==-1])
     devLog['rTraining(+):(-)'] = devLog['nTraining(+)']/float(devLog['nTraining(-)'])
-    devLog['rTraining:Devel'] = devLog['nTraining']/float(devLog['nDevel'])
+    devLog['rTraining:Devel'] = devLog['nTraining']/float(dataLog['nDevelResampled'])
     devLog['nTesting'] = len(xte)
     devLog['nTesting(+)'] = len([i for i in yte if i==1])
     devLog['nTesting(-)'] = len([i for i in yte if i==-1])
     devLog['rTesting(+):(-)'] = devLog['nTesting(+)']/float(devLog['nTesting(-)'])
-    devLog['rTesting:Devel'] = devLog['nTesting']/float(devLog['nDevel'])
+    devLog['rTesting:Devel'] = devLog['nTesting']/float(dataLog['nDevelResampled'])
 
     ## tuning
     clf = None
     if method=='esvm':
-        clf  = eSVM(cfg['method']['mode'],
+        clf  = eSVM(cfg['method']['kernel'],cfg['method']['mode'],
                     cfg['method']['maxTrainingSamplesPerBatch'],
                     cfg['method']['maxTestingSamplesPerBatch'],
                     cfg['method']['bootstrap'],
                     {'com':comSimDict,'pro':proSimDict})
     elif method=='psvm':
-        # clf = svm.SVC(kernel='precomputed',probability=True)
-        clf = svm.SVC(probability=True)
+        clf = svm.SVC(kernel=cfg['method']['kernel'],probability=True)
 
     ## training
     print msg+': fitting nTr= '+str(len(ytr))
     if method=='esvm':
         clf.fit(xtr,ytr)
-        clf.writeLabels(outDir)
+        devLog['labels'] = clf.labels()
         devLog['nSVM'] = clf.nSVM()
     elif method=='psvm':
-        # simMatTr = cutil.makeKernel(xtr,xtr,{'com':comSimDict,'pro':proSimDict})
-        # clf.fit(simMatTr,ytr)
-        clf.fit(xtr,ytr)
+        if cfg['method']['kernel']=='precomputed':
+            simMatTr = cutil.makeKernel(xtr,xtr,{'com':comSimDict,'pro':proSimDict})
+            clf.fit(simMatTr,ytr)
+        else:
+            clf.fit(xtr,ytr)
         devLog['labels'] = clf.classes_.tolist()
 
     ## testing
@@ -227,12 +227,14 @@ def main():
     if method=='esvm':
         ypred,yscore = clf.predict(xte)
     elif method=='psvm':
-        # simMatTe = cutil.makeKernel(xte,xtr,{'com':comSimDict,'pro':proSimDict})
-        # ypred = clf.predict(simMatTe)
-        # yscore = clf.predict_proba(simMatTe)
-        ypred = clf.predict(xte)
-        yscore = clf.predict_proba(xte)
-        yscore = [max(i.tolist()) for i in yscore]
+        if cfg['method']['kernel']=='precomputed':
+            simMatTe = cutil.makeKernel(xte,xtr,{'com':comSimDict,'pro':proSimDict})
+            ypred = clf.predict(simMatTe)
+            yscore = clf.predict_proba(simMatTe)
+        else:
+            ypred = clf.predict(xte)
+            yscore = clf.predict_proba(xte)
+            yscore = [max(i.tolist()) for i in yscore]
 
     result = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred,'yscore':yscore}
     with open(os.path.join(outDir,'result_'+tag+'.pkl'),'w') as f: pickle.dump(result,f)
