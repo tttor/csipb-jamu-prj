@@ -22,6 +22,12 @@ import classifier_util as cutil
 
 from devel_config import config as cfg
 
+def ensembleSmote(xydev):
+    xdevf,ydev = xydev
+    sm = SMOTE(kind='svm',random_state=sh.getConst('smoteSeed'))
+    xdevfr,ydevr = sm.fit_sample(xdevf,ydev)
+    return (xdevfr,ydevr)
+
 def main():
     if len(sys.argv)!=4:
         print 'USAGE:'
@@ -40,10 +46,6 @@ def main():
     if method not in ['esvm','psvm']:
         print 'FATAL: unknown method'
         return
-    print 'method: '+method
-
-    # outDir = os.path.join(baseOutDir,'-'.join([method+'#'+cloneID,dataset,util.tag()]))
-    # os.makedirs(outDir);
 
     ## Load data ###################################################################################
     dataLog = {}; dataLogFpath = os.path.join(baseOutDir,'data_log.json')
@@ -140,11 +142,11 @@ def main():
         print ('ensembled smote freshly...')
         xyDevList = cutil.divideSamples(xdevf,ydev,cfg['smoteBatchSize'])
         smoteSeed = util.seed(); dataLog['smoteSeed'] = smoteSeed
+        sh.setConst(smoteSeed=smoteSeed)
 
         xdevfr = []; ydevr = []
-        for xdevfi,ydevi in xyDevList:
-            sm = SMOTE(kind='svm',random_state=smoteSeed)
-            xdevfri,ydevri = sm.fit_sample(xdevfi,ydevi)
+        xydevfrList = list( fu.map(ensembleSmote,xyDevList) )
+        for xdevfri,ydevri in xydevfrList:
             for x in xdevfri: xdevfr.append(x.tolist())
             for y in ydevri: ydevr.append(y)
         assert len(xdevfr)==len(ydevr),'len(xdevfr)!=len(ydevr)'
@@ -166,11 +168,14 @@ def main():
 
     return
 
+    # ## TUNE+TRAIN+TEST #############################################################################
+    # outDir = os.path.join(baseOutDir,'-'.join([method+'#'+cloneID,dataset,util.tag()]))
+    # os.makedirs(outDir);
+
     # ##
     # xdev = xdevfr
     # ydev = ydevr
 
-    # ## TUNE+TRAIN+TEST #############################################################################
     # msg = 'devel '+dataset+' '+cloneID
     # xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
     #                       random_state=seed,stratify=ydev)
