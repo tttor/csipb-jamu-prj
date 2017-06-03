@@ -47,7 +47,7 @@ def main():
     np.random.seed(seed)
 
     # outDir = os.path.join(baseOutDir,'-'.join([method+'#'+cloneID,dataset,util.tag()]))
-    # os.makedirs(outDir); shutil.copy2('devel_config.py',outDir)
+    # os.makedirs(outDir);
 
     ## Load data ###################################################################################
     dataLog = {}
@@ -114,6 +114,8 @@ def main():
 
         ##
         print 'writing...'
+        shutil.copy2('devel_config.py',baseOutDir)
+
         with h5py.File(xydevFpath,'w') as f:
             f.create_dataset('xdevf',data=xdevf,dtype=np.float32)
             f.create_dataset('ydev',data=ydev,dtype=np.int8)
