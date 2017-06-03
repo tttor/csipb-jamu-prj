@@ -1,5 +1,5 @@
 # devel_config.py
-esvm_config =  dict(name='esvm',kernel='rbf',mode='soft',bootstrap=True,
+esvm_config =  dict(name='esvm',kernel='precomputed',mode='soft',bootstrap=True,
                     maxTrainingSamplesPerBatch=10000,
                     maxTestingSamplesPerBatch=100)
 
@@ -9,4 +9,5 @@ config = dict(method=esvm_config,
               testSize=0.30,
               maxTestingSamples=0,
               smoteBatchSize=10000,
+              comKernel='rbf',proKernel='rbf',
               datasetDir='../../dataset/connectivity/compound_vs_protein')
