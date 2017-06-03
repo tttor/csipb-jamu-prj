@@ -113,7 +113,7 @@ def main():
         xdevf = list( fu.map(cutil.extractComProFea,xdev) )
 
         ##
-        print 'writing (com,pro) feature......'
+        print 'writing (com,pro) feature...'
         shutil.copy2('devel_config.py',baseOutDir)
 
         with h5py.File(xyDevFpath,'w') as f:
@@ -169,72 +169,74 @@ def main():
 
     return
 
-    # ## TUNE+TRAIN+TEST #############################################################################
-    # outDir = os.path.join(baseOutDir,'-'.join([method+'#'+cloneID,dataset,util.tag()]))
-    # os.makedirs(outDir);
+    ## TUNE+TRAIN+TEST #############################################################################
+    devLog = {}
+    devSeed = util.seed(); dataLog['devSeed'] = devSeed
+    outDir = baseOutDir
+    tag = '_'.join([method+'#'+cloneID,dataset,util.tag()])
 
-    # ##
-    # xdev = xdevfr
-    # ydev = ydevr
+    xdev = xdevfr
+    ydev = ydevr
 
-    # msg = 'devel '+dataset+' '+cloneID
-    # xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
-    #                       random_state=seed,stratify=ydev)
+    ##
+    msg = 'devel '+dataset+' '+cloneID
+    xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
+                          random_state=devSeed,stratify=ydev)
 
-    # if cfg['maxTestingSamples']>0:
-    #     chosenIdx = np.random.randint(len(xte),size=cfg['maxTestingSamples'])
-    #     xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
+    if cfg['maxTestingSamples']>0:
+        chosenIdx = np.random.randint(len(xte),size=cfg['maxTestingSamples'])
+        xte = [xte[i] for i in chosenIdx]; yte = [yte[i] for i in chosenIdx]
 
-    # log['nTraining'] = len(xtr)
-    # log['nTraining(+)'] = len([i for i in ytr if i==1])
-    # log['nTraining(-)'] = len([i for i in ytr if i==-1])
-    # log['rTraining(+):(-)'] = log['nTraining(+)']/float(log['nTraining(-)'])
-    # log['rTraining:Devel'] = log['nTraining']/float(log['nDevel'])
-    # log['nTesting'] = len(xte)
-    # log['nTesting(+)'] = len([i for i in yte if i==1])
-    # log['nTesting(-)'] = len([i for i in yte if i==-1])
-    # log['rTesting(+):(-)'] = log['nTesting(+)']/float(log['nTesting(-)'])
-    # log['rTesting:Devel'] = log['nTesting']/float(log['nDevel'])
+    devLog['nTraining'] = len(xtr)
+    devLog['nTraining(+)'] = len([i for i in ytr if i==1])
+    devLog['nTraining(-)'] = len([i for i in ytr if i==-1])
+    devLog['rTraining(+):(-)'] = devLog['nTraining(+)']/float(devLog['nTraining(-)'])
+    devLog['rTraining:Devel'] = devLog['nTraining']/float(devLog['nDevel'])
+    devLog['nTesting'] = len(xte)
+    devLog['nTesting(+)'] = len([i for i in yte if i==1])
+    devLog['nTesting(-)'] = len([i for i in yte if i==-1])
+    devLog['rTesting(+):(-)'] = devLog['nTesting(+)']/float(devLog['nTesting(-)'])
+    devLog['rTesting:Devel'] = devLog['nTesting']/float(devLog['nDevel'])
 
-    # ## tuning
-    # clf = None
-    # if method=='esvm':
-    #     clf  = eSVM(cfg['method']['mode'],
-    #                 cfg['method']['maxTrainingSamplesPerBatch'],
-    #                 cfg['method']['maxTestingSamplesPerBatch'],
-    #                 cfg['method']['bootstrap'],
-    #                 {'com':comSimDict,'pro':proSimDict})
-    # elif method=='psvm':
-    #     # clf = svm.SVC(kernel='precomputed',probability=True)
-    #     clf = svm.SVC(probability=True)
+    ## tuning
+    clf = None
+    if method=='esvm':
+        clf  = eSVM(cfg['method']['mode'],
+                    cfg['method']['maxTrainingSamplesPerBatch'],
+                    cfg['method']['maxTestingSamplesPerBatch'],
+                    cfg['method']['bootstrap'],
+                    {'com':comSimDict,'pro':proSimDict})
+    elif method=='psvm':
+        # clf = svm.SVC(kernel='precomputed',probability=True)
+        clf = svm.SVC(probability=True)
 
-    # ## training
-    # print msg+': fitting nTr= '+str(len(ytr))
-    # if method=='esvm':
-    #     clf.fit(xtr,ytr)
-    #     clf.writeLabels(outDir)
-    #     log['nSVM'] = clf.nSVM()
-    # elif method=='psvm':
-    #     # simMatTr = cutil.makeKernel(xtr,xtr,{'com':comSimDict,'pro':proSimDict})
-    #     # clf.fit(simMatTr,ytr)
-    #     clf.fit(xtr,ytr)
-    #     log['labels'] = clf.classes_.tolist()
+    ## training
+    print msg+': fitting nTr= '+str(len(ytr))
+    if method=='esvm':
+        clf.fit(xtr,ytr)
+        clf.writeLabels(outDir)
+        devLog['nSVM'] = clf.nSVM()
+    elif method=='psvm':
+        # simMatTr = cutil.makeKernel(xtr,xtr,{'com':comSimDict,'pro':proSimDict})
+        # clf.fit(simMatTr,ytr)
+        clf.fit(xtr,ytr)
+        devLog['labels'] = clf.classes_.tolist()
 
-    # ## testing
-    # print msg+': predicting nTe= '+str(len(yte))
-    # if method=='esvm':
-    #     ypred,yscore = clf.predict(xte)
-    # elif method=='psvm':
-    #     # simMatTe = cutil.makeKernel(xte,xtr,{'com':comSimDict,'pro':proSimDict})
-    #     # ypred = clf.predict(simMatTe)
-    #     # yscore = clf.predict_proba(simMatTe)
-    #     ypred = clf.predict(xte)
-    #     yscore = clf.predict_proba(xte)
-    #     yscore = [max(i.tolist()) for i in yscore]
+    ## testing
+    print msg+': predicting nTe= '+str(len(yte))
+    if method=='esvm':
+        ypred,yscore = clf.predict(xte)
+    elif method=='psvm':
+        # simMatTe = cutil.makeKernel(xte,xtr,{'com':comSimDict,'pro':proSimDict})
+        # ypred = clf.predict(simMatTe)
+        # yscore = clf.predict_proba(simMatTe)
+        ypred = clf.predict(xte)
+        yscore = clf.predict_proba(xte)
+        yscore = [max(i.tolist()) for i in yscore]
 
-    # result = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred,'yscore':yscore}
-    # with open(os.path.join(outDir,"result.pkl"),'w') as f: pickle.dump(result,f)
-    # with open(os.path.join(outDir,'log.json'),'w') as f: json.dump(log,f,indent=2,sort_keys=True)
+    result = {'xtr':xtr,'xte':xte,'ytr':ytr,'yte':yte,'ypred':ypred,'yscore':yscore}
+    with open(os.path.join(outDir,'result_'+tag+'.pkl'),'w') as f: pickle.dump(result,f)
+    with open(os.path.join(outDir,'devLog_'+tag+'.json'),'w') as f: json.dump(devLog,f,indent=2,sort_keys=True)
 
 if __name__ == '__main__':
     tic = time.time()

@@ -5,7 +5,7 @@ esvm_config =  dict(name='esvm',mode='soft',bootstrap=True,
 
 svm_config = dict(name='psvm') # psvm: plain svm
 
-config = dict(method=svm_config,
+config = dict(method=esvm_config,
               testSize=0.30,
               maxTestingSamples=0,
               smoteBatchSize=10000,
