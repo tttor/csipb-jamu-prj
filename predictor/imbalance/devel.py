@@ -12,6 +12,7 @@ from scoop import futures as fu
 from scoop import shared as sh
 from sklearn import svm
 from sklearn.model_selection import train_test_split as tts
+from sklearn.metrics.pairwise import rbf_kernel
 from ensembled_svm import EnsembledSVM as eSVM
 from imblearn.over_sampling import SMOTE
 
@@ -52,10 +53,6 @@ def main():
     dataLog = {}; dataLogFpath = os.path.join(outDir,'data_log.json')
     dataset = clusterDir.split('/')[-2].split('-')[-1]; dataLog['dataset'] = dataset
     datasetParams = dataset.split('#')
-
-    simDir = os.path.join(cfg['datasetDir'],datasetParams[0],'similarity-mat')
-    comSimDict = yam.loadKernel2('compound',datasetParams[1],simDir)
-    proSimDict = yam.loadKernel2('protein',datasetParams[1],simDir)
 
     xyDevFpath = os.path.join(baseOutDir,'_'.join(['xdevf','ydev']+datasetParams)+'.h5')
     if os.path.exists(xyDevFpath):
@@ -169,13 +166,60 @@ def main():
         dataLog['rDevelResampled(+):(-)'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled(-)'])
         with open(dataLogFpath,'w') as f: json.dump(dataLog,f,indent=2,sort_keys=True)
 
+    ##
+    # simDir = os.path.join(cfg['datasetDir'],datasetParams[0],'similarity-mat')
+    # comSimDict = yam.loadKernel2('compound',datasetParams[1],simDir)
+    # proSimDict = yam.loadKernel2('protein',datasetParams[1],simDir)
+
+    print 'get sets of com,pro...'
+    comFeaLen = 4860
+    proFeaLen = 20
+    assert (comFeaLen+proFeaLen) == len(xdevfr[0])
+
+    comFeaList = [tuple(i[0:comFeaLen].tolist()) for i in xdevfr]
+    comFeaList = list(set(comFeaList))
+    fea2ComMap = dict( zip(comFeaList,range(len(comFeaList))) )
+
+    proFeaList = [tuple(i[comFeaLen:]) for i in xdevfr]
+    proFeaList = list(set(proFeaList))
+    fea2ProMap = dict( zip(proFeaList,range(len(proFeaList))) )
+
+    print 'compute kernel of com...'
+    comSimDict = {}
+    comSimMat = rbf_kernel(comFeaList,comFeaList)
+    for i,icom in enumerate(comFeaList):
+        for j,jcom in enumerate(comFeaList):
+            icomID = fea2ComMap[icom]
+            jcomID = fea2ComMap[jcom]
+            comSimDict[(icomID,jcomID)] = comSimMat[i][j]
+
+    print 'compute kernel of pro...'
+    proSimDict = {}
+    proSimMat = rbf_kernel(proFeaList,proFeaList)
+    for i,ipro in enumerate(proFeaList):
+        for j,jpro in enumerate(proFeaList):
+            iproID = fea2ProMap[ipro]
+            jproID = fea2ProMap[jpro]
+            proSimDict[(iproID,jproID)] = proSimMat[i][j]
+
+    ##
+    print 'update xdev,ydev...'
+
+    xdevm = []
+    for x in xdevfr:
+        comFea = tuple( x[0:comFeaLen] )
+        proFea = tuple( x[comFeaLen:] )
+        comID = fea2ComMap[comFea]
+        proID = fea2ProMap[proFea]
+        xdevm.append( (comID,proID) )
+
+    xdev = xdevm[:]
+    ydev = ydevr[:]
+
     ## TUNE+TRAIN+TEST #############################################################################
     devLog = {}
     devSeed = util.seed(); dataLog['devSeed'] = devSeed
     tag = '_'.join([method+'#'+cloneID,dataset,util.tag()])
-
-    xdev = xdevfr
-    ydev = ydevr
 
     ##
     msg = 'devel '+dataset+' '+cloneID
