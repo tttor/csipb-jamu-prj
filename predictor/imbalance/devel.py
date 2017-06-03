@@ -57,6 +57,8 @@ def main():
     xyDevFpath = os.path.join(baseOutDir,'_'.join(['xdevf','ydev']+datasetParams)+'.h5')
     xyDevFpath2 = os.path.join(baseOutDir,'_'.join(['xdevf','ydev','b']+datasetParams)+'.h5')
     xyDevResFpath = os.path.join(baseOutDir,'_'.join(['xdevf','ydev','resampled']+datasetParams)+'.h5')
+    comSimDictFpath = os.path.join(baseOutDir,'_'.join(['comSimDict']+datasetParams)+'.pkl')
+    proSimDictFpath = os.path.join(baseOutDir,'_'.join(['proSimDict']+datasetParams)+'.pkl')
 
     if os.path.exists(xyDevFpath) and os.path.exists(xyDevResFpath):
         print 'loading data from previous...'
@@ -221,6 +223,12 @@ def main():
     with h5py.File(xyDevFpath2,'w') as f:
         f.create_dataset('xdev',data=xdev,dtype=np.float32)
         f.create_dataset('ydev',data=ydev,dtype=np.int8)
+
+    with open(comSimDictFpath,'wb') as f:
+        pickle.dump(comSimDict,f)
+
+    with open(proSimDictFpath,'wb') as f:
+        pickle.dump(proSimDict,f)
 
     return
     ## TUNE+TRAIN+TEST #############################################################################
