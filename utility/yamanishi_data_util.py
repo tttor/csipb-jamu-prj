@@ -1,6 +1,26 @@
 # util.py
 import os
 import numpy as np
+import h5py
+
+def saveFeaInHDF(yamType,feaName):
+   bdir = '../dataset/connectivity/compound_vs_protein/yamanishi/feature'
+   tdir = os.path.join(bdir,feaName,feaName+'-'+yamType)
+   fnameList = os.listdir(tdir)
+   feaList = []; iList = []
+   for i,fname in enumerate(fnameList):
+      print 'loading '+fname+' => '+str(i+1)+'/'+str(len(fnameList))
+      fpath = os.path.join(tdir,fname)
+      fea = np.loadtxt(fpath,delimiter=",")
+      feaList.append(fea)
+      iList.append( fname.split('.')[0] )
+
+   print 'writing...'
+   ofpath = os.path.join(bdir,feaName,feaName+'-'+yamType+'.h5')
+   with h5py.File(ofpath,'w') as f:
+      for i,fea in enumerate(feaList):
+         key = iList[i]
+         f.create_dataset(key,data=fea,dtype=np.float32)
 
 def loadComProConn(mode,dPath):
     print 'loading yamanishi connectivity...'
@@ -80,3 +100,13 @@ def loadKernel2(compro,mode,dpath):
             kernel[(r,c)] = float(rowValues[i][j])
 
     return kernel
+
+def main():
+   # saveFeaInHDF('nr','klekotaroth')
+   # saveFeaInHDF('ic','klekotaroth')
+   # saveFeaInHDF('nr','amino-acid-composition')
+   # saveFeaInHDF('ic','amino-acid-composition')
+   pass
+
+if __name__ == '__main__':
+   main()

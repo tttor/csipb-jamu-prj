@@ -8,5 +8,5 @@ svm_config = dict(name='psvm') # psvm: plain svm
 config = dict(method=svm_config,
               testSize=0.30,
               maxTestingSamples=0,
-              datasetDir='../../dataset/connectivity/compound_vs_protein',
-              outputDir='./output')
+              smoteBatchSize=10000,
+              datasetDir='../../dataset/connectivity/compound_vs_protein')
