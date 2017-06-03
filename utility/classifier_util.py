@@ -28,40 +28,6 @@ def divideSamples(x,y,maxSamplesPerBatch):
 
    return xyList
 
-def _loadKlekotaroth(keggComID):
-   dpath = sh.getConst('comFeaDir')
-   fea = np.loadtxt(os.path.join(dpath,keggComID+'.fpkr'), delimiter=",")
-   return fea
-
-def _loadAAC(keggProID):
-   dpath = sh.getConst('proFeaDir')
-   fea = np.loadtxt(os.path.join(dpath,keggProID+'.aac'), delimiter=",")
-   return fea
-
-def _mergeComProFea(comFea,proFea):
-   fea = np.append(comFea,proFea)
-   fea = fea.tolist()
-   return fea
-
-def loadFeature(x,comFeaDir,proFeaDir):
-   comList = [i[0] for i in x]
-   proList = [i[1] for i in x]
-   sh.setConst(comFeaDir=comFeaDir)
-   sh.setConst(proFeaDir=proFeaDir)
-
-   print 'comFeaList...'
-   comFeaList = list( fu.map(_loadKlekotaroth,comList) )
-
-   print 'proFeaList...'
-   proFeaList = list( fu.map(_loadAAC,proList) )
-
-   print 'merge...'
-   comFeaDict = dict( zip(comList,comFeaList) )
-   proFeaDict = dict( zip(proList,proFeaList) )
-   xf = [_mergeComProFea(comFeaDict[com],proFeaDict[pro]) for com,pro in x ]
-
-   return xf
-
 def makeKernel(x1,x2,simDict):
    mat = np.zeros( (len(x1),len(x2)) )
    for i,ii in enumerate(x1):
@@ -74,3 +40,13 @@ def makeKernel(x1,x2,simDict):
 def mergeComProKernel(comSim,proSim,alpha = 0.5):
    sim = alpha*comSim + (1.0-alpha)*proSim
    return sim
+
+def extractComProFea(compro):
+   com,pro = compro
+   comFea = sh.getConst('krDict')[com]
+   proFea = sh.getConst('aacDict')[pro]
+
+   fea = np.append(comFea,proFea)
+   fea = fea.tolist()
+
+   return fea
