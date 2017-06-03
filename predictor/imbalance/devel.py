@@ -120,11 +120,11 @@ def main():
         xdevf = list( fu.map(cutil.extractComProFea,xdev) )
 
         ##
-        print 'Resampling via Smote FRESHLY...'
         xyDevList = cutil.divideSamples(xdevf,ydev,cfg['smoteBatchSize'])
         smoteSeed = util.seed(); dataLog['smoteSeed'] = smoteSeed
         sh.setConst(smoteSeed=smoteSeed)
 
+        print 'resampling via Smote FRESHLY... '+str(len(xyDevList))+' smote(s)'
         xdevfr = []; ydevr = []
         xydevfrList = list( fu.map(ensembleSmote,xyDevList) )
         for xdevfri,ydevri in xydevfrList:
@@ -146,18 +146,18 @@ def main():
         proFeaList = list(set(proFeaList))
         fea2ProMap = dict( zip(proFeaList,range(len(proFeaList))) )
 
-        print 'compute kernel of com...'
+        print 'compute kernel of com... '+str(len(comFeaList))
         comSimMat = rbf_kernel(comFeaList,comFeaList)
         with h5py.File(comSimMatFpath,'w') as f:
             f.create_dataset('comSimMat',data=comSimMat,dtype=np.float32)
 
-        print 'compute kernel of pro...'
+        print 'compute kernel of pro... '+str(len(proFeaList))
         proSimMat = rbf_kernel(proFeaList,proFeaList)
         with h5py.File(proSimMatFpath,'w') as f:
             f.create_dataset('proSimMat',data=proSimMat,dtype=np.float32)
 
         ##
-        print 'mapping xdev to newIdx...'
+        print 'mapping xdev to newIdx... '+str(len(xdevfr))
 
         sh.setConst(comFeaLen=comFeaLen)
         sh.setConst(fea2ComMap=fea2ComMap)
