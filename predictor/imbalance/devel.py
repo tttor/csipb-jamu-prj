@@ -39,8 +39,9 @@ def main():
     clusterDir = sys.argv[2]; assert clusterDir[-1]=='/',"should be ended with '/'"
     baseOutDir = sys.argv[3]
 
-    if not(os.path.isdir(baseOutDir)):
-        os.makedirs(baseOutDir)
+    outDir = os.path.join(baseOutDir,'devel')
+    if not(os.path.isdir(baseOutDir)): os.makedirs(baseOutDir)
+    if not(os.path.isdir(outDir)): os.makedirs(outDir)
 
     method = cfg['method']['name']
     if method not in ['esvm','psvm']:
@@ -48,7 +49,7 @@ def main():
         return
 
     ## Load data ###################################################################################
-    dataLog = {}; dataLogFpath = os.path.join(baseOutDir,'data_log.json')
+    dataLog = {}; dataLogFpath = os.path.join(outDir,'data_log.json')
     dataset = clusterDir.split('/')[-2].split('-')[-1]; dataLog['dataset'] = dataset
     datasetParams = dataset.split('#')
 
@@ -115,7 +116,7 @@ def main():
 
         ##
         print 'writing (com,pro) feature...'
-        shutil.copy2('devel_config.py',baseOutDir)
+        shutil.copy2('devel_config.py',outDir)
 
         with h5py.File(xyDevFpath,'w') as f:
             f.create_dataset('xdevf',data=xdevf,dtype=np.float32)
@@ -171,7 +172,6 @@ def main():
     ## TUNE+TRAIN+TEST #############################################################################
     devLog = {}
     devSeed = util.seed(); dataLog['devSeed'] = devSeed
-    outDir = baseOutDir
     tag = '_'.join([method+'#'+cloneID,dataset,util.tag()])
 
     xdev = xdevfr
