@@ -6,7 +6,10 @@ import pickle
 import json
 import time
 import shutil
+import h5py
 import numpy as np
+from scoop import futures as fu
+from scoop import shared as sh
 from sklearn import svm
 from sklearn.model_selection import train_test_split as tts
 from ensembled_svm import EnsembledSVM as eSVM
@@ -84,28 +87,45 @@ def main():
     print 'nDevel: '+str(log['nDevel'])+'/'+str(log['nData'])+' = '+str(log['rDevel:Data'])
 
     ##
-    comFeaDir = '../../dataset/connectivity/compound_vs_protein/yamanishi/fingerprint'
-    proFeaDir = '../../dataset/connectivity/compound_vs_protein/yamanishi/amino-acid-composition'
-    feaPickleFpath = os.path.join(cfg['outputDir'],'_'.join(['xdef','xdevf']+datasetParams)+'.pkl')
-    if os.path.isfile(feaPickleFpath):
-        print 'loading feature... from previous!'
-        with open(feaPickleFpath,'r') as f:
-            xdevPrev,xdevf = pickle.load(f)
-            assert xdev == xdevPrev
-    else:
-        print 'loading feature... FRESH!'
-        comFeaDir = os.path.join(comFeaDir,'klekotaroth-'+datasetParams[1])
-        proFeaDir = os.path.join(proFeaDir,'aac-'+datasetParams[1])
-        xdevf = cutil.loadFeature(xdev,comFeaDir,proFeaDir)
-        with open(feaPickleFpath,'w') as f:
-            pickle.dump((xdev,xdevf),f)
+    print 'loading com, pro feature...'
+    krFpath = os.path.join(cfg['datasetDir'],datasetParams[0],'feature',
+                           'klekotaroth','klekotaroth-'+datasetParams[1]+'.h5')
+    aacFpath = os.path.join(cfg['datasetDir'],datasetParams[0],'feature',
+                            'amino-acid-composition','amino-acid-composition-'+datasetParams[1]+'.h5')
+
+    comList = list( set([i[0] for i in xdev]) )
+    proList = list( set([i[1] for i in xdev]) )
+
+    krDict = {}; aacDict = {}
+    with h5py.File(krFpath, 'r') as f:
+        for com in comList: krDict[com] = f[com][:]
+    with h5py.File(aacFpath, 'r') as f:
+        for pro in proList: aacDict[pro] = f[pro][:]
 
     ##
-    print ('smote...')
-    sm = SMOTE(kind='svm',random_state=seed)
-    xdevfr,ydevr = sm.fit_sample(xdevf,ydev)
-    xdev = xdevfr
-    ydev = ydevr
+    print 'extract (com,pro) feature...'
+    sh.setConst(krDict=krDict)
+    sh.setConst(aacDict=aacDict)
+    xdevf = list( fu.map(cutil.extractComProFea,xdev) )
+
+    print 'writing...'
+    ofpath = os.path.join(cfg['outputDir'],'_'.join(['xdevf']+datasetParams)+'.h5')
+    with h5py.File(ofpath,'w') as f:
+        f.create_dataset('xdevf',data=xdevf,dtype=np.float32)
+        f.create_dataset('ydev',data=ydev,dtype=np.int8)
+
+    return
+
+    ##
+    print ('ensembled smote...')
+    n = 100
+    xyList = cutil.divideSamples(xdevf,ydev,n)
+    print len(xyList)
+
+    for xdevfi,ydevi in xyList:
+        sm = SMOTE(kind='svm',random_state=seed)
+        xdevfri,ydevri = sm.fit_sample(xdevfi,ydevi)
+        break
 
     log['nDevelResampled'] = len(ydevr)
     log['rDevelResampled:Data'] = log['nDevelResampled']/float(log['nData'])
@@ -116,6 +136,16 @@ def main():
     log['rDevelResampled(+):(-)'] = log['nDevelResampled(+)']/float(log['nDevelResampled(-)'])
     print 'nDevelResampled: '+str(log['nDevelResampled'])+'/'+str(log['nData'])+' = '+str(log['rDevelResampled:Data'])
     with open(os.path.join(outDir,'log.json'),'w') as f: json.dump(log,f,indent=2,sort_keys=True)
+
+    return
+
+    ##
+    xdev = xdevfr
+    ydev = ydevr
+
+            # with h5py.File(feaH5Fpath,'w') as hf:
+        #     hf.create_dataset("xdevf",data=xdevf,dtype=np.float32)
+
 
     ## TUNE+TRAIN+TEST #############################################################################
     msg = 'devel '+dataset+' '+cloneID
