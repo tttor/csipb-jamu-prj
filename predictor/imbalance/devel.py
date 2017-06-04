@@ -111,7 +111,9 @@ def main():
                 krDict[com] = f[com][:]
         with h5py.File(aacFpath, 'r') as f:
             for pro in [str(i) for i in f.keys()]:
-                aacDict[pro] = f[pro][:]
+                fea = f[pro][:]
+                fea = list( fu.map(lambda x: float('%.2f'%(x)),fea) ) # rounding
+                aacDict[pro] = fea
 
         ##
         print 'extract (com,pro) feature...'
