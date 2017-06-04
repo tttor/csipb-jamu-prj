@@ -155,6 +155,9 @@ def main():
 
         ##
         xyDevList = cutil.divideSamples(xdevf,ydev,cfg['smoteBatchSize'])
+        if cfg['maxNumberOfSmoteBatch'] != 0:
+            xyDevList = xyDevList[0:cfg['maxNumberOfSmoteBatch']]
+
         smoteSeed = util.seed(); dataLog['smoteSeed'] = smoteSeed
         sh.setConst(smoteSeed=smoteSeed)
 
