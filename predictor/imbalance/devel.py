@@ -13,6 +13,7 @@ from scoop import shared as sh
 from sklearn import svm
 from sklearn.model_selection import train_test_split as tts
 from sklearn.metrics.pairwise import rbf_kernel
+from sklearn.feature_selection import VarianceThreshold
 from ensembled_svm import EnsembledSVM as eSVM
 from imblearn.over_sampling import SMOTE
 
@@ -106,20 +107,39 @@ def main():
                                 'amino-acid-composition','amino-acid-composition-'+datasetParams[1]+'.h5')
 
         krDict = {}; aacDict = {}
+        krList = []; krComList = []
+        aacList = []; aacProList = []
         with h5py.File(krFpath, 'r') as f:
             for com in [str(i) for i in f.keys()]:
-                krDict[com] = f[com][:]
+                krComList.append(com)
+                krList.append( f[com][:] )
         with h5py.File(aacFpath, 'r') as f:
             for pro in [str(i) for i in f.keys()]:
+                aacProList.append(pro)
                 fea = f[pro][:]
-                fea = list( fu.map(lambda x: float('%.2f'%(x)),fea) ) # rounding
-                aacDict[pro] = fea
+                # fea = list( fu.map(lambda x: float('%.2f'%(x)),fea) ) # rounding
+                aacList.append(fea)
 
-        comFeaLen = len( krDict.values()[0] )
-        proFeaLen = len( aacDict.values()[0] )
+        comFeaLen = len(krList[0])
+        proFeaLen = len(aacList[0])
+
+        ##
+        print 'reduce feature dim of com... '+str(comFeaLen)
+        # removed any column, which has a probability > th of containing a zero.
+        th = 0.9
+        vt = VarianceThreshold(threshold=(th * (1 - th)))
+        krList = vt.fit_transform( np.asarray(krList)).tolist()
+        comFeaLen = len(krList[0])
+
+        # comFeaLen = len( krDict.values()[0] )
+        # proFeaLen = len( aacDict.values()[0] )
 
         ##
         print 'extract (com,pro) feature... dims: '+str(comFeaLen)+','+str(proFeaLen)
+
+        krDict = dict(zip(krComList,krList))
+        aacDict = dict(zip(aacProList,aacList))
+
         sh.setConst(krDict=krDict)
         sh.setConst(aacDict=aacDict)
         xdevf = list( fu.map(cutil.extractComProFea,xdev) )
