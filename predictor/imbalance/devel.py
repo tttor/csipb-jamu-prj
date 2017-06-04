@@ -54,21 +54,21 @@ def main():
     assert datasetParams[0]=='yamanishi'
 
     xyDevFpath = os.path.join(baseOutDir,'_'.join(['xdev','ydev']+datasetParams)+'.h5')
-    comSimMatFpath = os.path.join(baseOutDir,'_'.join(['comSimMat']+datasetParams)+'.h5')
-    proSimMatFpath = os.path.join(baseOutDir,'_'.join(['proSimMat']+datasetParams)+'.h5')
+    # comSimMatFpath = os.path.join(baseOutDir,'_'.join(['comSimMat']+datasetParams)+'.h5')
+    # proSimMatFpath = os.path.join(baseOutDir,'_'.join(['proSimMat']+datasetParams)+'.h5')
 
-    if os.path.exists(xyDevFpath) and os.path.exists(comSimMatFpath) and os.path.exists(proSimMatFpath):
+    if os.path.exists(xyDevFpath):# and os.path.exists(comSimMatFpath) and os.path.exists(proSimMatFpath):
         print 'loading data from PREVIOUS...'
 
         with h5py.File(xyDevFpath,'r') as f:
             xdev = f['xdev'][:]
             ydev = f['ydev'][:]
 
-        with h5py.File(comSimMatFpath,'r') as f:
-            comSimMat = f['comSimMat'][:]
+        # with h5py.File(comSimMatFpath,'r') as f:
+        #     comSimMat = f['comSimMat'][:]
 
-        with h5py.File(proSimMatFpath,'r') as f:
-            proSimMat = f['proSimMat'][:]
+        # with h5py.File(proSimMatFpath,'r') as f:
+        #     proSimMat = f['proSimMat'][:]
 
         with open(dataLogFpath,'r') as f:
             dataLog = yaml.load(f)
@@ -242,7 +242,7 @@ def main():
     tag = '_'.join([method+'#'+cloneID,dataset,util.tag()])
 
     ##
-    msg = 'devel '+dataset+' '+cloneID
+    msg = ' '.join( ['devel',dataset,cloneID])
     xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
                           random_state=devSeed,stratify=ydev)
 
@@ -273,7 +273,10 @@ def main():
         clf = svm.SVC(kernel=cfg['method']['kernel'],probability=True)
 
     ## training
-    print msg+': fitting nTr= '+str(len(ytr))
+    msg2  = msg+': fitting nTr= '+str(len(ytr))
+    msg2 += ' with maxTrainingSamplesPerBatch= '+str(cfg['method']['maxTrainingSamplesPerBatch'])
+    print msg2
+
     if method=='esvm':
         clf.fit(xtr,ytr)
         devLog['labels'] = clf.labels()
