@@ -12,16 +12,19 @@ from scoop import futures as fu
 sys.path.append('../../utility')
 import classifier_util as cutil
 
+from devel_config import config as cfg
+
 class EnsembledSVM:
-    def __init__(self,ikernel,imode,imaxTrSamples,imaxTeSamples,ibootstrap,isimMat):
-        self._kernel = ikernel
-        self._mode = imode
-        self._maxTrainingSamples = imaxTrSamples
-        self._maxTestingSamples = imaxTeSamples
-        self._boostrap = ibootstrap
-        self._simMat = isimMat
+    def __init__(self,kernel,mode,maxTrSamples,maxTeSamples,bootstrap,simMat):
+        self._kernel = kernel
+        self._mode = mode
+        self._maxTrainingSamples = maxTrSamples
+        self._maxTestingSamples = maxTeSamples
+        self._boostrap = bootstrap
+        self._simMat = simMat
         self._svmList = []
         self._labels = []
+        self._maxNumberOfSVM = cfg['method']['maxNumberOfSVM']
 
     def writeSVM(self,outDir):
         fpath = os.path.join(outDir,'esvm.pkl')
@@ -37,6 +40,9 @@ class EnsembledSVM:
     ## Fit #########################################################################################
     def fit(self,ixtr,iytr):
         xyTrList = cutil.divideSamples(ixtr,iytr,self._maxTrainingSamples)
+        if self._maxNumberOfSVM != 0:
+            xyTrList = xyTrList[0:self._maxNumberOfSVM]
+
         self._svmList = list( fu.map(self._fit,
                                      [xytr[0] for xytr in xyTrList],
                                      [xytr[1] for xytr in xyTrList]) )
@@ -51,6 +57,7 @@ class EnsembledSVM:
 
         ## train
         if self._kernel=='precomputed':
+            assert self._simMat is not None
             simMatTr = cutil.makeComProKernelMatFromSimMat(xtr,xtr,self._simMat)
             clf.fit(simMatTr,ytr)
         else:
@@ -89,6 +96,7 @@ class EnsembledSVM:
         clf,xtr = iclf
 
         if self._kernel=='precomputed':
+            assert self._simMat is not None
             simMatTe = cutil.makeComProKernelMatFromSimMat(xte,xtr,self._simMat)
             ypred2iRaw = clf.predict(simMatTe) # remember: ypred2i is a vector
             ypredproba2iRaw = clf.predict_proba(simMatTe)

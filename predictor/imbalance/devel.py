@@ -51,23 +51,24 @@ def main():
     dataLog = {}; dataLogFpath = os.path.join(outDir,'data_log.json')
     dataset = clusterDir.split('/')[-2].split('-')[-1]; dataLog['dataset'] = dataset
     datasetParams = dataset.split('#')
+    assert datasetParams[0]=='yamanishi'
 
     xyDevFpath = os.path.join(baseOutDir,'_'.join(['xdev','ydev']+datasetParams)+'.h5')
-    comSimMatFpath = os.path.join(baseOutDir,'_'.join(['comSimMat']+datasetParams)+'.h5')
-    proSimMatFpath = os.path.join(baseOutDir,'_'.join(['proSimMat']+datasetParams)+'.h5')
+    # comSimMatFpath = os.path.join(baseOutDir,'_'.join(['comSimMat']+datasetParams)+'.h5')
+    # proSimMatFpath = os.path.join(baseOutDir,'_'.join(['proSimMat']+datasetParams)+'.h5')
 
-    if os.path.exists(xyDevFpath) and os.path.exists(comSimMatFpath) and os.path.exists(proSimMatFpath):
+    if os.path.exists(xyDevFpath):# and os.path.exists(comSimMatFpath) and os.path.exists(proSimMatFpath):
         print 'loading data from PREVIOUS...'
 
         with h5py.File(xyDevFpath,'r') as f:
             xdev = f['xdev'][:]
             ydev = f['ydev'][:]
 
-        with h5py.File(comSimMatFpath,'r') as f:
-            comSimMat = f['comSimMat'][:]
+        # with h5py.File(comSimMatFpath,'r') as f:
+        #     comSimMat = f['comSimMat'][:]
 
-        with h5py.File(proSimMatFpath,'r') as f:
-            proSimMat = f['proSimMat'][:]
+        # with h5py.File(proSimMatFpath,'r') as f:
+        #     proSimMat = f['proSimMat'][:]
 
         with open(dataLogFpath,'r') as f:
             dataLog = yaml.load(f)
@@ -76,19 +77,19 @@ def main():
         print 'loading data FRESHLY...'
 
         print 'loading cluster result...'
-        if datasetParams[0]=='yamanishi':
-            nUnlabels = []
-            statFnames = [i for i in os.listdir(clusterDir) if 'labels_stat.json' in i]
-            for i in statFnames:
-                with open(os.path.join(clusterDir,i),'r') as f: stat = yaml.load(f)
-                nUnlabels.append(stat['0'])
-            metric = '_'.join(statFnames[ nUnlabels.index(min(nUnlabels)) ].split('_')[0:2])
-            dataLog['metric'] = metric
+        nUnlabels = []
+        statFnames = [i for i in os.listdir(clusterDir) if 'labels_stat.json' in i]
+        for i in statFnames:
+            with open(os.path.join(clusterDir,i),'r') as f: stat = yaml.load(f)
+            nUnlabels.append(stat['0'])
 
-            connFpath = os.path.join(clusterDir,metric+'_labels.pkl')
-            with open(connFpath,'r') as f: data = pickle.load(f)
-        else:
-            assert False,'FATAL: unknown dataset'
+        # use the cluster with minimum numbers of unlabeled samples
+        metric = '_'.join(statFnames[ nUnlabels.index(min(nUnlabels)) ].split('_')[0:2])
+        dataLog['metric'] = metric
+
+        connFpath = os.path.join(clusterDir,metric+'_labels.pkl')
+        with open(connFpath,'r') as f:
+            data = pickle.load(f)
 
         ##
         print 'getting devel data...'
@@ -115,9 +116,8 @@ def main():
                 krDict[com] = f[com][:]
         with h5py.File(aacFpath, 'r') as f:
             for pro in [str(i) for i in f.keys()]:
-                fea = f[pro][:]
-                # fea = list( fu.map(lambda x: float('%.2f'%(x)),fea) ) # rounding
-                aacDict[pro] = fea
+                aacDict[pro] = f[pro][:]
+                # aacDict[pro] = list( fu.map(lambda x: float('%.2f'%(x)),f[pro][:]) ) # rounding
 
         comFeaLenOri = len(krDict.values()[0])
         proFeaLenOri = len(aacDict.values()[0])
@@ -129,31 +129,35 @@ def main():
         sh.setConst(aacDict=aacDict)
         xdevf = list( fu.map(cutil.extractComProFea,xdev) )
 
-        ##
-        print 'reduce feature dim of com... '+str(comFeaLenOri)
-        krList = [i[0:comFeaLenOri] for i in xdevf]
+        # ##
+        # print 'reduce feature dim of com... '+str(comFeaLenOri)
 
-        # removed any column, which has a probability > th of containing a zero.
-        th = 0.9
-        vt = VarianceThreshold(threshold=(th * (1 - th)))
-        krList = vt.fit_transform( np.asarray(krList)).tolist()
-        comFeaLen = len(krList[0])
+        # # removed any column, which has a probability > th of containing a zero.
+        # th = 0.9
+        # krList = [i[0:comFeaLenOri] for i in xdevf]
+        # vt = VarianceThreshold(threshold=(th * (1 - th)))
+        # krList = vt.fit_transform( np.asarray(krList)).tolist()
+        # comFeaLen = len(krList[0])
+        # dataLog['comFeaLenOri'] = comFeaLenOri; dataLog['comFeaLen'] = comFeaLen
 
-        ##
-        print 'reduce feature dim of pro... '+str(proFeaLenOri)
-        aacList = [i[comFeaLenOri:] for i in xdevf]
-        assert len(aacList)==len(ydev)
+        # ##
+        # print 'reduce feature dim of pro... '+str(proFeaLenOri)
 
-        aacList = SelectPercentile(chi2, percentile=50).fit_transform(np.asarray(aacList),ydev)
-        aacList = aacList.tolist()
-        proFeaLen = len(aacList[0])
+        # aacList = [i[comFeaLenOri:] for i in xdevf]
+        # aacList = SelectPercentile(chi2, percentile=100).fit_transform(np.asarray(aacList),ydev)
+        # aacList = aacList.tolist()
+        # proFeaLen = len(aacList[0])
+        # dataLog['proFeaLenOri'] = proFeaLenOri; dataLog['proFeaLen'] = proFeaLen
 
-        ##
-        print 'update xdevf after dim-reduction... '+str(comFeaLen)+','+str(proFeaLen)
-        xdevf = [krList[i]+aacList[i] for i in range(len(xdevf))]
+        # ##
+        # print 'update xdevf after dim-reduction... '+str(comFeaLen)+','+str(proFeaLen)
+        # xdevf = [krList[i]+aacList[i] for i in range(len(xdevf))]
 
         ##
         xyDevList = cutil.divideSamples(xdevf,ydev,cfg['smoteBatchSize'])
+        if cfg['maxNumberOfSmoteBatch'] != 0:
+            xyDevList = xyDevList[0:cfg['maxNumberOfSmoteBatch']]
+
         smoteSeed = util.seed(); dataLog['smoteSeed'] = smoteSeed
         sh.setConst(smoteSeed=smoteSeed)
 
@@ -165,35 +169,48 @@ def main():
             for y in ydevri: ydevr.append(y)
         assert len(xdevfr)==len(ydevr),'len(xdevfr)!=len(ydevr)'
 
+        # ##
+        # print 'getting sets of resampled com,pro...'
+        # assert (comFeaLen+proFeaLen) == len(xdevfr[0])
+
+        # comFeaList = [tuple(i[0:comFeaLen]) for i in xdevfr]
+        # comFeaList = list(set(comFeaList))
+        # fea2ComMap = dict( zip(comFeaList,range(len(comFeaList))) )
+
+        # proFeaList = [tuple(i[comFeaLen:]) for i in xdevfr]
+        # proFeaList = list(set(proFeaList))
+        # fea2ProMap = dict( zip(proFeaList,range(len(proFeaList))) )
+
+        # dataLog['nComResampled'] = len(comFeaList)
+        # dataLog['nProResampled'] = len(proFeaList)
+
+        # print 'compute kernel of com... '+str(len(comFeaList))
+        # comSimMat = rbf_kernel(comFeaList,comFeaList)
+        # with h5py.File(comSimMatFpath,'w') as f:
+        #     f.create_dataset('comSimMat',data=comSimMat,dtype=np.float32)
+
+        # print 'compute kernel of pro... '+str(len(proFeaList))
+        # proSimMat = rbf_kernel(proFeaList,proFeaList)
+        # with h5py.File(proSimMatFpath,'w') as f:
+        #     f.create_dataset('proSimMat',data=proSimMat,dtype=np.float32)
+
+        # ##
+        # print 'mapping xdev to newIdx... '+str(len(xdevfr))
+
+        # sh.setConst(comFeaLen=comFeaLen)
+        # sh.setConst(fea2ComMap=fea2ComMap)
+        # sh.setConst(fea2ProMap=fea2ProMap)
+        # xdevm = list( fu.map(mapToIdx,xdevfr) )
+
         ##
-        print 'getting sets of resampled com,pro...'
-        assert (comFeaLen+proFeaLen) == len(xdevfr[0])
+        print 'update xdev,ydev...'
+        xdev = xdevfr[:]
+        ydev = ydevr[:]
 
-        comFeaList = [tuple(i[0:comFeaLen]) for i in xdevfr]
-        comFeaList = list(set(comFeaList))
-        fea2ComMap = dict( zip(comFeaList,range(len(comFeaList))) )
-
-        proFeaList = [tuple(i[comFeaLen:]) for i in xdevfr]
-        proFeaList = list(set(proFeaList))
-        fea2ProMap = dict( zip(proFeaList,range(len(proFeaList))) )
-
-        print 'compute kernel of com... '+str(len(comFeaList))
-        comSimMat = rbf_kernel(comFeaList,comFeaList)
-        with h5py.File(comSimMatFpath,'w') as f:
-            f.create_dataset('comSimMat',data=comSimMat,dtype=np.float32)
-
-        print 'compute kernel of pro... '+str(len(proFeaList))
-        proSimMat = rbf_kernel(proFeaList,proFeaList)
-        with h5py.File(proSimMatFpath,'w') as f:
-            f.create_dataset('proSimMat',data=proSimMat,dtype=np.float32)
-
-        ##
-        print 'mapping xdev to newIdx... '+str(len(xdevfr))
-
-        sh.setConst(comFeaLen=comFeaLen)
-        sh.setConst(fea2ComMap=fea2ComMap)
-        sh.setConst(fea2ProMap=fea2ProMap)
-        xdevm = list( fu.map(mapToIdx,xdevfr) )
+        print 'writing updated xdev,ydev...'
+        with h5py.File(xyDevFpath,'w') as f:
+            f.create_dataset('xdev',data=xdev,dtype=np.float32)
+            f.create_dataset('ydev',data=ydev,dtype=np.int8)
 
         ##
         print 'writing dataLog...'
@@ -217,24 +234,10 @@ def main():
 
         dataLog['nCom'] = len(krDict)
         dataLog['nPro'] = len(aacDict)
-        dataLog['nComResampled'] = len(comFeaList)
-        dataLog['nProResampled'] = len(proFeaList)
-        dataLog['comFeaLenOri'] = comFeaLenOri; dataLog['comFeaLen'] = comFeaLen
-        dataLog['proFeaLenOri'] = proFeaLenOri; dataLog['proFeaLen'] = proFeaLen
 
         shutil.copy2('devel_config.py',outDir)
         with open(dataLogFpath,'w') as f:
             json.dump(dataLog,f,indent=2,sort_keys=True)
-
-        ##
-        print 'update xdev,ydev...'
-        xdev = xdevm[:]
-        ydev = ydevr[:]
-
-        print 'writing updated xdev,ydev...'
-        with h5py.File(xyDevFpath,'w') as f:
-            f.create_dataset('xdev',data=xdev,dtype=np.float32)
-            f.create_dataset('ydev',data=ydev,dtype=np.int8)
 
     ## TUNE+TRAIN+TEST #############################################################################
     devLog = {}
@@ -242,11 +245,9 @@ def main():
     tag = '_'.join([method+'#'+cloneID,dataset,util.tag()])
 
     ##
-    msg = 'devel '+dataset+' '+cloneID
+    msg = ' '.join( ['devel',dataset,cloneID])
     xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
                           random_state=devSeed,stratify=ydev)
-
-    simMat = {'com':comSimMat,'pro':proSimMat}
 
     if cfg['maxTestingSamples']>0:
         chosenIdx = np.random.randint(len(xte),size=cfg['maxTestingSamples'])
@@ -270,20 +271,24 @@ def main():
                     cfg['method']['maxTrainingSamplesPerBatch'],
                     cfg['method']['maxTestingSamplesPerBatch'],
                     cfg['method']['bootstrap'],
-                    simMat)
+                    simMat=None)
     elif method=='psvm':
         clf = svm.SVC(kernel=cfg['method']['kernel'],probability=True)
 
     ## training
-    print msg+': fitting nTr= '+str(len(ytr))
+    msg2  = msg+': fitting nTr= '+str(len(ytr))
+    msg2 += ' with maxTrainingSamplesPerBatch= '+str(cfg['method']['maxTrainingSamplesPerBatch'])
+    print msg2
+
     if method=='esvm':
         clf.fit(xtr,ytr)
         devLog['labels'] = clf.labels()
         devLog['nSVM'] = clf.nSVM()
     elif method=='psvm':
         if cfg['method']['kernel']=='precomputed':
-            simMatTr = cutil.makeComProKernelMatFromSimMat(xtr,xtr,simMat)
-            clf.fit(simMatTr,ytr)
+            assert False
+            # simMatTr = cutil.makeComProKernelMatFromSimMat(xtr,xtr,simMat)
+            # clf.fit(simMatTr,ytr)
         else:
             clf.fit(xtr,ytr)
         devLog['labels'] = clf.classes_.tolist()
@@ -294,9 +299,10 @@ def main():
         ypred,yscore = clf.predict(xte)
     elif method=='psvm':
         if cfg['method']['kernel']=='precomputed':
-            simMatTe = cutil.makeComProKernelMatFromSimMat(xte,xtr,simMat)
-            ypred = clf.predict(simMatTe)
-            yscore = clf.predict_proba(simMatTe)
+            assert False
+            # simMatTe = cutil.makeComProKernelMatFromSimMat(xte,xtr,simMat)
+            # ypred = clf.predict(simMatTe)
+            # yscore = clf.predict_proba(simMatTe)
         else:
             ypred = clf.predict(xte)
             yscore = clf.predict_proba(xte)
