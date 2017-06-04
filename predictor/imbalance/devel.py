@@ -13,6 +13,10 @@ from scoop import shared as sh
 from sklearn import svm
 from sklearn.model_selection import train_test_split as tts
 from sklearn.metrics.pairwise import rbf_kernel
+from sklearn.feature_selection import VarianceThreshold
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import SelectPercentile
+from sklearn.feature_selection import chi2
 from ensembled_svm import EnsembledSVM as eSVM
 from imblearn.over_sampling import SMOTE
 
@@ -111,20 +115,49 @@ def main():
                 krDict[com] = f[com][:]
         with h5py.File(aacFpath, 'r') as f:
             for pro in [str(i) for i in f.keys()]:
-                aacDict[pro] = f[pro][:]
+                fea = f[pro][:]
+                # fea = list( fu.map(lambda x: float('%.2f'%(x)),fea) ) # rounding
+                aacDict[pro] = fea
+
+        comFeaLenOri = len(krDict.values()[0])
+        proFeaLenOri = len(aacDict.values()[0])
 
         ##
-        print 'extract (com,pro) feature...'
+        print 'extract (com,pro) feature... dims: '+str(comFeaLenOri)+','+str(proFeaLenOri)
+
         sh.setConst(krDict=krDict)
         sh.setConst(aacDict=aacDict)
         xdevf = list( fu.map(cutil.extractComProFea,xdev) )
 
         ##
-        print 'Resampling via Smote FRESHLY...'
+        print 'reduce feature dim of com... '+str(comFeaLenOri)
+        krList = [i[0:comFeaLenOri] for i in xdevf]
+
+        # removed any column, which has a probability > th of containing a zero.
+        th = 0.9
+        vt = VarianceThreshold(threshold=(th * (1 - th)))
+        krList = vt.fit_transform( np.asarray(krList)).tolist()
+        comFeaLen = len(krList[0])
+
+        ##
+        print 'reduce feature dim of pro... '+str(proFeaLenOri)
+        aacList = [i[comFeaLenOri:] for i in xdevf]
+        assert len(aacList)==len(ydev)
+
+        aacList = SelectPercentile(chi2, percentile=50).fit_transform(np.asarray(aacList),ydev)
+        aacList = aacList.tolist()
+        proFeaLen = len(aacList[0])
+
+        ##
+        print 'update xdevf after dim-reduction...'
+        xdevf = [krList[i]+aacList[i] for i in range(len(xdevf))]
+
+        ##
         xyDevList = cutil.divideSamples(xdevf,ydev,cfg['smoteBatchSize'])
         smoteSeed = util.seed(); dataLog['smoteSeed'] = smoteSeed
         sh.setConst(smoteSeed=smoteSeed)
 
+        print 'resampling via Smote FRESHLY... '+str(len(xyDevList))+' smote(s)'
         xdevfr = []; ydevr = []
         xydevfrList = list( fu.map(ensembleSmote,xyDevList) )
         for xdevfri,ydevri in xydevfrList:
@@ -134,8 +167,6 @@ def main():
 
         ##
         print 'getting sets of resampled com,pro...'
-        comFeaLen = 4860
-        proFeaLen = 20
         assert (comFeaLen+proFeaLen) == len(xdevfr[0])
 
         comFeaList = [tuple(i[0:comFeaLen]) for i in xdevfr]
@@ -146,18 +177,18 @@ def main():
         proFeaList = list(set(proFeaList))
         fea2ProMap = dict( zip(proFeaList,range(len(proFeaList))) )
 
-        print 'compute kernel of com...'
+        print 'compute kernel of com... '+str(len(comFeaList))
         comSimMat = rbf_kernel(comFeaList,comFeaList)
         with h5py.File(comSimMatFpath,'w') as f:
             f.create_dataset('comSimMat',data=comSimMat,dtype=np.float32)
 
-        print 'compute kernel of pro...'
+        print 'compute kernel of pro... '+str(len(proFeaList))
         proSimMat = rbf_kernel(proFeaList,proFeaList)
         with h5py.File(proSimMatFpath,'w') as f:
             f.create_dataset('proSimMat',data=proSimMat,dtype=np.float32)
 
         ##
-        print 'mapping xdev to newIdx...'
+        print 'mapping xdev to newIdx... '+str(len(xdevfr))
 
         sh.setConst(comFeaLen=comFeaLen)
         sh.setConst(fea2ComMap=fea2ComMap)
@@ -188,6 +219,8 @@ def main():
         dataLog['nPro'] = len(aacDict)
         dataLog['nComResampled'] = len(comFeaList)
         dataLog['nProResampled'] = len(proFeaList)
+        dataLog['comFeaLenOri'] = comFeaLenOri; dataLog['comFeaLen'] = comFeaLen
+        dataLog['proFeaLenOri'] = proFeaLenOri; dataLog['proFeaLen'] = proFeaLen
 
         shutil.copy2('devel_config.py',outDir)
         with open(dataLogFpath,'w') as f:
