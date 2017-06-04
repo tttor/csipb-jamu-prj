@@ -51,6 +51,7 @@ def main():
     dataLog = {}; dataLogFpath = os.path.join(outDir,'data_log.json')
     dataset = clusterDir.split('/')[-2].split('-')[-1]; dataLog['dataset'] = dataset
     datasetParams = dataset.split('#')
+    assert datasetParams[0]=='yamanishi'
 
     xyDevFpath = os.path.join(baseOutDir,'_'.join(['xdev','ydev']+datasetParams)+'.h5')
     comSimMatFpath = os.path.join(baseOutDir,'_'.join(['comSimMat']+datasetParams)+'.h5')
@@ -76,19 +77,19 @@ def main():
         print 'loading data FRESHLY...'
 
         print 'loading cluster result...'
-        if datasetParams[0]=='yamanishi':
-            nUnlabels = []
-            statFnames = [i for i in os.listdir(clusterDir) if 'labels_stat.json' in i]
-            for i in statFnames:
-                with open(os.path.join(clusterDir,i),'r') as f: stat = yaml.load(f)
-                nUnlabels.append(stat['0'])
-            metric = '_'.join(statFnames[ nUnlabels.index(min(nUnlabels)) ].split('_')[0:2])
-            dataLog['metric'] = metric
+        nUnlabels = []
+        statFnames = [i for i in os.listdir(clusterDir) if 'labels_stat.json' in i]
+        for i in statFnames:
+            with open(os.path.join(clusterDir,i),'r') as f: stat = yaml.load(f)
+            nUnlabels.append(stat['0'])
 
-            connFpath = os.path.join(clusterDir,metric+'_labels.pkl')
-            with open(connFpath,'r') as f: data = pickle.load(f)
-        else:
-            assert False,'FATAL: unknown dataset'
+        # use the cluster with minimum numbers of unlabeled samples
+        metric = '_'.join(statFnames[ nUnlabels.index(min(nUnlabels)) ].split('_')[0:2])
+        dataLog['metric'] = metric
+
+        connFpath = os.path.join(clusterDir,metric+'_labels.pkl')
+        with open(connFpath,'r') as f:
+            data = pickle.load(f)
 
         ##
         print 'getting devel data...'
