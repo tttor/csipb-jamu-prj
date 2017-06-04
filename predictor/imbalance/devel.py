@@ -115,8 +115,11 @@ def main():
                 fea = list( fu.map(lambda x: float('%.2f'%(x)),fea) ) # rounding
                 aacDict[pro] = fea
 
+        comFeaLen = len( krDict.values()[0] )
+        proFeaLen = len( aacDict.values()[0] )
+
         ##
-        print 'extract (com,pro) feature...'
+        print 'extract (com,pro) feature... dims: '+str(comFeaLen)+','+str(proFeaLen)
         sh.setConst(krDict=krDict)
         sh.setConst(aacDict=aacDict)
         xdevf = list( fu.map(cutil.extractComProFea,xdev) )
@@ -136,8 +139,6 @@ def main():
 
         ##
         print 'getting sets of resampled com,pro...'
-        comFeaLen = 4860
-        proFeaLen = 20
         assert (comFeaLen+proFeaLen) == len(xdevfr[0])
 
         comFeaList = [tuple(i[0:comFeaLen]) for i in xdevfr]
