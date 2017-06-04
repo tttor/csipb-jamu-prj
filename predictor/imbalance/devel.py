@@ -149,7 +149,7 @@ def main():
         proFeaLen = len(aacList[0])
 
         ##
-        print 'update xdevf after dim-reduction...'
+        print 'update xdevf after dim-reduction... '+str(comFeaLen)+','+str(proFeaLen)
         xdevf = [krList[i]+aacList[i] for i in range(len(xdevf))]
 
         ##
