@@ -240,7 +240,6 @@ def main():
         dataLog['nCom'] = len(krDict)
         dataLog['nPro'] = len(aacDict)
 
-        shutil.copy2('devel_config.py',outDir)
         with open(dataLogFpath,'w') as f:
             json.dump(dataLog,f,indent=2,sort_keys=True)
 
@@ -317,6 +316,10 @@ def main():
             if k in ['ytr','yte','ypred']: dt = np.int8
             f.create_dataset(k,data=v,dtype=dt)
 
+    ##
+    print 'writing devLog...'
+    devLog['clfParam'] = clfParam
+    devLog['devParam'] = cfg
     with open(os.path.join(outDir,'devLog_'+tag+'.json'),'w') as f:
         json.dump(devLog,f,indent=2,sort_keys=True)
 
