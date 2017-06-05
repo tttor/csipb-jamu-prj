@@ -103,6 +103,14 @@ def main():
         xdev = [xraw[i] for i in devIdx]
         ydev = [yraw[i] for i in devIdx]
 
+        dataLog['nDevel'] = len(devIdx); dataLog['nData'] = len(yraw)
+        dataLog['rDevel:Data'] = dataLog['nDevel']/float(dataLog['nData'])
+        dataLog['nDevel(+)'] = len( [i for i in ydev if i==1] ); assert dataLog['nDevel(+)']!=0
+        dataLog['nDevel(-)'] = len( [i for i in ydev if i==-1] ); assert dataLog['nDevel(-)']!=0
+        dataLog['rDevel(+):Devel'] = float(dataLog['nDevel(+)'])/dataLog['nDevel']
+        dataLog['rDevel(-):Devel'] = float(dataLog['nDevel(-)'])/dataLog['nDevel']
+        dataLog['rDevel(+):(-)'] = float(dataLog['nDevel(+)'])/float(dataLog['nDevel(-)'])
+
         ##
         print 'loading com, pro feature...'
         krFpath = os.path.join(cfg['datasetDir'],datasetParams[0],'feature',
@@ -169,6 +177,15 @@ def main():
             for y in ydevri: ydevr.append(y)
         assert len(xdevfr)==len(ydevr),'len(xdevfr)!=len(ydevr)'
 
+        dataLog['nSmote'] = len(xyDevList)
+        dataLog['nDevelResampled'] = len(ydevr)
+        dataLog['rDevelResampled:Data'] = dataLog['nDevelResampled']/float(dataLog['nData'])
+        dataLog['nDevelResampled(+)'] = len( [i for i in ydevr if i==1] )
+        dataLog['nDevelResampled(-)'] = len( [i for i in ydevr if i==-1] )
+        dataLog['rDevelResampled(+):DevelResampled'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled'])
+        dataLog['rDevelResampled(-):DevelResampled'] = dataLog['nDevelResampled(-)']/float(dataLog['nDevelResampled'])
+        dataLog['rDevelResampled(+):(-)'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled(-)'])
+
         # ##
         # print 'getting sets of resampled com,pro...'
         # assert (comFeaLen+proFeaLen) == len(xdevfr[0])
@@ -214,23 +231,6 @@ def main():
 
         ##
         print 'writing dataLog...'
-
-        dataLog['nDevel'] = len(devIdx); dataLog['nData'] = len(yraw)
-        dataLog['rDevel:Data'] = dataLog['nDevel']/float(dataLog['nData'])
-        dataLog['nDevel(+)'] = len( [i for i in ydev if i==1] ); assert dataLog['nDevel(+)']!=0
-        dataLog['nDevel(-)'] = len( [i for i in ydev if i==-1] ); assert dataLog['nDevel(-)']!=0
-        dataLog['rDevel(+):Devel'] = float(dataLog['nDevel(+)'])/dataLog['nDevel']
-        dataLog['rDevel(-):Devel'] = float(dataLog['nDevel(-)'])/dataLog['nDevel']
-        dataLog['rDevel(+):(-)'] = float(dataLog['nDevel(+)'])/float(dataLog['nDevel(-)'])
-
-        dataLog['nSmote'] = len(xyDevList)
-        dataLog['nDevelResampled'] = len(ydevr)
-        dataLog['rDevelResampled:Data'] = dataLog['nDevelResampled']/float(dataLog['nData'])
-        dataLog['nDevelResampled(+)'] = len( [i for i in ydevr if i==1] )
-        dataLog['nDevelResampled(-)'] = len( [i for i in ydevr if i==-1] )
-        dataLog['rDevelResampled(+):DevelResampled'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled'])
-        dataLog['rDevelResampled(-):DevelResampled'] = dataLog['nDevelResampled(-)']/float(dataLog['nDevelResampled'])
-        dataLog['rDevelResampled(+):(-)'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled(-)'])
 
         dataLog['nCom'] = len(krDict)
         dataLog['nPro'] = len(aacDict)
