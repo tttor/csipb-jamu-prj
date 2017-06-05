@@ -53,7 +53,7 @@ def main():
     if not(os.path.isdir(outDir)): os.makedirs(outDir)
 
     ## Load data ###################################################################################
-    dataLog = {}; dataLogFpath = os.path.join(outDir,'data_log.json')
+    dataLog = {}; dataLogFpath = os.path.join(outDir,'data_log_'+os.path.basename(baseOutDir)+'.json')
     dataset = clusterDir.split('/')[-2].split('-')[-1]; dataLog['dataset'] = dataset
     datasetParams = dataset.split('#')
     assert datasetParams[0]=='yamanishi'
