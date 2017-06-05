@@ -58,7 +58,7 @@ npm-debug.log
 dll/
 
 # Node Files on API #
-/api/upload/node_modules/
+/api_upload/node_modules/
 
 # Doc #
 /doc/
