@@ -175,6 +175,8 @@ def main():
         sh.setConst(smoteSeed=smoteSeed)
 
         print 'resampling via Smote FRESHLY... '+str(len(xyDevList))+' smote(s)'+' on '+str(len(ydev))
+        smoteTic = time.time()
+
         xdevfr = []; ydevr = []
         xydevfrList = list( fu.map(ensembleSmote,xyDevList) )
         for xdevfri,ydevri in xydevfrList:
@@ -190,6 +192,7 @@ def main():
         dataLog['rDevelResampled(+):DevelResampled'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled'])
         dataLog['rDevelResampled(-):DevelResampled'] = dataLog['nDevelResampled(-)']/float(dataLog['nDevelResampled'])
         dataLog['rDevelResampled(+):(-)'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled(-)'])
+        dataLog['timeSMOTE'] =  str(time.time()-smoteTic)
 
         # ##
         # print 'getting sets of resampled com,pro...'
@@ -277,6 +280,7 @@ def main():
 
     ## training
     print msg+': fitting nTr= '+str(len(ytr))
+    trTic = time.time()
 
     if method=='esvm':
         clf.fit(xtr,ytr)
@@ -290,9 +294,11 @@ def main():
         else:
             clf.fit(xtr,ytr)
         devLog['labels'] = clf.classes_.tolist()
+    devLog['timeTraining'] = str(time.time()-trTic)
 
     ## testing
     print msg+': predicting nTe= '+str(len(yte))
+    teTic = time.time()
 
     if method=='esvm':
         ypred,yscore = clf.predict(xte)
@@ -307,6 +313,7 @@ def main():
             yscore = clf.predict_proba(xte)
             yscore = [max(i.tolist()) for i in yscore]
     result = {'yte':yte,'ypred':ypred,'yscore':yscore}
+    devLog['timeTesting'] = str(time.time()-teTic)
 
     ##
     print 'writing prediction...'
