@@ -38,7 +38,7 @@ def main():
     clusterDir = sys.argv[2]; assert clusterDir[-1]=='/',"should be ended with '/'"
     baseOutDir = sys.argv[3]
 
-    outDir = os.path.join(baseOutDir,'devel')
+    outDir = os.path.join(baseOutDir,'devel-'+os.path.basename(baseOutDir))
     if not(os.path.isdir(baseOutDir)): os.makedirs(baseOutDir)
     if not(os.path.isdir(outDir)): os.makedirs(outDir)
 
