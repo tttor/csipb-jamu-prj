@@ -38,17 +38,22 @@ def main():
     clusterDir = sys.argv[2]; assert clusterDir[-1]=='/',"should be ended with '/'"
     baseOutDir = sys.argv[3]
 
-    outDir = os.path.join(baseOutDir,'devel')
-    if not(os.path.isdir(baseOutDir)): os.makedirs(baseOutDir)
-    if not(os.path.isdir(outDir)): os.makedirs(outDir)
-
-    method = cfg['method']['name']
-    if method not in ['esvm','psvm']:
+    clfParam = None
+    method = cfg['method']
+    if method=='esvm':
+        from esvm_config import config as clfParam
+    elif method=='psvm':
+        from psvm_config import config as clfParam
+    else:
         print 'FATAL: unknown method'
         return
 
+    outDir = os.path.join(baseOutDir,'devel-'+os.path.basename(baseOutDir))
+    if not(os.path.isdir(baseOutDir)): os.makedirs(baseOutDir)
+    if not(os.path.isdir(outDir)): os.makedirs(outDir)
+
     ## Load data ###################################################################################
-    dataLog = {}; dataLogFpath = os.path.join(outDir,'data_log.json')
+    dataLog = {}; dataLogFpath = os.path.join(outDir,'data_log_'+os.path.basename(baseOutDir)+'.json')
     dataset = clusterDir.split('/')[-2].split('-')[-1]; dataLog['dataset'] = dataset
     datasetParams = dataset.split('#')
     assert datasetParams[0]=='yamanishi'
@@ -170,6 +175,8 @@ def main():
         sh.setConst(smoteSeed=smoteSeed)
 
         print 'resampling via Smote FRESHLY... '+str(len(xyDevList))+' smote(s)'+' on '+str(len(ydev))
+        smoteTic = time.time()
+
         xdevfr = []; ydevr = []
         xydevfrList = list( fu.map(ensembleSmote,xyDevList) )
         for xdevfri,ydevri in xydevfrList:
@@ -185,6 +192,7 @@ def main():
         dataLog['rDevelResampled(+):DevelResampled'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled'])
         dataLog['rDevelResampled(-):DevelResampled'] = dataLog['nDevelResampled(-)']/float(dataLog['nDevelResampled'])
         dataLog['rDevelResampled(+):(-)'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled(-)'])
+        dataLog['timeSMOTE'] =  str(time.time()-smoteTic)
 
         # ##
         # print 'getting sets of resampled com,pro...'
@@ -235,7 +243,6 @@ def main():
         dataLog['nCom'] = len(krDict)
         dataLog['nPro'] = len(aacDict)
 
-        shutil.copy2('devel_config.py',outDir)
         with open(dataLogFpath,'w') as f:
             json.dump(dataLog,f,indent=2,sort_keys=True)
 
@@ -267,18 +274,13 @@ def main():
     ## tuning
     clf = None
     if method=='esvm':
-        clf  = eSVM(cfg['method']['kernel'],cfg['method']['mode'],
-                    cfg['method']['maxTrainingSamplesPerBatch'],
-                    cfg['method']['maxTestingSamplesPerBatch'],
-                    cfg['method']['bootstrap'],
-                    simMat=None)
+        clf  = eSVM(simMat=None)
     elif method=='psvm':
-        clf = svm.SVC(kernel=cfg['method']['kernel'],probability=True)
+        clf = svm.SVC(kernel=clfParam['kernel'],probability=True)
 
     ## training
-    msg2  = msg+': fitting nTr= '+str(len(ytr))
-    msg2 += ' with maxTrainingSamplesPerBatch= '+str(cfg['method']['maxTrainingSamplesPerBatch'])
-    print msg2
+    print msg+': fitting nTr= '+str(len(ytr))
+    trTic = time.time()
 
     if method=='esvm':
         clf.fit(xtr,ytr)
@@ -292,11 +294,11 @@ def main():
         else:
             clf.fit(xtr,ytr)
         devLog['labels'] = clf.classes_.tolist()
+    devLog['timeTraining'] = str(time.time()-trTic)
 
     ## testing
-    msg2  = msg+': predicting nTe= '+str(len(yte))
-    msg2 += ' with maxTestingSamplesPerBatch= '+str(cfg['method']['maxTestingSamplesPerBatch'])
-    print msg2
+    print msg+': predicting nTe= '+str(len(yte))
+    teTic = time.time()
 
     if method=='esvm':
         ypred,yscore = clf.predict(xte)
@@ -311,6 +313,7 @@ def main():
             yscore = clf.predict_proba(xte)
             yscore = [max(i.tolist()) for i in yscore]
     result = {'yte':yte,'ypred':ypred,'yscore':yscore}
+    devLog['timeTesting'] = str(time.time()-teTic)
 
     ##
     print 'writing prediction...'
@@ -320,6 +323,10 @@ def main():
             if k in ['ytr','yte','ypred']: dt = np.int8
             f.create_dataset(k,data=v,dtype=dt)
 
+    ##
+    print 'writing devLog...'
+    devLog['clfParam'] = clfParam
+    devLog['devParam'] = cfg
     with open(os.path.join(outDir,'devLog_'+tag+'.json'),'w') as f:
         json.dump(devLog,f,indent=2,sort_keys=True)
 

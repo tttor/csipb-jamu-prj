@@ -12,19 +12,19 @@ from scoop import futures as fu
 sys.path.append('../../utility')
 import classifier_util as cutil
 
-from devel_config import config as cfg
+from esvm_config import config as cfg
 
 class EnsembledSVM:
-    def __init__(self,kernel,mode,maxTrSamples,maxTeSamples,bootstrap,simMat):
-        self._kernel = kernel
-        self._mode = mode
-        self._maxTrainingSamples = maxTrSamples
-        self._maxTestingSamples = maxTeSamples
-        self._boostrap = bootstrap
+    def __init__(self,simMat):
+        self._kernel = cfg['kernel']
+        self._mode = cfg['mode']
+        self._boostrap = cfg['bootstrap']
+        self._maxTrainingSamplesPerBatch = cfg['maxTrainingSamplesPerBatch']
+        self._maxTestingSamplesPerBatch = cfg['maxTestingSamplesPerBatch']
+        self._maxNumberOfSVM = cfg['maxNumberOfSVM']
         self._simMat = simMat
         self._svmList = []
         self._labels = []
-        self._maxNumberOfSVM = cfg['method']['maxNumberOfSVM']
 
     def writeSVM(self,outDir):
         fpath = os.path.join(outDir,'esvm.pkl')
@@ -39,7 +39,7 @@ class EnsembledSVM:
 
     ## Fit #########################################################################################
     def fit(self,ixtr,iytr):
-        xyTrList = cutil.divideSamples(ixtr,iytr,self._maxTrainingSamples)
+        xyTrList = cutil.divideSamples(ixtr,iytr,self._maxTrainingSamplesPerBatch)
         if self._maxNumberOfSVM != 0:
             xyTrList = xyTrList[0:self._maxNumberOfSVM]
 
@@ -68,7 +68,7 @@ class EnsembledSVM:
     ## Predict #####################################################################################
     def predict(self,ixte):
         assert len(self._svmList)!=0,'empty _svmList in predict()'
-        xyTeList = cutil.divideSamples(ixte,None,self._maxTestingSamples)
+        xyTeList = cutil.divideSamples(ixte,None,self._maxTestingSamplesPerBatch)
         xTeList = [i[0] for i in xyTeList]; n = len(xTeList)
         ypredList = list( fu.map(self._predict,
                                  xTeList,[self._mode]*n,[self._svmList]*n,[self._labels]*n) )
