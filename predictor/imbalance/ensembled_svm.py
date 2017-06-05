@@ -21,7 +21,7 @@ class EnsembledSVM:
         self._boostrap = cfg['bootstrap']
         self._maxTrainingSamplesPerBatch = cfg['maxTrainingSamplesPerBatch']
         self._maxTestingSamplesPerBatch = cfg['maxTestingSamplesPerBatch']
-        self._maxNumberOfSVM = cfg['maxNumberOfSVM']
+        self._maxNumberOfTrainingBatches = cfg['maxNumberOfTrainingBatches']
         self._simMat = simMat
         self._svmList = []
         self._labels = []
@@ -40,8 +40,8 @@ class EnsembledSVM:
     ## Fit #########################################################################################
     def fit(self,ixtr,iytr):
         xyTrList = cutil.divideSamples(ixtr,iytr,self._maxTrainingSamplesPerBatch)
-        if self._maxNumberOfSVM != 0:
-            xyTrList = xyTrList[0:self._maxNumberOfSVM]
+        if self._maxNumberOfTrainingBatches != 0:
+            xyTrList = xyTrList[0:self._maxNumberOfTrainingBatches]
 
         self._svmList = list( fu.map(self._fit,
                                      [xytr[0] for xytr in xyTrList],
