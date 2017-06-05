@@ -123,7 +123,7 @@ def main():
         proFeaLenOri = len(aacDict.values()[0])
 
         ##
-        print 'extract (com,pro) feature... dims: '+str(comFeaLenOri)+','+str(proFeaLenOri)
+        print 'extract (com,pro) feature... dims: '+str(comFeaLenOri)+','+str(proFeaLenOri)+' of '+str(len(ydev))
 
         sh.setConst(krDict=krDict)
         sh.setConst(aacDict=aacDict)
@@ -161,7 +161,7 @@ def main():
         smoteSeed = util.seed(); dataLog['smoteSeed'] = smoteSeed
         sh.setConst(smoteSeed=smoteSeed)
 
-        print 'resampling via Smote FRESHLY... '+str(len(xyDevList))+' smote(s)'
+        print 'resampling via Smote FRESHLY... '+str(len(xyDevList))+' smote(s)'+' on '+str(len(ydev))
         xdevfr = []; ydevr = []
         xydevfrList = list( fu.map(ensembleSmote,xyDevList) )
         for xdevfri,ydevri in xydevfrList:
@@ -203,7 +203,7 @@ def main():
         # xdevm = list( fu.map(mapToIdx,xdevfr) )
 
         ##
-        print 'update xdev,ydev...'
+        print 'update xdev,ydev... '+str(len(xdevfr))
         xdev = xdevfr[:]
         ydev = ydevr[:]
 
@@ -294,7 +294,10 @@ def main():
         devLog['labels'] = clf.classes_.tolist()
 
     ## testing
-    print msg+': predicting nTe= '+str(len(yte))
+    msg2  = msg+': predicting nTe= '+str(len(yte))
+    msg2 += ' with maxTestingSamplesPerBatch= '+str(cfg['method']['maxTestingSamplesPerBatch'])
+    print msg2
+
     if method=='esvm':
         ypred,yscore = clf.predict(xte)
     elif method=='psvm':
