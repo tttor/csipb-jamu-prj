@@ -23,10 +23,9 @@ def main():
       print 'python anal.py [targetDir]'
       return
 
-   bdir = sys.argv[1]
+   tdir = sys.argv[1]
 
-   tdir = os.path.join(bdir,'devel')
-   odir = os.path.join(bdir,'anal')
+   odir = os.path.join(tdir,'anal')
    if not os.path.exists(odir): os.makedirs(odir)
 
    perfs = ddict(list); cms = []
