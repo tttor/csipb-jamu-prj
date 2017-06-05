@@ -38,14 +38,19 @@ def main():
     clusterDir = sys.argv[2]; assert clusterDir[-1]=='/',"should be ended with '/'"
     baseOutDir = sys.argv[3]
 
+    clfParam = None
+    method = cfg['method']
+    if method=='esvm':
+        from esvm_config import config as clfParam
+    elif method=='psvm':
+        from psvm_config import config as clfParam
+    else:
+        print 'FATAL: unknown method'
+        return
+
     outDir = os.path.join(baseOutDir,'devel-'+os.path.basename(baseOutDir))
     if not(os.path.isdir(baseOutDir)): os.makedirs(baseOutDir)
     if not(os.path.isdir(outDir)): os.makedirs(outDir)
-
-    method = cfg['method']['name']
-    if method not in ['esvm','psvm']:
-        print 'FATAL: unknown method'
-        return
 
     ## Load data ###################################################################################
     dataLog = {}; dataLogFpath = os.path.join(outDir,'data_log.json')
@@ -267,18 +272,12 @@ def main():
     ## tuning
     clf = None
     if method=='esvm':
-        clf  = eSVM(cfg['method']['kernel'],cfg['method']['mode'],
-                    cfg['method']['maxTrainingSamplesPerBatch'],
-                    cfg['method']['maxTestingSamplesPerBatch'],
-                    cfg['method']['bootstrap'],
-                    simMat=None)
+        clf  = eSVM(simMat=None)
     elif method=='psvm':
-        clf = svm.SVC(kernel=cfg['method']['kernel'],probability=True)
+        clf = svm.SVC(kernel=clfParam['kernel'],probability=True)
 
     ## training
-    msg2  = msg+': fitting nTr= '+str(len(ytr))
-    msg2 += ' with maxTrainingSamplesPerBatch= '+str(cfg['method']['maxTrainingSamplesPerBatch'])
-    print msg2
+    print msg+': fitting nTr= '+str(len(ytr))
 
     if method=='esvm':
         clf.fit(xtr,ytr)
@@ -294,9 +293,7 @@ def main():
         devLog['labels'] = clf.classes_.tolist()
 
     ## testing
-    msg2  = msg+': predicting nTe= '+str(len(yte))
-    msg2 += ' with maxTestingSamplesPerBatch= '+str(cfg['method']['maxTestingSamplesPerBatch'])
-    print msg2
+    print msg+': predicting nTe= '+str(len(yte))
 
     if method=='esvm':
         ypred,yscore = clf.predict(xte)
