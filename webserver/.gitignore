@@ -57,6 +57,9 @@ npm-debug.log
 /compiled/
 dll/
 
+# Node Files on API #
+/api_upload/node_modules/
+
 # Doc #
 /doc/
 
