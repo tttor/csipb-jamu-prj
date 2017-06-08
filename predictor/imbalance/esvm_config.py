@@ -4,6 +4,6 @@ config = dict(name='esvm',
               kernel='rbf',
               mode='soft',
               bootstrap=True,
-              maxTestingSamplesPerBatch=100,
-              maxTrainingSamplesPerBatch=10000,
-              maxNumberOfTrainingBatches=1)
+              maxTestingSamplesPerBatch=1000,
+              maxTrainingSamplesPerBatch=3000,
+              maxNumberOfTrainingBatches=0)
