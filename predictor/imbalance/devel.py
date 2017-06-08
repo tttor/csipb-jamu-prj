@@ -17,6 +17,7 @@ from sklearn.feature_selection import VarianceThreshold
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import SelectPercentile
 from sklearn.feature_selection import chi2
+from sklearn.decomposition import PCA
 from ensembled_svm import EnsembledSVM as eSVM
 from imblearn.over_sampling import SMOTE
 
@@ -36,7 +37,7 @@ def main():
 
     cloneID = sys.argv[1]
     clusterDir = sys.argv[2]; assert clusterDir[-1]=='/',"should be ended with '/'"
-    baseOutDir = sys.argv[3]
+    baseOutDir = sys.argv[3]; assert baseOutDir[-1]!='/',"should NOT be ended with '/'"
 
     clfParam = None
     method = cfg['method']
@@ -228,8 +229,20 @@ def main():
         # xdevm = list( fu.map(mapToIdx,xdevfr) )
 
         ##
-        print 'update xdev,ydev... '+str(len(xdevfr))
-        xdev = xdevfr[:]
+        print 'dim-reduction pca...'+str(len(xdevfr))+','+str(len(xdevfr[0]))
+        if len(xdevfr)>len(xdevfr[0]):
+            nComponents = 'mle'
+        else:
+            nComponents = 0.95
+        dataLog['nComponents'] = nComponents
+
+        pca = PCA(n_components=nComponents,svd_solver='full')
+        xdevfr2 = pca.fit_transform(np.asarray(xdevfr))
+        dataLog['xdevfr2.shape'] = xdevfr2.shape
+
+        ##
+        print 'update xdev,ydev... '+str(xdevfr2.shape)
+        xdev = xdevfr2.tolist()
         ydev = ydevr[:]
 
         print 'writing updated xdev,ydev...'
