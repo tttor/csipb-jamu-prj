@@ -65,6 +65,8 @@ def main():
         with h5py.File(xyDevFpath,'r') as f:
             xdev = f['xdev'][:]
             ydev = f['ydev'][:]
+            xrel = f['xrel'][:]
+            yrel = f['yrel'][:]
 
         with open(dataLogFpath,'r') as f:
             dataLog = yaml.load(f)
@@ -189,7 +191,6 @@ def main():
         with open(dataLogFpath,'w') as f:
             json.dump(dataLog,f,indent=2,sort_keys=True)
 
-    return
     ## TUNE+TRAIN+TEST #############################################################################
     devLog = {}
     devSeed = util.seed(); dataLog['devSeed'] = devSeed
@@ -257,15 +258,34 @@ def main():
             ypred = clf.predict(xte)
             yscore = clf.predict_proba(xte)
             yscore = [max(i.tolist()) for i in yscore]
-    result = {'yte':yte,'ypred':ypred,'yscore':yscore}
     devLog['timeTesting'] = str(time.time()-teTic)
 
-    ##
+    ## TEST RELEASE ################################################################################
+    print msg+': predicting RELEASE n= '+str(len(yrel))
+    relTic = time.time()
+
+    if method=='esvm':
+        yrel,yrelscore = clf.predict(xrel)
+    elif method=='psvm':
+        if cfg['method']['kernel']=='precomputed':
+            assert False
+            # simMatTe = cutil.makeComProKernelMatFromSimMat(xrel,xtr,simMat)
+            # yrel = clf.predict(simMatTe)
+            # yrelscore = clf.predict_proba(simMatTe)
+        else:
+            yrel = clf.predict(xrel)
+            yrelscore = clf.predict_proba(xrel)
+            yrelscore = [max(i.tolist()) for i in yrelscore]
+    devLog['timeRelease'] = str(time.time()-relTic)
+
+    ## WRITE RESULT ################################################################################
+    result = {'yte':yte,'ypred':ypred,'yscore':yscore,'yrel':yrel,'yrelscore':yrelscore}
+
     print 'writing prediction...'
     with h5py.File(os.path.join(outDir,'result_'+tag+'.h5'),'w') as f:
         for k,v in result.iteritems():
-            dt = np.float32
-            if k in ['ytr','yte','ypred']: dt = np.int8
+            dt = np.int8
+            if 'score' in k: dt = np.float32
             f.create_dataset(k,data=v,dtype=dt)
 
     ##
@@ -274,8 +294,6 @@ def main():
     devLog['devParam'] = cfg
     with open(os.path.join(outDir,'devLog_'+tag+'.json'),'w') as f:
         json.dump(devLog,f,indent=2,sort_keys=True)
-
-    ## TEST RELEASE ################################################################################
 
 def ensembleSmote(xydev):
     xdevf,ydev = xydev
