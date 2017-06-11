@@ -41,6 +41,7 @@ def main():
       rfpath = os.path.join(tdir,'result_'+tag+'.h5')
       with h5py.File(rfpath,'r') as f:
          ytrue = f['yte'][:]; ypred = f['ypred'][:]; yscore = f['yscore'][:]
+         yrel = f['yrel'][:]; yrelscore = f['yrelscore'][:]
 
       perfs['roc_auc_score'].append( roc_auc_score(ytrue,yscore,average='macro') )
       perfs['aupr_score'].append( average_precision_score(ytrue,yscore,average='macro') )
@@ -49,6 +50,14 @@ def main():
       perfs['fbeta_score'].append( fbeta_score(ytrue,ypred,average='macro',beta=0.5) )
       perfs['matthews_corrcoef'].append( matthews_corrcoef(ytrue,ypred) )
       cms.append( confusion_matrix(ytrue,ypred,labels) )
+
+      posIdxList = [i for i in range(len(yrel)) if yrel[i]==1]
+      posScoreList = [yrelscore[i] for i in posIdxList]
+      negScoreList = [yrelscore[i] for i in range(len(yrel)) if  (i not in posIdxList)]
+      perfs['yrelPos'].append(len(posIdxList))
+      perfs['yrelNeg'].append( len(yrel)-len(posIdxList) )
+      perfs['yrelscorePos'].append( float(np.mean(posScoreList)) )
+      perfs['yrelscoreNeg'].append( float(np.mean(negScoreList)) )
 
    print 'writing perfs...'
    perfAvg = {}

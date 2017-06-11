@@ -89,6 +89,8 @@
 * http://pages.cs.wisc.edu/~jerryzhu/ssl/software.html
 * https://github.com/sslh/sslh/
 * https://github.com/tmadl/semisup-learn
+* https://github.com/jkrijthe/RSSL
+* https://cran.r-project.org/web/packages/upclass/index.html
 
 ## Benchmarking datasets for development
 * Yamanishi (2008):

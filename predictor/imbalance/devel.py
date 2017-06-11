@@ -58,22 +58,15 @@ def main():
     datasetParams = dataset.split('#')
     assert datasetParams[0]=='yamanishi'
 
-    xyDevFpath = os.path.join(baseOutDir,'_'.join(['xdev','ydev']+datasetParams)+'.h5')
-    # comSimMatFpath = os.path.join(baseOutDir,'_'.join(['comSimMat']+datasetParams)+'.h5')
-    # proSimMatFpath = os.path.join(baseOutDir,'_'.join(['proSimMat']+datasetParams)+'.h5')
-
-    if os.path.exists(xyDevFpath):# and os.path.exists(comSimMatFpath) and os.path.exists(proSimMatFpath):
+    xyDevFpath = os.path.join(baseOutDir,'_'.join(['xdev','ydev','xrel','yrel']+datasetParams)+'.h5')
+    if os.path.exists(xyDevFpath):
         print 'loading data from PREVIOUS...'
 
         with h5py.File(xyDevFpath,'r') as f:
             xdev = f['xdev'][:]
             ydev = f['ydev'][:]
-
-        # with h5py.File(comSimMatFpath,'r') as f:
-        #     comSimMat = f['comSimMat'][:]
-
-        # with h5py.File(proSimMatFpath,'r') as f:
-        #     proSimMat = f['proSimMat'][:]
+            xrel = f['xrel'][:]
+            yrel = f['yrel'][:]
 
         with open(dataLogFpath,'r') as f:
             dataLog = yaml.load(f)
@@ -97,7 +90,7 @@ def main():
             data = pickle.load(f)
 
         ##
-        print 'getting devel data...'
+        print 'getting devel and release data...'
         xraw = []; yraw = []
         for k,v in data.iteritems():
             for vv in v:
@@ -108,6 +101,10 @@ def main():
         xdev = [xraw[i] for i in devIdx]
         ydev = [yraw[i] for i in devIdx]
 
+        relIdx = [i for i in range(len(xraw)) if yraw[i]==0]
+        xrel = [xraw[i] for i in relIdx]
+        yrel = [yraw[i] for i in relIdx]
+
         dataLog['nDevel'] = len(devIdx); dataLog['nData'] = len(yraw)
         dataLog['rDevel:Data'] = dataLog['nDevel']/float(dataLog['nData'])
         dataLog['nDevel(+)'] = len( [i for i in ydev if i==1] ); assert dataLog['nDevel(+)']!=0
@@ -115,6 +112,8 @@ def main():
         dataLog['rDevel(+):Devel'] = float(dataLog['nDevel(+)'])/dataLog['nDevel']
         dataLog['rDevel(-):Devel'] = float(dataLog['nDevel(-)'])/dataLog['nDevel']
         dataLog['rDevel(+):(-)'] = float(dataLog['nDevel(+)'])/float(dataLog['nDevel(-)'])
+        dataLog['nRelease'] = len(relIdx);
+        dataLog['rRelease:Data'] = dataLog['nRelease']/float(dataLog['nData'])
 
         ##
         print 'loading com, pro feature...'
@@ -136,11 +135,14 @@ def main():
         proFeaLenOri = len(aacDict.values()[0])
 
         ##
-        print 'extract (com,pro) feature... dims: '+str(comFeaLenOri)+','+str(proFeaLenOri)+' of '+str(len(ydev))
+        msg = 'extract (com,pro) feature... dims: '+str(comFeaLenOri)+','+str(proFeaLenOri)
+        msg += ' of '+str(len(ydev))+' and '+str(len(yrel))
+        print msg
 
         sh.setConst(krDict=krDict)
         sh.setConst(aacDict=aacDict)
         xdevf = list( fu.map(cutil.extractComProFea,xdev) )
+        xrelf = list( fu.map(cutil.extractComProFea,xrel) )
 
         ##
         xyDevList = cutil.divideSamples(xdevf,ydev,cfg['smoteBatchSize'])
@@ -171,16 +173,18 @@ def main():
         dataLog['timeSMOTE'] =  str(time.time()-smoteTic)
 
         ##
-        print 'update xdev,ydev... '+str(np.asarray(xdevfr).shape)
-        xdev = xdevfr
+        print 'update xdev,ydev,xrel... '+str(np.asarray(xdevfr).shape)
+        xrel = xrelf[:]
+        xdev = xdevfr[:]
         ydev = ydevr[:]
 
-        print 'writing updated xdev,ydev...'
+        print 'writing updated xdev,ydev and xrel,yrel...'
         with h5py.File(xyDevFpath,'w') as f:
             f.create_dataset('xdev',data=xdev,dtype=np.float32)
             f.create_dataset('ydev',data=ydev,dtype=np.int8)
+            f.create_dataset('xrel',data=xrel,dtype=np.float32)
+            f.create_dataset('yrel',data=yrel,dtype=np.int8)
 
-        ##
         print 'writing dataLog...'
         dataLog['nCom'] = len(krDict)
         dataLog['nPro'] = len(aacDict)
@@ -254,15 +258,34 @@ def main():
             ypred = clf.predict(xte)
             yscore = clf.predict_proba(xte)
             yscore = [max(i.tolist()) for i in yscore]
-    result = {'yte':yte,'ypred':ypred,'yscore':yscore}
     devLog['timeTesting'] = str(time.time()-teTic)
 
-    ##
+    ## TEST RELEASE ################################################################################
+    print msg+': predicting RELEASE n= '+str(len(yrel))
+    relTic = time.time()
+
+    if method=='esvm':
+        yrel,yrelscore = clf.predict(xrel)
+    elif method=='psvm':
+        if cfg['method']['kernel']=='precomputed':
+            assert False
+            # simMatTe = cutil.makeComProKernelMatFromSimMat(xrel,xtr,simMat)
+            # yrel = clf.predict(simMatTe)
+            # yrelscore = clf.predict_proba(simMatTe)
+        else:
+            yrel = clf.predict(xrel)
+            yrelscore = clf.predict_proba(xrel)
+            yrelscore = [max(i.tolist()) for i in yrelscore]
+    devLog['timeRelease'] = str(time.time()-relTic)
+
+    ## WRITE RESULT ################################################################################
+    result = {'yte':yte,'ypred':ypred,'yscore':yscore,'yrel':yrel,'yrelscore':yrelscore}
+
     print 'writing prediction...'
     with h5py.File(os.path.join(outDir,'result_'+tag+'.h5'),'w') as f:
         for k,v in result.iteritems():
-            dt = np.float32
-            if k in ['ytr','yte','ypred']: dt = np.int8
+            dt = np.int8
+            if 'score' in k: dt = np.float32
             f.create_dataset(k,data=v,dtype=dt)
 
     ##
