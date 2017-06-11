@@ -58,22 +58,13 @@ def main():
     datasetParams = dataset.split('#')
     assert datasetParams[0]=='yamanishi'
 
-    xyDevFpath = os.path.join(baseOutDir,'_'.join(['xdev','ydev']+datasetParams)+'.h5')
-    # comSimMatFpath = os.path.join(baseOutDir,'_'.join(['comSimMat']+datasetParams)+'.h5')
-    # proSimMatFpath = os.path.join(baseOutDir,'_'.join(['proSimMat']+datasetParams)+'.h5')
-
-    if os.path.exists(xyDevFpath):# and os.path.exists(comSimMatFpath) and os.path.exists(proSimMatFpath):
+    xyDevFpath = os.path.join(baseOutDir,'_'.join(['xdev','ydev','xrel','yrel']+datasetParams)+'.h5')
+    if os.path.exists(xyDevFpath):
         print 'loading data from PREVIOUS...'
 
         with h5py.File(xyDevFpath,'r') as f:
             xdev = f['xdev'][:]
             ydev = f['ydev'][:]
-
-        # with h5py.File(comSimMatFpath,'r') as f:
-        #     comSimMat = f['comSimMat'][:]
-
-        # with h5py.File(proSimMatFpath,'r') as f:
-        #     proSimMat = f['proSimMat'][:]
 
         with open(dataLogFpath,'r') as f:
             dataLog = yaml.load(f)
@@ -97,7 +88,7 @@ def main():
             data = pickle.load(f)
 
         ##
-        print 'getting devel data...'
+        print 'getting devel and release data...'
         xraw = []; yraw = []
         for k,v in data.iteritems():
             for vv in v:
@@ -108,6 +99,10 @@ def main():
         xdev = [xraw[i] for i in devIdx]
         ydev = [yraw[i] for i in devIdx]
 
+        relIdx = [i for i in range(len(xraw)) if yraw[i]==0]
+        xrel = [xraw[i] for i in relIdx]
+        yrel = [yraw[i] for i in relIdx]
+
         dataLog['nDevel'] = len(devIdx); dataLog['nData'] = len(yraw)
         dataLog['rDevel:Data'] = dataLog['nDevel']/float(dataLog['nData'])
         dataLog['nDevel(+)'] = len( [i for i in ydev if i==1] ); assert dataLog['nDevel(+)']!=0
@@ -115,6 +110,8 @@ def main():
         dataLog['rDevel(+):Devel'] = float(dataLog['nDevel(+)'])/dataLog['nDevel']
         dataLog['rDevel(-):Devel'] = float(dataLog['nDevel(-)'])/dataLog['nDevel']
         dataLog['rDevel(+):(-)'] = float(dataLog['nDevel(+)'])/float(dataLog['nDevel(-)'])
+        dataLog['nRelease'] = len(relIdx);
+        dataLog['rRelease:Data'] = dataLog['nRelease']/float(dataLog['nData'])
 
         ##
         print 'loading com, pro feature...'
@@ -136,11 +133,14 @@ def main():
         proFeaLenOri = len(aacDict.values()[0])
 
         ##
-        print 'extract (com,pro) feature... dims: '+str(comFeaLenOri)+','+str(proFeaLenOri)+' of '+str(len(ydev))
+        msg = 'extract (com,pro) feature... dims: '+str(comFeaLenOri)+','+str(proFeaLenOri)
+        msg += ' of '+str(len(ydev))+' and '+str(len(yrel))
+        print msg
 
         sh.setConst(krDict=krDict)
         sh.setConst(aacDict=aacDict)
         xdevf = list( fu.map(cutil.extractComProFea,xdev) )
+        xrelf = list( fu.map(cutil.extractComProFea,xrel) )
 
         ##
         xyDevList = cutil.divideSamples(xdevf,ydev,cfg['smoteBatchSize'])
@@ -171,22 +171,25 @@ def main():
         dataLog['timeSMOTE'] =  str(time.time()-smoteTic)
 
         ##
-        print 'update xdev,ydev... '+str(np.asarray(xdevfr).shape)
-        xdev = xdevfr
+        print 'update xdev,ydev,xrel... '+str(np.asarray(xdevfr).shape)
+        xrel = xrelf[:]
+        xdev = xdevfr[:]
         ydev = ydevr[:]
 
-        print 'writing updated xdev,ydev...'
+        print 'writing updated xdev,ydev and xrel,yrel...'
         with h5py.File(xyDevFpath,'w') as f:
             f.create_dataset('xdev',data=xdev,dtype=np.float32)
             f.create_dataset('ydev',data=ydev,dtype=np.int8)
+            f.create_dataset('xrel',data=xrel,dtype=np.float32)
+            f.create_dataset('yrel',data=yrel,dtype=np.int8)
 
-        ##
         print 'writing dataLog...'
         dataLog['nCom'] = len(krDict)
         dataLog['nPro'] = len(aacDict)
         with open(dataLogFpath,'w') as f:
             json.dump(dataLog,f,indent=2,sort_keys=True)
 
+    return
     ## TUNE+TRAIN+TEST #############################################################################
     devLog = {}
     devSeed = util.seed(); dataLog['devSeed'] = devSeed
@@ -271,6 +274,8 @@ def main():
     devLog['devParam'] = cfg
     with open(os.path.join(outDir,'devLog_'+tag+'.json'),'w') as f:
         json.dump(devLog,f,indent=2,sort_keys=True)
+
+    ## TEST RELEASE ################################################################################
 
 def ensembleSmote(xydev):
     xdevf,ydev = xydev
