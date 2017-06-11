@@ -38,6 +38,12 @@ class EnsembledSVM:
     def nSVM(self):
         return len(self._svmList)
 
+    def xtrDimAllBatches(self):
+        dims = []
+        for _,xtr,_ in self._svmList:
+            dims.append( np.asarray(xtr).shape )
+        return dims
+
     ## Fit #########################################################################################
     def fit(self,ixtr,iytr):
         xyTrList = cutil.divideSamples(ixtr,iytr,self._maxTrainingSamplesPerBatch)
@@ -63,8 +69,9 @@ class EnsembledSVM:
         else:
             assert False,'FATAL: unknown dimred'
 
-        dimred.fit(xtr)
-        xtr = dimred.transform(np.asarray(xtr))
+        if dimred is not None:
+            dimred.fit(xtr)
+            xtr = dimred.transform(np.asarray(xtr))
 
         ## tuning
         clf = svm.SVC(kernel=self._kernel,probability=True)

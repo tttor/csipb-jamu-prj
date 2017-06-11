@@ -227,6 +227,7 @@ def main():
         clf.fit(xtr,ytr)
         devLog['labels'] = clf.labels()
         devLog['nSVM'] = clf.nSVM()
+        devLog['xtrDimAllBatches'] = clf.xtrDimAllBatches()
     elif method=='psvm':
         if cfg['method']['kernel']=='precomputed':
             assert False
