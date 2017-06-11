@@ -4,6 +4,10 @@ config = dict(name='esvm',
               kernel='rbf',
               mode='soft',
               bootstrap=True,
-              maxTestingSamplesPerBatch=100,
-              maxTrainingSamplesPerBatch=10000,
-              maxNumberOfTrainingBatches=1)
+              dimred='pca',
+              dimredNComponents=0.85,
+              dimredSolver='full',
+              dimredKernel='rbf', # iff dimred=='kpca'
+              maxTestingSamplesPerBatch=1000,
+              maxTrainingSamplesPerBatch=3000,
+              maxNumberOfTrainingBatches=0)

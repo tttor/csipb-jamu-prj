@@ -17,7 +17,6 @@ from sklearn.feature_selection import VarianceThreshold
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import SelectPercentile
 from sklearn.feature_selection import chi2
-from sklearn.decomposition import PCA
 from ensembled_svm import EnsembledSVM as eSVM
 from imblearn.over_sampling import SMOTE
 
@@ -143,30 +142,6 @@ def main():
         sh.setConst(aacDict=aacDict)
         xdevf = list( fu.map(cutil.extractComProFea,xdev) )
 
-        # ##
-        # print 'reduce feature dim of com... '+str(comFeaLenOri)
-
-        # # removed any column, which has a probability > th of containing a zero.
-        # th = 0.9
-        # krList = [i[0:comFeaLenOri] for i in xdevf]
-        # vt = VarianceThreshold(threshold=(th * (1 - th)))
-        # krList = vt.fit_transform( np.asarray(krList)).tolist()
-        # comFeaLen = len(krList[0])
-        # dataLog['comFeaLenOri'] = comFeaLenOri; dataLog['comFeaLen'] = comFeaLen
-
-        # ##
-        # print 'reduce feature dim of pro... '+str(proFeaLenOri)
-
-        # aacList = [i[comFeaLenOri:] for i in xdevf]
-        # aacList = SelectPercentile(chi2, percentile=100).fit_transform(np.asarray(aacList),ydev)
-        # aacList = aacList.tolist()
-        # proFeaLen = len(aacList[0])
-        # dataLog['proFeaLenOri'] = proFeaLenOri; dataLog['proFeaLen'] = proFeaLen
-
-        # ##
-        # print 'update xdevf after dim-reduction... '+str(comFeaLen)+','+str(proFeaLen)
-        # xdevf = [krList[i]+aacList[i] for i in range(len(xdevf))]
-
         ##
         xyDevList = cutil.divideSamples(xdevf,ydev,cfg['smoteBatchSize'])
         if cfg['maxNumberOfSmoteBatch'] != 0:
@@ -195,54 +170,9 @@ def main():
         dataLog['rDevelResampled(+):(-)'] = dataLog['nDevelResampled(+)']/float(dataLog['nDevelResampled(-)'])
         dataLog['timeSMOTE'] =  str(time.time()-smoteTic)
 
-        # ##
-        # print 'getting sets of resampled com,pro...'
-        # assert (comFeaLen+proFeaLen) == len(xdevfr[0])
-
-        # comFeaList = [tuple(i[0:comFeaLen]) for i in xdevfr]
-        # comFeaList = list(set(comFeaList))
-        # fea2ComMap = dict( zip(comFeaList,range(len(comFeaList))) )
-
-        # proFeaList = [tuple(i[comFeaLen:]) for i in xdevfr]
-        # proFeaList = list(set(proFeaList))
-        # fea2ProMap = dict( zip(proFeaList,range(len(proFeaList))) )
-
-        # dataLog['nComResampled'] = len(comFeaList)
-        # dataLog['nProResampled'] = len(proFeaList)
-
-        # print 'compute kernel of com... '+str(len(comFeaList))
-        # comSimMat = rbf_kernel(comFeaList,comFeaList)
-        # with h5py.File(comSimMatFpath,'w') as f:
-        #     f.create_dataset('comSimMat',data=comSimMat,dtype=np.float32)
-
-        # print 'compute kernel of pro... '+str(len(proFeaList))
-        # proSimMat = rbf_kernel(proFeaList,proFeaList)
-        # with h5py.File(proSimMatFpath,'w') as f:
-        #     f.create_dataset('proSimMat',data=proSimMat,dtype=np.float32)
-
-        # ##
-        # print 'mapping xdev to newIdx... '+str(len(xdevfr))
-
-        # sh.setConst(comFeaLen=comFeaLen)
-        # sh.setConst(fea2ComMap=fea2ComMap)
-        # sh.setConst(fea2ProMap=fea2ProMap)
-        # xdevm = list( fu.map(mapToIdx,xdevfr) )
-
         ##
-        print 'dim-reduction pca...'+str(len(xdevfr))+','+str(len(xdevfr[0]))
-        if len(xdevfr)>len(xdevfr[0]):
-            nComponents = 'mle'
-        else:
-            nComponents = 0.95
-        dataLog['nComponents'] = nComponents
-
-        pca = PCA(n_components=nComponents,svd_solver='full')
-        xdevfr2 = pca.fit_transform(np.asarray(xdevfr))
-        dataLog['xdevfr2.shape'] = xdevfr2.shape
-
-        ##
-        print 'update xdev,ydev... '+str(xdevfr2.shape)
-        xdev = xdevfr2.tolist()
+        print 'update xdev,ydev... '+str(np.asarray(xdevfr).shape)
+        xdev = xdevfr
         ydev = ydevr[:]
 
         print 'writing updated xdev,ydev...'
@@ -252,10 +182,8 @@ def main():
 
         ##
         print 'writing dataLog...'
-
         dataLog['nCom'] = len(krDict)
         dataLog['nPro'] = len(aacDict)
-
         with open(dataLogFpath,'w') as f:
             json.dump(dataLog,f,indent=2,sort_keys=True)
 
@@ -264,7 +192,7 @@ def main():
     devSeed = util.seed(); dataLog['devSeed'] = devSeed
     tag = '_'.join([method+'#'+cloneID,dataset,util.tag()])
 
-    ##
+    ## split devel dataset
     msg = ' '.join( ['devel',dataset,cloneID])
     xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
                           random_state=devSeed,stratify=ydev)
@@ -299,6 +227,7 @@ def main():
         clf.fit(xtr,ytr)
         devLog['labels'] = clf.labels()
         devLog['nSVM'] = clf.nSVM()
+        devLog['xtrDimAllBatches'] = clf.xtrDimAllBatches()
     elif method=='psvm':
         if cfg['method']['kernel']=='precomputed':
             assert False
@@ -348,13 +277,6 @@ def ensembleSmote(xydev):
     sm = SMOTE(kind='svm',random_state=sh.getConst('smoteSeed'))
     xdevfr,ydevr = sm.fit_sample(xdevf,ydev)
     return (xdevfr,ydevr)
-
-def mapToIdx(x):
-    comFea = tuple( x[0:sh.getConst('comFeaLen')] )
-    proFea = tuple( x[sh.getConst('comFeaLen'):] )
-    comIdx = sh.getConst('fea2ComMap')[comFea]
-    proIdx = sh.getConst('fea2ProMap')[proFea]
-    return (comIdx,proIdx)
 
 if __name__ == '__main__':
     tic = time.time()

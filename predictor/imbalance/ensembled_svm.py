@@ -6,6 +6,7 @@ import json
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import KFold
+from sklearn.decomposition import PCA, KernelPCA
 from sklearn import svm
 from scoop import futures as fu
 
@@ -37,6 +38,12 @@ class EnsembledSVM:
     def nSVM(self):
         return len(self._svmList)
 
+    def xtrDimAllBatches(self):
+        dims = []
+        for _,xtr,_ in self._svmList:
+            dims.append( np.asarray(xtr).shape )
+        return dims
+
     ## Fit #########################################################################################
     def fit(self,ixtr,iytr):
         xyTrList = cutil.divideSamples(ixtr,iytr,self._maxTrainingSamplesPerBatch)
@@ -52,6 +59,20 @@ class EnsembledSVM:
         for svm in self._svmList: assert svm[0].classes_.tolist()==self._labels
 
     def _fit(self,xtr,ytr):
+        ## dimred
+        if cfg['dimred']=='pca':
+            dimred = PCA(n_components=cfg['dimredNComponents'],svd_solver=cfg['dimredSolver'])
+        elif cfg['dimred']=='kpca':
+            dimred = KernelPCA(n_components=cfg['dimredNComponents'],kernel=cfg['kernel'],n_jobs=-1)
+        elif clf['dimred'=='none']:
+            dimred = None
+        else:
+            assert False,'FATAL: unknown dimred'
+
+        if dimred is not None:
+            dimred.fit(xtr)
+            xtr = dimred.transform(np.asarray(xtr))
+
         ## tuning
         clf = svm.SVC(kernel=self._kernel,probability=True)
 
@@ -63,7 +84,7 @@ class EnsembledSVM:
         else:
             clf.fit(xtr,ytr)
 
-        return (clf,xtr)
+        return (clf,xtr,dimred)
 
     ## Predict #####################################################################################
     def predict(self,ixte):
@@ -93,7 +114,8 @@ class EnsembledSVM:
         return ypred3
 
     def _predict2(self,iclf,xte):
-        clf,xtr = iclf
+        clf,xtr,dimred = iclf
+        xte = dimred.transform(np.asarray(xte))
 
         if self._kernel=='precomputed':
             assert self._simMat is not None
