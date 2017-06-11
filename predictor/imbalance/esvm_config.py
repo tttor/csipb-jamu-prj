@@ -5,7 +5,7 @@ config = dict(name='esvm',
               mode='soft',
               bootstrap=True,
               dimred='pca',
-              dimredNComponents=0.85,
+              dimredNComponents=0.90,
               dimredSolver='full',
               dimredKernel='rbf', # iff dimred=='kpca'
               maxTestingSamplesPerBatch=1000,
