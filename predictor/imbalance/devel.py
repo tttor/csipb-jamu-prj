@@ -192,7 +192,7 @@ def main():
     devSeed = util.seed(); dataLog['devSeed'] = devSeed
     tag = '_'.join([method+'#'+cloneID,dataset,util.tag()])
 
-    ##
+    ## split devel dataset
     msg = ' '.join( ['devel',dataset,cloneID])
     xtr,xte,ytr,yte = tts(xdev,ydev,test_size=cfg['testSize'],
                           random_state=devSeed,stratify=ydev)
@@ -276,13 +276,6 @@ def ensembleSmote(xydev):
     sm = SMOTE(kind='svm',random_state=sh.getConst('smoteSeed'))
     xdevfr,ydevr = sm.fit_sample(xdevf,ydev)
     return (xdevfr,ydevr)
-
-def mapToIdx(x):
-    comFea = tuple( x[0:sh.getConst('comFeaLen')] )
-    proFea = tuple( x[sh.getConst('comFeaLen'):] )
-    comIdx = sh.getConst('fea2ComMap')[comFea]
-    proIdx = sh.getConst('fea2ProMap')[proFea]
-    return (comIdx,proIdx)
 
 if __name__ == '__main__':
     tic = time.time()
