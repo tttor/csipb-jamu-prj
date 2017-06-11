@@ -142,30 +142,6 @@ def main():
         sh.setConst(aacDict=aacDict)
         xdevf = list( fu.map(cutil.extractComProFea,xdev) )
 
-        # ##
-        # print 'reduce feature dim of com... '+str(comFeaLenOri)
-
-        # # removed any column, which has a probability > th of containing a zero.
-        # th = 0.9
-        # krList = [i[0:comFeaLenOri] for i in xdevf]
-        # vt = VarianceThreshold(threshold=(th * (1 - th)))
-        # krList = vt.fit_transform( np.asarray(krList)).tolist()
-        # comFeaLen = len(krList[0])
-        # dataLog['comFeaLenOri'] = comFeaLenOri; dataLog['comFeaLen'] = comFeaLen
-
-        # ##
-        # print 'reduce feature dim of pro... '+str(proFeaLenOri)
-
-        # aacList = [i[comFeaLenOri:] for i in xdevf]
-        # aacList = SelectPercentile(chi2, percentile=100).fit_transform(np.asarray(aacList),ydev)
-        # aacList = aacList.tolist()
-        # proFeaLen = len(aacList[0])
-        # dataLog['proFeaLenOri'] = proFeaLenOri; dataLog['proFeaLen'] = proFeaLen
-
-        # ##
-        # print 'update xdevf after dim-reduction... '+str(comFeaLen)+','+str(proFeaLen)
-        # xdevf = [krList[i]+aacList[i] for i in range(len(xdevf))]
-
         ##
         xyDevList = cutil.divideSamples(xdevf,ydev,cfg['smoteBatchSize'])
         if cfg['maxNumberOfSmoteBatch'] != 0:
