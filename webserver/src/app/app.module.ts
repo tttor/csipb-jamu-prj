@@ -30,7 +30,7 @@ import { DownloadComponent } from './download';
 import { UploadComponent } from './upload';
 import { HelpComponent } from './help';
 import { DisclaimerComponent } from './disclaimer';
-import { V1Component } from './v1';
+import { IjahV1Component } from './ijahv1';
 import { ContactComponent } from './contact';
 import { AboutComponent } from './about';
 import { TestComponent } from './test';
@@ -59,7 +59,7 @@ type StoreType = {
     DownloadComponent,
     UploadComponent,
     DisclaimerComponent,
-    V1Component,
+    IjahV1Component,
     ContactComponent,
     AboutComponent,
     TestComponent

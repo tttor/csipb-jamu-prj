@@ -4,7 +4,7 @@ import { DownloadComponent } from './download';
 import { UploadComponent } from './upload';
 import { HelpComponent } from './help';
 import { DisclaimerComponent } from './disclaimer';
-import { V1Component } from './v1';
+import { IjahV1Component } from './ijahv1';
 import { ContactComponent } from './contact';
 import { AboutComponent } from './about';
 import { TestComponent } from './test';
@@ -17,7 +17,7 @@ export const ROUTES: Routes = [
   { path: 'upload', component: UploadComponent },
   { path: 'help-faq', component: HelpComponent },
   { path: 'disclaimer', component: DisclaimerComponent },
-  { path: 'ijahv1', component: V1Component },
+  { path: 'ijahv1', component: IjahV1Component },
   { path: 'contact', component: ContactComponent },
   { path: 'about', component: AboutComponent },
   { path: 'test', component: TestComponent },
