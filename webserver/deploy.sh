@@ -95,6 +95,7 @@ if [ ${12} -ne 0 ]; then
   echo "### DOCKER ############################################################"
   echo "deploying docker files ..."
   scp ../docker/sh/start.sh ../docker/sh/stop.sh $SERVER:/home/ijah/
+  scp ../docker/dockerfile/nodeapiDockerfile ../docker/sh/node_api_start_stop.sh $SERVER:home/ijah/node_api_docker/
   # scp ../docker/dockerfile/webDockerfile $SERVER:/home/ijah/ijah/
   # scp ../docker/dockerfile/predictorDockerfile $SERVER:/home/ijah/ijah-predictor
 fi
