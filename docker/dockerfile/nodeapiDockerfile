@@ -1,0 +1,19 @@
+FROM node:latest
+
+# Create app directory
+RUN mkdir -p /var/www/html/api_upload
+RUN mkdir -p /var/www/html/api_upload/uploads
+WORKDIR /var/www/html/api_upload
+
+# Bundle app source
+COPY ./api_upload/* /var/www/html/api_upload/
+
+RUN npm install
+RUN npm install gulp -g
+RUN npm i lite-server -g
+
+#
+EXPOSE 9001
+
+#
+CMD [ "gulp" ]
