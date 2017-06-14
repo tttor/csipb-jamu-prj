@@ -6,7 +6,7 @@ import { FileUploader } from 'ng2-file-upload';
 
 // const URL = 'https://evening-anchorage-3159.herokuapp.com/api/';
 // const URL = 'http://localhost/ijah-api/';
-const uploadURL = 'http://localhost:9001/api_upload/upload';
+const uploadURL = 'http://ijah.apps.cs.ipb.ac.id/api-node/upload';
 
 @Component({
   selector: 'upload',
