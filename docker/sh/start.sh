@@ -61,3 +61,7 @@ serverPortHi=6050 # must >= wrt biggest server port
 LB=/ijah-predictor/predictor/server/load_balancer.py
 
 docker run --restart=always -d --name "ijah_loadbalancer_daemon" -p $phpApiPort:$phpApiPort -v /home/ijah/ijah-predictor/python:/ijah-predictor ijahpredictor python -u $LB $phpApiHost $phpApiPort $serverHost $serverPortLo $serverPortHi
+
+#################################################################################
+
+. ./node_api_docker/node_api_start_stop.sh 1

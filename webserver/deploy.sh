@@ -59,6 +59,7 @@ if [ $6 -ne 0 ]; then
   if [ "$dbLinkSet" -ne 0 ]; then
     echo "deploying APIs ..."
     scp -r api/* $SERVER:$WEB_DIR/api
+    scp -r api_upload/* $SERVER:/home/ijah/node_api_docker/api_upload/
   fi
 fi
 
@@ -95,6 +96,7 @@ if [ ${12} -ne 0 ]; then
   echo "### DOCKER ############################################################"
   echo "deploying docker files ..."
   scp ../docker/sh/start.sh ../docker/sh/stop.sh $SERVER:/home/ijah/
+  scp ../docker/dockerfile/nodeapiDockerfile ../docker/sh/node_api_start_stop.sh ../docker/sh/node_api_build.sh $SERVER:/home/ijah/node_api_docker/
   # scp ../docker/dockerfile/webDockerfile $SERVER:/home/ijah/ijah/
   # scp ../docker/dockerfile/predictorDockerfile $SERVER:/home/ijah/ijah-predictor
 fi

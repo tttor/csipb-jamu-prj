@@ -24,7 +24,7 @@ app.listen('9001', function(){
   console.log('running on 9001...');
 });
 
-app.get('/api_upload/', function (req, res) {
+app.get('/api-node/', function (req, res) {
   res.send('Greeting from Ijah Uploader API :)');
 });
 
@@ -66,7 +66,7 @@ var upload = multer({ //multer settings
                    }).single('file');
 
 /** API path that will upload the files */
-app.post('/api_upload/upload', function(req, res) {
+app.post('/api-node/upload', function(req, res) {
   upload(req,res,function(err){
   console.log(req.file);
     if(err){

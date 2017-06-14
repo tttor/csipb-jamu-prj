@@ -17,3 +17,5 @@ docker rm   ijah_predictor_0_daemon
 # docker rm   ijah_predictor_2_daemon
 # docker stop ijah_predictor_3_daemon
 # docker rm   ijah_predictor_3_daemon
+
+. ./node_api_docker/node_api_start_stop.sh 0
