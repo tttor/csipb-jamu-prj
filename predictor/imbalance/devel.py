@@ -175,7 +175,7 @@ def main():
 
         ##
         print 'update xdev,ydev,xrel... '+str(np.asarray(xdevfr).shape)
-        xrelraw = xrel[:]
+        xrelraw = xrel[:] # raw: feature is NOT extracted
         xrel = xrelf[:]
         xdev = xdevfr[:]
         ydev = ydevr[:]
@@ -187,9 +187,6 @@ def main():
             f.create_dataset('xrel',data=xrel,dtype=np.float32)
             f.create_dataset('yrel',data=yrel,dtype=np.int8)
             f.create_dataset('xrelraw',data=xrelraw)
-
-        with open('test.json','w') as f:
-            json.dump(xrelraw,f,indent=2,sort_keys=True)
 
         print 'writing dataLog...'
         dataLog['nCom'] = len(krDict)
