@@ -20,7 +20,7 @@ from sklearn.metrics import matthews_corrcoef
 def main():
    if len(sys.argv)!=2:
       print 'USAGE:'
-      print 'python anal.py [targetDir]'
+      print 'python anal.py [targetDevelDir]'
       return
 
    tdir = sys.argv[1]
@@ -35,13 +35,15 @@ def main():
    with open(os.path.join(tdir,'devLog_'+tags[0]+'.json'),'r') as f:
       labels = yaml.load(f)['labels']
 
+   relDict = ddict(list)
+   delim = '__'
    for i,tag in enumerate(tags):
       print 'anal on '+tag+' '+str(i+1)+'/'+str(len(tags))
 
       rfpath = os.path.join(tdir,'result_'+tag+'.h5')
       with h5py.File(rfpath,'r') as f:
          ytrue = f['yte'][:]; ypred = f['ypred'][:]; yscore = f['yscore'][:]
-         yrel = f['yrel'][:]; yrelscore = f['yrelscore'][:]
+         yrel = f['yrel'][:]; yrelscore = f['yrelscore'][:]; xrelraw = f['xrelraw'][:]
 
       perfs['roc_auc_score'].append( roc_auc_score(ytrue,yscore,average='macro') )
       perfs['aupr_score'].append( average_precision_score(ytrue,yscore,average='macro') )
@@ -51,23 +53,72 @@ def main():
       perfs['matthews_corrcoef'].append( matthews_corrcoef(ytrue,ypred) )
       cms.append( confusion_matrix(ytrue,ypred,labels) )
 
-      posIdxList = [i for i in range(len(yrel)) if yrel[i]==1]
-      posScoreList = [yrelscore[i] for i in posIdxList]
-      negScoreList = [yrelscore[i] for i in range(len(yrel)) if  (i not in posIdxList)]
-      perfs['yrelPos'].append(len(posIdxList))
-      perfs['yrelNeg'].append( len(yrel)-len(posIdxList) )
-      perfs['yrelscorePos'].append( float(np.mean(posScoreList)) )
-      perfs['yrelscoreNeg'].append( float(np.mean(negScoreList)) )
+      for i,ii in enumerate(xrelraw):
+         relDict[delim.join(ii)].append( str(yrel[i])+delim+str(yrelscore[i]) )
 
    print 'writing perfs...'
    perfAvg = {}
-   for m,v in perfs.iteritems(): perfAvg[m+'_avg'] = ( np.mean(v),np.std(v) )
+   for m,v in perfs.iteritems():
+      perfAvg[m+'_avg'] = ( np.mean(v),np.std(v) )
    with open(os.path.join(odir,'perfAvg.json'),'w') as f:
       json.dump(perfAvg,f,indent=2,sort_keys=True)
 
    perfs['tags'] = tags
    with open(os.path.join(odir,'perfs.json'),'w') as f:
       json.dump(perfs,f,indent=2,sort_keys=True)
+
+   print 'writing release...'
+   relPosProbs = []; relNegProbs = []
+   for k,v in relDict.iteritems():
+      labels = [int(i.split(delim)[0]) for i in v]
+      probs = [float(i.split(delim)[1]) for i in v]
+
+      maxProb = max(probs)
+      maxProbLabel = labels[ probs.index(maxProb) ]
+
+      if maxProbLabel==1:
+         vpos = (k,maxProb)
+         vneg = (k,1.0-maxProb)
+      else:
+         vneg = (k,maxProb)
+         vpos = (k,1.0-maxProb)
+      relPosProbs.append(vpos)
+      relNegProbs.append(vneg)
+
+   with open(os.path.join(odir,'release.json'),'w') as f:
+      json.dump(relDict,f,indent=2,sort_keys=True)
+   with open(os.path.join(odir,'releaseMaxProbPos.json'),'w') as f:
+      json.dump(relPosProbs,f,indent=2,sort_keys=True)
+   with open(os.path.join(odir,'releaseMaxProbNeg.json'),'w') as f:
+      json.dump(relNegProbs,f,indent=2,sort_keys=True)
+
+   def plotHist(vals,normalized,tag):
+      histRange = (0.0,1.0); histInc = 0.05
+      histBins = np.arange(histRange[0],histRange[1]+histInc,histInc)
+      weights = np.ones_like(vals)/float(len(vals))
+
+      fig = plt.figure()
+      plt.xlabel('probability')
+      plt.xticks(np.arange(0.0,1.0+0.1,0.1))
+      fname = tag
+      if normalized:
+         plt.hist(vals,weights=weights,normed=False,
+                  bins=histBins,range=histRange)
+         plt.ylabel('#data (normalized)')
+         plt.yticks(np.arange(0.0,1.0+0.1,0.1))
+         fname += '_norm'
+      else:
+         plt.hist(vals,normed=False,
+                  bins=histBins,range=histRange)
+         plt.ylabel('#data')
+      plt.grid();
+      plt.savefig(os.path.join(odir,fname+'.png'),
+                dpi=300,format='png',bbox_inches='tight');
+      plt.close(fig)
+
+   for norm in [True,False]:
+      plotHist([i[1] for i in relPosProbs],norm,'releaseMaxProbPosHist')
+      plotHist([i[1] for i in relNegProbs],norm,'releaseMaxProbNegHist')
 
    print 'writing cm...'
    def _getBestIdx(metric):

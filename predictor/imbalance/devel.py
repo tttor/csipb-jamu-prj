@@ -67,6 +67,7 @@ def main():
             ydev = f['ydev'][:]
             xrel = f['xrel'][:]
             yrel = f['yrel'][:]
+            xrelraw = f['xrelraw'][:]
 
         with open(dataLogFpath,'r') as f:
             dataLog = yaml.load(f)
@@ -174,6 +175,7 @@ def main():
 
         ##
         print 'update xdev,ydev,xrel... '+str(np.asarray(xdevfr).shape)
+        xrelraw = xrel[:] # raw: feature is NOT extracted
         xrel = xrelf[:]
         xdev = xdevfr[:]
         ydev = ydevr[:]
@@ -184,6 +186,7 @@ def main():
             f.create_dataset('ydev',data=ydev,dtype=np.int8)
             f.create_dataset('xrel',data=xrel,dtype=np.float32)
             f.create_dataset('yrel',data=yrel,dtype=np.int8)
+            f.create_dataset('xrelraw',data=xrelraw)
 
         print 'writing dataLog...'
         dataLog['nCom'] = len(krDict)
@@ -279,14 +282,18 @@ def main():
     devLog['timeRelease'] = str(time.time()-relTic)
 
     ## WRITE RESULT ################################################################################
-    result = {'yte':yte,'ypred':ypred,'yscore':yscore,'yrel':yrel,'yrelscore':yrelscore}
+    result = {'yte':yte,'ypred':ypred,'yscore':yscore,
+              'xrelraw':xrelraw,'yrel':yrel,'yrelscore':yrelscore}
 
     print 'writing prediction...'
     with h5py.File(os.path.join(outDir,'result_'+tag+'.h5'),'w') as f:
         for k,v in result.iteritems():
-            dt = np.int8
-            if 'score' in k: dt = np.float32
-            f.create_dataset(k,data=v,dtype=dt)
+            if 'raw' in k:
+                f.create_dataset(k,data=v)
+            else:
+                dt = np.int8
+                if 'score' in k: dt = np.float32
+                f.create_dataset(k,data=v,dtype=dt)
 
     ##
     print 'writing devLog...'
