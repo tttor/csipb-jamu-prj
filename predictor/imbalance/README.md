@@ -67,11 +67,15 @@
   * LIBLINEAR: http://www.csie.ntu.edu.tw/~cjlin/liblinear/
 
 ## lib/tool/resources
-### imbalanced learning
+#### imbalanced learning
 * https://github.com/scikit-learn-contrib/imbalanced-learn
   * imblearn.over_sampling.SMOTE
     * mode:  regular, borderline1, borderline2, svm
     * fit_sample(X, y), where X : ndarray, shape (n_samples, n_features)
-### active learning
+* scikit-learn SVC with weight setting
+  * https://stackoverflow.com/questions/40568254/machine-learning-classification-on-imbalanced-data
+* ROSE: Random Over-Sampling Examples
+  * https://cran.r-project.org/web/packages/ROSE/index.html
+#### active learning
 * http://active-learning.net/
 * https://github.com/ntucllab/libact
