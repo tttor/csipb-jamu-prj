@@ -76,6 +76,9 @@
   * https://stackoverflow.com/questions/40568254/machine-learning-classification-on-imbalanced-data
 * ROSE: Random Over-Sampling Examples
   * https://cran.r-project.org/web/packages/ROSE/index.html
+* unbalanced: Racing for Unbalanced Methods Selection
+  * https://cran.r-project.org/web/packages/unbalanced/index.html
+  
 #### active learning
 * http://active-learning.net/
 * https://github.com/ntucllab/libact
