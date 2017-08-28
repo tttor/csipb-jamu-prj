@@ -1,8 +1,8 @@
-# Database-related source code
+# Database
 
-## Steps
-* aim for connectivity data.
-* aim for metadata of each item.
+## Objectives
+* connectivity data: pla-com, com-pro, pro-dis
+* meta data: plants, compounds, proteins, diseases
 
 ## Commands
 
