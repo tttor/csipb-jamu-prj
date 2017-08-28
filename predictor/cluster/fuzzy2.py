@@ -1,35 +1,37 @@
-import Tkinter 
 import os
 import sys
-import yaml
-import pickle
+
+import Tkinter
 import json
-import time
-import shutil
 import numpy as np
 from pprint import pprint
-from ast import literal_eval
-import itertools
-import matplotlib.pyplot as plt
+import itertools #for remove duplicate data
+import matplotlib.pyplot as plt #pie
 
 def main():
-	if len(sys.argv)!=2:
+	if len(sys.argv)!=4:
 		print 'inputan salah'
-		print 'python fuzzy2.py [InDir]'
-		print 'Contoh inputan: python fuzzy1.py output'
+		print 'python fuzzy2.py  [Target Direktori][compound Direktori] [protein Direktori]'
+		print 'Contoh inputan: python fuzzy1.py output dbscan#10-yamanishi#nr-compound-david-20170828135141  '
 		return
 	elif os.path.exists(sys.argv[1])==False:
 		print "folder target tidak ditemukan"
 		return
 	
-	InDir=os.path.join(sys.argv[1],'Fuzzy_protein')
+	TarDir=sys.argv[1]
+	comDir=sys.argv[2]
+	proDir=sys.argv[3]
+
+
+	InDir=os.path.join(TarDir,proDir)
+
 	InDir2=os.path.join(InDir,"analisis")
 	os.makedirs(InDir2)
 
 	jenis=['e','gpcr','ic','nr']
 
 	for item in jenis:
-		proPath='Protein_'+item+'_index.json'
+		proPath='protein_'+item+'_index.json'
 		proPath=os.path.join(InDir,proPath)
 		status=os.path.exists(proPath)
 		if status==True:
@@ -41,7 +43,6 @@ def main():
 	    data = json.load(data_file)
 	ProName= data.keys() #nama
 	ProCluster= data.values() #cluster
-
 	n_cluster=max(max(ProCluster))
 	clusterPro={}
 	for i in range(1,n_cluster+1):
@@ -54,7 +55,8 @@ def main():
 		clusterPro[i]=row
 
 	#cluster compound
-	ComPath=os.path.join(InDir,'compound_calinskiharabaz_bestlabels.json')
+	ComPath=os.path.join(TarDir,comDir)
+	ComPath=os.path.join(ComPath,'compound_calinskiharabaz_bestlabels.json')
 	if os.path.exists(ComPath)==False:
 		print "label compound tidak di temukan di direktori"
 		return
@@ -102,7 +104,11 @@ def main():
 	datanew.sort()
 	datanew=list(datanew for datanew,_ in itertools.groupby(datanew)) #remove duplicate data
 
-	konektivitas = open(os.path.join(InDir2,'konektivitas.txt'), 'a')
+	ConPath="konektivitas_protein_compound_"+jenis+".txt"
+	konektivitas = open(os.path.join(InDir2,ConPath), 'a')
+
+	judul="[cluster protein][cluster compound]"
+	konektivitas.write("%s\n" % judul)
 	for item in datanew:
   		konektivitas.write("%s\n" % item)
 
@@ -147,7 +153,7 @@ def main():
 			else:
 				Datamin1+=1
 	plt.pie([Data1, Data0,Datamin1], 					#nilai
-	        colors=["green","red", "blue"],				#warna
+	        colors=["g","r", "b"],				#warna
 	        labels=["1", "0 credible", "0 incredible"],	#label
 	        autopct='%1.1f%%')
 	plt.axis('equal') #ensure pie is round

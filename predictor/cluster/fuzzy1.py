@@ -1,29 +1,30 @@
-import os 
+import os  
 import sys
-import yaml
-import pickle
+
 import json
-import time
-import shutil
 import h5py 
 import numpy as np
 import skfuzzy as fuzz
 
 def main():
-	if len(sys.argv)!=3:
+	if len(sys.argv)!=4:
 		print 'inputan salah'
-		print 'python fuzzy1.py [dataset] [OutDir]'
-		print 'Contoh inputan: python fuzzy1.py nr output'
+		print 'python fuzzy1.py [sub dataset yamanishi] [nilai threshold] [OutDir] '
+		print 'Contoh inputan: python fuzzy1.py nr 0.3 output'
 		return
-	elif(os.path.exists(sys.argv[2])==False):
-		os.makedirs(sys.argv[2])
+
+	elif(os.path.exists(sys.argv[3])==False):
+		os.makedirs(sys.argv[3])
+	
 
 	dataset=sys.argv[1]
 	dataset=dataset.lower()
 
-	OutDir="Fuzzy_protein"
-	OutDir=os.path.join(sys.argv[2],OutDir)
+	threshold=float(sys.argv[2])
+	OutDir="fuzzy_protein"
+	OutDir=os.path.join(sys.argv[3],OutDir)
 	os.makedirs(OutDir)
+	
 	# #ambil data
 	print 'checking protein feature...'
 	aacFpath = "../../dataset/connectivity/compound_vs_protein/yamanishi/feature/amino-acid-composition/"
@@ -40,7 +41,6 @@ def main():
 	proPath= os.path.join(proPath,proPath2)
 	with open(proPath,'r') as f:
 		prolist = [line.strip() for line in f] #list protein
-
 
 	aacDict = {}
 	with h5py.File(aacFpath, 'r') as f:
@@ -68,14 +68,13 @@ def main():
 	print "modeling...."
 	cntr, degree, u0, d, jm, p, fpc = fuzz.cluster.cmeans(
 		        Dataset, fix_center, 2, error=0.005, maxiter=1000, init=None)
-	threshold=0.3
-	Stat={}
 	
 	print "nilai fpc:",fpc
 	print "jumlah center:", fix_center
 
 	degree=np.transpose(degree)
-	degreeFile=open(os.path.join(OutDir,"Protein_degree.txt"),'a')
+	np.savetxt(os.path.join(OutDir,"protein_degree.csv"), degree, delimiter=",")
+
 	saveindex=[]
 	for count, item in enumerate(degree):
 		index=1
@@ -85,8 +84,6 @@ def main():
 				temp.append(index)
 			index+=1
 		saveindex.append(temp)
-		degreeFile.write("%s\n" % item)
-
 	#print hasil
 	str_json="{"
 	for i in range (len(prolist)):
@@ -97,14 +94,10 @@ def main():
 	str_json+="}"
 	data=json.loads(str_json)
 
-	hasilPath='Protein_'+dataset+'_index.json'
+	hasilPath='protein_'+dataset+'_index.json'
 	hasilPath=os.path.join(OutDir,hasilPath)
 	with open(hasilPath, 'a') as outfile:
 	    json.dump(data, outfile,indent=2,sort_keys=True)
-
-
-
-
 if __name__ == "__main__":
     main()
 
