@@ -1,6 +1,10 @@
 # Database
 
 ## Objectives
+Ijah aims to integrate multiple separated databases in order to 
+infer connectivity from plants to compound to proteins to diseases.
+
+## Data types
 * connectivity data: pla-com, com-pro, pro-dis
 * meta data: plants, compounds, proteins, diseases
 
