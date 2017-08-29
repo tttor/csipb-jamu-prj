@@ -17,7 +17,9 @@ def main():
                           host=dcfg['host'], port=dcfg['port'])
     csr = conn.cursor()
 
+    ## conn source ##
     knapsack(csr)
+    ################
 
     conn.commit()
     conn.close
