@@ -1,15 +1,7 @@
 #!/bin/bash
 # TODO hide paths
 
-. ./login.sh
-
-if [ "$1" == "cdb" ]; then
-  python create_db.py $db $user $passwd $host $port
 ## PLANT #######################################################################
-elif [ "$1" == "ipks" ]; then
-  ### insert_plant
-  path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003/knapsack_jsp_plant_vs_compound_2016-10-04_16:34:06.468234.pkl
-  python insert_plant.py $db $user $passwd $host $port $path
 elif [ "$1" == "upidr" ]; then
   ### update IDR plant name
   mode=updatePlantIdrName
@@ -37,11 +29,6 @@ elif [ "$1" == "uckg" ]; then
   exe=insert_compound.py
   python $exe $db $user $passwd $host $port $mode $outDir $path $path2
 ## PROTEIN #####################################################################
-elif [ "$1" == "ipu" ]; then
-  ### insert_protein: Uniprot's protein-disease connectivity
-  mode=insertProteinUniprot
-  path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/uniprot/uniprot_human_dat_20160928/uniprot_sprot_human_protein.pkl
-  python insert_protein.py $db $user $passwd $host $port $mode $outDir $path
 elif [ "$1" == "uppdb" ]; then
   mode=updateProteinPDB
   uniprot2pdbFpath=/home/tor/robotics/prj/csipb-jamu-prj/dataset/pdb/27Nov2016/uniprot2pdb.pkl
@@ -52,13 +39,6 @@ elif [ "$1" == "idu" ]; then
   path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/uniprot/uniprot_human_dat_20160928/uniprot_sprot_human_disease.pkl
   python insert_disease.py $db $user $passwd $host $port $path
 ## CONNECTIVITY ################################################################
-elif [ "$1" == "ipc" ]; then
-  ### insert_plant_vs_compound: knapsack
-  path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/knapsack/20161003/knapsack_jsp_plant_vs_compound_2016-10-04_16:34:06.468234.pkl
-  python insert_plant_vs_compound.py $db $user $passwd $host $port $outDir $path
-elif [ "$1" == "ipd" ]; then
-  ### insert_protein_vs_disease: uniprot
-  path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/uniprot/uniprot_human_dat_20160928/uniprot_sprot_human.pkl
   python insert_protein_vs_disease.py $db $user $passwd $host $port $outDir $path
 elif [ "$1" == "icp" ]; then
   ### insert_compound_vs_protein: drugbank
