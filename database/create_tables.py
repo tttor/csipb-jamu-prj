@@ -1,27 +1,30 @@
 #!/usr/bin/python
-import psycopg2
 import sys
 
+import yaml
+import psycopg2
+
+with open('config_database.json','r') as f:
+   dcfg = yaml.load(f)
+   
 def main(argv):
-    assert len(argv)==6
+    conn = psycopg2.connect(database=dcfg['database'],
+                          user=dcfg['user'], password=dcfg['password'],
+                          host=dcfg['host'], port=dcfg['port'])
+    csr = conn.cursor()
 
-    db = argv[1]
-    user = argv[2]; passwd = argv[3]
-    host = argv[4]; port = argv[5]
-    conn = psycopg2.connect(database=db, user=user, password=passwd,
-                            host=host, port=port)
-    cur = conn.cursor()
-
-    cur.execute('DROP TABLE IF EXISTS plant;')
-    cur.execute('''CREATE TABLE plant (
+    csr.execute('DROP TABLE IF EXISTS plant;')
+    csr.execute('''
+                CREATE TABLE plant (
                 pla_id varchar(12) PRIMARY KEY,
                 pla_name varchar(256) NOT NULL UNIQUE,
                 pla_idr_name varchar(256)
                 );
                 ''')
 
-    cur.execute('DROP TABLE IF EXISTS compound;')
-    cur.execute('''CREATE TABLE compound (
+    csr.execute('DROP TABLE IF EXISTS compound;')
+    csr.execute('''
+                CREATE TABLE compound (
                 com_id varchar(12) PRIMARY KEY,
                 com_drugbank_id varchar(128) UNIQUE,
                 com_knapsack_id varchar(128) UNIQUE,
@@ -37,8 +40,9 @@ def main(argv):
                 );
                 ''')
 
-    cur.execute('DROP TABLE IF EXISTS protein;')
-    cur.execute('''CREATE TABLE protein (
+    csr.execute('DROP TABLE IF EXISTS protein;')
+    csr.execute('''
+                CREATE TABLE protein (
                 pro_id varchar(12) PRIMARY KEY,
                 pro_name varchar(512) NOT NULL UNIQUE,
                 pro_uniprot_id varchar(8) NOT NULL UNIQUE,
@@ -47,8 +51,9 @@ def main(argv):
                 );
                 ''')
 
-    cur.execute('DROP TABLE IF EXISTS disease;')
-    cur.execute('''CREATE TABLE disease (
+    csr.execute('DROP TABLE IF EXISTS disease;')
+    csr.execute('''
+                CREATE TABLE disease (
                 dis_id varchar(12) PRIMARY KEY,
                 dis_omim_id varchar(8) NOT NULL UNIQUE,
                 dis_name varchar(16384) NOT NULL UNIQUE,
@@ -56,8 +61,9 @@ def main(argv):
                 );
                 ''')
 
-    cur.execute('DROP TABLE IF EXISTS plant_vs_compound;')
-    cur.execute('''CREATE TABLE plant_vs_compound (
+    csr.execute('DROP TABLE IF EXISTS plant_vs_compound;')
+    csr.execute('''
+                CREATE TABLE plant_vs_compound (
                 pla_id varchar(12) NOT NULL,
                 com_id varchar(12) NOT NULL,
                 source varchar(128) NOT NULL,
@@ -66,8 +72,9 @@ def main(argv):
                 );
                 ''')
 
-    cur.execute('DROP TABLE IF EXISTS compound_vs_protein;')
-    cur.execute('''CREATE TABLE compound_vs_protein (
+    csr.execute('DROP TABLE IF EXISTS compound_vs_protein;')
+    csr.execute('''
+                CREATE TABLE compound_vs_protein (
                 com_id varchar(12) NOT NULL,
                 pro_id varchar(12) NOT NULL,
                 source varchar(256) NOT NULL,
@@ -76,8 +83,9 @@ def main(argv):
                 );
                 ''')
 
-    cur.execute('DROP TABLE IF EXISTS protein_vs_disease;')
-    cur.execute('''CREATE TABLE protein_vs_disease (
+    csr.execute('DROP TABLE IF EXISTS protein_vs_disease;')
+    csr.execute('''
+                CREATE TABLE protein_vs_disease (
                 pro_id varchar(12) NOT NULL,
                 dis_id varchar(12) NOT NULL,
                 source varchar(256) NOT NULL,
@@ -86,8 +94,9 @@ def main(argv):
                 );
                 ''')
 
-    cur.execute('DROP TABLE IF EXISTS user_msg;')
-    cur.execute('''CREATE TABLE user_msg (
+    csr.execute('DROP TABLE IF EXISTS user_msg;')
+    csr.execute('''
+                CREATE TABLE user_msg (
                 id SERIAL PRIMARY KEY,
                 name varchar(32),
                 email varchar(32),
@@ -98,16 +107,8 @@ def main(argv):
                 );
                 ''')
 
-    cur.execute('DROP VIEW IF EXISTS total_view;')
-    curr.execute('''create view total_view as select
-                (select count (*) from plant) as plant_total,
-                (select count (*) from compound) as compound_total,
-                (select count (*) from protein) as protein_total,
-                (select count (*) from disease) as disease_total;
-                ''')
-
-    cur.execute('DROP TABLE IF EXISTS compound_similarity;')
-    curr.execute('''
+    csr.execute('DROP TABLE IF EXISTS compound_similarity;')
+    csr.execute('''
                 CREATE TABLE compound_similarity (
                 com_id_i varchar(12) NOT NULL,
                 com_id_j varchar(12) NOT NULL,
@@ -117,8 +118,8 @@ def main(argv):
                 );
                 ''')
 
-    cur.execute('DROP TABLE IF EXISTS protein_similarity;')
-    curr.execute('''
+    csr.execute('DROP TABLE IF EXISTS protein_similarity;')
+    csr.execute('''
                 CREATE TABLE protein_similarity (
                 pro_id_i varchar(12) NOT NULL,
                 pro_id_j varchar(12) NOT NULL,
@@ -128,10 +129,17 @@ def main(argv):
                 );
                 ''')
 
-    conn.commit()
-    print "Tables have created successfully"
+    csr.execute('DROP VIEW IF EXISTS total_view;')
+    csr.execute('''create view total_view as select
+                (select count (*) from plant) as plant_total,
+                (select count (*) from compound) as compound_total,
+                (select count (*) from protein) as protein_total,
+                (select count (*) from disease) as disease_total;
+                ''')
 
+    conn.commit()
     conn.close()
+    print "Tables and views have been created successfully"
 
 if __name__ == '__main__':
     main(sys.argv)

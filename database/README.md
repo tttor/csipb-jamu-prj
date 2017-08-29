@@ -9,9 +9,10 @@ infer connectivity from plants to compound to proteins to diseases.
 * meta data: plants, compounds, proteins, diseases
 
 ## Commands
-
-### login via psql (9.6.1)
-psql [username] -h 127.0.0.1 -d [dbname]
+* sudo -u postgres createdb [dbname]
+* psql [username] -h 127.0.0.1 -d [dbname] # login via psql (9.6.1)
+* psql ijah -h 127.0.0.1 -d ijah < ijah_201612141709.sql # import
+* sudo -u postgres dropdb [dname]
 
 ### export
 * tor@torpc:~$ sudo -u ijah pg_dump ijah > ijah.sql
@@ -19,20 +20,13 @@ psql [username] -h 127.0.0.1 -d [dbname]
 * ijah=> \copy protein to /home/tor/protein.csv csv header
 * ijah=> \copy (SELECT com_cas_id FROM compound) TO '/home/tor/tmp/test.csv' With CSV;
 
-### import
-psql ijah  -h 127.0.0.1 -d ijah < ijah_201612141709.sql
-
 ### init db
-* sudo -u postgres createdb [dbname]
 * sudo -u postgres createuser [username]
 * sudo -u postgres psql
   * postgres=# \password [role/username]
 * sudo adduser [username]
   * To log in with ident based authentication,
   you'll need a Linux user with the same name as your Postgres role and database.
-
-### misc
-* sudo -u postgres dropdb [dname]
 
 ## Queries
 ```sql
