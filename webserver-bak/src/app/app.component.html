@@ -15,6 +15,13 @@
           <div class="navbar-collapse collapse navbar-responsive-collapse">
             <ul class="nav navbar-nav">
               <li class="active"><a [routerLink]=" ['./home'] ">Home</a></li>
+              <li class="active"><a [routerLink]=" ['./downloads'] ">Download</a></li>
+              <li class="active"><a [routerLink]=" ['./upload'] ">Upload</a></li>
+              <li class="active"><a [routerLink]=" ['./ijahv1'] ">Ijahv1</a></li>
+              <li class="active"><a [routerLink]=" ['./help-faq'] ">Help/FAQ</a></li>
+              <li class="active"><a [routerLink]=" ['./contact'] ">Contact</a></li>
+              <li class="active"><a [routerLink]=" ['./about'] ">About</a></li>
+              <!-- <li class="active"><a [routerLink]=" ['./test'] ">Test</a></li> -->
             </ul>
           </div>
         </div>
@@ -24,6 +31,19 @@
   </div>
 </div>
 <!-- /HEADER ROW -->
+
+<div class="container">
+  <!--   ==================================================-->
+  <div class="row" >
+
+    <!-- Radio -->
+    <main>
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+
+</div>
 
 <!--Footer ==========================-->
 <footer class="footer">

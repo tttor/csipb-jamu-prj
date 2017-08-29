@@ -1,71 +1,25 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import {
-  inject,
-  async,
-  TestBed,
-  ComponentFixture
-} from '@angular/core/testing';
-import { Component } from '@angular/core';
-import {
-  BaseRequestOptions,
-  ConnectionBackend,
-  Http
-} from '@angular/http';
-import { MockBackend } from '@angular/http/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-// Load the implementations that should be tested
-import { AppState } from '../app.service';
-import { Home } from './home.component';
-import { Title } from './title';
+import { HomeComponent } from './home.component';
 
-describe(`Home`, () => {
-  let comp: Home;
-  let fixture: ComponentFixture<Home>;
+describe('HomeComponent', () => {
+  let component: HomeComponent;
+  let fixture: ComponentFixture<HomeComponent>;
 
-  // async beforeEach
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [Home],
-      schemas: [NO_ERRORS_SCHEMA],
-      providers: [
-        BaseRequestOptions,
-        MockBackend,
-        {
-          provide: Http,
-          useFactory: (backend: ConnectionBackend, defaultOptions: BaseRequestOptions) => {
-            return new Http(backend, defaultOptions);
-          },
-          deps: [MockBackend, BaseRequestOptions]
-        },
-        AppState,
-        Title,
-      ]
+      declarations: [ HomeComponent ]
     })
-    .compileComponents(); // compile template and css
+    .compileComponents();
   }));
 
-  // synchronous beforeEach
   beforeEach(() => {
-    fixture = TestBed.createComponent(Home);
-    comp = fixture.componentInstance;
-
-    fixture.detectChanges(); // trigger initial data binding
+    fixture = TestBed.createComponent(HomeComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
-  it('should have default data', () => {
-    expect(comp.localState).toEqual({ value: '' });
+  it('should be created', () => {
+    expect(component).toBeTruthy();
   });
-
-  it('should have a title', () => {
-    expect(!!comp.title).toEqual(true);
-  });
-
-  it('should log ngOnInit', () => {
-    spyOn(console, 'log');
-    expect(console.log).not.toHaveBeenCalled();
-
-    comp.ngOnInit();
-    expect(console.log).toHaveBeenCalled();
-  });
-
 });
