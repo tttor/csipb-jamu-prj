@@ -1,10 +1,6 @@
 #!/bin/bash
 # TODO hide paths
 
-. ./login.sh
-
-if [ "$1" == "cdb" ]; then
-  python create_db.py $db $user $passwd $host $port
 ## PLANT #######################################################################
 elif [ "$1" == "ipks" ]; then
   ### insert_plant

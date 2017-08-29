@@ -4,7 +4,7 @@ import sys
 import yaml
 import psycopg2
 
-with open('config_database.json','r') as f:
+with open('../config_database.json','r') as f:
    dcfg = yaml.load(f)
    
 def main(argv):
