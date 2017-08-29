@@ -1,1 +1,3 @@
-credential.py
+*
+!make_config.sh
+!.gitignore
