@@ -21,8 +21,14 @@ def select(col,table,colCond,cond,csr):
   q = 'SELECT '+col+' FROM '+table
   q+= ' WHERE '+colCond+'='+quote(cond)
   csr.execute(q)
-  rows = csr.fetchall();
+  rows = csr.fetchall()
   return rows
+
+def selectMax(col,table,csr):
+  q = "SELECT MAX("+col+") FROM "+table
+  csr.execute(q)
+  rows = csr.fetchall()
+  return rows[0][0]
 
 def getID(col,table,colCond,cond,csr):
   q = 'SELECT '+col+' FROM '+table
