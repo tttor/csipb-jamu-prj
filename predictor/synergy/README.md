@@ -44,3 +44,6 @@ G. Menghitung matriks skor agen (AS).
 	* Li, Y. (2015)
 * Network-based drug discovery by integrating systems biology and computational technologies
 	* Leung, E. (2012)
+
+hpo_imilarity dapat didownload di https://github.com/jeremymcrae/hpo_similarity
+	pada directory hpo_similarity/hpo_similarity/data replace file hp.obo dengan file yang dapat diunduh di http://purl.obolibrary.org/obo/hp.obo
