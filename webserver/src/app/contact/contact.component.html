@@ -1,0 +1,117 @@
+<div class="col-md-8 col-md-offset-2">
+<h1 class="text-center">Contact Us</h1><br />
+
+<form (ngSubmit)="onSubmit()" class="ui form">
+  <div class="field" class="row">
+    <div class="col-md-2">
+      <label for="subject">Subject:</label>
+    </div>
+    <div class="col-md-10">
+      <input type="radio"
+           id="subjectQ"
+           value="question"
+           [(ngModel)]="subject"
+           name="subject" required> Question
+      <input type="radio"
+           id="subjectE"
+           value="error/bugs"
+           [(ngModel)]="subject"
+           name="subject" required> Error/Bugs
+      <input type="radio"
+           id="subjectW"
+           value="wishlist"
+           [(ngModel)]="subject"
+           name="subject" required> Wishlist
+      <input type="radio"
+           id="subjectC"
+           value="complaint"
+           [(ngModel)]="subject"
+           name="subject" required> Complaint
+      <input type="radio"
+           id="subjectS"
+           value="suggestion"
+           [(ngModel)]="subject"
+           name="subject" required> Suggestion
+      <input type="radio"
+           id="subjectT"
+           value="testimony"
+           [(ngModel)]="subject"
+           name="subject" required> Testimony
+      <input type="radio"
+           id="subjectO"
+           value="other"
+           [(ngModel)]="subject"
+           name="subject" required> Other
+    </div>
+  </div>
+
+  <div class="field" class="row">
+    <div class="col-md-2">
+      <label for="nameInput">Message:</label>
+    </div>
+    <div class="col-md-10">
+      <textarea type="text"
+           id="nameInput"
+           [(ngModel)]="msg"
+           class="form-control"
+           placeholder="Your message"
+           name="msg" required
+           cols="50" rows="5">
+      </textarea>
+    </div>
+  </div>
+  <br />
+  <br />
+
+  <div class="field" class="row">
+    <div class="col-md-2">
+      <label for="name">Name:</label>
+    </div>
+    <div class="col-md-6">
+      <input type="text"
+             id="name"
+             [(ngModel)]="name"
+             class="form-control"
+             placeholder="YourFirstName YourLastName"
+             name="name" required>
+    </div>
+  </div>
+  <br />
+
+  <div class="field" class="row">
+    <div class="col-md-2">
+      <label for="email">Email:</label>
+    </div>
+    <div class="col-md-6">
+      <input type="email"
+           id="email"
+           [(ngModel)]="email"
+           class="form-control"
+           placeholder="you@yourEmail"
+           name="email" required>
+    </div>
+  </div>
+  <br />
+
+  <div class="field" class="row">
+    <div class="col-md-2">
+      <label for="affiliation">Affiliation:</label>
+    </div>
+    <div class="col-md-6">
+      <input type="affiliation"
+           id="affiliation"
+           [(ngModel)]="affiliation"
+           class="form-control"
+           placeholder="Your university, organization, company, etc"
+           name="affiliation" required>
+    </div>
+  </div>
+  <br />
+
+  <div class="col-md-12 text-center">
+    <button type="submit" class="ui button btn btn-success">Submit</button>
+  </div>
+
+</form>
+
+</div>
