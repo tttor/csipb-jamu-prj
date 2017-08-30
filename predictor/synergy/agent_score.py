@@ -34,4 +34,7 @@ def agent_score(graph,openCompound,proteinPheno,compound1,compound2):
 		for row2 in indexProtein2:
 			totalPhenotypeSimilarity += get_similarity_prot(graph,proteinPheno,row,row2)
 			count += 1
-	return totalPhenotypeSimilarity/count
+	if (count==0):
+		return false
+	else:
+		return totalPhenotypeSimilarity/count

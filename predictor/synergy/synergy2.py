@@ -4,8 +4,9 @@ import sys
 
 import networkx as nx
 import numpy as np
-import yaml
 import psycopg2
+import pickle
+import yaml
 
 from function import *
 from hpo_similarity.hpo_similarity.ontology import Ontology
@@ -34,6 +35,7 @@ def main():
 	# end input argumen
 
 
+
 	# start initialize agent score
 
 	fp=open("hpo_similarity/hpo_similarity/data/hp.obo")
@@ -45,14 +47,20 @@ def main():
 
 	cursor.execute("SELECT c.com_id,p.pro_uniprot_abbrv FROM compound_vs_protein cp inner join compound c on cp.com_id=c.com_id inner join protein p on cp.pro_id=p.pro_id where c.com_id='%s' or c.com_id='%s'"%(inputCompoundID1,inputCompoundID2))
 	openCompound=cursor.fetchall()
-	pp=[]
-	proteinPheno={}
-	for row in openCompound:
-		cursor.execute("SELECT protein,hpo_id from protein_phenotype2 where protein='%s'"%row[1])
-		loadPhenotype=cursor.fetchall()
-		for row2 in loadPhenotype:
-			pp.insert(0,row2)
 
+	with open('ppi.pickle', 'rb') as handle:
+	    loadPpi = pickle.load(handle)
+
+	proteinPheno={}
+
+	pp=[]
+	with open('proteinphenotype.pickle', 'rb') as handle:
+	    loadPhenotype = pickle.load(handle)
+
+	for row in openCompound:
+		for row2 in loadPhenotype:
+			if(row[1]==row2[0]):
+				pp.insert(0,row2)
 	for row in pp:
 		if (row[1] in proteinPheno):
 			proteinPheno[row[0]].append(row[1])
@@ -98,10 +106,9 @@ def main():
 			listCompoundIdIjah.insert(0,row2)
 
 	for i in range(len(proteinUniprotAbbrv)):
-		cursor.execute("SELECT protein1,protein2 from ppi_ijah_2 where protein1=%s and score>908",(proteinUniprotAbbrv[i]))
-		ppi=cursor.fetchall()
-		for row2 in ppi:
-			g.add_edge(row2[0],"%s"%row2[1])
+		for row in loadPpi:
+			if(row[1]=='%s'%proteinUniprotAbbrv[i]):
+				g.add_edge(row[1],row[2])
 
 	closeness =closeness_centrality(g)
 	listProtein=closeness.keys()
@@ -134,6 +141,7 @@ def main():
 	for row in openCompound2:
 		listProteinSenyawa2.insert(0,row[1])
 	intersectProteinSenyawa2=list(set(listProteinSenyawa2)&set(listProtein))
+
 	print "DiseaseID,Compound1,Compound2,Topology Score,Agent Score,Synergy Score"
 
 	if(intersectProteinSenyawa1==[] or intersectProteinSenyawa2==[]):
@@ -159,6 +167,7 @@ def main():
 		else:
 			SS=AS*TS
 			print "%s"%inputDiseaseID+","+"%s"%inputCompoundID1+","+"%s"%inputCompoundID2+","+"%s"%TS+","+"%s"%AS+","+"%s"%SS
+
 
 if __name__=='__main__':
 	main()
