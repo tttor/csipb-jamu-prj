@@ -1,4 +1,12 @@
 # insert_protein.py
+
+## PROTEIN #####################################################################
+elif [ "$1" == "uppdb" ]; then
+  mode=updateProteinPDB
+  uniprot2pdbFpath=/home/tor/robotics/prj/csipb-jamu-prj/dataset/pdb/27Nov2016/uniprot2pdb.pkl
+  python insert_protein.py $db $user $passwd $host $port $mode $outDir $uniprot2pdbFpath
+
+
 import os
 import sys
 import time

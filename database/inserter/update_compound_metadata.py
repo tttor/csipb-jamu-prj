@@ -1,4 +1,14 @@
 # insert_compound_metadata.py
+
+## COMPOUND ####################################################################
+elif [ "$1" == "uckg" ]; then
+  ### update_compound from kegg (3): kegg's compound-protein connectivity
+  mode=updateComBasedOnKegg
+  path=/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010/keggCom_20161010_1-100K
+  path2=/home/tor/robotics/prj/csipb-jamu-prj/dataset/kegg/kegg_20161010/keggdrug_data_2016-10-11_16:58:04.683546.pkl
+  exe=insert_compound.py
+  python $exe $db $user $passwd $host $port $mode $outDir $path $path2
+
 import os
 import yaml
 import psycopg2
