@@ -11,6 +11,7 @@ import { Ng2PageScrollModule } from 'ng2-page-scroll';
 import { FileUploadModule } from 'ng2-file-upload';
 import { ChartsModule } from 'ng2-charts';
 import { TreeviewModule } from 'ngx-treeview';
+import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 
 import { ROUTES } from './app.routes';
 import { AppComponent } from './app.component';
@@ -44,6 +45,7 @@ enableProdMode();
     ChartsModule,
     Ng2PageScrollModule.forRoot(),
     TreeviewModule.forRoot(),
+    TypeaheadModule.forRoot(),
   ],
   providers: [],
   bootstrap: [AppComponent]

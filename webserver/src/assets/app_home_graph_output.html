@@ -1,0 +1,102 @@
+<html>
+<head>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+<body>
+
+<div onload="render()">
+  <div id="html-content-holder">
+    <!-- Values of width and height below should have offset with respect to Sankey's width and height -->
+    <div class="text-center graph" id="sankey_multiple" style="width: 1180px; height: 2010px; background-color:white;"></div>
+  </div>
+</div>
+
+<!-- Labels below the multipartite graph -->
+<div class="row">
+  <div class="text-left col-md-3">
+    <b>PLAnts:LatinName,IndonesianName(s)</b>
+  </div>
+  <div class="text-center col-md-3">
+    <b>COM:CAS,DrugbankID,KnapsackID,KeggID</b>
+  </div>
+  <div class="text-center col-md-3">
+    <b>PRO:UniprotID,UniprotAbbrv,UniprotName</b>
+  </div>
+  <div class="col-md-3 text-right">
+    <b>DISeases:OmimID,OmimName</b>
+  </div>
+</div>
+
+<br />
+<a id="btn-convert" class="btn btn-success col-md-4 col-md-offset-4 text-center">Download Connectivity Graph</a>
+<br />
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/h2c/html2canvas.js"></script>
+<script type="text/javascript" src="js/filesaver.js"></script>
+<script type="text/javascript" src="js/jszip.min.js"></script>
+<script>
+
+    var element = $("#html-content-holder"); // global variable
+    var getCanvas; // global variable
+
+      $("#btn-convert").on('click', function () {
+        html2canvas(element, {
+        onrendered: function (canvas) {
+               $("#previewImage").append(canvas);
+               getCanvas = canvas;
+            }
+        });
+
+        var imgageData = getCanvas.toDataURL("image/png");
+
+        // var currentdate = new Date();
+        // var pngName = "ijah_multipartite_graph_"
+        // var pngName = pngName.concat(currentdate.toString());
+        // var pngName2 = pngName.concat(".png");
+        // console.log(pngName2);
+
+        var pngFname = "ijah_multipartite_graph.png"
+        var newData = imgageData.replace(/^data:image\/png/, "data:application/octet-stream");
+        $("#btn-convert").attr("download", pngFname).attr("href", newData);
+    });
+</script>
+
+<script
+<script async type="text/javascript">
+  var init = function() {
+    google.charts.load("current", {packages:["sankey"]});
+    google.charts.setOnLoadCallback(drawChart);
+     function drawChart() {
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'From');
+      data.addColumn('string', 'To');
+      data.addColumn('number', 'Weight');
+      data.addRows(JSON.parse(localStorage.getItem('connectivityGraphData')) );
+
+      var options = {
+        width: 1170,
+        height: 2000,
+        sankey: {
+          node: {
+            label: {
+              color: '#34495e',
+              bold: true
+            },
+            interactivity: true,
+            labelPadding: 0,
+            width: 5
+          }
+        },
+      };
+
+      // Instantiate and draw our chart, passing in some options.
+      var chart = new google.visualization.Sankey(document.getElementById('sankey_multiple'));
+      chart.draw(data, options);
+     }
+  }
+  window.onload = init;
+</script>
+</body>
+</html>

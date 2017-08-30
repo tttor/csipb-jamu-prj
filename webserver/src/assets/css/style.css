@@ -19,12 +19,12 @@ html,body{
      text-shadow: 0 1px 1px rgba(255,255,255,.3);
 }
 
-/*pre {
+pre {
   font-family:'Source Sans Pro', sans-serif;
 	font-size:13px;
 	position:relative;
 	z-index: 1;
-}*/
+}
 
 p{line-height: 24px}
 a{color:#0088cc;}
@@ -89,7 +89,7 @@ Card styles
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 
-
+/*card classes----------------------------------------------------------------*/
 .card {
   background: #f5f5f5;
   border-radius: 2px;
@@ -132,7 +132,39 @@ Card styles
 .card-5 {
   box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
 }
+/*----------------------------------------------------------------------------*/
 
+/*summary text CSS classes----------------------------------------------------*/
+.totalConn {
+  font-family: 'Roboto', sans-serif;
+	font-size:90px;
+  color:#008744;
+}
+
+.uniquePla {
+  font-family: 'Roboto', sans-serif;
+	font-size:70px;
+  color:#00b300;
+}
+
+.uniqueCom {
+  font-family: 'Roboto', sans-serif;
+	font-size:70px;
+  color:#ffa500;
+}
+
+.uniquePro {
+  font-family: 'Roboto', sans-serif;
+	font-size:70px;
+  color:#6666ff;
+}
+
+.uniqueDis {
+  font-family: 'Roboto', sans-serif;
+	font-size:70px;
+  color:#ff4d4d;
+}
+/*----------------------------------------------------------------------------*/
 
 /*
 Carousel
