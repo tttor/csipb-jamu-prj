@@ -1,6 +1,9 @@
 import {
   Component, OnInit, Inject, ElementRef, ViewChild
 } from '@angular/core';
+import {
+  PageScrollService, PageScrollInstance, Ng2PageScrollModule
+ } from 'ng2-page-scroll';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
@@ -8,6 +11,7 @@ import { Http } from '@angular/http';
 import { ChartsModule } from 'ng2-charts';
 import { AppState } from '../app.service';
 import { UserInput } from './userinput.interface';
+import { DOCUMENT } from '@angular/platform-browser';
 declare var saveAs: any;
 
 @Component({
@@ -165,7 +169,10 @@ export class HomeComponent implements OnInit {
   });
 
 /////////////////////////////////////////////////////////////////////////////
-  public constructor(private http: Http) {
+  public constructor(
+    private http: Http,
+    private pageScrollService: PageScrollService, @Inject(DOCUMENT) private document: any,
+    ) {
     this.interactionQueryAPI = this.baseAPI + 'connectivity.php';
     this.metaQueryAPI = this.baseAPI + 'metadata.php';
     this.predictAPI = this.baseAPI + 'predict.php';
@@ -1039,6 +1046,12 @@ export class HomeComponent implements OnInit {
 
       this.filterThreshold = 0.0;
     }
+
+    // NEW JUMP BUTTON CALLBACK METHOD /////////////////////////////////////////
+    public jumpTo(jumpTarget): void {
+      let pageScrollInstance: PageScrollInstance = PageScrollInstance.newInstance({document: this.document, scrollTarget: jumpTarget, pageScrollDuration: 100});
+      this.pageScrollService.start(pageScrollInstance);
+    };
 
     // BACK-BUTTON METHOD ////////////////////////////////////////////////////////
     public backButtonCallback() {

@@ -246,7 +246,7 @@
   <div class="row" *ngIf="show">
     <!-- The control buttons on bottom ///////////////////////////////////// -->
     <!-- First row ///////////////////////////////////////////////////////// -->
-      <div style="z-index:10000000; position: fixed" class="card-fixed" id="buttoncard">
+      <!-- <div style="z-index:10000000; position: fixed" class="card-fixed" id="buttoncard">
         <div class="row">
           <div class="col-md-10 col-md-offset-1">
             <div style="z-index:500; position: relative" class="col-md-3">
@@ -264,7 +264,7 @@
           </div>
         </div>
       <!-- Second row ////////////////////////////////////////////////////// -->
-        <div class="row">
+        <!--<div class="row">
           <div *ngIf="(this.mode.indexOf('predict')==-1)" style="z-index:500; position: relative; padding-top:8px"
           class="col-md-8 col-md-offset-3">
             <div class="btn-toolbar text-center">
@@ -283,7 +283,7 @@
             </div>
           </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- The output handling /////////////////////////////////////////////// -->
     <div>
@@ -379,15 +379,33 @@
             </canvas>
           </div>
         </div>
+        <div class="row col-md-12" style="margin-top: 20px; text-align: center">
+          <div class="btn-group">
+            <button type="button" class="btn btn-success" (click)="backButtonCallback()">Back</button>
+            <button type="button" class="btn btn-success" (click)="jumpTo('#metadataText')">Metadata Text</button>
+            <button type="button" class="btn btn-success" (click)="jumpTo('#connectivityText')">Connectivity Text</button>
+            <button type="button" class="btn btn-success" (click)="jumpTo('#connectivityGraph')">Connectivity Graph</button>
+            <button type="button" class="btn btn-warning" (click)="filter()">Filter {{filterThreshold}}</button>
+            <button type="button" class="btn btn-warning" (click)="predictMore()">Predict More</button>
+            <button type="button" class="btn btn-warning" (click)="reset()">Reset</button>
+          </div>
+        </div>
       </div>
 
       <!-- The multi-partite graph output ////////////////////////////////// -->
       <div style="z-index:500; position: relative" class="card card-2" id="connectivityGraph">
-      <div class="text-center col-md-12">
-        <h2><strong>Connectivity Graph</strong></h2>
+        <div class="text-center col-md-12">
+          <h2><strong>Connectivity Graph</strong></h2>
+        </div>
+        <iframe id="graph" *ngIf="showGraph" class="text-center" src="assets/app_home_graph_output.html" height="850px" width="100%" frameBorder="0"></iframe>
+        <div class="row col-md-12" style="margin-top: 20px; text-align: center">
+          <div class="btn-group">
+            <button type="button" class="btn btn-success" (click)="jumpTo('#metadataText')">Metadata Text</button>
+            <button type="button" class="btn btn-success" (click)="jumpTo('#connectivityText')">Connectivity Text</button>
+            <button type="button" class="btn btn-success" (click)="jumpTo('#summary')">Summary</button>
+          </div>
+        </div>
       </div>
-      <iframe id="graph" *ngIf="showGraph" class="text-center" src="assets/app_home_graph_output.html" height="850px" width="100%" frameBorder="0"></iframe>
-    </div>
 
       <!-- Connectivity Text Output //////////////////////////////////////// -->
       <div style="z-index:500; position: relative" class="card card-2" id="connectivityText">
@@ -467,45 +485,59 @@
         <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('disease_vs_protein')">Download Disease-Protein Connectivity</button>
       </div>
       <br />
+      <div class="row col-md-12" style="margin-top: 20px; text-align: center">
+        <div class="btn-group">
+          <button type="button" class="btn btn-success" (click)="jumpTo('#metadataText')">Metadata Text</button>
+          <button type="button" class="btn btn-success" (click)="jumpTo('#connectivityGraph')">Connectivity Graph</button>
+          <button type="button" class="btn btn-success" (click)="jumpTo('#summary')">Summary</button>
+        </div>
+      </div>
     </div>
 
       <!-- Metadata Text Output //////////////////////////////////////////// -->
       <div style="z-index:500; position: relative" class="card card-2" id="metadataText">
-      <div class="text-center col-md-12">
-        <h2><strong>Metadata Text</strong></h2>
-      </div>
-      <div style="z-index:500; position: relative" class="col-md-3">
-        Plant Metadata
-        <pre [innerHTML]="plaMetaTxtOutput" style="height:800px"></pre>
-      </div>
-      <div class="col-md-3">
-        Compound Metadata
-        <pre [innerHTML]="comMetaTxtOutput" style="height:800px"></pre>
-      </div>
-      <div style="z-index:500; position: relative" class="col-md-3">
-        Protein Metadata
-        <pre [innerHTML]="proMetaTxtOutput" style="height:800px"></pre>
-      </div>
-      <br />
-      <div style="z-index:500; position: relative" class="col-md-3">
-        Disease Metadata
-        <pre [innerHTML]="disMetaTxtOutput" style="height:800px"></pre>
-      </div>
-      <br />
+        <div class="text-center col-md-12">
+          <h2><strong>Metadata Text</strong></h2>
+        </div>
+        <div style="z-index:500; position: relative" class="col-md-3">
+          Plant Metadata
+          <pre [innerHTML]="plaMetaTxtOutput" style="height:800px"></pre>
+        </div>
+        <div class="col-md-3">
+          Compound Metadata
+          <pre [innerHTML]="comMetaTxtOutput" style="height:800px"></pre>
+        </div>
+        <div style="z-index:500; position: relative" class="col-md-3">
+          Protein Metadata
+          <pre [innerHTML]="proMetaTxtOutput" style="height:800px"></pre>
+        </div>
+        <br />
+        <div style="z-index:500; position: relative" class="col-md-3">
+          Disease Metadata
+          <pre [innerHTML]="disMetaTxtOutput" style="height:800px"></pre>
+        </div>
+        <br />
 
-      <div style="z-index:500; position: relative" class="col-md-3">
-        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('plant')">Download Plant Meta</button>
-      </div>
-      <div style="z-index:500; position: relative" class="col-md-3">
-        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('compound')">Download Compound Meta</button>
-      </div>
-      <div style="z-index:500; position: relative" class="col-md-3">
-        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('protein')">Download Protein Meta</button>
-      </div>
-      <div style="z-index:500; position: relative" class="col-md-3">
-        <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('disease')">Download Disease Meta</button>
-      </div>
-      <br />
+        <div style="z-index:500; position: relative" class="col-md-3">
+          <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('plant')">Download Plant Meta</button>
+        </div>
+        <div style="z-index:500; position: relative" class="col-md-3">
+          <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('compound')">Download Compound Meta</button>
+        </div>
+        <div style="z-index:500; position: relative" class="col-md-3">
+          <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('protein')">Download Protein Meta</button>
+        </div>
+        <div style="z-index:500; position: relative" class="col-md-3">
+          <button class="btn btn-success col-md-10 col-md-offset-1 text-center" (click)="downloadTextOutput('disease')">Download Disease Meta</button>
+        </div>
+        <br />
+        <div class="row col-md-12" style="margin-top: 20px; text-align: center">
+          <div class="btn-group">
+            <button type="button" class="btn btn-success" (click)="jumpTo('#connectivityText')">Connectivity Text</button>
+            <button type="button" class="btn btn-success" (click)="jumpTo('#connectivityGraph')">Connectivity Graph</button>
+            <button type="button" class="btn btn-success" (click)="jumpTo('#summary')">Summary</button>
+          </div>
+        </div>
     </div>
 
     </div>
