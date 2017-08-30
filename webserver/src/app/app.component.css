@@ -1,11 +1,3 @@
-html,body{
-  font-family:'Source Sans Pro', sans-serif;
-  color:#666;
-  font-size:16px;
-  font-weight: 400;
-  -webkit-font-smoothing: antialiased;
-  font-smoothing: antialiased;
-}
 
 * {
   text-shadow: 0 1px 1px rgba(255,255,255,.3);
@@ -354,12 +346,6 @@ iframe {
 
 .foot {
   color: #34495e;
-}
-
-footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
 }
 
 .iconSpan {
