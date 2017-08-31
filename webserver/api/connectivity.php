@@ -1,5 +1,5 @@
 <?php
-  include 'config.php';
+  include 'init.php';
 
   $postdata = file_get_contents("php://input");
   $requestList = json_decode($postdata, true);

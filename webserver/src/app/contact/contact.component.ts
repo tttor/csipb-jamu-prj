@@ -9,6 +9,8 @@ import {
 import { Http } from '@angular/http';
 import { ActivatedRoute } from '@angular/router';
 
+import { WebserverConfig } from '../config_webserver';
+
 @Component({
   selector: 'app-contact',
   templateUrl: './contact.component.html',
@@ -21,9 +23,7 @@ export class ContactComponent implements OnInit {
   public msg;
   public subject;
 
-  // private baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  private baseAPI = 'http://localhost/ijah-api/'; // Comment this if you run online!
-  // private baseAPI = 'http://ijah.agri.web.id/api/';
+  public baseAPI = WebserverConfig['api_url'];
 
   constructor(public route: ActivatedRoute, private http: Http) {
     // do nothing

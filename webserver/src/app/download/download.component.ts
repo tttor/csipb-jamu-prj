@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Http } from '@angular/http';
 
+import { WebserverConfig } from '../config_webserver';
+
 declare var saveAs: any;
 
 @Component({
@@ -10,9 +12,7 @@ declare var saveAs: any;
   styleUrls: ['./download.component.css']
 })
 export class DownloadComponent implements OnInit {
-  // private baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  private baseAPI = 'http://localhost/ijah-api/'; // Comment this if you run online!
-  // private baseAPI = 'http://ijah.agri.web.id/api/';
+  public baseAPI = WebserverConfig['api_url'];
 
   constructor(public route: ActivatedRoute, private http: Http) {
   // do nothing

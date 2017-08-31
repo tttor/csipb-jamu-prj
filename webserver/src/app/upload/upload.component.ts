@@ -4,6 +4,8 @@ import { Http, Headers } from '@angular/http';
 import { ActivatedRoute } from '@angular/router';
 import { FileUploader } from 'ng2-file-upload';
 
+import { WebserverConfig } from '../config_webserver';
+
 const uploadURL = 'http://ijah.apps.cs.ipb.ac.id/api-node/upload';
 
 @Component({
@@ -27,9 +29,7 @@ export class UploadComponent implements OnInit {
   public uploader: FileUploader = new FileUploader({url: uploadURL});
   public hasBaseDropZoneOver: boolean = false;
 
-  // private baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  private baseAPI = 'http://localhost/ijah-api/'; // Comment this if you run online!
-  // private baseAPI = 'http://ijah.agri.web.id/api/';
+  public baseAPI = WebserverConfig['api_url'];
 
   constructor(public route: ActivatedRoute, private http: Http) {
   // do nothing

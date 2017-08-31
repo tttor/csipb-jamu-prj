@@ -12,6 +12,8 @@ import { ChartsModule } from 'ng2-charts';
 import { AppState } from '../app.service';
 import { UserInput } from './userinput.interface';
 import { DOCUMENT } from '@angular/platform-browser';
+
+import { WebserverConfig } from '../config_webserver';
 declare var saveAs: any;
 
 @Component({
@@ -20,10 +22,7 @@ declare var saveAs: any;
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  // public baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  // public baseAPI = 'http://ijah.agri.web.id/api/';
-  public baseAPI = 'http://localhost/ijah-api/';
-
+  public baseAPI = WebserverConfig['api_url'];
   public userinput: UserInput;
   public useCaseRadio;
 
