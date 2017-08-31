@@ -50,13 +50,9 @@ fi
 # api
 if [ $6 -ne 0 ]; then
   echo "#### API ##############################################################"
-  echo 'Have you set the _DBlink_ at api/config.php? [0/1]'
-  read dbLinkSet
-  if [ "$dbLinkSet" -ne 0 ]; then
-    echo "deploying APIs ..."
-    scp -r api/* $SERVER:$WEB_DIR/api
-    scp -r api_upload/* $SERVER:/home/ijah/node_api_docker/api_upload/
-  fi
+  echo "deploying APIs ..."
+  rsync -avP webserver/api/* $SERVER:$WEB_DIR/api
+  # scp -r api_upload/* $SERVER:/home/ijah/node_api_docker/api_upload/
 fi
 
 # predictor
