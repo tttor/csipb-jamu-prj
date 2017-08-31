@@ -14,3 +14,7 @@ cp "${MODE}_database_config.json" ../predictor/connectivity/classifier/config_da
 ## predictor ########################################################################################
 echo "making PREDICTOR config..."
 cp "${MODE}_predictor_config.json" ../predictor/connectivity/classifier/config_predictor.json
+
+## webserver ########################################################################################
+echo "making WEBSERVER config..."
+cp "${MODE}_webserver_config.ts" ../webserver/src/app/config_webserver.ts
