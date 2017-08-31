@@ -10,15 +10,12 @@ declare var saveAs: any;
   styleUrls: ['./download.component.css']
 })
 export class DownloadComponent implements OnInit {
-  private baseAPI;
-  // constructor(public route: ActivatedRoute, private http: Http) {
-  //   this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  //   // this.baseAPI = 'http://localhost/ijah-api/';
-  // }
+  // private baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
+  private baseAPI = 'http://localhost/ijah-api/'; // Comment this if you run online!
+  // private baseAPI = 'http://ijah.agri.web.id/api/';
 
-  constructor() {
-  //   this.baseAPI = 'http://ijah.apps.cs.ipb.ac.id/api/';
-  //   // this.baseAPI = 'http://localhost/ijah-api/';
+  constructor(public route: ActivatedRoute, private http: Http) {
+  // do nothing
   }
 
   public ngOnInit() {
@@ -168,28 +165,28 @@ export class DownloadComponent implements OnInit {
     }
   }
 
-  // public download(type) {
-  //   let api = this.baseAPI + 'metadata.php';
-  //   if (type.indexOf('_vs_') !== -1) {
-  //     api = this.baseAPI + 'connectivity.php';
-  //   }
-  //
-  //   let msg = '[{"id":"' + type.toUpperCase() + '_ALL_ROWS"}]';
-  //   this.http.post(api, msg).map((res) => res.json())
-  //     .subscribe((data) => {
-  //       let txt = this.getHeader(type) + '\n';
-  //       for (let i = 0; i < data.length; i++) { // tslint:disable-line
-  //         let props = this.getProps(type);
-  //         for (let j  = 0; j < props.length; j++) {
-  //           txt += data[i][props[j]];
-  //           if (j < props.length - 1) {
-  //             txt += ',';
-  //           }
-  //         }
-  //         txt = txt + '\n';
-  //       }
-  //       let blob = new Blob([txt], {type: 'text/csv;charset=utf-8'});
-  //       saveAs(blob, this.getFilename(type));
-  //     });
-  // }
+  public download(type) {
+    let api = this.baseAPI + 'metadata.php';
+    if (type.indexOf('_vs_') !== -1) {
+      api = this.baseAPI + 'connectivity.php';
+    }
+
+    let msg = '[{"id":"' + type.toUpperCase() + '_ALL_ROWS"}]';
+    this.http.post(api, msg).map((res) => res.json())
+      .subscribe((data) => {
+        let txt = this.getHeader(type) + '\n';
+        for (let i = 0; i < data.length; i++) { // tslint:disable-line
+          let props = this.getProps(type);
+          for (let j  = 0; j < props.length; j++) {
+            txt += data[i][props[j]];
+            if (j < props.length - 1) {
+              txt += ',';
+            }
+          }
+          txt = txt + '\n';
+        }
+        let blob = new Blob([txt], {type: 'text/csv;charset=utf-8'});
+        saveAs(blob, this.getFilename(type));
+      });
+  }
 }

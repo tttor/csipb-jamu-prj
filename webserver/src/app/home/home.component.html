@@ -1,9 +1,5 @@
-<div class="row feature-box">
-  <div class="col-sm-12 col-md-12" id="top">
-    <h1>Ijah Webserver</h1>
-    <h3>Search and Predict (Plant - Compound) - (Protein - Disease) Connectivity</h3>
-  </div>
-</div>
+<h1 class="text-center">Ijah Webserver</h1>
+<h3 class="text-center">Search and Predict (Plant - Compound) - (Protein - Disease) Connectivity</h3>
 
 <div>
   <div class="loading text-center" *ngIf="click">
@@ -14,42 +10,54 @@
 
 <div *ngIf="!click">
   <div class="row" *ngIf="!show">
-    <form class="form-horizontal">
-      <div class="form-group" style="width:60%; margin: 20px auto 20px auto;">
-        <label class="control-label col-md-3">Select Example:</label>
-        <div class="col-md-8">
-          <select name="useCase" class="form-control" [(ngModel)]="userinput.useCase">
-              <option *ngFor="let useCase of useCases" [value]="useCase.value">
-              {{useCase.display}}
-              </option>
-          </select>
+    <form (ngSubmit)="onSubmit()" class="ui form">
+      <div style="margin-bottom: 10px" class="field" class="row col-md-12">
+        <div class="text-center col-md-12">
+          <strong>Use-case Examples:</strong>&ensp;
+          <input type="radio"
+               id="drugSide"
+               value="useCase1"
+               [(ngModel)]="useCaseRadio"
+               name="drugSide" required> Drug-side &ensp;
+          <input type="radio"
+               id="targetSide"
+               value="useCase2"
+               [(ngModel)]="useCaseRadio"
+               name="targetSide" required> Target-side &ensp;
+          <input type="radio"
+               id="bothSide"
+               value="useCase3"
+               [(ngModel)]="useCaseRadio"
+               name="bothSide" required> Both sides
         </div>
       </div>
     </form>
 
-    <div class="text-center" *ngIf="userinput.useCase === 'useCase1'">
-      <button class="btn btn-success"(click)="exampleCallback('plant')">Plant Input</button>
-      <button class="btn btn-success"(click)="exampleCallback('compound')">Compound Input</button>
-    </div>
+    <div class="row">
+      <div class="text-center" *ngIf="useCaseRadio === 'useCase1'">
+        <button class="btn btn-success"(click)="exampleCallback('plant')">Plant Input</button>
+        <button class="btn btn-success"(click)="exampleCallback('compound')">Compound Input</button>
+      </div>
 
-    <div class="text-center" *ngIf="userinput.useCase === 'useCase2'">
-      <button class="btn btn-success"(click)="exampleCallback('protein')">Protein Input</button>
-      <button class="btn btn-success"(click)="exampleCallback('disease')">Disease Input</button>
-    </div>
+      <div class="text-center" *ngIf="useCaseRadio === 'useCase2'">
+        <button class="btn btn-success"(click)="exampleCallback('protein')">Protein Input</button>
+        <button class="btn btn-success"(click)="exampleCallback('disease')">Disease Input</button>
+      </div>
 
-    <div class="text-center" *ngIf="userinput.useCase === 'useCase3'">
-      <button class="btn btn-success"(click)="exampleCallback('plant_vs_disease')">Plant and Disease Input</button>
-      <button class="btn btn-success"(click)="exampleCallback('plant_vs_protein')">Plant and Protein Input</button>
-      <button class="btn btn-success"(click)="exampleCallback('compound_vs_protein')">Compound and Protein Input</button>
-      <button class="btn btn-success"(click)="exampleCallback('compound_vs_disease')">Compound and Disease Input</button>
+      <div class="text-center" *ngIf="useCaseRadio === 'useCase3'">
+        <button class="btn btn-success"(click)="exampleCallback('plant_vs_disease')">Plant and Disease Input</button>
+        <button class="btn btn-success"(click)="exampleCallback('plant_vs_protein')">Plant and Protein Input</button>
+        <button class="btn btn-success"(click)="exampleCallback('compound_vs_protein')">Compound and Protein Input</button>
+        <button class="btn btn-success"(click)="exampleCallback('compound_vs_disease')">Compound and Disease Input</button>
+      </div>
     </div>
 
   <div class="card card-3">
-    <div class="row text-center">
+    <!-- <div class="row text-center">
       <h3>
         Formula 1
       </h3>
-    </div>
+    </div> -->
     <div class="col-md-6">
       <div class="row text-center">
         <h3>
@@ -229,12 +237,11 @@
         <button class="form-control btn btn-success" (click)="searchAndPredictButtonCallback()"> Search <span *ngIf="(this.selectedPlants.length!==0 || this.selectedCompounds.length!==0) && (this.selectedProteins.length!==0 || this.selectedDiseases.length!==0)">and Predict</span></button>
       </a>
     </div>
-    <div class="col-md-2 col-md-offset-2" style="margin-right: 0px">
-      <!-- <div class="fab fab6"> -->
+    <!-- <div class="col-md-2 col-md-offset-2" style="margin-right: 0px">
       <button class="form-control btn btn-success">
           +  More Formula
     </button>
-    </div>
+    </div> -->
   </div>
   <br />
   <div class="row" *ngIf="!show">
@@ -244,47 +251,6 @@
   </div>
 
   <div class="row" *ngIf="show">
-    <!-- The control buttons on bottom ///////////////////////////////////// -->
-    <!-- First row ///////////////////////////////////////////////////////// -->
-      <!-- <div style="z-index:10000000; position: fixed" class="card-fixed" id="buttoncard">
-        <div class="row">
-          <div class="col-md-10 col-md-offset-1">
-            <div style="z-index:500; position: relative" class="col-md-3">
-              <a style="color:white" pageScroll href="#metadataText" class="btn btn-info col-md-12 text-center">MetaText</a>
-            </div>
-            <div style="z-index:500; position: relative" class="col-md-3">
-              <a style="color:white" pageScroll href="#connectivityText" class="btn btn-info col-md-12 text-center">ConnText</a>
-            </div>
-            <div style="z-index:500; position: relative" class="col-md-3">
-              <a style="color:white" pageScroll href="#connectivityGraph" class="btn btn-info col-md-12 text-center">ConnGraph</a>
-            </div>
-            <div style="z-index:500; position: relative" class="col-md-3">
-              <a style="color:white" pageScroll href="#top" class="btn btn-info col-md-12 text-center">Summary</a>
-            </div>
-          </div>
-        </div>
-      <!-- Second row ////////////////////////////////////////////////////// -->
-        <!--<div class="row">
-          <div *ngIf="(this.mode.indexOf('predict')==-1)" style="z-index:500; position: relative; padding-top:8px"
-          class="col-md-8 col-md-offset-3">
-            <div class="btn-toolbar text-center">
-              <button class="btn btn-danger col-md-3 text-center"(click)="backButtonCallback()">Back</button>
-              <button class="btn btn-danger col-md-3 text-center"(click)="filter()">Filter {{filterThreshold}}</button>
-              <button class="btn btn-danger col-md-3 text-center"(click)="reset()">Reset</button>
-            </div>
-          </div>
-          <div *ngIf="(this.mode.indexOf('predict')!==-1)" style="z-index:500; position: relative; padding-top:8px;
-          margin-left:21.3%" class="col-md-8">
-            <div class="btn-toolbar text-center">
-              <button class="btn btn-danger col-md-2 text-center"(click)="backButtonCallback()">Back</button>
-              <button class="btn btn-danger col-md-3 text-center"(click)="filter()">Filter {{filterThreshold}}</button>
-              <button class="btn btn-danger col-md-3 text-center"(click)="predictMore()">Predict More</button>
-              <button class="btn btn-danger col-md-2 text-center"(click)="reset()">Reset</button>
-            </div>
-          </div>
-        </div>
-    </div> -->
-
     <!-- The output handling /////////////////////////////////////////////// -->
     <div>
     <!-- The new summary test //////////////////////////////////////////////// -->

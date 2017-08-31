@@ -25,6 +25,7 @@ export class HomeComponent implements OnInit {
   public baseAPI = 'http://localhost/ijah-api/';
 
   public userinput: UserInput;
+  public useCaseRadio;
 
   // count number of input rows
   public nPlaInputHolders = 0;
@@ -272,6 +273,7 @@ export class HomeComponent implements OnInit {
     this.userinput = {
       useCase: 'default'
     };
+    this.useCaseRadio = 'useCase1';
   }
 
   public changeTypeaheadNoResults(e: boolean, id): void {
