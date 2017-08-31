@@ -1,6 +1,6 @@
 <?php
 
-  include 'config.php';
+  include 'init.php';
   require 'libphp-phpmailer/PHPMailerAutoload.php';
   require_once('libphp-phpmailer/class.smtp.php');
 

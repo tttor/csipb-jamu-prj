@@ -1,6 +1,6 @@
 <?php
 
-  include 'config.php';
+  include 'init.php';
   $query = pg_query($link, 'SELECT * FROM total_view');
 
   $array = array();
